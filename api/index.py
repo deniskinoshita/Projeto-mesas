@@ -1065,17 +1065,29 @@ select option{background:#1A1A1A}
     <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px"></div>
   </div>
 
-  <div class="grid-2" style="margin-bottom:0">
-    <div>
-      <label>Relatório XP (PDF) *</label>
-      <div class="upload-area" id="drop1">
-        <input type="file" id="pdf-xp" accept=".pdf">
-        <div class="icon">📊</div>
-        <p>XPerformance — arraste ou clique</p>
-        <p class="fname" id="fname-xp"></p>
-      </div>
+  <div style="margin-bottom:10px">
+    <label>Relatório XPerformance (PDF) *</label>
+    <div class="upload-area" id="drop1">
+      <input type="file" id="pdf-xp" accept=".pdf">
+      <div class="icon">📊</div>
+      <p>XPerformance — arraste ou clique para identificar o cliente</p>
+      <p class="fname" id="fname-xp"></p>
     </div>
   </div>
+
+  <!-- Painel do cliente identificado — aparece automaticamente após o upload -->
+  <div id="box-cliente-identificado" style="margin-top:10px;background:#111;border:1px solid #2A2A2A;border-radius:10px;padding:14px;display:none;transition:all .3s"></div>
+  <script>
+    // Mostra o painel assim que tiver conteúdo
+    const _obs = new MutationObserver(()=>{
+      const b = document.getElementById("box-cliente-identificado");
+      if(b) b.style.display = b.innerHTML.trim() ? "block" : "none";
+    });
+    document.addEventListener("DOMContentLoaded",()=>{
+      const b = document.getElementById("box-cliente-identificado");
+      if(b) _obs.observe(b, {childList:true, subtree:true});
+    });
+  </script>
 </div>
 
 <!-- Modelo de Servir — card separado, sempre visível -->
@@ -1541,12 +1553,162 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
 
 function setupDrop(dropId,inputId,fnameId){
   const drop=document.getElementById(dropId), input=document.getElementById(inputId), fname=document.getElementById(fnameId);
-  input.addEventListener("change",()=>{ fname.textContent=input.files[0]?.name||""; });
+  input.addEventListener("change",()=>{
+    fname.textContent=input.files[0]?.name||"";
+    if(input.files[0]) identificarCliente(input.files[0]);
+  });
   drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("drag");});
   drop.addEventListener("dragleave",()=>drop.classList.remove("drag"));
-  drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("drag");input.files=e.dataTransfer.files;fname.textContent=e.dataTransfer.files[0]?.name||"";});
+  drop.addEventListener("drop",e=>{
+    e.preventDefault();drop.classList.remove("drag");
+    input.files=e.dataTransfer.files;
+    fname.textContent=e.dataTransfer.files[0]?.name||"";
+    if(e.dataTransfer.files[0]) identificarCliente(e.dataTransfer.files[0]);
+  });
 }
 setupDrop("drop1","pdf-xp","fname-xp");
+
+// ── Identificação automática do cliente ao subir o XPerformance ──────────────
+let _clienteIdentificado = null;
+
+async function identificarCliente(file){
+  const box = document.getElementById("box-cliente-identificado");
+  if(box) box.innerHTML = '<div style="font-size:12px;color:#555;padding:8px">Identificando cliente...</div>';
+
+  const fd = new FormData();
+  fd.append("pdf", file);
+  try{
+    const r = await fetch("/api/xp-identificar", {method:"POST", body:fd});
+    const d = await r.json();
+    _clienteIdentificado = d;
+
+    // Preenche campos do formulário automaticamente
+    if(d.ficha_salva?.nome) document.getElementById("nome").value = d.ficha_salva.nome;
+    if(d.ficha_salva?.perfil){ document.getElementById("perfil").value = d.ficha_salva.perfil; atualizarModelo(); }
+    if(d.ficha_salva?.objetivo) document.getElementById("objetivo").value = d.ficha_salva.objetivo || "";
+
+    // Restaura checklist do modelo de servir salvo
+    if(d.ficha_salva?.checklist){
+      Object.assign(checklist, d.ficha_salva.checklist);
+      PILARES.forEach(p=>{
+        const feito = !!checklist[p.id];
+        if(!feito) return;
+        const el  = document.getElementById("pilar-"+p.id);
+        if(el){ el.style.background="#0A1A10"; el.style.border="1.5px solid #2A5040"; }
+        const chk = document.getElementById("chk-"+p.id);
+        if(chk){ chk.style.background="#5DCAA5"; chk.style.borderColor="#5DCAA5"; chk.textContent="✓"; chk.style.color="#000"; }
+        const nEl = document.getElementById("nome-"+p.id);
+        if(nEl) nEl.style.color="#5DCAA5";
+        const det = document.getElementById("det-"+p.id);
+        if(det) det.style.display="none";
+      });
+      atualizarGraficoServir();
+    }
+
+    // Restaura cross-sell salvo
+    if(d.ficha_salva?.cross_ativos?.length){
+      CROSS_AREAS.forEach(a=>{ crossSell[a.id]=false; });
+      d.ficha_salva.cross_ativos.forEach(id=>{ crossSell[id]=true; });
+      renderCrossForm();
+    }
+
+    // Renderiza painel de histórico
+    renderPainelCliente(d);
+  }catch(e){
+    if(box) box.innerHTML = "";
+    console.error("Identificação falhou:", e);
+  }
+}
+
+function renderPainelCliente(d){
+  const box = document.getElementById("box-cliente-identificado");
+  if(!box) return;
+
+  const temFicha = d.ficha_salva && Object.keys(d.ficha_salva).length > 0;
+  const temHist  = d.tem_historico && d.ultima_carteira;
+  const rent     = d.rent?.portfolio || {};
+
+  // ── Cabeçalho da conta identificada
+  let html = `
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="font-size:22px">📋</div>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:700;color:#D6B27A">${d.nome_cliente || "Cliente " + d.conta}</div>
+      <div style="font-size:11px;color:#555">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:16px;font-weight:700;color:#F0F0F0">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</div>
+      ${rent["12m"] ? `<div style="font-size:11px;color:#5DCAA5">${rent["12m"].toFixed(2)}% em 12M</div>` : ""}
+    </div>
+  </div>`;
+
+  // ── Status do Modelo de Servir
+  const chk = d.ficha_salva?.checklist || {};
+  const nFeitos = PILARES.filter(p=>chk[p.id]).length;
+  const nTotal  = PILARES.length;
+  const scoreCor = nFeitos >= 5 ? "#5DCAA5" : nFeitos >= 3 ? "#FFD966" : "#FF6B6B";
+
+  if(temFicha){
+    html += `
+    <div style="background:#0D0D0D;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #1E1E1E">
+      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${PILARES.map(p=>{
+          const feito = !!chk[p.id];
+          return `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:${feito?"#0A2018":"#1A0808"};color:${feito?"#5DCAA5":"#FF6B6B"};border:1px solid ${feito?"#2A5040":"#4A1010"}">
+            ${feito?"✓":"✕"} ${p.icone} ${p.nome}
+          </span>`;
+        }).join("")}
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:${scoreCor};font-weight:700">${nFeitos}/${nTotal} pilares completos</div>
+      ${d.ficha_salva.cross_ativos?.length ? `
+        <div style="margin-top:8px;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
+        <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
+          ${d.ficha_salva.cross_ativos.map(id=>{
+            const a = CROSS_AREAS.find(x=>x.id===id);
+            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#1A1600;color:#D6B27A;border:1px solid #D6B27A">${a.icone} ${a.nome}</span>` : "";
+          }).join("")}
+        </div>` : ""}
+    </div>`;
+  } else {
+    html += `<div style="font-size:12px;color:#555;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
+  }
+
+  // ── Comparativo vs. última carteira salva
+  if(temHist && d.comparativo?.length){
+    const ult = d.ultima_carteira;
+    html += `
+    <div style="background:#0D0D0D;border-radius:8px;padding:10px 14px;border:1px solid #1E1E1E">
+      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+        Comparativo — Última reunião (${ult.data_ref || ult.salvo_em}) vs. Hoje (${d.data_ref})
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
+        ${d.comparativo.filter(c=>c.anterior>0||c.atual>0).map(c=>{
+          const dCor = c.delta>1?"#FF6B6B":c.delta<-1?"#5DCAA5":"#555";
+          const sinal = c.delta>0?"+":"";
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#141414;border-radius:6px;font-size:11px">
+            <span style="color:#888">${c.label}</span>
+            <span style="color:#555">${c.anterior.toFixed(1)}%</span>
+            <span style="color:#333">→</span>
+            <span style="color:#F0F0F0;font-weight:700">${c.atual.toFixed(1)}%</span>
+            <span style="color:${dCor};font-weight:700;min-width:38px;text-align:right">${sinal}${c.delta.toFixed(1)}%</span>
+          </div>`;
+        }).join("")}
+      </div>
+      <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#555">
+        <span>Patrimônio anterior: <b style="color:#888">R$ ${(ult.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
+        <span>Atual: <b style="color:#D6B27A">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
+        ${(d.patrimonio||0)-(ult.patrimonio||0) ? `<span style="color:${(d.patrimonio||0)>(ult.patrimonio||0)?"#5DCAA5":"#FF6B6B"}">
+          ${(d.patrimonio||0)>(ult.patrimonio||0)?"+":""}R$ ${((d.patrimonio||0)-(ult.patrimonio||0)).toLocaleString("pt-BR",{maximumFractionDigits:0})}
+        </span>` : ""}
+      </div>
+    </div>`;
+  } else if(!temHist){
+    html += `<div style="font-size:11px;color:#444;padding:6px 0">📌 Após analisar, o sistema salvará esta carteira como referência para o próximo comparativo.</div>`;
+  }
+
+  box.innerHTML = html;
+}
 
 function tab(name){
   const TABS=["desvios","recomendacoes","servir","crosssell","gestores","sugestoes"];
@@ -1795,6 +1957,36 @@ async function analisar(){
 
     renderizar(analiseData);
     if(analiseData._xp) renderAnaliseHP(analiseData._xp);
+
+    // Salva snapshot da carteira para comparativo futuro
+    if(_clienteIdentificado?.conta && analiseData._xp){
+      const xp = analiseData._xp;
+      fetch("/api/salvar-carteira", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          conta: _clienteIdentificado.conta,
+          data_ref: xp.data_ref || "",
+          patrimonio: xp.patrimonio || 0,
+          composicao: xp.comp || {},
+          rent: xp.rent || {},
+        })
+      }).catch(()=>{});
+    }
+
+    // Salva ficha atualizada (modelo de servir + cross-sell + código da conta)
+    if(_clienteIdentificado?.conta){
+      fetch("/api/ficha", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          conta: _clienteIdentificado.conta,
+          nome, perfil, objetivo, assessor,
+          checklist,
+          cross_ativos: Object.keys(crossSell).filter(k=>crossSell[k]),
+        })
+      }).catch(()=>{});
+    }
   }catch(e){ alert("Erro: "+e.message); }
   finally{
     document.getElementById("spinner").classList.remove("show");
@@ -2489,8 +2681,11 @@ def ficha_endpoint():
     fichas = load_fichas()
     if request.method == "POST":
         d = request.get_json()
-        key = f"{d.get('assessor','')}|{d.get('nome','')}".lower().strip()
+        # Chave primária: código da conta (preferencial) ou assessor|nome
+        conta = d.get("conta","").strip()
+        key = f"conta:{conta}" if conta else f"{d.get('assessor','')}|{d.get('nome','')}".lower().strip()
         fichas[key] = {
+            "conta": conta,
             "nome": d.get("nome",""),
             "assessor": d.get("assessor",""),
             "perfil": d.get("perfil","conservadora"),
@@ -2501,11 +2696,91 @@ def ficha_endpoint():
         }
         save_fichas(fichas)
         return jsonify({"ok":True})
-    # GET: retorna fichas de um assessor
+    # GET: retorna fichas de um assessor OU de uma conta específica
+    conta = request.args.get("conta","").strip()
+    if conta:
+        ficha = fichas.get(f"conta:{conta}") or fichas.get(conta)
+        return jsonify(ficha or {})
     assessor = request.args.get("assessor","").lower().strip()
-    result = [v for k,v in fichas.items() if k.startswith(assessor+"|")]
+    result = [v for k,v in fichas.items() if k.startswith(assessor+"|") or (v.get("assessor","").lower()==assessor)]
     result.sort(key=lambda x: x.get("nome",""))
     return jsonify(result)
+
+
+@app.route("/api/xp-identificar", methods=["POST"])
+def xp_identificar():
+    """Recebe o PDF XPerformance, extrai o código do cliente e retorna dados salvos."""
+    f = request.files.get("pdf")
+    if not f:
+        return jsonify({"erro": "PDF não enviado"}), 400
+
+    pdf_bytes = f.read()
+    xp = extrair_xperformance(pdf_bytes)
+    conta = xp.get("conta", "").strip()
+
+    # Busca ficha salva para este código de conta
+    fichas = load_fichas()
+    ficha = fichas.get(f"conta:{conta}") or fichas.get(conta) or {}
+
+    # Busca histórico de carteiras salvas
+    hist = load_hist()
+    historico_conta = hist.get(conta, [])
+    ultima_carteira = historico_conta[-1] if historico_conta else None
+
+    # Calcula comparativo vs. última carteira salva
+    comparativo = []
+    if ultima_carteira:
+        comp_ant = ultima_carteira.get("composicao", {})
+        comp_atual = xp.get("comp", {})
+        for cat in CATS:
+            ant = comp_ant.get(cat, 0)
+            atual = comp_atual.get(cat, 0)
+            delta = round(atual - ant, 2)
+            if ant > 0 or atual > 0:
+                comparativo.append({
+                    "cat": cat,
+                    "label": LABELS.get(cat, cat),
+                    "anterior": ant,
+                    "atual": atual,
+                    "delta": delta,
+                })
+
+    return jsonify({
+        "conta": conta,
+        "assessor_xp": xp.get("assessor",""),
+        "nome_cliente": ficha.get("nome",""),
+        "data_ref": xp.get("data_ref",""),
+        "patrimonio": xp.get("patrimonio", 0),
+        "rent": xp.get("rent", {}),
+        "composicao_atual": xp.get("comp", {}),
+        "ficha_salva": ficha,          # modelo de servir + cross-sell salvos
+        "ultima_carteira": ultima_carteira,
+        "comparativo": comparativo,    # delta vs. última reunião
+        "tem_historico": len(historico_conta) > 0,
+    })
+
+
+@app.route("/api/salvar-carteira", methods=["POST"])
+def salvar_carteira():
+    """Salva snapshot da carteira atual para histórico comparativo futuro."""
+    d = request.get_json()
+    conta = d.get("conta","").strip()
+    if not conta:
+        return jsonify({"erro": "conta obrigatória"}), 400
+    hist = load_hist()
+    if conta not in hist:
+        hist[conta] = []
+    hist[conta].append({
+        "data_ref": d.get("data_ref",""),
+        "patrimonio": d.get("patrimonio", 0),
+        "composicao": d.get("composicao", {}),
+        "rent": d.get("rent", {}),
+        "salvo_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+    })
+    # Mantém apenas as últimas 12 carteiras
+    hist[conta] = hist[conta][-12:]
+    save_hist(hist)
+    return jsonify({"ok": True, "snapshots": len(hist[conta])})
 
 @app.route("/api/clientes/<cid>/nota", methods=["POST"])
 def set_nota(cid):
