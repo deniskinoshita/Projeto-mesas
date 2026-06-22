@@ -667,7 +667,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     import matplotlib.pyplot as plt
     import numpy as np
 
-    PRETO=colors.HexColor("#0D0D0D"); DOURADO=colors.HexColor("#D6B27A"); DESC=colors.HexColor("#A07840")
+    PRETO=colors.HexColor("#0D0D0D"); DOURADO=colors.HexColor("#C9A96E"); DESC=colors.HexColor("#A07840")
     CESC=colors.HexColor("#1A1A1A"); CMED=colors.HexColor("#2C2C2C"); BRANCO=colors.white
     VERM=colors.HexColor("#FF6B6B"); VERDE=colors.HexColor("#5DCAA5"); AMARELO=colors.HexColor("#FFD966")
     LARANJA=colors.HexColor("#FF8C00")
@@ -772,7 +772,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     x=np.arange(len(lbs)); w=0.35
     fig,ax=plt.subplots(figsize=(10,4))
     fig.patch.set_facecolor("#0D0D0D"); ax.set_facecolor("#1A1A1A")
-    ax.bar(x-w/2,rea,w,color="#D6B27A",zorder=3,linewidth=0)
+    ax.bar(x-w/2,rea,w,color="#C9A96E",zorder=3,linewidth=0)
     ax.bar(x+w/2,alv,w,color="#444",zorder=3,linewidth=0)
     ax.set_xticks(x); ax.set_xticklabels(lbs,rotation=28,ha="right",color="white",fontsize=8)
     ax.tick_params(colors="white"); ax.spines[:].set_color("#2C2C2C")
@@ -841,66 +841,66 @@ HTML = r"""<!DOCTYPE html>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0D0D0D;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#111;border-bottom:1px solid #222;padding:14px 28px;display:flex;align-items:center;gap:12px}
-header h1{font-size:18px;color:#D6B27A;font-weight:700;letter-spacing:.5px}
+header h1{font-size:18px;color:#C9A96E;font-weight:700;letter-spacing:.5px}
 header p{font-size:11px;color:#555;margin-top:2px}
 .container{max-width:1020px;margin:0 auto;padding:28px 20px}
 .card{background:#141414;border:1px solid #222;border-radius:12px;padding:22px;margin-bottom:18px}
-.card h2{font-size:12px;color:#D6B27A;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.card h2{font-size:12px;color:#C9A96E;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 label{font-size:12px;color:#777;display:block;margin-bottom:5px}
 input,select{width:100%;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:8px;padding:9px 12px;color:#F0F0F0;font-size:13px;outline:none;transition:border .2s}
-input:focus,select:focus{border-color:#D6B27A}
+input:focus,select:focus{border-color:#C9A96E}
 select option{background:#1A1A1A}
 .upload-area{border:1.5px dashed #2A2A2A;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#111}
-.upload-area:hover,.upload-area.drag{border-color:#D6B27A;background:#1A1A1A}
+.upload-area:hover,.upload-area.drag{border-color:#C9A96E;background:#1A1A1A}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
 .upload-area p{font-size:13px;color:#666}
-.upload-area .fname{color:#D6B27A;font-weight:600;font-size:13px;margin-top:6px}
-.btn{width:100%;background:#D6B27A;color:#0D0D0D;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.upload-area .fname{color:#C9A96E;font-weight:600;font-size:13px;margin-top:6px}
+.btn{width:100%;background:#C9A96E;color:#0D0D0D;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.88}.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-out{background:transparent;color:#D6B27A;border:1px solid #D6B27A}
+.btn-out{background:transparent;color:#C9A96E;border:1px solid #C9A96E}
 .btn-out:hover{background:#1A1A1A}
 .metric{background:#1A1A1A;border-radius:10px;padding:14px;text-align:center}
 .metric .lbl{font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.metric .val{font-size:20px;font-weight:700;color:#D6B27A}
+.metric .val{font-size:20px;font-weight:700;color:#C9A96E}
 .metric .val.danger{color:#FF6B6B}.metric .val.ok{color:#5DCAA5}
 .desvio-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1A1A1A;font-size:12px}
 .desvio-row:last-child{border:none}
 .dn{width:106px;font-weight:500}.da{width:46px;color:#777;font-size:11px}
 .db-w{flex:1;background:#1A1A1A;border-radius:3px;height:5px;overflow:hidden}
-.db{height:100%;background:#D6B27A;border-radius:3px;transition:width .5s}
+.db{height:100%;background:#C9A96E;border-radius:3px;transition:width .5s}
 .dalvo{width:52px;color:#444;font-size:10px}
 .dpp{width:60px;text-align:right;font-weight:700;font-size:11px}
 .red{color:#FF6B6B}.grn{color:#5DCAA5}.dim{color:#333}
 .alert{border-radius:8px;padding:10px 14px;margin:5px 0;font-size:12px;line-height:1.5}
 .alert.danger{background:#2A1010;border-left:3px solid #FF6B6B;color:#FFB3B3}
 .alert.success{background:#0A2018;border-left:3px solid #5DCAA5;color:#9FE1CB}
-.alert.gold{background:#1A160A;border-left:3px solid #D6B27A;color:#D6B27A}
+.alert.gold{background:#1A160A;border-left:3px solid #C9A96E;color:#C9A96E}
 .alert.warn{background:#1A1500;border-left:3px solid #FFD966;color:#FFD966}
 .rec-card{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #2A2A2A}
 .rec-header{font-size:13px;font-weight:700;margin-bottom:6px}
 .rec-ctx{font-size:12px;color:#AAA;line-height:1.5;margin-bottom:6px}
-.rec-carta{font-size:11px;color:#888;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#111;border-radius:6px;border-left:2px solid #D6B27A}
+.rec-carta{font-size:11px;color:#888;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#111;border-radius:6px;border-left:2px solid #C9A96E}
 .rec-prods{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.prod-tag{background:#0D0D0D;border:1px solid #333;border-radius:20px;padding:3px 10px;font-size:11px;color:#D6B27A}
+.prod-tag{background:#0D0D0D;border:1px solid #333;border-radius:20px;padding:3px 10px;font-size:11px;color:#C9A96E}
 .gestor-card{background:#1A1A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #333}
-.gestor-nome{font-size:11px;color:#D6B27A;font-weight:700;margin-bottom:3px}
+.gestor-nome{font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:3px}
 .gestor-msg{font-size:11px;color:#888;line-height:1.4}
 .gestor-impl{font-size:11px;color:#5DCAA5;margin-top:3px}
 .macro-badge{display:inline-flex;align-items:center;gap:6px;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:20px;padding:4px 12px;font-size:12px;margin:3px}
-.macro-badge span{color:#D6B27A;font-weight:700}
+.macro-badge span{color:#C9A96E;font-weight:700}
 #results{display:none}
-.spinner{display:none;text-align:center;padding:32px;color:#D6B27A}
+.spinner{display:none;text-align:center;padding:32px;color:#C9A96E}
 .spinner.show{display:block}
-.loader{width:36px;height:36px;border:3px solid #222;border-top-color:#D6B27A;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+.loader{width:36px;height:36px;border:3px solid #222;border-top-color:#C9A96E;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .chart-wrap{position:relative;width:100%;height:250px}
 .tab-btns{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .tab-btn{background:#1A1A1A;border:1px solid #2A2A2A;border-radius:8px;padding:6px 14px;font-size:12px;color:#888;cursor:pointer;transition:all .2s}
-.tab-btn.active{background:#D6B27A;color:#0D0D0D;border-color:#D6B27A;font-weight:700}
+.tab-btn.active{background:#C9A96E;color:#0D0D0D;border-color:#C9A96E;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
 .rodape{text-align:center;font-size:11px;color:#333;margin-top:32px;padding-top:14px;border-top:1px solid #1A1A1A}
 /* Checklist Modelo de Servir */
@@ -918,18 +918,18 @@ select option{background:#1A1A1A}
 .badge-crit{background:#FF2222;color:#fff}
 .badge-high{background:#FFD966;color:#000}
 .badge-med{background:#444;color:#aaa}
-.badge-dir{background:#D6B27A;color:#000}
+.badge-dir{background:#C9A96E;color:#000}
 .pilar-desc{font-size:11px;color:#555;line-height:1.4}
 .pilar-falta{display:none;margin-top:10px;padding:10px;background:#0D0D0D;border-radius:8px;border-left:3px solid #FF6B6B}
 .pilar-falta.show{display:block}
 .pilar-falta.warn{border-left-color:#FFD966}
 .pilar-falta.med{border-left-color:#555}
 .pilar-falta p{font-size:11px;color:#AAA;line-height:1.6;margin-bottom:6px}
-.pilar-falta .acao{font-size:11px;color:#D6B27A;line-height:1.5;padding:8px;background:#1A1600;border-radius:6px;margin-top:6px}
-.pilar-falta .diretriz-badge{font-size:10px;color:#D6B27A;font-weight:700;margin-top:6px;padding:4px 8px;background:#1A1600;border:1px solid #D6B27A;border-radius:4px;display:inline-block}
+.pilar-falta .acao{font-size:11px;color:#C9A96E;line-height:1.5;padding:8px;background:#1A1600;border-radius:6px;margin-top:6px}
+.pilar-falta .diretriz-badge{font-size:10px;color:#C9A96E;font-weight:700;margin-top:6px;padding:4px 8px;background:#1A1600;border:1px solid #C9A96E;border-radius:4px;display:inline-block}
 /* Placard de score */
 .servir-score{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:10px;background:#111;border:1px solid #2A2A2A;margin-bottom:14px}
-.score-num{font-size:36px;font-weight:700;color:#D6B27A;min-width:56px;text-align:center}
+.score-num{font-size:36px;font-weight:700;color:#C9A96E;min-width:56px;text-align:center}
 .score-info{flex:1}
 .score-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .score-bar-w{height:6px;background:#222;border-radius:3px;overflow:hidden}
@@ -947,31 +947,31 @@ select option{background:#1A1A1A}
 .status-ok{background:#0A2018;color:#5DCAA5}
 .status-pendente{background:#2A1010;color:#FF6B6B}
 .pilar-result-impacto{font-size:11px;color:#888;line-height:1.5;margin-bottom:6px}
-.pilar-result-acao{font-size:11px;color:#D6B27A;padding:8px;background:#111;border-radius:6px}
+.pilar-result-acao{font-size:11px;color:#C9A96E;padding:8px;background:#111;border-radius:6px}
 /* Cross Sell chips */
 .cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #2A2A2A;background:#111;cursor:pointer;font-size:12px;font-weight:600;color:#777;transition:all .2s;user-select:none}
-.cs-chip:hover{border-color:#D6B27A;color:#D6B27A}
-.cs-chip.ativo{background:#1A1600;border-color:#D6B27A;color:#D6B27A}
+.cs-chip:hover{border-color:#C9A96E;color:#C9A96E}
+.cs-chip.ativo{background:#1A1600;border-color:#C9A96E;color:#C9A96E}
 .cs-chip .cs-icon{font-size:16px}
 .cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #333;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
-.cs-chip.ativo .cs-check{background:#D6B27A;border-color:#D6B27A;color:#0D0D0D;font-weight:900}
+.cs-chip.ativo .cs-check{background:#C9A96E;border-color:#C9A96E;color:#0D0D0D;font-weight:900}
 /* Cross sell result cards */
 .cs-area{background:#1A1A1A;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #2A2A2A}
 .cs-area.tem{border-left:4px solid #5DCAA5;opacity:.7}
-.cs-area.nao-tem{border-left:4px solid #D6B27A}
+.cs-area.nao-tem{border-left:4px solid #C9A96E}
 .cs-area-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .cs-area-nome{font-size:14px;font-weight:700;flex:1}
 .cs-status-tag{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700}
 .cs-tem-tag{background:#0A2018;color:#5DCAA5}
-.cs-falta-tag{background:#1A1600;color:#D6B27A}
-.cs-pitch{font-size:12px;color:#D6B27A;font-style:italic;padding:10px 12px;background:#111;border-radius:8px;border-left:3px solid #D6B27A;margin-bottom:10px;line-height:1.6}
+.cs-falta-tag{background:#1A1600;color:#C9A96E}
+.cs-pitch{font-size:12px;color:#C9A96E;font-style:italic;padding:10px 12px;background:#111;border-radius:8px;border-left:3px solid #C9A96E;margin-bottom:10px;line-height:1.6}
 .cs-ops{list-style:none;padding:0}
 .cs-ops li{font-size:11px;color:#888;padding:5px 0;border-bottom:1px solid #1A1A1A;line-height:1.5}
 .cs-ops li:last-child{border:none}
-.cs-ops li::before{content:"→ ";color:#D6B27A}
+.cs-ops li::before{content:"→ ";color:#C9A96E}
 /* Especialista FP */
 .fp-bloco{background:#111;border-radius:10px;padding:14px;margin-top:10px;border:1px solid #2A2A2A}
-.fp-bloco-titulo{font-size:12px;font-weight:700;color:#D6B27A;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fp-bloco-titulo{font-size:12px;font-weight:700;color:#C9A96E;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .fp-bloco p{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px}
 .fp-bloco .fp-item{padding:6px 0;border-bottom:1px solid #1A1A1A;font-size:11px;color:#AAA;line-height:1.5}
 .fp-bloco .fp-item:last-child{border:none}
@@ -981,7 +981,7 @@ select option{background:#1A1A1A}
 .cs-score-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-radius:10px;border:1px solid #2A2A2A;margin-bottom:14px}
 /* Sugestões de Alocação */
 .sg-bloco{background:#111;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #2A2A2A}
-.sg-bloco-title{font-size:11px;font-weight:700;color:#D6B27A;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sg-bloco-title{font-size:11px;font-weight:700;color:#C9A96E;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .sg-card{background:#1A1A1A;border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid #2A2A2A;position:relative}
 .sg-card.urg-alta{border-left-color:#FF6B6B}
 .sg-card.urg-media{border-left-color:#FFD966}
@@ -989,7 +989,7 @@ select option{background:#1A1A1A}
 .sg-card .sg-topo{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .sg-card .sg-acao{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;background:#2A2A2A;color:#AAA}
 .sg-card .sg-produto{font-size:13px;font-weight:700;color:#F0F0F0;flex:1}
-.sg-card .sg-idx{font-size:10px;color:#D6B27A;padding:2px 7px;border-radius:6px;background:#1A1600;border:1px solid #D6B27A}
+.sg-card .sg-idx{font-size:10px;color:#C9A96E;padding:2px 7px;border-radius:6px;background:#1A1600;border:1px solid #C9A96E}
 .sg-card .sg-motivo{font-size:11px;color:#888;line-height:1.5;margin-top:4px}
 .sg-card .sg-de{font-size:11px;color:#FF6B6B;margin-bottom:4px}
 .sg-card .sg-fonte{font-size:10px;color:#555;margin-top:4px}
@@ -1000,20 +1000,20 @@ select option{background:#1A1A1A}
 .sg-fii-table th{text-align:left;color:#555;font-weight:600;padding:5px 8px;border-bottom:1px solid #2A2A2A;font-size:10px;text-transform:uppercase}
 .sg-fii-table td{padding:7px 8px;border-bottom:1px solid #1A1A1A;color:#CCC}
 .sg-fii-table tr:last-child td{border:none}
-.sg-fii-table .fii-ticker{color:#D6B27A;font-weight:700}
-.sg-header-box{background:#1A1600;border:1px solid #D6B27A;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sg-fii-table .fii-ticker{color:#C9A96E;font-weight:700}
+.sg-header-box{background:#1A1600;border:1px solid #C9A96E;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .sg-vazio{font-size:13px;color:#5DCAA5;padding:16px;text-align:center}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 /* ── Fluxo em 2 etapas ── */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
 .step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#141414;border:1px solid #222;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
-.step-item.active{background:#1A1600;border-color:#D6B27A}
+.step-item.active{background:#1A1600;border-color:#C9A96E}
 .step-item.done{background:#0A1A10;border-color:#2A4030}
 .step-circle{width:26px;height:26px;border-radius:50%;background:#222;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#555;flex-shrink:0;transition:all .3s}
-.step-item.active .step-circle{background:#D6B27A;border-color:#D6B27A;color:#0D0D0D}
+.step-item.active .step-circle{background:#C9A96E;border-color:#C9A96E;color:#0D0D0D}
 .step-item.done .step-circle{background:#5DCAA5;border-color:#5DCAA5;color:#000}
 .step-label{font-size:12px;font-weight:700;color:#444;letter-spacing:.3px;transition:all .3s}
-.step-item.active .step-label{color:#D6B27A}
+.step-item.active .step-label{color:#C9A96E}
 .step-item.done .step-label{color:#5DCAA5}
 .step-line{flex:1;height:1px;background:#222;min-width:20px}
 .step2-banner{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
@@ -1028,7 +1028,7 @@ select option{background:#1A1A1A}
     <p>Análise de Alocação por Indexador · Modelo Levante Asset</p>
   </div>
   <nav style="display:flex;gap:8px">
-    <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D6B27A;color:#D6B27A;text-decoration:none;font-weight:700">📊 Assessor</a>
+    <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #C9A96E;color:#C9A96E;text-decoration:none;font-weight:700">📊 Assessor</a>
     <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A2A;color:#555;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#8B9FE8';this.style.color='#8B9FE8'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#555'">👥 Líder</a>
     <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A2A;color:#555;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#5DCAA5';this.style.color='#5DCAA5'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#555'">⚙️ Admin</a>
     <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#888'">Sair</button>
@@ -1051,8 +1051,8 @@ select option{background:#1A1A1A}
 
 <!-- Formulário -->
 <!-- Mensagem do Admin (se houver) -->
-<div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#1A1600;border:1px solid #D6B27A;border-radius:10px">
-  <p style="font-size:10px;color:#D6B27A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
+<div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#1A1600;border:1px solid #C9A96E;border-radius:10px">
+  <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
   <p id="msg-admin-txt" style="font-size:12px;color:#CCC;line-height:1.6"></p>
   <p id="msg-admin-data" style="font-size:10px;color:#555;margin-top:4px"></p>
 </div>
@@ -1062,14 +1062,14 @@ select option{background:#1A1A1A}
 
   <!-- Seletor de cliente salvo -->
   <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#0D0D0D;border-radius:10px;border:1px solid #1E1E1E">
-    <p style="font-size:10px;color:#D6B27A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700">📁 Clientes salvos — clique para carregar</p>
+    <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700">📁 Clientes salvos — clique para carregar</p>
     <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
     <div>
       <label>Assessor</label>
-      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#1A1A1A;cursor:default;color:#D6B27A">
+      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#1A1A1A;cursor:default;color:#C9A96E">
     </div>
     <div><label>Nome do cliente</label><input type="text" id="nome" placeholder="Ex: Lucia Silva"></div>
   </div>
@@ -1083,13 +1083,13 @@ select option{background:#1A1A1A}
       </select>
     </div>
     <div><label>Objetivo do cliente</label><input type="text" id="objetivo" placeholder="Ex: aposentadoria, compra de imóvel..."></div>
-    <div id="carta-ativa-info" style="display:flex;align-items:flex-end"><p style="font-size:11px;color:#555">Carta da gestão: <span id="carta-ativa-nome" style="color:#D6B27A">verificando...</span></p></div>
+    <div id="carta-ativa-info" style="display:flex;align-items:flex-end"><p style="font-size:11px;color:#555">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
   </div>
 
   <div id="macro-badges" style="margin-bottom:14px"></div>
 
   <div style="background:#111;border-radius:8px;padding:10px 14px;margin-bottom:14px">
-    <p style="font-size:10px;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">MODELO LEVANTE — <span id="perfil-lbl" style="color:#D6B27A">CONSERVADORA</span></p>
+    <p style="font-size:10px;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">MODELO LEVANTE — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
     <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px"></div>
   </div>
 
@@ -1109,7 +1109,7 @@ select option{background:#1A1A1A}
 
   <!-- Botão para avançar — aparece após PDF carregado -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
-    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#D6B27A;color:#0D0D0D;font-size:15px;padding:15px">
+    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#C9A96E;color:#0D0D0D;font-size:15px;padding:15px">
       Continuar para Etapa 2 — Perfil &amp; Cross Sell →
     </button>
   </div>
@@ -1140,7 +1140,7 @@ select option{background:#1A1A1A}
       <div style="position:relative;width:150px;margin:0 auto 0">
         <canvas id="chart-servir" width="150" height="150"></canvas>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;line-height:1">
-          <div id="servir-score-num" style="font-size:32px;font-weight:900;color:#D6B27A">0</div>
+          <div id="servir-score-num" style="font-size:32px;font-weight:900;color:#C9A96E">0</div>
           <div style="font-size:10px;color:#555;margin-top:2px">de 6 pilares</div>
         </div>
       </div>
@@ -1172,7 +1172,7 @@ select option{background:#1A1A1A}
 
   <!-- ── Análise Head de Produtos (HP) ── -->
   <div class="card" id="card-hp" style="display:none;border-color:#2A2A18">
-    <h2 style="color:#E8C96B">⭐ Análise Head de Produtos — Modelo Levante</h2>
+    <h2 style="color:#D4B483">⭐ Análise Head de Produtos — Modelo Levante</h2>
 
     <!-- Cabeçalho da conta -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px" id="hp-header"></div>
@@ -1182,8 +1182,8 @@ select option{background:#1A1A1A}
 
     <!-- Desvios vs Modelo HP -->
     <div style="font-size:11px;color:#666;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-      <span>Comparativo vs. <span id="hp-ref" style="color:#E8C96B"></span></span>
-      <span id="hp-perfil-badge" style="background:#1A1A08;color:#E8C96B;border:1px solid #E8C96B;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700"></span>
+      <span>Comparativo vs. <span id="hp-ref" style="color:#D4B483"></span></span>
+      <span id="hp-perfil-badge" style="background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700"></span>
     </div>
     <div id="hp-desvios" style="margin-bottom:16px"></div>
 
@@ -1201,13 +1201,13 @@ select option{background:#1A1A1A}
 
     <!-- Sugestões de produtos HP para fechar gaps -->
     <div id="hp-sugestoes" style="display:none">
-      <div style="font-size:11px;color:#E8C96B;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
+      <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
       <div id="hp-sugestoes-lista"></div>
     </div>
 
     <!-- Cenário macro HP -->
     <div id="hp-cenario" style="display:none;margin-top:12px">
-      <div style="font-size:11px;color:#E8C96B;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">🌐 Visão Macro — Head de Produtos</div>
+      <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">🌐 Visão Macro — Head de Produtos</div>
       <div id="hp-cenario-txt" style="background:#080808;border-radius:8px;padding:12px;font-size:11px;color:#AAA;line-height:1.6;border:1px solid #2A2A18"></div>
     </div>
   </div>
@@ -1228,7 +1228,7 @@ select option{background:#1A1A1A}
   <div class="card">
     <h2>Composição atual vs. modelo</h2>
     <div style="display:flex;gap:16px;margin-bottom:8px;font-size:11px">
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#D6B27A;display:inline-block"></span>Carteira atual</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#C9A96E;display:inline-block"></span>Carteira atual</span>
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#444;display:inline-block"></span>Modelo Levante</span>
     </div>
     <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Comparativo de alocação"></canvas></div>
@@ -1256,9 +1256,9 @@ select option{background:#1A1A1A}
 
   <!-- Plano de Ação para atingir o objetivo -->
   <div class="card" id="card-plano">
-    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#D6B27A;text-transform:capitalize"></span></h2>
-    <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#1A1600;border:1px solid #D6B27A;border-radius:8px">
-      <p style="font-size:10px;color:#D6B27A;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
+    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#C9A96E;text-transform:capitalize"></span></h2>
+    <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#1A1600;border:1px solid #C9A96E;border-radius:8px">
+      <p style="font-size:10px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
       <p id="plano-objetivo-txt" style="font-size:13px;color:#F0F0F0"></p>
     </div>
     <div id="plano-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"></div>
@@ -1306,7 +1306,7 @@ select option{background:#1A1A1A}
 
   <!-- ── Gerar Apresentação de Reunião — ao final ── -->
   <div style="padding:20px 0 8px">
-    <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#D6B27A;color:#0A0A08;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
+    <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#C9A96E;color:#0A0A08;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
       🎯 Gerar Apresentação de Reunião (.pptx)
     </button>
     <p style="font-size:11px;color:#555;text-align:center;margin-top:8px">PowerPoint · Cenário macro · Análise da carteira · Sugestões de realocação · Identidade Braúna</p>
@@ -1489,14 +1489,14 @@ function renderPilaresForm(){
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">' +
           '<span style="font-size:13px;font-weight:700;color:' + (feito?"#5DCAA5":"#F0F0F0") + '">' + p.nome + '</span>' +
           '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1E1E1E;color:' + impCor + ';font-weight:700">' + impTxt + '</span>' +
-          (p.dir ? '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A1600;color:#D6B27A;border:1px solid #D6B27A;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
+          (p.dir ? '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
         '</div>' +
         '<div style="font-size:11px;color:#666;line-height:1.4">' + p.desc + '</div>' +
         (!feito ?
           '<div style="background:#111;border-radius:6px;padding:8px 10px;border-left:3px solid ' + impCor + ';margin-top:8px">' +
             '<div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
-            '<div style="font-size:11px;color:#D6B27A;padding:6px 8px;background:#1A1600;border-radius:5px">→ ' + p.acao + '</div>' +
-            (p.dir ? '<div style="font-size:10px;color:#D6B27A;margin-top:6px;padding:5px 8px;border:1px solid #D6B27A;border-radius:5px;background:#1A1600">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
+            '<div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A1600;border-radius:5px">→ ' + p.acao + '</div>' +
+            (p.dir ? '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A1600">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
           '</div>' : "") +
       '</div>' +
     '</div>';
@@ -1574,8 +1574,8 @@ function atualizarModelo(){
   if(!g) return;
 
   const COR_CLS = {
-    pos_fixado:"#D6B27A", inflacao:"#F0A830", pre_fixado:"#B8A0E8",
-    acoes:"#5DCAA5", fiis:"#7DCFEF", multimercado:"#E8C96B",
+    pos_fixado:"#C9A96E", inflacao:"#F0A830", pre_fixado:"#B8A0E8",
+    acoes:"#5DCAA5", fiis:"#7DCFEF", multimercado:"#D4B483",
     internacional:"#FF8E8E", alternativos:"#4EC9B0", criptomoedas:"#888"
   };
   const itens = Object.entries(m)
@@ -1615,7 +1615,7 @@ function onXpFileChange(input){
   const btn   = document.getElementById("btn-proxima-etapa");
   // Feedback imediato — síncrono
   if(fname) fname.textContent = "⏳ " + file.name;
-  if(drop)  drop.style.borderColor = "#D6B27A";
+  if(drop)  drop.style.borderColor = "#C9A96E";
   if(wrap)  wrap.style.display = "block";
   if(btn){  btn.innerHTML = "⏳ Identificando cliente..."; btn.disabled = true; btn.style.opacity = ".6"; }
   // Processa em background (async)
@@ -1745,7 +1745,7 @@ function ativarEtapa2(d){
     if(iconEl) iconEl.textContent = "🆕";
     if(tituloEl) tituloEl.textContent = nomeCliente + " — Primeiro acesso";
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Preencha o Modelo de Servir e o Cross Sell abaixo";
-    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#1A1600;color:#D6B27A;border:1px solid #D6B27A;border-radius:20px;font-weight:700">Novo cliente</span>';
+    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E;border-radius:20px;font-weight:700">Novo cliente</span>';
   } else {
     if(banner){ banner.className="step2-banner return"; }
     if(iconEl) iconEl.textContent = "🔄";
@@ -1786,7 +1786,7 @@ function renderPainelCliente(d){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
     <div style="font-size:22px">📋</div>
     <div style="flex:1">
-      <div style="font-size:14px;font-weight:700;color:#D6B27A">${d.nome_cliente || "Cliente " + d.conta}</div>
+      <div style="font-size:14px;font-weight:700;color:#C9A96E">${d.nome_cliente || "Cliente " + d.conta}</div>
       <div style="font-size:11px;color:#555">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
     </div>
     <div style="text-align:right">
@@ -1819,7 +1819,7 @@ function renderPainelCliente(d){
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
           ${d.ficha_salva.cross_ativos.map(id=>{
             const a = CROSS_AREAS.find(x=>x.id===id);
-            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#1A1600;color:#D6B27A;border:1px solid #D6B27A">${a.icone} ${a.nome}</span>` : "";
+            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E">${a.icone} ${a.nome}</span>` : "";
           }).join("")}
         </div>` : ""}
     </div>`;
@@ -1850,7 +1850,7 @@ function renderPainelCliente(d){
       </div>
       <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#555">
         <span>Patrimônio anterior: <b style="color:#888">R$ ${(ult.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
-        <span>Atual: <b style="color:#D6B27A">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
+        <span>Atual: <b style="color:#C9A96E">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
         ${(d.patrimonio||0)-(ult.patrimonio||0) ? `<span style="color:${(d.patrimonio||0)>(ult.patrimonio||0)?"#5DCAA5":"#FF6B6B"}">
           ${(d.patrimonio||0)>(ult.patrimonio||0)?"+":""}R$ ${((d.patrimonio||0)-(ult.patrimonio||0)).toLocaleString("pt-BR",{maximumFractionDigits:0})}
         </span>` : ""}
@@ -1882,8 +1882,8 @@ async function buscarClientesSalvos(){
     if(!lista.length){ box.style.display="none"; return; }
     ul.innerHTML = lista.map(c=>`
       <button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
-        style="padding:6px 12px;border-radius:20px;border:1px solid #2A2A2A;background:#111;color:#D6B27A;font-size:12px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='#D6B27A'" onmouseout="this.style.borderColor='#2A2A2A'">
+        style="padding:6px 12px;border-radius:20px;border:1px solid #2A2A2A;background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='#C9A96E'" onmouseout="this.style.borderColor='#2A2A2A'">
         ${c.nome} <span style="color:#555;font-size:10px">${c.perfil}</span>
       </button>`).join("");
     box.style.display="block";
@@ -1925,7 +1925,7 @@ function carregarFicha(jsonStr){
 
   // Aviso visual
   const nome = document.getElementById("nome");
-  nome.style.borderColor="#D6B27A";
+  nome.style.borderColor="#C9A96E";
   setTimeout(()=>nome.style.borderColor="", 1500);
 }
 
@@ -1945,7 +1945,7 @@ function renderAnaliseHP(xp){
   ].map(([lbl,val])=>`
     <div style="background:#0A0A08;border:1px solid #2A2A18;border-radius:8px;padding:8px 14px;min-width:90px">
       <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
-      <div style="font-size:13px;color:#E8C96B;font-weight:700;margin-top:2px">${val}</div>
+      <div style="font-size:13px;color:#D4B483;font-weight:700;margin-top:2px">${val}</div>
     </div>
   `).join("");
 
@@ -1956,7 +1956,7 @@ function renderAnaliseHP(xp){
   // Alertas relevantes
   const alertasDiv = document.getElementById("hp-alertas");
   if(xp.alertas_relevantes && xp.alertas_relevantes.length){
-    const ACOR = {info:"#5DCAA5", atencao:"#E8C96B", urgente:"#FF6B6B"};
+    const ACOR = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
     alertasDiv.innerHTML = xp.alertas_relevantes.map(a=>`
       <div style="border-left:3px solid ${ACOR[a.tipo]||"#444"};background:#0A0A08;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:6px">
         <span style="font-size:11px;font-weight:700;color:${ACOR[a.tipo]||"#CCC"}">🔔 ${a.produto}</span>
@@ -1967,13 +1967,13 @@ function renderAnaliseHP(xp){
   }
 
   // Desvios
-  const STATUS_COLOR = {ok:"#5DCAA5", atencao:"#E8C96B", fora:"#FF6B6B"};
+  const STATUS_COLOR = {ok:"#5DCAA5", atencao:"#D4B483", fora:"#FF6B6B"};
   const STATUS_ICON  = {ok:"✅", atencao:"⚠️", fora:"❌"};
   const devDiv = document.getElementById("hp-desvios");
   devDiv.innerHTML = (xp.desvios||[]).map(d=>`
     <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #111;font-size:12px">
       <span style="width:130px;color:#CCC">${d.label}</span>
-      <span style="width:44px;color:#E8C96B;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
+      <span style="width:44px;color:#D4B483;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
       <div style="flex:1;background:#1A1A18;border-radius:3px;height:5px;overflow:hidden;position:relative">
         <div style="position:absolute;height:100%;background:#444;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
         <div style="position:absolute;height:100%;background:${STATUS_COLOR[d.status]};border-radius:3px;width:${Math.min(d.atual,100)}%"></div>
@@ -1998,7 +1998,7 @@ function renderAnaliseHP(xp){
         </tr></thead>
         <tbody>${xp.acoes.map((a,i)=>`
           <tr style="background:${i%2?"#070707":"#0A0A08"}">
-            <td style="padding:6px 8px;color:#E8C96B;font-weight:700">${a.ticker}</td>
+            <td style="padding:6px 8px;color:#D4B483;font-weight:700">${a.ticker}</td>
             <td style="padding:6px 8px;color:#888;text-align:right">${a.qtd||"—"}</td>
             <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
             <td style="padding:6px 8px;text-align:right">${(a.perc||0).toFixed(2)}%</td>
@@ -2036,9 +2036,9 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-sugestoes-lista").innerHTML = sugs.map(s=>{
       const p = s.produto || {};
       return `
-        <div style="background:#0A0A08;border:1px solid #2A2A18;border-left:3px solid #E8C96B;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
+        <div style="background:#0A0A08;border:1px solid #2A2A18;border-left:3px solid #D4B483;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-            <span style="font-size:10px;background:#1A1A08;color:#E8C96B;border:1px solid #E8C96B;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
+            <span style="font-size:10px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
             <span style="font-size:12px;color:#FF6B6B;font-weight:700">gap ${s.gap.toFixed(1)}%</span>
             <span style="font-size:13px;font-weight:700;color:#F0F0F0">${p.nome||"—"}</span>
             ${p.taxa ? `<span style="font-size:11px;color:#5DCAA5">${p.taxa}</span>` : ""}
@@ -2054,13 +2054,13 @@ function renderAnaliseHP(xp){
   if(c && (c.brasil || c.posicionamento)){
     document.getElementById("hp-cenario").style.display = "";
     const vieses = c.vieses || {};
-    const VCOR = {positivo:"#5DCAA5", neutro:"#E8C96B", negativo:"#FF6B6B"};
+    const VCOR = {positivo:"#5DCAA5", neutro:"#D4B483", negativo:"#FF6B6B"};
     const viesHtml = Object.entries(vieses).map(([cls,v])=>
       `<span style="font-size:10px;background:#111;border:1px solid #222;border-radius:10px;padding:2px 8px;color:${VCOR[v]||"#888"}">${cls}: ${v}</span>`
     ).join(" ");
     document.getElementById("hp-cenario-txt").innerHTML = `
-      ${c.posicionamento ? `<p style="margin-bottom:8px"><b style="color:#E8C96B">Posicionamento:</b> ${c.posicionamento}</p>` : ""}
-      ${c.brasil ? `<p style="margin-bottom:8px"><b style="color:#E8C96B">Brasil:</b> ${c.brasil}</p>` : ""}
+      ${c.posicionamento ? `<p style="margin-bottom:8px"><b style="color:#D4B483">Posicionamento:</b> ${c.posicionamento}</p>` : ""}
+      ${c.brasil ? `<p style="margin-bottom:8px"><b style="color:#D4B483">Brasil:</b> ${c.brasil}</p>` : ""}
       ${viesHtml ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${viesHtml}</div>` : ""}
     `;
   }
@@ -2158,7 +2158,7 @@ function renderSugestoes(sg){
   let html = `<div class="sg-header-box">
     <span style="font-size:20px">💡</span>
     <div>
-      <div style="font-size:12px;font-weight:700;color:#D6B27A">${sg.titulo||"Sugestões do Gestor"}</div>
+      <div style="font-size:12px;font-weight:700;color:#C9A96E">${sg.titulo||"Sugestões do Gestor"}</div>
       <div style="font-size:10px;color:#555">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
     </div>
   </div>`;
@@ -2252,7 +2252,7 @@ function renderSugestoes(sg){
 
 function renderClassesAtivos(desvios, patrimonio){
   const grupos = [
-    { nome:"Renda Fixa",     cor:"#D6B27A", icone:"🏦", chaves:["pos_fixado","inflacao","pre_fixado"] },
+    { nome:"Renda Fixa",     cor:"#C9A96E", icone:"🏦", chaves:["pos_fixado","inflacao","pre_fixado"] },
     { nome:"Renda Variável", cor:"#8B9FE8", icone:"📈", chaves:["acoes","fiis"] },
     { nome:"Multimercado",   cor:"#5DCAA5", icone:"⚖️", chaves:["multimercado"] },
     { nome:"Internacional",  cor:"#E88B8B", icone:"🌎", chaves:["internacional"] },
@@ -2435,8 +2435,8 @@ function renderizar(data){
             <span style="font-size:10px;padding:2px 7px;background:${imp_cor}22;color:${imp_cor};border-radius:10px;font-weight:700">${p.importancia}</span>
           </div>
           <div style="font-size:11px;color:#888;margin-bottom:4px">${p.impacto_falta}</div>
-          <div style="font-size:11px;color:#D6B27A;font-weight:600">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:6px;padding:6px 8px;background:#1A1600;border:1px solid #D6B27A33;border-radius:5px;font-size:10px;color:#D6B27A">★ 1ª DIRETRIZ BRAÚNA — Provocar o cliente sobre o Financial Planning.</div>`:""}
+          <div style="font-size:11px;color:#C9A96E;font-weight:600">→ ${p.acao}</div>
+          ${p.diretriz?`<div style="margin-top:6px;padding:6px 8px;background:#1A1600;border:1px solid #C9A96E33;border-radius:5px;font-size:10px;color:#C9A96E">★ 1ª DIRETRIZ BRAÚNA — Provocar o cliente sobre o Financial Planning.</div>`:""}
         </div>`;
       });
       insightsHtml += `</div>`;
@@ -2466,7 +2466,7 @@ function renderizar(data){
   if(chartInst) chartInst.destroy();
   chartInst=new Chart(document.getElementById("chart"),{
     type:"bar",
-    data:{labels:lbs,datasets:[{label:"Atual",data:rea,backgroundColor:"#D6B27A",borderRadius:4},{label:"Modelo",data:alv,backgroundColor:"rgba(100,100,100,0.4)",borderRadius:4}]},
+    data:{labels:lbs,datasets:[{label:"Atual",data:rea,backgroundColor:"#C9A96E",borderRadius:4},{label:"Modelo",data:alv,backgroundColor:"rgba(100,100,100,0.4)",borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+": "+ctx.parsed.y.toFixed(2)+"%"}}},scales:{x:{ticks:{color:"#666",font:{size:10}}},y:{ticks:{color:"#666",callback:v=>v+"%"},beginAtZero:true}}}
   });
 
@@ -2496,7 +2496,7 @@ function renderizar(data){
   if(recomendacoes&&recomendacoes.length){
     rl.innerHTML=recomendacoes.map(r=>`
       <div class="rec-card">
-        <div class="rec-header">${r.urgencia} <span style="color:#D6B27A">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
+        <div class="rec-header">${r.urgencia} <span style="color:#C9A96E">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
         <div class="rec-ctx">${r.explicacao}</div>
         ${r.carta_insight?`<div class="rec-carta">📄 Carta da gestão: "${r.carta_insight}"</div>`:""}
         <div class="rec-prods">${(r.produtos||[]).map(p=>`<span class="prod-tag">${p}</span>`).join("")}</div>
@@ -2534,7 +2534,7 @@ function renderizar(data){
           </div>
           <div class="pilar-result-impacto">${p.impacto_falta}</div>
           <div class="pilar-result-acao">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#1A1600;border:1px solid #D6B27A;border-radius:6px;font-size:11px;color:#D6B27A">
+          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#1A1600;border:1px solid #C9A96E;border-radius:6px;font-size:11px;color:#C9A96E">
             <b>★ 1ª DIRETRIZ BRAÚNA — QUALIDADE</b><br>Provocar o cliente sobre o Financial Planning. Perguntar ao assessor: O FP deste cliente já foi feito? Quando? Isso é primordial para traçar o caminho do destino que o cliente deseja alcançar.
           </div>`:""}
         </div>`;
@@ -2637,7 +2637,7 @@ function renderCrossSellResult(areas, tem, naoTem){
   const temAreas=areas.filter(a=>a.ativo);
   const score=temAreas.length;
 
-  const barColor=score>=4?"#5DCAA5":score>=2?"#D6B27A":"#FF6B6B";
+  const barColor=score>=4?"#5DCAA5":score>=2?"#C9A96E":"#FF6B6B";
   let html=`<div class="cs-score-bar">
     <span style="font-size:28px;font-weight:700;color:${barColor};min-width:44px;text-align:center">${score}/5</span>
     <div style="flex:1">
@@ -2648,7 +2648,7 @@ function renderCrossSellResult(areas, tem, naoTem){
   </div>`;
 
   if(naoTemAreas.length){
-    html+=`<p style="font-size:11px;color:#D6B27A;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
+    html+=`<p style="font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
     naoTemAreas.forEach(a=>{
       html+=`<div class="cs-area nao-tem">
         <div class="cs-area-header">
@@ -2794,8 +2794,8 @@ def _pilar_html_inicial(p):
     desc     = p.get("descricao", p.get("desc",""))
     impacto  = p.get("impacto_falta", p.get("impacto",""))
     acao     = p.get("acao","")
-    dir_tag  = '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A1600;color:#D6B27A;border:1px solid #D6B27A;font-weight:700">★ 1ª DIRETRIZ</span>' if eh_dir else ""
-    dir_note = '<div style="font-size:10px;color:#D6B27A;margin-top:6px;padding:5px 8px;border:1px solid #D6B27A;border-radius:5px;background:#1A1600">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' if eh_dir else ""
+    dir_tag  = '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' if eh_dir else ""
+    dir_note = '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A1600">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' if eh_dir else ""
     return f'''<div onclick="togglePilar('{pid}')" id="pilar-{pid}" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;background:{bg};border:1.5px solid {border};cursor:pointer;transition:all .2s;user-select:none">
   <div id="chk-{pid}" style="width:24px;height:24px;border-radius:6px;border:2px solid #444;background:transparent;display:flex;align-items:center;justify-content:center;color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px"></div>
   <div style="font-size:20px;flex-shrink:0;margin-top:2px">{icone}</div>
@@ -2808,7 +2808,7 @@ def _pilar_html_inicial(p):
     <div style="font-size:11px;color:#666;line-height:1.4">{desc}</div>
     <div id="det-{pid}" style="background:#111;border-radius:6px;padding:8px 10px;border-left:3px solid {imp_cor};margin-top:8px">
       <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px">{impacto}</div>
-      <div style="font-size:11px;color:#D6B27A;padding:6px 8px;background:#1A1600;border-radius:5px">→ {acao}</div>
+      <div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A1600;border-radius:5px">→ {acao}</div>
       {dir_note}
     </div>
   </div>
@@ -4080,9 +4080,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 
 /* Logo */
 .logo-area{text-align:center;margin-bottom:40px}
-.logo-title{font-size:28px;font-weight:800;color:#D6B27A;letter-spacing:2px;text-transform:uppercase}
+.logo-title{font-size:28px;font-weight:800;color:#C9A96E;letter-spacing:2px;text-transform:uppercase}
 .logo-sub{font-size:13px;color:#444;margin-top:6px;letter-spacing:1px}
-.logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#D6B27A,transparent);margin:14px auto 0}
+.logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#C9A96E,transparent);margin:14px auto 0}
 
 /* Cards de papel */
 .roles{display:flex;gap:16px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
@@ -4095,19 +4095,19 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .role-card::before{
   content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;
 }
-.role-card:hover{border-color:#D6B27A;transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
+.role-card:hover{border-color:#C9A96E;transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
 .role-card.selected{transform:translateY(-3px)}
 
 /* Assessor */
-.role-card.assessor.selected{border-color:#D6B27A;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#1A1600}
-.role-card.assessor:hover{border-color:#D6B27A}
+.role-card.assessor.selected{border-color:#C9A96E;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#1A1600}
+.role-card.assessor:hover{border-color:#C9A96E}
 /* Líder */
 .role-card.lider.selected{border-color:#8B9FE8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#0D0D1F}
 .role-card.lider:hover{border-color:#8B9FE8}
 /* Head */
-.role-card.head.selected{border-color:#E8C96B;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#1A1500}
-.role-card.head:hover{border-color:#E8C96B}
-.head .role-check{background:#E8C96B;color:#000}
+.role-card.head.selected{border-color:#D4B483;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#1A1500}
+.role-card.head:hover{border-color:#D4B483}
+.head .role-check{background:#D4B483;color:#000}
 /* Admin */
 .role-card.admin.selected{border-color:#5DCAA5;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#081410}
 .role-card.admin:hover{border-color:#5DCAA5}
@@ -4122,7 +4122,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   font-size:10px;font-weight:900;
   opacity:0;transition:opacity .2s;
 }
-.assessor .role-check{background:#D6B27A;color:#000}
+.assessor .role-check{background:#C9A96E;color:#000}
 .lider .role-check{background:#8B9FE8;color:#000}
 .admin .role-check{background:#5DCAA5;color:#000}
 .role-card.selected .role-check{opacity:1}
@@ -4178,7 +4178,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   <div class="role-card assessor" onclick="selRole('assessor')" id="card-assessor">
     <div class="role-check">✓</div>
     <span class="role-icon">📊</span>
-    <div class="role-name" style="color:#D6B27A">Assessor</div>
+    <div class="role-name" style="color:#C9A96E">Assessor</div>
     <div class="role-desc">Análise de carteiras e atendimento ao cliente</div>
   </div>
   <div class="role-card lider" onclick="selRole('lider')" id="card-lider">
@@ -4190,7 +4190,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   <div class="role-card head" onclick="selRole('head')" id="card-head">
     <div class="role-check">✓</div>
     <span class="role-icon">🏛️</span>
-    <div class="role-name" style="color:#E8C96B">Head de Produtos</div>
+    <div class="role-name" style="color:#D4B483">Head de Produtos</div>
     <div class="role-desc">Portfólios modelo, cenário macro e produtos em destaque</div>
   </div>
   <div class="role-card admin" onclick="selRole('admin')" id="card-admin">
@@ -4220,9 +4220,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 <script>
 let roleAtual = null;
 const ROLES = {
-  assessor: {nome:"Assessor",        icon:"📊", color:"#D6B27A", dest:"/assessor"},
+  assessor: {nome:"Assessor",        icon:"📊", color:"#C9A96E", dest:"/assessor"},
   lider:    {nome:"Líder",           icon:"👥", color:"#8B9FE8", dest:"/lider"},
-  head:     {nome:"Head de Produtos",icon:"🏛️", color:"#E8C96B", dest:"/head-produtos"},
+  head:     {nome:"Head de Produtos",icon:"🏛️", color:"#D4B483", dest:"/head-produtos"},
   admin:    {nome:"Administração",   icon:"⚙️", color:"#5DCAA5", dest:"/admin"},
 };
 
@@ -4324,7 +4324,7 @@ header p{font-size:11px;color:#444;margin-top:2px}
 }
 .rank-item:hover,.rank-item.aberto{border-color:#8B9FE8;background:#0D0D22}
 .rank-pos{font-size:20px;font-weight:900;color:#2A2A4A;min-width:28px;text-align:center}
-.rank-pos.top1{color:#D6B27A}
+.rank-pos.top1{color:#C9A96E}
 .rank-pos.top2{color:#8B9FE8}
 .rank-pos.top3{color:#5DCAA5}
 .rank-nome{font-size:14px;font-weight:700;color:#F0F0F0;flex:1}
@@ -5419,39 +5419,39 @@ HTML_HEAD = r"""<!DOCTYPE html>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0A0A08;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#0F0F0A;border-bottom:1px solid #2A2A18;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-header h1{font-size:17px;color:#E8C96B;font-weight:700}
+header h1{font-size:17px;color:#D4B483;font-weight:700}
 header p{font-size:11px;color:#444;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
 .nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A18;color:#666;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
-.nav a:hover,.nav button:hover{border-color:#E8C96B;color:#E8C96B}
-.nav a.active{background:#E8C96B;color:#000;border-color:#E8C96B;font-weight:700}
+.nav a:hover,.nav button:hover{border-color:#D4B483;color:#D4B483}
+.nav a.active{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
 .card{background:#0F0F0A;border:1px solid #2A2A18;border-radius:12px;padding:22px;margin-bottom:18px}
-.card-title{font-size:11px;color:#E8C96B;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-title{font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title span{font-size:16px}
 /* Tabs */
 .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
 .tab{padding:7px 16px;border-radius:8px;border:1px solid #2A2A18;background:#080808;color:#666;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
-.tab.active{background:#E8C96B;color:#000;border-color:#E8C96B;font-weight:700}
+.tab.active{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
 /* Portfólio modelo — tabela */
 .porto-table{width:100%;border-collapse:collapse;font-size:12px}
 .porto-table th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #2A2A18;color:#666}
-.porto-table th.classe{text-align:left;color:#E8C96B;width:140px}
+.porto-table th.classe{text-align:left;color:#D4B483;width:140px}
 .porto-table td{padding:6px 8px;border-bottom:1px solid #1A1A10;text-align:center}
 .porto-table td.classe-label{text-align:left;font-size:11px;color:#CCC;padding-left:4px}
 .porto-table td input[type=number]{width:70px;background:#080808;border:1px solid #2A2A18;border-radius:5px;padding:5px 6px;color:#F0F0F0;font-size:12px;text-align:center;outline:none}
-.porto-table td input[type=number]:focus{border-color:#E8C96B}
+.porto-table td input[type=number]:focus{border-color:#D4B483}
 .porto-table .total-row td{font-weight:700;font-size:12px;border-top:2px solid #2A2A18;padding-top:8px}
-.total-val{color:#E8C96B}
+.total-val{color:#D4B483}
 .total-ok{color:#5DCAA5}.total-err{color:#FF6B6B}
 /* Viés badges */
 .vies-select{background:#080808;border:1px solid #2A2A18;border-radius:5px;padding:4px 6px;color:#CCC;font-size:11px;outline:none;cursor:pointer}
-.vies-select:focus{border-color:#E8C96B}
+.vies-select:focus{border-color:#D4B483}
 /* Inputs gerais */
 label{font-size:11px;color:#666;display:block;margin-bottom:5px}
 input[type=text],textarea,select:not(.vies-select){width:100%;background:#080808;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
-input[type=text]:focus,textarea:focus{border-color:#E8C96B}
+input[type=text]:focus,textarea:focus{border-color:#D4B483}
 textarea{resize:vertical}
 /* Produto item */
 .prod-item{background:#080808;border:1px solid #2A2A18;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
@@ -5462,29 +5462,29 @@ textarea{resize:vertical}
 .prod-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .prod-mini label{font-size:10px;color:#555;margin-bottom:3px}
 /* Botões */
-.btn{display:inline-flex;align-items:center;gap:6px;background:#E8C96B;color:#000;border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;background:#D4B483;color:#000;border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn:hover{opacity:.88;transform:translateY(-1px)}
 .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.btn-out{background:transparent;color:#E8C96B;border:1px solid #E8C96B}
-.btn-out:hover{background:#E8C96B;color:#000}
+.btn-out{background:transparent;color:#D4B483;border:1px solid #D4B483}
+.btn-out:hover{background:#D4B483;color:#000}
 .btn-sm{padding:6px 14px;font-size:12px}
 .btn-ghost{background:transparent;border:1px solid #2A2A18;color:#555;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
-.btn-ghost:hover{border-color:#E8C96B;color:#E8C96B}
-.btn-add{background:#1A1A08;color:#E8C96B;border:1px solid #E8C96B;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .2s;margin-bottom:10px;font-family:inherit}
-.btn-add:hover{background:#E8C96B;color:#000}
+.btn-ghost:hover{border-color:#D4B483;color:#D4B483}
+.btn-add{background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .2s;margin-bottom:10px;font-family:inherit}
+.btn-add:hover{background:#D4B483;color:#000}
 /* Status */
 .status-ok{color:#5DCAA5}.status-err{color:#FF6B6B}
 .info-box{background:#080808;border-radius:8px;padding:12px 14px;font-size:12px;color:#555;line-height:1.6;border:1px solid #2A2A18}
-.info-box b{color:#E8C96B}
+.info-box b{color:#D4B483}
 /* Publish bar */
-.publish-bar{background:#1A1A08;border:2px solid #E8C96B;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .publish-bar .pub-info{flex:1}
-.publish-bar .pub-info h3{font-size:14px;color:#E8C96B;font-weight:700}
+.publish-bar .pub-info h3{font-size:14px;color:#D4B483;font-weight:700}
 .publish-bar .pub-info p{font-size:11px;color:#666;margin-top:3px}
 /* Referência */
 .ref-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .ref-row input{max-width:320px;font-size:12px;padding:6px 10px}
-.ref-badge{font-size:10px;padding:3px 10px;background:#1A1A08;color:#E8C96B;border:1px solid #E8C96B;border-radius:10px;white-space:nowrap}
+.ref-badge{font-size:10px;padding:3px 10px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:10px;white-space:nowrap}
 /* Viés indicator */
 .vies-pos{color:#5DCAA5}.vies-neg{color:#FF6B6B}.vies-neu{color:#666}
 @media(max-width:640px){.prod-grid-3,.prod-grid-2{grid-template-columns:1fr}}
@@ -5519,11 +5519,11 @@ textarea{resize:vertical}
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
     <!-- Drop zone -->
     <div style="flex:0 0 220px">
-      <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#080808;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#E8C96B'" onmouseout="this.style.borderColor='#3A3A20'">
+      <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#080808;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
         <input type="file" id="pdf-rapido" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapido(this)">
         <div style="font-size:28px;margin-bottom:8px">📄</div>
         <p style="font-size:12px;color:#555">Arraste o PDF ou clique</p>
-        <p style="font-size:11px;color:#E8C96B;margin-top:6px;min-height:16px" id="pdf-rapido-nome"></p>
+        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px" id="pdf-rapido-nome"></p>
       </div>
       <div style="margin-top:8px;text-align:center">
         <span id="pdf-rapido-st" style="font-size:11px"></span>
@@ -5532,7 +5532,7 @@ textarea{resize:vertical}
     <!-- Preview + ações -->
     <div id="pdf-rapido-box" style="flex:1;min-width:280px;display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:11px;color:#E8C96B;font-weight:700">Conteúdo extraído — escolha onde usar:</span>
+        <span style="font-size:11px;color:#D4B483;font-weight:700">Conteúdo extraído — escolha onde usar:</span>
         <button onclick="fecharRapido()" style="background:none;border:none;color:#555;cursor:pointer;font-size:14px">✕</button>
       </div>
       <textarea id="pdf-rapido-texto" rows="7" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:8px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none" placeholder="Texto extraído aparece aqui..."></textarea>
@@ -5577,7 +5577,7 @@ textarea{resize:vertical}
       <tbody id="porto-body"></tbody>
       <tfoot>
         <tr class="total-row">
-          <td class="classe-label" style="color:#E8C96B">TOTAL</td>
+          <td class="classe-label" style="color:#D4B483">TOTAL</td>
           <td><span id="tot-super_conservadora" class="total-val">—</span></td>
           <td><span id="tot-conservadora" class="total-val">—</span></td>
           <td><span id="tot-moderada" class="total-val">—</span></td>
@@ -5661,11 +5661,11 @@ textarea{resize:vertical}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div>
       <label>Upload de PDF (carta, relatório, nota)</label>
-      <div style="border:1.5px dashed #2A2A18;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#080808;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#E8C96B'" onmouseout="this.style.borderColor='#2A2A18'">
+      <div style="border:1.5px dashed #2A2A18;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#080808;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A2A18'">
         <input type="file" id="base-pdf" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadBase(this)">
         <div style="font-size:24px;margin-bottom:6px">📄</div>
         <p style="font-size:12px;color:#555">Arraste ou clique para subir PDF</p>
-        <p style="font-size:11px;color:#E8C96B;margin-top:4px;min-height:16px" id="base-fname"></p>
+        <p style="font-size:11px;color:#D4B483;margin-top:4px;min-height:16px" id="base-fname"></p>
       </div>
       <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
         <span id="base-st" style="font-size:11px"></span>
@@ -6005,11 +6005,11 @@ function initProdButtons(){
     toolbar.style.cssText = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#070C07;border:1px dashed #2A2A18;border-radius:8px;margin-bottom:12px";
     toolbar.innerHTML = `
       <span style="font-size:11px;color:#3A4A3A;flex:1">📂 Importar produtos via arquivo:</span>
-      <label style="display:inline-flex;align-items:center;gap:6px;background:#1A1A08;color:#E8C96B;border:1px solid #E8C96B;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#E8C96B';this.style.color='#000'" onmouseout="this.style.background='#1A1A08';this.style.color='#E8C96B'">
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#D4B483';this.style.color='#000'" onmouseout="this.style.background='#1A1A08';this.style.color='#D4B483'">
         📄 PDF
         <input type="file" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadPdfProduto('${cls.key}',this)">
       </label>
-      <label style="display:inline-flex;align-items:center;gap:6px;background:#1A1A08;color:#E8C96B;border:1px solid #E8C96B;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#E8C96B';this.style.color='#000'" onmouseout="this.style.background='#1A1A08';this.style.color='#E8C96B'">
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#D4B483';this.style.color='#000'" onmouseout="this.style.background='#1A1A08';this.style.color='#D4B483'">
         📊 Planilha CSV/Excel
         <input type="file" accept=".csv,.xlsx,.xls" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="importarProdPlanilha('${cls.key}',this)">
       </label>
@@ -6021,10 +6021,10 @@ function initProdButtons(){
     // Preview PDF por aba
     const preview = document.createElement("div");
     preview.id = `prod-pdf-preview-${cls.key}`;
-    preview.style.cssText = "display:none;background:#070C07;border:1px solid #E8C96B;border-radius:8px;padding:12px;margin-bottom:12px";
+    preview.style.cssText = "display:none;background:#070C07;border:1px solid #D4B483;border-radius:8px;padding:12px;margin-bottom:12px";
     preview.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:11px;color:#E8C96B;font-weight:700">📄 Conteúdo extraído — ${cls.label}</span>
+        <span style="font-size:11px;color:#D4B483;font-weight:700">📄 Conteúdo extraído — ${cls.label}</span>
         <button onclick="document.getElementById('prod-pdf-preview-${cls.key}').style.display='none'" style="background:none;border:none;color:#555;cursor:pointer;font-size:14px">✕</button>
       </div>
       <textarea id="prod-pdf-texto-${cls.key}" rows="6" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:7px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none"></textarea>
@@ -6212,7 +6212,7 @@ function renderBase(){
 }
 
 // ── Alertas de Monitoramento ──────────────────────────────────────────────────
-const ALERT_COLORS = { info:"#5DCAA5", atencao:"#E8C96B", urgente:"#FF6B6B" };
+const ALERT_COLORS = { info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B" };
 const ALERT_LABELS = { info:"ℹ️ Informativo", atencao:"⚠️ Atenção", urgente:"🚨 Urgente" };
 
 async function registrarAlerta(){
@@ -6251,7 +6251,7 @@ async function carregarAlertas(){
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:12px;font-weight:700;color:${ALERT_COLORS[a.tipo]||"#CCC"}">${ALERT_LABELS[a.tipo]||a.tipo}</span>
-            <span style="font-size:11px;color:#E8C96B;font-weight:700">${a.produto||""}</span>
+            <span style="font-size:11px;color:#D4B483;font-weight:700">${a.produto||""}</span>
             ${a.classe ? `<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${a.classe}</span>` : ""}
             <span style="font-size:10px;color:#333;margin-left:auto">${a.data||""} · ${a.origem||"HP"}</span>
           </div>
