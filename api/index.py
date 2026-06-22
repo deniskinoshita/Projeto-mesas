@@ -6110,12 +6110,10 @@ textarea{resize:vertical}
 
 <!-- ══ 0. UPLOAD RÁPIDO DE PDF ═══════════════════════════════════════════════ -->
 <div class="card" style="border-color:#3A3A20;padding:14px 20px">
+  <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
     <span style="font-size:12px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">⚡ Upload Rápido</span>
-    <label class="btn btn-sm" style="cursor:pointer;position:relative;margin:0">
-      📎 Selecionar PDFs <span style="font-size:10px;opacity:.7">(até 5)</span>
-      <input type="file" id="pdf-rapido" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
-    </label>
+    <button class="btn btn-sm" onclick="document.getElementById('pdf-rapido').click()">📎 Selecionar PDFs (até 5)</button>
     <span id="pdf-rapido-contador" style="font-size:11px;color:#4A7055"></span>
     <button class="btn btn-sm" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="display:none">⚡ Salvar todos</button>
     <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
