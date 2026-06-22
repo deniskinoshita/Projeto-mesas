@@ -1047,7 +1047,7 @@ select option{background:#1A1A1A}
   </div>
   <div class="grid-3" style="margin-bottom:14px">
     <div><label>Perfil</label>
-      <select id="perfil">
+      <select id="perfil" onchange="atualizarModelo()">
         <option value="conservadora">Conservadora</option>
         <option value="moderada">Moderada</option>
         <option value="arrojada">Arrojada</option>
@@ -1514,26 +1514,52 @@ if(document.readyState === "loading"){
   else setTimeout(atualizarGraficoServir, 600);
 }
 
-function atualizarModelo(){
-  const p = document.getElementById("perfil").value;
+// Cache do portfólio HP para não buscar múltiplas vezes
+let _hpPortfolios = null;
+
+async function carregarHpPortfolios(){
+  if(_hpPortfolios) return _hpPortfolios;
+  try{
+    const r = await fetch("/api/hp/portfolios");
+    const d = await r.json();
+    _hpPortfolios = d.perfis || {};
+    return _hpPortfolios;
+  } catch(e){ return {}; }
+}
+
+async function atualizarModelo(){
+  const sel = document.getElementById("perfil");
+  if(!sel) return;
+  const p   = sel.value;
   const lbl = document.getElementById("perfil-lbl");
-  if(lbl) lbl.textContent = p.toUpperCase();
-  const m = MODELOS[p];
+
+  // Tenta buscar o modelo do HP publicado; fallback para MODELOS hardcoded
+  const perfis = await carregarHpPortfolios();
+  const m = (perfis[p] && Object.keys(perfis[p]).length > 1) ? perfis[p] : MODELOS[p];
+  const ref = _hpPortfolios && Object.keys(_hpPortfolios).length ? " — Levante Asset" : "";
+
+  if(lbl) lbl.textContent = (m?.label || p).toUpperCase() + ref;
   const g = document.getElementById("modelo-grid");
   if(!g || !m) return;
 
-  // Mostra alocação do modelo com barra visual
-  const itens = Object.entries(m).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const COR_CLS = {
+    pos_fixado:"#D6B27A", inflacao:"#F0A830", pre_fixado:"#B8A0E8",
+    acoes:"#5DCAA5", fiis:"#7DCFEF", multimercado:"#E8C96B",
+    internacional:"#FF8E8E", alternativos:"#4EC9B0", criptomoedas:"#888"
+  };
+
+  const itens = Object.entries(m)
+    .filter(([k,v]) => typeof v === "number" && v > 0 && k !== "label")
+    .sort((a,b) => b[1]-a[1]);
+
   g.innerHTML = itens.map(([k,v])=>{
-    const cor = k==="pos_fixado"?"#8B9FE8": k==="inflacao"?"#FFD966": k==="pre_fixado"?"#B8A0E8":
-                k==="acoes"?"#5DCAA5": k==="fiis"?"#7DD3C0": k==="multimercado"?"#D6B27A":
-                k==="internacional"?"#FF8E8E": k==="alternativos"?"#E8B04A":"#555";
+    const cor = COR_CLS[k] || "#555";
     return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
-      '<span style="font-size:11px;color:#888;min-width:100px;flex-shrink:0">' + LABELS[k] + '</span>' +
+      '<span style="font-size:11px;color:#888;min-width:110px;flex-shrink:0">' + (LABELS[k]||k) + '</span>' +
       '<div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden">' +
-        '<div style="width:' + Math.min(v,100) + '%;height:100%;background:' + cor + ';border-radius:3px"></div>' +
+        '<div style="width:' + Math.min(v,100) + '%;height:100%;background:' + cor + ';border-radius:3px;transition:width .4s"></div>' +
       '</div>' +
-      '<span style="font-size:11px;font-weight:700;color:' + cor + ';min-width:32px;text-align:right">' + v + '%</span>' +
+      '<span style="font-size:11px;font-weight:700;color:' + cor + ';min-width:36px;text-align:right">' + v + '%</span>' +
     '</div>';
   }).join("");
 }
