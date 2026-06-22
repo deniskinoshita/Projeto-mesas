@@ -2415,10 +2415,48 @@ function renderizar(data){
   // Score Modelo de Servir como métrica
   if(checklist_servir){
     const scoreColor=score_servir>=5?"ok":score_servir>=3?"":"danger";
-    html+=`<div class="metric" style="grid-column:span 4;background:${pendentes_criticos>0?'#2A1010':'#141414'};border:1px solid ${pendentes_criticos>0?'#FF4444':'#2A2A2A'}">
+    const pendentes_list = checklist_servir.filter(p=>p.status==="pendente");
+    const barColor = score_servir>=5?"#5DCAA5":score_servir>=3?"#FFD966":"#FF6B6B";
+    const bordaColor = pendentes_criticos>0?"#FF4444":score_servir>=5?"#2A5040":"#2A2A2A";
+    const bgColor = pendentes_criticos>0?"#2A1010":score_servir>=5?"#0A1A10":"#141414";
+
+    let insightsHtml = "";
+    if(pendentes_list.length > 0){
+      insightsHtml = `<div style="margin-top:14px;border-top:1px solid #2A2A2A;padding-top:12px">
+        <div style="font-size:10px;color:#FF6B6B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
+          ⚠ Insights — o que fazer para completar o modelo
+        </div>`;
+      pendentes_list.forEach(p=>{
+        const imp_cor = p.importancia.startsWith("CRÍTICA")?"#FF6B6B":p.importancia==="ALTA"?"#FFD966":"#888";
+        insightsHtml += `<div style="margin-bottom:10px;padding:10px 12px;background:#0D0D0D;border-left:3px solid ${imp_cor};border-radius:0 6px 6px 0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:16px">${p.icone}</span>
+            <span style="font-size:12px;font-weight:700;color:#F0F0F0">${p.nome}</span>
+            <span style="font-size:10px;padding:2px 7px;background:${imp_cor}22;color:${imp_cor};border-radius:10px;font-weight:700">${p.importancia}</span>
+          </div>
+          <div style="font-size:11px;color:#888;margin-bottom:4px">${p.impacto_falta}</div>
+          <div style="font-size:11px;color:#D6B27A;font-weight:600">→ ${p.acao}</div>
+          ${p.diretriz?`<div style="margin-top:6px;padding:6px 8px;background:#1A1600;border:1px solid #D6B27A33;border-radius:5px;font-size:10px;color:#D6B27A">★ 1ª DIRETRIZ BRAÚNA — Provocar o cliente sobre o Financial Planning.</div>`:""}
+        </div>`;
+      });
+      insightsHtml += `</div>`;
+    } else {
+      insightsHtml = `<div style="margin-top:10px;font-size:12px;color:#5DCAA5">✓ Todos os pilares completos — cliente no modelo ideal.</div>`;
+    }
+
+    html+=`<div class="metric" style="grid-column:span 4;background:${bgColor};border:1px solid ${bordaColor}">
       <div class="lbl">Modelo de Servir</div>
-      <div class="val ${scoreColor}" style="font-size:24px">${score_servir}/6 pilares</div>
-      <div style="font-size:11px;color:#888;margin-top:4px">${pendentes_criticos>0?`🔴 ${pendentes_criticos} crítico(s) pendente(s)`:''}${pendentes_altos>0?` 🟡 ${pendentes_altos} importante(s) pendente(s)`:''}</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
+        <div class="val ${scoreColor}" style="font-size:28px;line-height:1">${score_servir}/6</div>
+        <div style="flex:1">
+          <div style="font-size:11px;color:#555;margin-bottom:5px">pilares completos</div>
+          <div style="height:6px;background:#222;border-radius:3px;overflow:hidden">
+            <div style="width:${score_servir/6*100}%;height:100%;background:${barColor};border-radius:3px"></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#888;margin-top:6px">${pendentes_criticos>0?`🔴 ${pendentes_criticos} crítico(s) pendente(s) `:''}${pendentes_altos>0?`🟡 ${pendentes_altos} importante(s) pendente(s)`:score_servir>=6?'✓ Todos completos':''}</div>
+      ${insightsHtml}
     </div>`;
   }
   m.innerHTML=html;
