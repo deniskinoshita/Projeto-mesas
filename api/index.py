@@ -1074,12 +1074,23 @@ select option{background:#1A1A1A}
     <h1>BRAÚNA INVESTIMENTOS</h1>
     <p>Análise de Alocação por Indexador · Modelo Levante Asset</p>
   </div>
-  <nav style="display:flex;gap:8px">
-    <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #C9A96E;color:#C9A96E;text-decoration:none;font-weight:700">📊 Assessor</a>
-    <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#8B9FE8';this.style.color='#8B9FE8'" onmouseout="this.style.borderColor='#1C4A34';this.style.color='#3A6A48'">👥 Líder</a>
-    <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#5DCAA5';this.style.color='#5DCAA5'" onmouseout="this.style.borderColor='#1C4A34';this.style.color='#3A6A48'">⚙️ Admin</a>
+  <nav style="display:flex;gap:8px" id="nav-assessor">
     <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#888'">Sair</button>
   </nav>
+  <script>
+  (function(){
+    const role = localStorage.getItem("brauna_role");
+    if(role === "admin"){
+      const nav = document.getElementById("nav-assessor");
+      nav.innerHTML = `
+        <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #C9A96E;color:#C9A96E;text-decoration:none;font-weight:700">📊 Assessor</a>
+        <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">👥 Líder</a>
+        <a href="/head-produtos" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">🏛️ Head</a>
+        <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">⚙️ Admin</a>
+        <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer">Sair</button>`;
+    }
+  })();
+  </script>
 </header>
 <div class="container">
 
@@ -5036,12 +5047,19 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 <body>
 <header>
   <div><h1>👥 BRAÚNA — PAINEL DO LÍDER</h1><p>Ranking de assessores · Histórico de carteiras</p></div>
-  <nav class="nav">
+  <nav class="nav" id="nav-lider">
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider" class="active">👥 Líder</a>
-    <a href="/admin">⚙️ Admin</a>
     <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#4A7055;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#4A7055'">Sair</button>
   </nav>
+  <script>
+  (function(){
+    if(localStorage.getItem("brauna_role")==="admin"){
+      const nav=document.getElementById("nav-lider");
+      nav.innerHTML=`<a href="/assessor">📊 Assessor</a><a href="/lider" class="active">👥 Líder</a><a href="/head-produtos">🏛️ Head</a><a href="/admin">⚙️ Admin</a>`;
+    }
+  })();
+  </script>
 </header>
 <div class="container">
 
@@ -6127,13 +6145,18 @@ textarea{resize:vertical}
     <h1>🏛️ HEAD DE PRODUTOS — BRAÚNA</h1>
     <p>Portfólios modelo · Cenário macro · Produtos em destaque · Base de conhecimento</p>
   </div>
-  <nav class="nav">
-    <a href="/assessor">📊 Assessor</a>
-    <a href="/lider">👥 Líder</a>
+  <nav class="nav" id="nav-head">
     <a href="/head-produtos" class="active">🏛️ Head</a>
-    <a href="/admin">⚙️ Admin</a>
     <button onclick="sair()">Sair</button>
   </nav>
+  <script>
+  (function(){
+    if(localStorage.getItem("brauna_role")==="admin"){
+      const nav=document.getElementById("nav-head");
+      nav.innerHTML=`<a href="/assessor">📊 Assessor</a><a href="/lider">👥 Líder</a><a href="/head-produtos" class="active">🏛️ Head</a><a href="/admin">⚙️ Admin</a>`;
+    }
+  })();
+  </script>
 </header>
 
 <div class="container">
