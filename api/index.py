@@ -6077,20 +6077,29 @@ textarea{resize:vertical}
     Selecione até <b style="color:#D4B483">5 PDFs de uma vez</b> — cartas de gestora, research, relatórios. O sistema extrai o conteúdo de cada um e você escolhe onde usar.
   </p>
 
-  <!-- Drop zone -->
-  <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s;margin-bottom:12px" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
-    <input type="file" id="pdf-rapido" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
-    <div style="font-size:32px;margin-bottom:8px">📂</div>
-    <p style="font-size:13px;color:#3A6A48">Arraste PDFs ou clique para selecionar</p>
-    <p style="font-size:10px;color:#1E4A30;margin-top:4px">até 5 arquivos · .pdf · cartas, research, relatórios</p>
+  <!-- Drop zone + botão selecionar -->
+  <div style="display:flex;align-items:stretch;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+    <div id="drop-rapido" style="flex:1;min-width:240px;border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+      <input type="file" id="pdf-rapido" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
+      <div style="font-size:28px;margin-bottom:6px">📂</div>
+      <p style="font-size:12px;color:#3A6A48">Arraste PDFs aqui</p>
+      <p style="font-size:10px;color:#1E4A30;margin-top:3px">ou use o botão ao lado</p>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:180px">
+      <label class="btn" style="cursor:pointer;justify-content:center;position:relative">
+        📎 Selecionar PDFs
+        <input type="file" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
+      </label>
+      <p style="font-size:10px;color:#2A5A3A;text-align:center">até 5 arquivos por vez</p>
+    </div>
   </div>
 
   <!-- Lista de arquivos selecionados -->
-  <div id="pdf-rapido-lista" style="display:none;margin-bottom:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span id="pdf-rapido-contador" style="font-size:11px;color:#D4B483;font-weight:700"></span>
+  <div id="pdf-rapido-lista" style="display:none;margin-bottom:4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <span id="pdf-rapido-contador" style="font-size:12px;color:#D4B483;font-weight:700"></span>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" id="btn-extrair-todos" onclick="uploadRapidoTodos()">⚡ Extrair todos</button>
+        <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()">⚡ Salvar e extrair todos</button>
         <button class="btn-ghost" onclick="fecharRapido()">✕ Limpar</button>
       </div>
     </div>
