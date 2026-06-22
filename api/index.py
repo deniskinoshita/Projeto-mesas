@@ -1639,7 +1639,7 @@ function setupDrop(dropId,inputId,fnameId){
 setupDrop("drop1","pdf-xp","fname-xp");
 
 // ── Identificação automática do cliente ao subir o XPerformance ──────────────
-let _clienteIdentificado = null;
+var _clienteIdentificado = null;
 
 async function identificarCliente(file){
   // Mostra loading no upload
