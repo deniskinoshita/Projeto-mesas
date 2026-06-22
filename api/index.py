@@ -1212,18 +1212,6 @@ select option{background:#1A1A1A}
     </div>
   </div>
 
-  <!-- ── Barra de ações pós-análise ── -->
-  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;padding:14px 18px;background:#0D0D0D;border:1px solid #1A1A18;border-radius:12px">
-    <button id="btn-apres" onclick="gerarApresentacao()" style="display:inline-flex;align-items:center;gap:8px;background:#E8C96B;color:#0A0A08;border:none;border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-      🎯 Gerar Apresentação de Reunião
-    </button>
-    <div style="font-size:11px;color:#444;line-height:1.5;flex:1">
-      <span style="color:#E8C96B;font-weight:700">PDF landscape · slides dinâmicos · identidade Braúna</span><br>
-      Gerado com todos os dados do cliente — IA enriquece a narrativa quando disponível
-    </div>
-    <span id="apres-st" style="font-size:11px;color:#888"></span>
-  </div>
-
   <div class="card">
     <h2>Resumo</h2>
     <div class="grid-4" id="metrics"></div>
@@ -1314,6 +1302,15 @@ select option{background:#1A1A1A}
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
+  </div>
+
+  <!-- ── Gerar Apresentação de Reunião — ao final ── -->
+  <div style="padding:20px 0 8px">
+    <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#D6B27A;color:#0A0A08;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
+      🎯 Gerar Apresentação de Reunião
+    </button>
+    <p style="font-size:11px;color:#555;text-align:center;margin-top:8px">PDF landscape · slides dinâmicos · identidade Braúna · IA enriquece a narrativa quando disponível</p>
+    <span id="apres-st" style="display:block;font-size:12px;color:#888;text-align:center;margin-top:6px"></span>
   </div>
 
 </div>
