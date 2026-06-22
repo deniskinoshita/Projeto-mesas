@@ -404,53 +404,58 @@ def extrair_xperformance(pdf_bytes):
         for p in pdf.pages:
             texto += (p.extract_text() or "") + "\n"
 
-    # Dados do cabeçalho
+    # Dados do cabeçalho — suporta encoding com ? no lugar de acentos
     conta_m = re.search(r"Conta\s+Assessor\s+Data.*?\n(\d+)\s+(.+?)\s+(\d{2}/\d{2}/\d{4})", texto, re.DOTALL)
     conta    = conta_m.group(1).strip() if conta_m else ""
     assessor = conta_m.group(2).strip() if conta_m else ""
     data_ref = conta_m.group(3).strip() if conta_m else ""
 
-    # Patrimônio
-    pat_m = re.search(r"PATRIM.NIO TOTAL BRUTO:\s*R\$\s*([\d\.,]+)", texto)
+    # Patrimônio — cabeçalho e valor podem estar em linhas separadas
     patrimonio = 0.0
-    if pat_m:
-        try: patrimonio = float(pat_m.group(1).replace(".","").replace(",","."))
-        except: pass
+    idx_pat = texto.find("TOTAL BRUTO")
+    if idx_pat != -1:
+        trecho = texto[idx_pat:idx_pat+400]
+        pat_m = re.search(r"R\$\s*([\d]{1,3}(?:\.\d{3})*,\d{2})", trecho)
+        if pat_m:
+            try: patrimonio = float(pat_m.group(1).replace(".","").replace(",","."))
+            except: pass
 
     # Rentabilidade portfolio e CDI
     rent = {}
-    mp = re.search(r"Portf.lio\s+([\d,]+)%\s+([\d,]+)%\s+([\d,]+)%\s+([\d,]+)%", texto)
-    mc = re.search(r"CDI\s+([\d,]+)%\s+([\d,]+)%\s+([\d,]+)%\s+([\d,]+)%", texto)
+    mp = re.search(r"Portf.lio\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%", texto)
+    mc = re.search(r"CDI\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%", texto)
     if mp: rent["portfolio"] = {k: float(mp.group(i+1).replace(",",".")) for i,k in enumerate(["mes","ano","12m","24m"])}
     if mc: rent["cdi"]       = {k: float(mc.group(i+1).replace(",",".")) for i,k in enumerate(["mes","ano","12m","24m"])}
 
-    # Composição por estratégia (página de composição XP)
-    comp_map = {
-        r"[Pp][oó]s\s*[Ff]ixado":            "pos_fixado",
-        r"[Ii]nfla[cç][aã]o":                "inflacao",
-        r"[Pp]r[eé]\s*[Ff]ixado":            "pre_fixado",
-        r"[Rr]enda\s*[Vv]ari[aá]vel\s*[Bb]rasil": "acoes",
-        r"[Ff]undos\s*[Ll]istados":           "fiis",
-        r"[Mm]ulti[Mm]ercado":               "multimercado",
-        r"[Aa]lternativo":                    "alternativos",
-        r"[Ii]nternacional":                  "internacional",
-        r"[Cc]ripto":                         "criptomoedas",
-    }
+    # Composição — suporta acentos normais E substituídos por ? (encoding pdfplumber)
+    # Mapa amplo: nomes como aparecem no PDF (com e sem acento)
+    comp_map = [
+        (r"[Pp].s\s*[Ff]ix",               "pos_fixado"),    # Pós Fixado / P?s Fixado
+        (r"[Ii]nfla..[ao]",                "inflacao"),       # Inflação / Infla??o
+        (r"[Pp]r.\s*[Ff]ix",               "pre_fixado"),     # Pré Fixado / Pr? Fixado
+        (r"[Rr]enda\s*[Vv]ari",            "acoes"),          # Renda Variável Brasil
+        (r"[Ff]undos?\s*[Ll]ist",          "fiis"),           # Fundos Listados
+        (r"[Mm]ulti.?[Mm]ercado",          "multimercado"),   # Multimercado
+        (r"[Aa]lternativ",                 "alternativos"),   # Alternativo
+        (r"[Ii]nternacion",                "internacional"),  # Internacional
+        (r"[Cc]ripto",                     "criptomoedas"),   # Cripto
+        (r"[Ff]undos?\s*[Ee]strutur",      "alternativos"),   # Fundos Estruturados → alternativos
+        (r"[Pp]revidên|[Pp]revid.ncia",    "pos_fixado"),     # Previdência → pós fixado
+    ]
     comp = {c: 0.0 for c in CATS}
     caixa_perc = 0.0
 
     for linha in texto.splitlines():
-        # Busca padrão: "Pós Fixado (56,81%)   R$ 771.030,04"
-        m = re.search(r"([\w\s\-\/áéíóúâêôãõçÁÉÍÓÚÂÊÔÃÕÇ]+?)\s*\((\d{1,3}[,\.]\d{1,2})%\)", linha)
+        # Padrão 1: "Pós Fixado (77,79%)" ou "P?s Fixado (77,79%)"
+        m = re.search(r"([\w\s\?\-\/\.]+?)\s*\((\d{1,3}[,\.]\d{1,2})%\)", linha)
         if m:
             nome_cat = m.group(1).strip()
             try: perc = float(m.group(2).replace(",","."))
             except: continue
-            if re.search(r"[Cc]aixa", nome_cat):
-                caixa_perc = perc; continue
-            for pat, key in comp_map.items():
-                if re.search(pat, nome_cat):
-                    comp[key] = perc; break
+            if re.search(r"[Cc]aixa|[Pp]rovento|100,00", nome_cat): caixa_perc = perc; continue
+            for pat, key in comp_map:
+                if re.search(pat, nome_cat, re.I):
+                    comp[key] = max(comp[key], perc); break
 
     # Fallback: parser genérico se composição não encontrada
     if sum(comp.values()) < 1:
