@@ -1683,12 +1683,11 @@ async function identificarCliente(file){
       renderCrossForm();
     }
 
-    // ── Mostra botão para avançar
+    // ── Atualiza botão com dados do cliente
     mostrarBotaoProximaEtapa(d);
 
   }catch(e){
     console.error("Identificação falhou:", e);
-    // Mesmo com erro, libera o botão para o assessor continuar manualmente
     mostrarBotaoProximaEtapa(null);
   }
 }
@@ -2872,7 +2871,18 @@ def xp_identificar():
         return jsonify({"erro": "PDF não enviado"}), 400
 
     pdf_bytes = f.read()
-    xp = extrair_xperformance(pdf_bytes)
+    try:
+        xp = extrair_xperformance(pdf_bytes)
+    except Exception as e:
+        app.logger.error(f"extrair_xperformance falhou: {e}")
+        # Retorna resposta parcial para o frontend continuar
+        return jsonify({
+            "conta": "", "assessor_xp": "", "nome_cliente": "",
+            "data_ref": "", "patrimonio": 0, "rent": {},
+            "composicao_atual": {}, "ficha_salva": {},
+            "ultima_carteira": None, "comparativo": [],
+            "tem_historico": False, "erro_extracao": str(e)
+        })
     conta = xp.get("conta", "").strip()
 
     # Busca ficha salva para este código de conta
