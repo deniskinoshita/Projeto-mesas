@@ -2783,6 +2783,8 @@ function renderCrossSellResult(areas, tem, naoTem){
   const naoTemAreas=areas.filter(a=>!a.ativo);
   const temAreas=areas.filter(a=>a.ativo);
   const score=temAreas.length;
+  const ficha = _clienteIdentificado?.ficha_salva || {};
+  const crossHist = ficha.cross_historico || [];
 
   const barColor=score>=4?"#5DCAA5":score>=2?"#C9A96E":"#FF6B6B";
   let html=`<div class="cs-score-bar">
@@ -2793,6 +2795,55 @@ function renderCrossSellResult(areas, tem, naoTem){
       <div style="font-size:11px;color:#888;margin-top:5px">${naoTem.length} oportunidade(s) de negócio em aberto</div>
     </div>
   </div>`;
+
+  // ── Painel de insights com histórico ──────────────────────────────────────
+  const insights = [];
+
+  // Insight 1: produtos sem ativação há muito tempo (baseado em histórico)
+  naoTemAreas.forEach(a => {
+    // Verifica se alguma vez esteve ativo e foi desativado
+    const jaEsteve = crossHist.some(h => (h.ativos||[]).includes(a.id));
+    // Verifica quando foi a última vez que foi discutido (qualquer entrada no histórico)
+    const ultimaEntrada = crossHist.length ? crossHist[crossHist.length-1] : null;
+    if(jaEsteve){
+      insights.push({tipo:"atencao", icone:"🔄", texto:`<b>${a.icone} ${a.nome}</b> já esteve ativo — avaliar reativação nesta reunião.`});
+    } else if(crossHist.length >= 2){
+      // Nunca foi ativado mesmo com histórico longo — prioridade
+      insights.push({tipo:"oportunidade", icone:"💼", texto:`<b>${a.icone} ${a.nome}</b> nunca ativado em ${crossHist.length} reunião(ões) — oportunidade recorrente em aberto.`});
+    }
+  });
+
+  // Insight 2: produtos recém-ativados (última entrada do histórico)
+  if(crossHist.length >= 2){
+    const ultimo = crossHist[crossHist.length-1];
+    (ultimo.ativados||[]).forEach(id=>{
+      const area = CROSS_AREAS.find(a=>a.id===id);
+      if(area) insights.push({tipo:"novidade", icone:"✅", texto:`<b>${area.icone} ${area.nome}</b> ativado em ${ultimo.data} — confirme com o cliente na reunião.`});
+    });
+    (ultimo.desativados||[]).forEach(id=>{
+      const area = CROSS_AREAS.find(a=>a.id===id);
+      if(area) insights.push({tipo:"atencao", icone:"⚠️", texto:`<b>${area.icone} ${area.nome}</b> desativado em ${ultimo.data} — verificar motivo.`});
+    });
+  }
+
+  // Insight 3: cliente com score baixo mas patrimônio alto
+  const pat = _clienteIdentificado?.patrimonio || 0;
+  if(score <= 1 && pat >= 300000){
+    insights.push({tipo:"urgente", icone:"🚨", texto:`Cliente com R$ ${pat.toLocaleString("pt-BR",{maximumFractionDigits:0})} e apenas ${score} produto ativo — potencial de aprofundamento alto.`});
+  }
+
+  if(insights.length){
+    const COR = {oportunidade:"#D4B483", atencao:"#FF9F40", urgente:"#FF6B6B", novidade:"#5DCAA5"};
+    html += `<div style="background:#0A1A10;border:1px solid #1A3A20;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🧠 Insights para esta reunião</div>
+      ${insights.map(i=>`
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #0F2A18">
+          <span style="font-size:14px;flex-shrink:0">${i.icone}</span>
+          <span style="font-size:12px;color:#CCC;line-height:1.5">${i.texto}</span>
+        </div>`).join("")}
+      ${crossHist.length ? `<div style="margin-top:8px;font-size:10px;color:#2A5A3A">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"—"}</div>` : ""}
+    </div>`;
+  }
 
   if(naoTemAreas.length){
     html+=`<p style="font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
@@ -3030,6 +3081,19 @@ def ficha_endpoint():
         checklist_novo = d.get("checklist", {})
         checklist_final = {**ficha_anterior.get("checklist", {}), **checklist_novo} if checklist_novo else ficha_anterior.get("checklist", {})
 
+        # Histórico de cross sell — registra cada mudança de estado com data
+        cross_historico = ficha_anterior.get("cross_historico", [])
+        cross_anterior  = set(ficha_anterior.get("cross_ativos", []))
+        cross_atual_set = set(cross_final)
+        if cross_atual_set != cross_anterior:   # só registra se mudou
+            cross_historico.append({
+                "data": datetime.now().strftime("%d/%m/%Y"),
+                "ativos": list(cross_atual_set),
+                "ativados":   list(cross_atual_set - cross_anterior),
+                "desativados": list(cross_anterior - cross_atual_set),
+            })
+            cross_historico = cross_historico[-24:]   # mantém últimas 24 entradas
+
         fichas[key] = {
             "conta": conta,
             "nome": d.get("nome",""),
@@ -3038,6 +3102,7 @@ def ficha_endpoint():
             "objetivo": d.get("objetivo",""),
             "checklist": checklist_final,
             "cross_ativos": cross_final,
+            "cross_historico": cross_historico,
             "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
         }
         # Remove a ficha por nome se agora temos a chave por conta
