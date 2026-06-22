@@ -1095,8 +1095,9 @@ select option{background:#1A1A1A}
 
   <div style="margin-bottom:10px">
     <label>Relatório XPerformance (PDF) *</label>
-    <div class="upload-area" id="drop1">
-      <input type="file" id="pdf-xp" accept=".pdf">
+    <div class="upload-area" id="drop1" onclick="document.getElementById('pdf-xp').click()">
+      <input type="file" id="pdf-xp" accept=".pdf" style="display:none"
+        onchange="onXpFileChange(this)">
       <div class="icon">📊</div>
       <p>XPerformance — arraste ou clique para identificar o cliente</p>
       <p class="fname" id="fname-xp"></p>
@@ -1607,29 +1608,32 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
   if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#555">Gestores ref. <span style="color:#888">${d.ref_contexto}</span></span>`;
 }).catch(()=>{});
 
+// Handler global do input XPerformance — chamado pelo onchange inline no HTML
+function onXpFileChange(input){
+  const file = input.files[0];
+  if(!file) return;
+  const fname = document.getElementById("fname-xp");
+  const drop  = document.getElementById("drop1");
+  const wrap  = document.getElementById("btn-proxima-etapa-wrap");
+  const btn   = document.getElementById("btn-proxima-etapa");
+  // Feedback imediato — síncrono
+  if(fname) fname.textContent = "⏳ " + file.name;
+  if(drop)  drop.style.borderColor = "#D6B27A";
+  if(wrap)  wrap.style.display = "block";
+  if(btn){  btn.innerHTML = "⏳ Identificando cliente..."; btn.disabled = true; btn.style.opacity = ".6"; }
+  // Processa em background (async)
+  identificarCliente(file);
+}
+
 function setupDrop(dropId,inputId,fnameId){
   const drop=document.getElementById(dropId), input=document.getElementById(inputId), fname=document.getElementById(fnameId);
-  function handleFile(file){
-    if(!file) return;
-    // Feedback imediato
-    if(fname) fname.textContent = "⏳ " + file.name + " — identificando...";
-    drop.style.borderColor="#D6B27A";
-    // Mostra botão desabilitado imediatamente
-    const wrap = document.getElementById("btn-proxima-etapa-wrap");
-    const btn  = document.getElementById("btn-proxima-etapa");
-    if(wrap) wrap.style.display="block";
-    if(btn){ btn.textContent="⏳ Identificando cliente..."; btn.disabled=true; btn.style.opacity=".6"; }
-    // Processa em background
-    identificarCliente(file);
-  }
-  input.addEventListener("change",()=>{ if(input.files[0]) handleFile(input.files[0]); });
+  // Drag-and-drop support
   drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("drag");});
   drop.addEventListener("dragleave",()=>drop.classList.remove("drag"));
   drop.addEventListener("drop",e=>{
     e.preventDefault();drop.classList.remove("drag");
-    input.files=e.dataTransfer.files;
-    fname.textContent=e.dataTransfer.files[0]?.name||"";
-    if(e.dataTransfer.files[0]) identificarCliente(e.dataTransfer.files[0]);
+    const f = e.dataTransfer.files[0];
+    if(f){ const dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; onXpFileChange(input); }
   });
 }
 setupDrop("drop1","pdf-xp","fname-xp");
