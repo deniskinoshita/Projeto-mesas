@@ -3456,7 +3456,11 @@ def analyze():
     carta_info  = _load("/tmp/brauna_carta.json", {})
     carta_texto = carta_info.get("texto","")
 
-    comp, caixa, rent, patrimonio = extrair_composicao(pdf.read())
+    xp_parsed = extrair_xperformance(pdf.read())
+    comp      = xp_parsed.get("comp", {c: 0.0 for c in CATS})
+    caixa     = xp_parsed.get("caixa", 0.0)
+    rent      = xp_parsed.get("rent", {})
+    patrimonio= xp_parsed.get("patrimonio", 0.0)
 
     modelo  = MODELOS.get(perfil, MODELOS["conservadora"])
     desvios = calcular_desvios(comp, modelo)
