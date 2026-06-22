@@ -6109,40 +6109,18 @@ textarea{resize:vertical}
 <div id="status-pub" class="info-box" style="margin-bottom:18px;display:none"></div>
 
 <!-- ══ 0. UPLOAD RÁPIDO DE PDF ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#3A3A20">
-  <div class="card-title"><span>⚡</span> Upload Rápido de PDF</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
-    Selecione até <b style="color:#D4B483">5 PDFs de uma vez</b> — cartas de gestora, research, relatórios. O sistema extrai o conteúdo de cada um e você escolhe onde usar.
-  </p>
-
-  <!-- Drop zone + botão selecionar -->
-  <div style="display:flex;align-items:stretch;gap:12px;margin-bottom:12px;flex-wrap:wrap">
-    <div id="drop-rapido" style="flex:1;min-width:240px;border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+<div class="card" style="border-color:#3A3A20;padding:14px 20px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">⚡ Upload Rápido</span>
+    <label class="btn btn-sm" style="cursor:pointer;position:relative;margin:0">
+      📎 Selecionar PDFs <span style="font-size:10px;opacity:.7">(até 5)</span>
       <input type="file" id="pdf-rapido" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
-      <div style="font-size:28px;margin-bottom:6px">📂</div>
-      <p style="font-size:12px;color:#3A6A48">Arraste PDFs aqui</p>
-      <p style="font-size:10px;color:#1E4A30;margin-top:3px">ou use o botão ao lado</p>
-    </div>
-    <div style="display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:180px">
-      <label class="btn" style="cursor:pointer;justify-content:center;position:relative">
-        📎 Selecionar PDFs
-        <input type="file" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
-      </label>
-      <p style="font-size:10px;color:#2A5A3A;text-align:center">até 5 arquivos por vez</p>
-    </div>
+    </label>
+    <span id="pdf-rapido-contador" style="font-size:11px;color:#4A7055"></span>
+    <button class="btn btn-sm" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="display:none">⚡ Salvar todos</button>
+    <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
   </div>
-
-  <!-- Lista de arquivos selecionados -->
-  <div id="pdf-rapido-lista" style="display:none;margin-bottom:4px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-      <span id="pdf-rapido-contador" style="font-size:12px;color:#D4B483;font-weight:700"></span>
-      <div style="display:flex;gap:8px">
-        <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()">⚡ Salvar e extrair todos</button>
-        <button class="btn-ghost" onclick="fecharRapido()">✕ Limpar</button>
-      </div>
-    </div>
-    <div id="pdf-rapido-itens"></div>
-  </div>
+  <div id="pdf-rapido-itens" style="margin-top:10px"></div>
 </div>
 
 <!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
@@ -7428,9 +7406,10 @@ function uploadRapidoSelecionar(input){
   if(files.length > MAX){ alert(`Selecione no máximo ${MAX} arquivos por vez.`); input.value=""; return; }
   _arquivosRapido = files.map(f => ({file: f, status: "pendente", texto: "", chars: 0}));
   renderListaRapido();
-  document.getElementById("pdf-rapido-lista").style.display = "";
   document.getElementById("pdf-rapido-contador").textContent =
     `${files.length} arquivo${files.length>1?"s":""} selecionado${files.length>1?"s":""}`;
+  document.getElementById("btn-extrair-todos").style.display = "";
+  document.getElementById("btn-limpar-rapido").style.display = "";
 }
 
 function renderListaRapido(){
@@ -7511,8 +7490,10 @@ async function uploadRapido(){ await uploadRapidoTodos(); }
 
 function fecharRapido(){
   _arquivosRapido = [];
-  document.getElementById("pdf-rapido-lista").style.display = "none";
   document.getElementById("pdf-rapido-itens").innerHTML = "";
+  document.getElementById("pdf-rapido-contador").textContent = "";
+  document.getElementById("btn-extrair-todos").style.display = "none";
+  document.getElementById("btn-limpar-rapido").style.display = "none";
   document.getElementById("pdf-rapido").value = "";
 }
 
