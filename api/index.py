@@ -3543,7 +3543,7 @@ def hp_knowledge_upload():
     docs.insert(0, doc)
     docs = docs[:50]   # manter últimos 50 documentos
     _save(_HP_KNOW_FILE, docs)
-    return jsonify({"ok": True, "id": doc["id"], "chars": len(texto), "doc": doc})
+    return jsonify({"ok": True, "id": doc["id"], "chars": len(texto), "texto": texto[:12000], "doc": doc})
 
 @app.route("/api/hp/knowledge/delete", methods=["POST"])
 def hp_knowledge_delete():
@@ -7342,14 +7342,16 @@ async function uploadRapidoUm(i){
   renderListaRapido();
   try{
     const fd = new FormData();
-    fd.append("arquivo", item.file);
-    fd.append("categoria", "geral");
-    const r = await fetch("/api/admin/upload-sugestao-doc", {method:"POST", body:fd});
+    fd.append("pdf", item.file);
+    fd.append("nome", item.file.name.replace(/\.pdf$/i,""));
+    fd.append("tipo", "carta");
+    fd.append("classes", "geral");
+    fd.append("fonte", "");
+    const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
     const d = await r.json();
     if(d.ok){
-      item.status = "ok"; item.texto = d.texto||""; item.chars = d.chars||0;
-      _base.push({nome: item.file.name, chars: item.chars, data: new Date().toLocaleDateString("pt-BR")});
-      renderBase();
+      item.status = "ok"; item.texto = d.texto||""; item.chars = d.chars||0; item.doc_id = d.id||"";
+      carregarKnowledge(); // atualiza lista da base
     } else { item.status="erro"; item.erro = d.error||"falha"; }
   } catch(e){ item.status="erro"; item.erro = e.message; }
   renderListaRapido();
