@@ -6076,32 +6076,44 @@ textarea{resize:vertical}
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
     Suba qualquer PDF — carta de gestora, relatório de casa de análise, nota de research. O sistema extrai o conteúdo e você escolhe onde usar.
   </p>
-  <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
-    <!-- Drop zone -->
-    <div style="flex:0 0 220px">
-      <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
-        <input type="file" id="pdf-rapido" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapido(this)">
-        <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <p style="font-size:12px;color:#3A6A48">Arraste o PDF ou clique</p>
-        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px" id="pdf-rapido-nome"></p>
+
+  <!-- Drop zone -->
+  <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s;margin-bottom:12px" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+    <input type="file" id="pdf-rapido" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
+    <div style="font-size:32px;margin-bottom:8px">📄</div>
+    <p style="font-size:13px;color:#3A6A48">Arraste o PDF ou clique para selecionar</p>
+    <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · carta de gestora, research, relatório</p>
+  </div>
+
+  <!-- Arquivo selecionado + botão extrair -->
+  <div id="pdf-rapido-selecionado" style="display:none;background:#0A140A;border:1px solid #2A3A20;border-radius:10px;padding:14px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">📎</span>
+        <div>
+          <div id="pdf-rapido-nome" style="font-size:13px;color:#D4B483;font-weight:700"></div>
+          <div id="pdf-rapido-st" style="font-size:11px;color:#4A7055;margin-top:2px"></div>
+        </div>
       </div>
-      <div style="margin-top:8px;text-align:center">
-        <span id="pdf-rapido-st" style="font-size:11px"></span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="btn-extrair-rapido" onclick="uploadRapido()">⚡ Extrair conteúdo</button>
+        <button class="btn-ghost" onclick="fecharRapido()">✕ Cancelar</button>
       </div>
     </div>
-    <!-- Preview + ações -->
-    <div id="pdf-rapido-box" style="flex:1;min-width:280px;display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:11px;color:#D4B483;font-weight:700">Conteúdo extraído — escolha onde usar:</span>
-        <button onclick="fecharRapido()" style="background:none;border:none;color:#3A6A48;cursor:pointer;font-size:14px">✕</button>
-      </div>
-      <textarea id="pdf-rapido-texto" rows="7" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:8px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none" placeholder="Texto extraído aparece aqui..."></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <button class="btn btn-sm" onclick="usarComoCenario()">→ Cenário Macro</button>
-        <button class="btn btn-sm btn-out" onclick="usarComoBase()">→ Base de Conhecimento</button>
-        <button class="btn-ghost" onclick="copiarRapido()">📋 Copiar</button>
-        <button class="btn-ghost" onclick="fecharRapido()">Fechar</button>
-      </div>
+  </div>
+
+  <!-- Preview + ações (após extração) -->
+  <div id="pdf-rapido-box" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:11px;color:#D4B483;font-weight:700">✅ Conteúdo extraído — escolha onde usar:</span>
+      <button onclick="fecharRapido()" style="background:none;border:none;color:#3A6A48;cursor:pointer;font-size:14px">✕</button>
+    </div>
+    <textarea id="pdf-rapido-texto" rows="6" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:8px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none" placeholder="Texto extraído aparece aqui..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="usarComoCenario()">🌐 → Cenário Macro</button>
+      <button class="btn btn-sm btn-out" onclick="usarComoBase()">📚 → Base de Conhecimento</button>
+      <button class="btn-ghost" onclick="copiarRapido()">📋 Copiar texto</button>
+      <button class="btn-ghost" onclick="fecharRapido()" style="margin-left:auto">Fechar</button>
     </div>
   </div>
 </div>
@@ -7307,12 +7319,23 @@ async function publicar(){
 }
 
 // ── Upload Rápido ─────────────────────────────────────────────────────────────
-async function uploadRapido(input){
+let _arquivoRapido = null;
+
+function uploadRapidoSelecionar(input){
   const f = input.files[0]; if(!f) return;
+  _arquivoRapido = f;
   document.getElementById("pdf-rapido-nome").textContent = f.name;
-  const st = document.getElementById("pdf-rapido-st");
-  st.textContent = "⏳ Extraindo...";
+  document.getElementById("pdf-rapido-st").textContent = `${(f.size/1024).toFixed(0)} KB`;
+  document.getElementById("pdf-rapido-selecionado").style.display = "";
   document.getElementById("pdf-rapido-box").style.display = "none";
+}
+
+async function uploadRapido(){
+  const f = _arquivoRapido; if(!f) return;
+  const st = document.getElementById("pdf-rapido-st");
+  const btn = document.getElementById("btn-extrair-rapido");
+  st.textContent = "⏳ Extraindo texto...";
+  btn.disabled = true;
   try{
     const fd = new FormData();
     fd.append("arquivo", f);
@@ -7321,20 +7344,28 @@ async function uploadRapido(input){
     const d = await r.json();
     if(d.ok){
       document.getElementById("pdf-rapido-texto").value = d.texto || "";
-      document.getElementById("pdf-rapido-box").style.display = "block";
-      st.innerHTML = `<span class="status-ok">✓ ${d.chars||0} caracteres</span>`;
+      document.getElementById("pdf-rapido-box").style.display = "";
+      st.innerHTML = `<span class="status-ok">✓ ${d.chars||0} caracteres extraídos</span>`;
       _base.push({nome: f.name, chars: d.chars||0, data: new Date().toLocaleDateString("pt-BR")});
       renderBase();
-    } else { st.innerHTML = `<span class="status-err">Erro: ${d.error||"falha"}</span>`; }
-  } catch(e){ st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`; }
-  input.value = "";
+    } else {
+      st.innerHTML = `<span class="status-err">Erro: ${d.error||"falha"}</span>`;
+    }
+  } catch(e){
+    st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+  document.getElementById("pdf-rapido").value = "";
 }
 
 function fecharRapido(){
+  _arquivoRapido = null;
   document.getElementById("pdf-rapido-box").style.display = "none";
+  document.getElementById("pdf-rapido-selecionado").style.display = "none";
   document.getElementById("pdf-rapido-nome").textContent = "";
   document.getElementById("pdf-rapido-st").textContent = "";
   document.getElementById("pdf-rapido-texto").value = "";
+  document.getElementById("pdf-rapido").value = "";
 }
 
 function usarComoCenario(){
