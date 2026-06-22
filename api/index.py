@@ -1974,15 +1974,40 @@ function renderAnaliseHP(xp){
 
   // Alertas relevantes
   const alertasDiv = document.getElementById("hp-alertas");
-  if(xp.alertas_relevantes && xp.alertas_relevantes.length){
-    const ACOR = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
-    alertasDiv.innerHTML = xp.alertas_relevantes.map(a=>`
-      <div style="border-left:3px solid ${ACOR[a.tipo]||"#2A5A3A"};background:#071E17;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:6px">
-        <span style="font-size:11px;font-weight:700;color:${ACOR[a.tipo]||"#CCC"}">🔔 ${a.produto}</span>
-        <span style="font-size:10px;color:#3A6A48;margin-left:8px">${a.data||""}</span>
-        <p style="font-size:11px;color:#AAA;margin:2px 0 0">${a.mensagem}</p>
-      </div>
-    `).join("");
+  const alertas = xp.alertas_relevantes || [];
+  if(alertas.length){
+    const ACOR   = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
+    const AICON  = {info:"ℹ️", atencao:"⚠️", urgente:"🚨"};
+    const ORIG   = {hp_manual:"HP", knowledge_base:"📚 Base", auto:"🤖 Auto"};
+    const urgentes = alertas.filter(a=>a.tipo==="urgente");
+    const outros   = alertas.filter(a=>a.tipo!=="urgente");
+    const bordaCor = urgentes.length ? "#FF6B6B" : "#D4B483";
+    alertasDiv.innerHTML = `
+      <div style="border:2px solid ${bordaCor};border-radius:10px;overflow:hidden;margin-bottom:14px">
+        <div style="background:${bordaCor}22;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+          <span style="font-size:13px;font-weight:700;color:${bordaCor}">${urgentes.length ? "🚨" : "⚠️"} ${alertas.length} ponto${alertas.length>1?"s":""} para discutir com o cliente</span>
+          <div style="display:flex;gap:6px">
+            ${urgentes.length ? `<span style="font-size:10px;background:#FF6B6B22;color:#FF6B6B;border:1px solid #FF6B6B44;padding:2px 8px;border-radius:10px">${urgentes.length} urgente${urgentes.length>1?"s":""}</span>` : ""}
+            ${outros.length   ? `<span style="font-size:10px;background:#D4B48322;color:#D4B483;border:1px solid #D4B48344;padding:2px 8px;border-radius:10px">${outros.length} atenção</span>` : ""}
+          </div>
+        </div>
+        <div style="padding:8px 14px 10px">
+          ${alertas.map(a=>{
+            const cor    = ACOR[a.tipo]||"#888";
+            const orig   = ORIG[a.origem_tipo]||a.origem||"";
+            return `<div style="border-left:3px solid ${cor};background:#060F0B;border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700;color:${cor}">${AICON[a.tipo]||"🔔"} ${a.produto||a.classe||""}</span>
+                ${orig ? `<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${orig}</span>` : ""}
+                <span style="font-size:10px;color:#2A5A3A;margin-left:auto">${a.data||""}</span>
+              </div>
+              <p style="font-size:11px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>`;
+  } else {
+    alertasDiv.innerHTML = "";
   }
 
   // Desvios
@@ -3388,14 +3413,100 @@ def analyze_xp():
                     "produto": p,
                 })
 
-    # Alertas ativos que afetam ativos da carteira
-    alertas_hp = _load(_HP_ALERTS_FILE, [])
-    tickers_carteira = [a["ticker"] for a in dados.get("acoes", [])] + [f["ticker"] for f in dados.get("fiis", [])]
-    alertas_relevantes = [
-        a for a in alertas_hp
-        if any(t in a.get("produto", "") for t in tickers_carteira)
-        or a.get("classe","") in [d["cls"] for d in desvios if d["status"] == "fora"]
-    ]
+    # ── Alertas para o assessor ────────────────────────────────────────────────
+    alertas_hp       = _load(_HP_ALERTS_FILE, [])
+    docs_publicados  = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
+    tickers_carteira = [a["ticker"] for a in dados.get("acoes", [])] + \
+                       [f["ticker"] for f in dados.get("fiis", [])]
+    nomes_fundos     = [a.get("nome","") for a in dados.get("acoes", [])] + \
+                       [f.get("nome","") for f in dados.get("fiis", [])]
+
+    alertas_relevantes = []
+
+    # 1. Alertas manuais do HP por ticker ou classe com desvio
+    classes_fora = [d["cls"] for d in desvios if d["status"] == "fora"]
+    for a in alertas_hp:
+        if any(t and t in a.get("produto","") for t in tickers_carteira) \
+        or a.get("classe","") in classes_fora:
+            alertas_relevantes.append({**a, "origem_tipo": "hp_manual"})
+
+    # 2. Varredura nos documentos publicados da Base de Conhecimento
+    #    Procura menções a tickers ou nomes de fundos da carteira
+    for doc in docs_publicados:
+        texto_doc = (doc.get("texto","") or "").upper()
+        for tk in tickers_carteira:
+            if tk and len(tk) >= 4 and tk.upper() in texto_doc:
+                # Extrai trecho ao redor da menção
+                idx = texto_doc.find(tk.upper())
+                trecho = doc.get("texto","")[max(0, idx-80):idx+200].replace("\n"," ").strip()
+                alertas_relevantes.append({
+                    "id":       f"kb_{doc['id']}_{tk}",
+                    "produto":  tk,
+                    "classe":   "",
+                    "tipo":     "atencao",
+                    "mensagem": f"Mencionado em \"{doc.get('nome','')}\" ({doc.get('fonte','HP')}): ...{trecho}...",
+                    "origem":   doc.get("nome","Base de Conhecimento"),
+                    "origem_tipo": "knowledge_base",
+                    "data":     doc.get("data",""),
+                })
+                break  # um alerta por doc por ticker
+
+    # 3. Alertas automáticos por concentração e desvios graves
+    comp_atual = dados.get("comp", {})
+    LABELS_CLS = {"pos_fixado":"Pós Fixado","inflacao":"Inflação","pre_fixado":"Pré Fixado",
+                  "acoes":"Ações","fiis":"FIIs","multimercado":"Multimercado",
+                  "internacional":"Internacional","alternativos":"Alternativos","criptomoedas":"Criptomoedas"}
+    for cls, pct in comp_atual.items():
+        if pct >= 80:
+            alertas_relevantes.append({
+                "id": f"auto_conc_{cls}",
+                "produto": LABELS_CLS.get(cls, cls),
+                "classe": cls,
+                "tipo": "urgente",
+                "mensagem": f"Concentração muito alta: {pct:.1f}% em {LABELS_CLS.get(cls, cls)}. Discuta diversificação com o cliente.",
+                "origem": "Análise automática",
+                "origem_tipo": "auto",
+                "data": datetime.now().strftime("%d/%m/%Y"),
+            })
+        elif pct >= 60:
+            alertas_relevantes.append({
+                "id": f"auto_conc_{cls}",
+                "produto": LABELS_CLS.get(cls, cls),
+                "classe": cls,
+                "tipo": "atencao",
+                "mensagem": f"Alocação elevada: {pct:.1f}% em {LABELS_CLS.get(cls, cls)}. Verifique se está alinhado ao objetivo do cliente.",
+                "origem": "Análise automática",
+                "origem_tipo": "auto",
+                "data": datetime.now().strftime("%d/%m/%Y"),
+            })
+
+    for d_desvio in desvios:
+        if abs(d_desvio.get("desvio_pp", 0)) >= 25:
+            cls  = d_desvio["cls"]
+            sinal = "+" if d_desvio["desvio_pp"] > 0 else ""
+            alertas_relevantes.append({
+                "id": f"auto_desvio_{cls}",
+                "produto": LABELS_CLS.get(cls, cls),
+                "classe": cls,
+                "tipo": "atencao",
+                "mensagem": f"Desvio significativo: {sinal}{d_desvio['desvio_pp']:.1f}pp em relação ao modelo. Pauta prioritária para rebalanceamento.",
+                "origem": "Análise automática",
+                "origem_tipo": "auto",
+                "data": datetime.now().strftime("%d/%m/%Y"),
+            })
+
+    # Remove duplicatas por id
+    seen = set()
+    alertas_unicos = []
+    for a in alertas_relevantes:
+        k = a.get("id") or a.get("produto","")
+        if k not in seen:
+            seen.add(k)
+            alertas_unicos.append(a)
+
+    # Ordena: urgente primeiro, depois atenção, depois info
+    _ord = {"urgente": 0, "atencao": 1, "info": 2}
+    alertas_unicos.sort(key=lambda a: _ord.get(a.get("tipo","info"), 2))
 
     resultado = {
         "conta":       dados["conta"],
@@ -3417,7 +3528,7 @@ def analyze_xp():
             "posicionamento":cenario.get("posicionamento",""),
             "vieses":        cenario.get("vieses",{}),
         },
-        "alertas_relevantes": alertas_relevantes,
+        "alertas_relevantes": alertas_unicos,
         "analisado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
     return jsonify(resultado)
