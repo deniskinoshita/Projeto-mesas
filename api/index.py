@@ -1178,8 +1178,8 @@ select option{background:#1A1A1A}
       🎯 Gerar Apresentação de Reunião
     </button>
     <div style="font-size:11px;color:#444;line-height:1.5;flex:1">
-      <span style="color:#E8C96B;font-weight:700">PDF landscape · 7 slides · identidade Braúna</span><br>
-      Claude escreve a narrativa personalizada usando todos os dados do HP publicados
+      <span style="color:#E8C96B;font-weight:700">PDF landscape · slides dinâmicos · identidade Braúna</span><br>
+      Gerado com todos os dados do cliente — IA enriquece a narrativa quando disponível
     </div>
     <span id="apres-st" style="font-size:11px;color:#888"></span>
   </div>
@@ -1270,10 +1270,9 @@ select option{background:#1A1A1A}
 
   <div class="card" style="text-align:center">
     <h2>Exportar Análise</h2>
-    <p style="font-size:12px;color:#555;margin-bottom:14px">Relatório técnico em PDF ou apresentação personalizada em PowerPoint (10 slides) para o cliente</p>
+    <p style="font-size:12px;color:#555;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
-      <button class="btn" id="btn-ppt" onclick="baixarPpt()" style="min-width:220px;background:linear-gradient(135deg,#C6500A,#D6B27A);border:none;color:#fff;font-weight:700">📊 Gerar Apresentação PPT</button>
     </div>
   </div>
 
