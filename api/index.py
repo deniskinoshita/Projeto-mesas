@@ -1103,19 +1103,15 @@ select option{background:#1A1A1A}
     </div>
   </div>
 
-  <!-- Painel do cliente identificado — aparece automaticamente após o upload -->
+  <!-- Status da identificação -->
   <div id="box-cliente-identificado" style="margin-top:10px;background:#111;border:1px solid #2A2A2A;border-radius:10px;padding:14px;display:none;transition:all .3s"></div>
-  <script>
-    // Mostra o painel assim que tiver conteúdo
-    const _obs = new MutationObserver(()=>{
-      const b = document.getElementById("box-cliente-identificado");
-      if(b) b.style.display = b.innerHTML.trim() ? "block" : "none";
-    });
-    document.addEventListener("DOMContentLoaded",()=>{
-      const b = document.getElementById("box-cliente-identificado");
-      if(b) _obs.observe(b, {childList:true, subtree:true});
-    });
-  </script>
+
+  <!-- Botão para avançar — aparece após PDF carregado -->
+  <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
+    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#D6B27A;color:#0D0D0D;font-size:15px;padding:15px">
+      Continuar para Etapa 2 — Perfil &amp; Cross Sell →
+    </button>
+  </div>
 </div>
 
 <!-- ETAPA 2 — aparece após identificar o cliente pelo XPerformance -->
@@ -1673,11 +1669,37 @@ async function identificarCliente(file){
       renderCrossForm();
     }
 
-    // ── Transição para Etapa 2
-    ativarEtapa2(d);
+    // ── Mostra botão para avançar
+    mostrarBotaoProximaEtapa(d);
 
   }catch(e){
     console.error("Identificação falhou:", e);
+    // Mesmo com erro, libera o botão para o assessor continuar manualmente
+    mostrarBotaoProximaEtapa(null);
+  }
+}
+
+function mostrarBotaoProximaEtapa(d){
+  const wrap = document.getElementById("btn-proxima-etapa-wrap");
+  const btn  = document.getElementById("btn-proxima-etapa");
+  if(!wrap) return;
+
+  if(d){
+    const nome = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
+    const retorno = d.tem_historico && d.ultima_carteira;
+    if(btn) btn.innerHTML = retorno
+      ? `🔄 Continuar com ${nome} — Retorno →`
+      : `🆕 Continuar com ${nome} — Primeiro acesso →`;
+  }
+  wrap.style.display = "block";
+}
+
+function avancarEtapa2(){
+  if(_clienteIdentificado){
+    ativarEtapa2(_clienteIdentificado);
+  } else {
+    // fallback: dados do cliente ainda não identificados, mostra etapa 2 mesmo assim
+    ativarEtapa2({conta:"", ficha_salva:{}, tem_historico:false, ultima_carteira:null, comparativo:[]});
   }
 }
 
