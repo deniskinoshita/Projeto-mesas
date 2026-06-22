@@ -1307,9 +1307,9 @@ select option{background:#1A1A1A}
   <!-- ── Gerar Apresentação de Reunião — ao final ── -->
   <div style="padding:20px 0 8px">
     <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#D6B27A;color:#0A0A08;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
-      🎯 Gerar Apresentação de Reunião
+      🎯 Gerar Apresentação de Reunião (.pptx)
     </button>
-    <p style="font-size:11px;color:#555;text-align:center;margin-top:8px">PDF landscape · slides dinâmicos · identidade Braúna · IA enriquece a narrativa quando disponível</p>
+    <p style="font-size:11px;color:#555;text-align:center;margin-top:8px">PowerPoint · Cenário macro · Análise da carteira · Sugestões de realocação · Identidade Braúna</p>
     <span id="apres-st" style="display:block;font-size:12px;color:#888;text-align:center;margin-top:6px"></span>
   </div>
 
@@ -2570,7 +2570,7 @@ async function gerarApresentacao(){
   };
 
   try{
-    const r = await fetch("/api/gerar-apresentacao", {
+    const r = await fetch("/api/gerar-pptx", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload),
@@ -2579,9 +2579,9 @@ async function gerarApresentacao(){
     const blob = await r.blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `apresentacao_${(payload.nome_cliente).replace(/ /g,"-").toLowerCase()}_${payload.data_ref.replace(/\//g,"-")}.pdf`;
+    a.download = `apresentacao_${(payload.nome_cliente).replace(/ /g,"-").toLowerCase()}_${payload.data_ref.replace(/\//g,"-")}.pptx`;
     a.click();
-    st.innerHTML = `<span style="color:#5DCAA5">✓ Apresentação gerada com sucesso — 7 slides</span>`;
+    st.innerHTML = `<span style="color:#5DCAA5">✓ Apresentação PowerPoint gerada com sucesso!</span>`;
   } catch(e){
     st.innerHTML = `<span style="color:#FF6B6B">Erro: ${e.message}</span>`;
   } finally{
@@ -3313,6 +3313,57 @@ def gerar_apresentacao():
     return send_file(
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@app.route("/api/gerar-pptx", methods=["POST"])
+def gerar_pptx():
+    """Gera PPTX de apresentação de reunião com identidade Braúna."""
+    try:
+        import sys, os
+        _api_dir = os.path.dirname(os.path.abspath(__file__))
+        if _api_dir not in sys.path:
+            sys.path.insert(0, _api_dir)
+        from apresentacao_pptx import gerar_apresentacao_pptx as _gerar_pptx
+    except Exception as e:
+        app.logger.error(f"Erro ao importar apresentacao_pptx: {e}")
+        return jsonify({"error": f"Erro ao carregar módulo PPTX: {e}"}), 500
+
+    body = request.get_json()
+    if not body:
+        return jsonify({"error": "Dados não enviados"}), 400
+
+    try:
+        hp_cenario = _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
+        body["cenario_macro"] = {
+            "global":         hp_cenario.get("global",""),
+            "brasil":         hp_cenario.get("brasil",""),
+            "posicionamento": hp_cenario.get("posicionamento",""),
+            "vieses":         hp_cenario.get("vieses",{}),
+        }
+        rent = body.get("rent", {})
+        port_rent = rent.get("portfolio", {}) if isinstance(rent, dict) else {}
+        cdi_rent  = rent.get("cdi", {}) if isinstance(rent, dict) else {}
+        rent_12m  = port_rent.get("12m", 0)
+        cdi_12m   = cdi_rent.get("12m", 0)
+        body["rent_12m"] = rent_12m
+        body["pct_cdi"]  = round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0
+
+        pptx_bytes = _gerar_pptx(body)
+    except Exception as e:
+        import traceback
+        app.logger.error(f"Erro ao gerar PPTX: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+    nome = body.get("nome_cliente","cliente").replace(" ","-").lower()
+    data = body.get("data_ref","").replace("/","-")
+    filename = f"apresentacao_{nome}_{data}.pptx"
+
+    return send_file(
+        io.BytesIO(pptx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
         as_attachment=True,
         download_name=filename,
     )
