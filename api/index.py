@@ -6088,10 +6088,10 @@ textarea{resize:vertical}
     <div>
       <label>PDF do material</label>
       <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
-        <input type="file" id="know-pdf" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
+        <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
         <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <p style="font-size:12px;color:#3A6A48">Arraste ou clique</p>
-        <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · max 10 MB</p>
+        <p style="font-size:12px;color:#3A6A48">Arraste ou clique — múltiplos PDFs</p>
+        <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · vários de uma vez</p>
         <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
       </div>
       <div style="margin-top:8px;text-align:center">
@@ -6674,41 +6674,59 @@ document.addEventListener("DOMContentLoaded", ()=>{
   carregarKnowledge();
 });
 
+let _knowFiles = [];  // suporta múltiplos
+
 function knowUpload(input){
-  const f = input.files[0]; if(!f) return;
-  _knowFile = f;
-  document.getElementById("know-fname").textContent = f.name;
-  if(!document.getElementById("know-nome").value)
-    document.getElementById("know-nome").value = f.name.replace(/\.pdf$/i,"");
+  const files = [...input.files];
+  if(!files.length) return;
+  _knowFiles = files;
+  _knowFile  = files[0];  // compatibilidade
+  document.getElementById("know-fname").textContent =
+    files.length === 1 ? files[0].name : `${files.length} arquivos selecionados`;
+  if(files.length === 1 && !document.getElementById("know-nome").value)
+    document.getElementById("know-nome").value = files[0].name.replace(/\.pdf$/i,"");
   document.getElementById("know-btn-upload").disabled = false;
-  document.getElementById("know-st").innerHTML = `<span style="color:#5DCAA5">✓ Pronto para subir</span>`;
+  document.getElementById("know-st").innerHTML =
+    `<span style="color:#5DCAA5">✓ ${files.length} arquivo${files.length>1?"s":""} prontos para subir</span>`;
 }
 
 async function knowSalvar(){
-  if(!_knowFile){ document.getElementById("know-save-st").innerHTML=`<span class="status-err">Selecione um PDF primeiro.</span>`; return; }
+  if(!_knowFiles.length){ document.getElementById("know-save-st").innerHTML=`<span class="status-err">Selecione ao menos um PDF.</span>`; return; }
   const btn = document.getElementById("know-btn-upload");
   const st  = document.getElementById("know-save-st");
   btn.disabled = true;
-  st.innerHTML = "⏳ Processando PDF...";
-  try{
-    const classes = [...document.querySelectorAll(".know-cls-btn.sel")].map(b=>b.dataset.cls).join(",");
-    const fd = new FormData();
-    fd.append("pdf",     _knowFile);
-    fd.append("nome",    document.getElementById("know-nome").value.trim());
-    fd.append("tipo",    document.getElementById("know-tipo").value);
-    fd.append("fonte",   document.getElementById("know-fonte").value.trim());
-    fd.append("classes", classes);
-    const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
-    const d = await r.json();
-    if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ ${d.chars.toLocaleString()} caracteres extraídos</span>`;
-      // reset form
-      _knowFile = null;
-      document.getElementById("know-pdf").value = "";
-      document.getElementById("know-fname").textContent = "";
-      document.getElementById("know-nome").value = "";
-      document.getElementById("know-fonte").value = "";
-      document.getElementById("know-st").textContent = "";
+  const classes = [...document.querySelectorAll(".know-cls-btn.sel")].map(b=>b.dataset.cls).join(",");
+  const tipo    = document.getElementById("know-tipo").value;
+  const fonte   = document.getElementById("know-fonte").value.trim();
+  const total   = _knowFiles.length;
+  let ok = 0, erros = [];
+
+  for(let i = 0; i < total; i++){
+    const f = _knowFiles[i];
+    st.innerHTML = `⏳ Processando ${i+1}/${total}: <b>${f.name}</b>`;
+    try{
+      const fd = new FormData();
+      fd.append("pdf",     f);
+      fd.append("nome",    total === 1 ? (document.getElementById("know-nome").value.trim() || f.name.replace(/\.pdf$/i,"")) : f.name.replace(/\.pdf$/i,""));
+      fd.append("tipo",    tipo);
+      fd.append("fonte",   fonte);
+      fd.append("classes", classes);
+      const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
+      const d = await r.json();
+      if(d.ok) ok++;
+      else erros.push(f.name);
+    } catch(e){ erros.push(f.name); }
+  }
+
+  if(ok > 0){
+    st.innerHTML = `<span class="status-ok">✓ ${ok} arquivo${ok>1?"s":""} adicionado${ok>1?"s":""} à base${erros.length ? ` · ${erros.length} erro(s)` : ""}</span>`;
+    // reset form
+    _knowFiles = []; _knowFile = null;
+    document.getElementById("know-pdf").value = "";
+    document.getElementById("know-fname").textContent = "";
+    document.getElementById("know-nome").value = "";
+    document.getElementById("know-fonte").value = "";
+    document.getElementById("know-st").textContent = "";
       document.querySelectorAll(".know-cls-btn.sel").forEach(b=>b.classList.remove("sel"));
       btn.disabled = true;
       carregarKnowledge();
