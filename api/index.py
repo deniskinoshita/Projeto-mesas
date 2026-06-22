@@ -3249,6 +3249,10 @@ def analyze_xp():
 def gerar_apresentacao():
     """Gera PDF de apresentação de reunião com dados HP + IA."""
     try:
+        import sys, os
+        _api_dir = os.path.dirname(os.path.abspath(__file__))
+        if _api_dir not in sys.path:
+            sys.path.insert(0, _api_dir)
         from apresentacao import gerar_apresentacao as _gerar
     except Exception as e:
         app.logger.error(f"Erro ao importar apresentacao: {e}")
