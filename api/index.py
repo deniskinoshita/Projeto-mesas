@@ -1116,7 +1116,10 @@ select option{background:#1A1A1A}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
     <div>
       <label>Assessor</label>
-      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#1A1A1A;cursor:default;color:#C9A96E">
+      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#1A1A1A;cursor:default;color:#C9A96E;display:none">
+      <select id="assessor-select" onchange="document.getElementById('assessor').value=this.value;buscarClientesSalvos()" style="display:none;width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#C9A96E;font-size:13px;outline:none">
+        <option value="">— Selecione o assessor —</option>
+      </select>
     </div>
     <div><label>Nome do cliente</label><input type="text" id="nome" placeholder="Ex: Lucia Silva"></div>
   </div>
@@ -1374,11 +1377,39 @@ select option{background:#1A1A1A}
 (function(){
   const role = localStorage.getItem("brauna_role");
   if(role !== "assessor" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
-  // Auto-preenche nome do assessor salvo no login
-  const nomeLogin = localStorage.getItem("brauna_nome");
-  if(nomeLogin){
+
+  const ASSESSORES_LIST = [
+    "Lucas Landroni Cozzi","Tatiane Cristina da Silva Cecchetti","Felipe Fraga",
+    "Bruno Seiji Ito","Matheus Escoza Milani","Alex Alves dos Santos",
+    "Flavia Guedes de Souza","Carolina Custodio Siqueira","Andre Guilherme Leite Figueiredo",
+    "Carlos Fernando Victor Bolivar Moreira Neto","Thiago Brunelli Borba",
+    "Walter Nogueira de Souza Netto Ribeiro","Giuseppe Hilario Neto",
+    "Felipe Pereira Gomes","Paulo Roberto Negreiros Sobrinho","Felipe Santos Nishio",
+    "Michael Ademilson Santos da Silva","Marcelo Ramos Dias","Denis Kinoshita"
+  ];
+
+  if(role === "admin"){
+    // Mostra select com lista de assessores
+    const sel = document.getElementById("assessor-select");
+    if(sel){
+      ASSESSORES_LIST.forEach(n=>{
+        const opt = document.createElement("option"); opt.value = n; opt.textContent = n; sel.appendChild(opt);
+      });
+      sel.style.display = "";
+      sel.addEventListener("change", ()=>{
+        document.getElementById("assessor").value = sel.value;
+        buscarClientesSalvos();
+      });
+    }
+  } else {
+    // Assessor normal — mostra input readonly com nome do login
     const el = document.getElementById("assessor");
-    if(el && !el.value) el.value = nomeLogin;
+    if(el){ el.style.display = ""; }
+    const nomeLogin = localStorage.getItem("brauna_nome");
+    if(nomeLogin){
+      const el2 = document.getElementById("assessor");
+      if(el2 && !el2.value) el2.value = nomeLogin;
+    }
   }
 })();
 function sair(){
