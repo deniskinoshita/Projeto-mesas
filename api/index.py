@@ -1047,7 +1047,7 @@ select option{background:#1A1A1A}
   </div>
   <div class="grid-3" style="margin-bottom:14px">
     <div><label>Perfil</label>
-      <select id="perfil" onchange="atualizarModelo()">
+      <select id="perfil" onchange="var _nm={conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();">
         <option value="conservadora">Conservadora</option>
         <option value="moderada">Moderada</option>
         <option value="arrojada">Arrojada</option>
@@ -1757,7 +1757,7 @@ async function buscarClientesSalvos(){
 function carregarFicha(jsonStr){
   const c = JSON.parse(jsonStr);
   document.getElementById("nome").value   = c.nome    || "";
-  document.getElementById("perfil").value = c.perfil  || "conservadora";
+  if(c.perfil) document.getElementById("perfil").value = c.perfil;
   document.getElementById("objetivo").value = c.objetivo || "";
   atualizarModelo();
 
