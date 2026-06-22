@@ -215,68 +215,110 @@ def s_cenario_brasil(prs, d):
     header(sl, "BRASIL & POSICIONAMENTO", "Visão Head de Produtos — Levante Asset")
     footer(sl, d.get("nome_cliente",""), d.get("data_ref",""))
 
-    cenario     = d.get("cenario_macro", {})
-    selic       = cenario.get("selic_meta")
-    ipca        = cenario.get("ipca_12m")
-    brasil_txt  = cenario.get("brasil", "Informação não disponível.")
-    pos_txt     = cenario.get("posicionamento", "Informação não disponível.")
-    vieses      = cenario.get("vieses", {})
-    VCOR        = {"positivo": C_GREEN, "neutro": C_AMBER, "negativo": C_RED}
+    cenario    = d.get("cenario_macro", {})
+    selic      = cenario.get("selic_meta")
+    ipca       = cenario.get("ipca_12m")
+    brasil_txt = cenario.get("brasil", "")
+    pos_txt    = cenario.get("posicionamento", "")
+    vieses     = cenario.get("vieses", {})
+    VCOR       = {"positivo": C_GREEN, "neutro": C_AMBER, "negativo": C_RED}
+    VIC        = {"positivo": "▲", "neutro": "→", "negativo": "▼"}
 
-    # ── Métricas macroeconômicas do Brasil (BCB em tempo real) ────────────────
     juro_real = round(selic - ipca, 2) if selic and ipca else None
+
+    # ── Linha 1: 4 métricas macro ─────────────────────────────────────────────
     metricas_br = [
-        ("SELIC META", f"{selic:.2f}%" if selic else "—", C_GOLD),
-        ("IPCA 12M",   f"{ipca:.2f}%"  if ipca  else "—", C_AMBER if ipca and ipca > 5 else C_GREEN),
-        ("JURO REAL",  f"{juro_real:.2f}%" if juro_real else "—",
-         C_GREEN if juro_real and juro_real > 6 else C_AMBER),
-        ("POSIÇÃO HP", "Definida", C_GOLD),
+        ("SELIC META",  f"{selic:.2f}%"     if selic     else "—",  C_GOLD),
+        ("IPCA 12M",    f"{ipca:.2f}%"      if ipca      else "—",  C_AMBER if ipca and ipca > 5 else C_GREEN),
+        ("JURO REAL",   f"{juro_real:.2f}%" if juro_real else "—",  C_GREEN if juro_real and juro_real > 6 else C_AMBER),
+        ("SPREAD REAL", f"+{max(0,(juro_real or 0)-6):.2f}%p acima NTN-B" if juro_real else "—", C_LGRAY),
     ]
     mw = (SW - Cm(1.4)) / 4 - Cm(0.25)
     for i, (lbl, val, cor) in enumerate(metricas_br):
         mx = MARGIN + i * (mw + Cm(0.25))
-        add_rect(sl, mx, Cm(3.0), mw, Cm(1.8), C_CARD, cor, 0.4)
-        add_rect(sl, mx, Cm(3.0), mw, Cm(0.12), cor)
-        add_text(sl, lbl,  mx + Cm(0.3), Cm(3.2),  mw - Cm(0.6), Cm(0.5),  size=7.5, color=C_LGRAY)
-        add_text(sl, val,  mx + Cm(0.3), Cm(3.75), mw - Cm(0.6), Cm(0.85), size=15, bold=True, color=cor)
+        add_rect(sl, mx, Cm(3.0), mw, Cm(2.0), C_CARD, cor, 0.5)
+        add_rect(sl, mx, Cm(3.0), mw, Cm(0.15), cor)
+        add_text(sl, lbl, mx + Cm(0.3), Cm(3.22), mw - Cm(0.6), Cm(0.5), size=8, color=C_LGRAY)
+        add_text(sl, val, mx + Cm(0.3), Cm(3.8),  mw - Cm(0.6), Cm(0.95), size=16, bold=True, color=cor)
 
-    # ── Análise Brasil (coluna esquerda) ──────────────────────────────────────
-    col_w  = (SW - Cm(2)) / 2 - Cm(0.3)
+    col_w = (SW - Cm(2)) / 2 - Cm(0.3)
     cx1, cx2 = MARGIN, MARGIN + col_w + Cm(0.6)
-    card_top = Cm(5.05)
-    card_h   = SH - card_top - Cm(0.75)
+    y0 = Cm(5.3)
 
-    add_rect(sl, cx1, card_top, col_w, Cm(0.06), C_LGRAY)
-    add_text(sl, "🇧🇷  CENÁRIO BRASIL", cx1, card_top + Cm(0.1),
-             col_w, Cm(0.5), size=8.5, bold=True, color=C_LGRAY)
-    add_rect(sl, cx1, card_top + Cm(0.65), col_w, card_h - Cm(0.65), C_CARD, C_GRAY, 0.3)
+    # ── Coluna esquerda: CENÁRIO BRASIL ───────────────────────────────────────
+    add_rect(sl, cx1, y0, col_w, Cm(0.6), C_DGRAY, C_GRAY, 0.3)
+    add_rect(sl, cx1, y0, Cm(0.18), Cm(0.6), C_LGRAY)
+    add_text(sl, "🇧🇷  CENÁRIO BRASIL", cx1 + Cm(0.4), y0 + Cm(0.1),
+             col_w - Cm(0.6), Cm(0.45), size=10, bold=True, color=C_WHITE)
+
+    add_rect(sl, cx1, y0 + Cm(0.6), col_w, Cm(5.5), C_CARD, C_GRAY, 0.3)
+
+    # Texto principal brasil
     add_text(sl, brasil_txt,
-             cx1 + Cm(0.4), card_top + Cm(0.95), col_w - Cm(0.8), card_h - Cm(1.2),
-             size=10, color=C_WHITE, wrap=True)
+             cx1 + Cm(0.4), y0 + Cm(0.85), col_w - Cm(0.8), Cm(3.5),
+             size=11, color=C_WHITE, wrap=True)
 
-    # ── Posicionamento HP (coluna direita) ────────────────────────────────────
-    add_rect(sl, cx2, card_top, col_w, Cm(0.06), C_GOLD)
-    add_text(sl, "★  POSICIONAMENTO HEAD DE PRODUTOS", cx2, card_top + Cm(0.1),
-             col_w, Cm(0.5), size=8.5, bold=True, color=C_GOLD)
-    add_rect(sl, cx2, card_top + Cm(0.65), col_w, card_h - Cm(0.65), C_CARD2, C_GOLD, 0.4)
-    add_rect(sl, cx2, card_top + Cm(0.65), col_w, Cm(0.15), C_GOLD)
+    # Sub-bloco: indicadores chave dentro do card
+    add_rect(sl, cx1 + Cm(0.3), y0 + Cm(4.55), col_w - Cm(0.6), Cm(0.04), C_GRAY)
+    add_text(sl, "INDICADORES CHAVE", cx1 + Cm(0.3), y0 + Cm(4.65),
+             col_w - Cm(0.6), Cm(0.4), size=7.5, bold=True, color=C_LGRAY)
+    kpis = []
+    if selic:   kpis.append(f"Selic: {selic:.2f}%")
+    if ipca:    kpis.append(f"IPCA 12M: {ipca:.2f}%")
+    if juro_real: kpis.append(f"Juro real: {juro_real:.2f}%")
+    kpis += ["Risco fiscal: elevado", "Câmbio: volatilidade moderada"]
+    for j, kpi in enumerate(kpis[:4]):
+        kx = cx1 + Cm(0.3) + (j % 2) * ((col_w - Cm(0.6)) / 2)
+        ky = y0 + Cm(5.15) + (j // 2) * Cm(0.55)
+        add_rect(sl, kx, ky, (col_w - Cm(0.8)) / 2, Cm(0.48), C_CARD2, C_GRAY, 0.3)
+        add_text(sl, kpi, kx + Cm(0.2), ky + Cm(0.06),
+                 (col_w - Cm(0.8)) / 2 - Cm(0.3), Cm(0.38), size=8.5, color=C_LGRAY)
+
+    # ── Coluna direita: POSICIONAMENTO HP ────────────────────────────────────
+    add_rect(sl, cx2, y0, col_w, Cm(0.6), C_CARD2, C_GOLD, 0.4)
+    add_rect(sl, cx2, y0, col_w, Cm(0.15), C_GOLD)
+    add_text(sl, "★  POSICIONAMENTO HEAD DE PRODUTOS", cx2 + Cm(0.3), y0 + Cm(0.12),
+             col_w - Cm(0.5), Cm(0.45), size=10, bold=True, color=C_GOLD)
+
+    add_rect(sl, cx2, y0 + Cm(0.6), col_w, Cm(3.0), C_CARD2, C_GOLD, 0.3)
     add_text(sl, pos_txt,
-             cx2 + Cm(0.4), card_top + Cm(1.0), col_w - Cm(0.8), card_h - Cm(1.4),
-             size=10, color=C_WHITE, wrap=True)
+             cx2 + Cm(0.4), y0 + Cm(0.85), col_w - Cm(0.8), Cm(2.65),
+             size=11, color=C_WHITE, wrap=True)
 
-    # ── Implicação para a carteira do cliente ────────────────────────────────
+    # Tabela de vieses por classe
+    add_rect(sl, cx2, y0 + Cm(3.6), col_w, Cm(0.5), C_DGRAY, C_GOLD, 0.3)
+    add_text(sl, "VIÉS POR CLASSE DE ATIVO", cx2 + Cm(0.3), y0 + Cm(3.68),
+             col_w - Cm(0.5), Cm(0.38), size=8, bold=True, color=C_GOLD)
+
+    items_v = [(c, v) for c, v in vieses.items() if c in CATS]
+    n_v = len(items_v)
+    if n_v:
+        row_h_v = Cm(0.72)
+        for j, (cls, v) in enumerate(items_v):
+            ry = y0 + Cm(4.15) + j * row_h_v
+            cor = VCOR.get(v, C_LGRAY)
+            fundo = C_CARD if j % 2 == 0 else C_CARD3
+            add_rect(sl, cx2, ry, col_w, row_h_v - Cm(0.05), fundo)
+            add_rect(sl, cx2, ry, Cm(0.2), row_h_v - Cm(0.05), cor)
+            add_text(sl, CLS_LABEL.get(cls, cls), cx2 + Cm(0.4), ry + Cm(0.1),
+                     col_w - Cm(2.2), Cm(0.52), size=10, color=C_WHITE)
+            add_text(sl, f"{VIC.get(v,'→')} {v.capitalize()}",
+                     cx2 + col_w - Cm(2.0), ry + Cm(0.1), Cm(1.8), Cm(0.52),
+                     size=10, bold=True, color=cor, align=PP_ALIGN.RIGHT)
+
+    # ── Barra de implicação para a carteira (largura total) ──────────────────
     vieses_pos = [CLS_LABEL.get(c, c) for c, v in vieses.items() if v == "positivo"]
     vieses_neg = [CLS_LABEL.get(c, c) for c, v in vieses.items() if v == "negativo"]
-    partes_impl = []
-    if vieses_pos: partes_impl.append(f"Classes favorecidas: {', '.join(vieses_pos)}")
-    if vieses_neg: partes_impl.append(f"Classes com cautela: {', '.join(vieses_neg)}")
+    partes = []
+    if vieses_pos: partes.append(f"Favorecidas: {', '.join(vieses_pos)}")
+    if vieses_neg: partes.append(f"Cautela: {', '.join(vieses_neg)}")
     if juro_real and juro_real > 7:
-        partes_impl.append(f"Juro real de {juro_real:.1f}% remunera bem ativos conservadores")
+        partes.append(f"Juro real de {juro_real:.1f}% sustenta renda fixa conservadora")
     elif juro_real and juro_real < 5:
-        partes_impl.append("Juro real comprimido favorece ativos de risco")
-    if partes_impl:
-        impl_txt = "Implicação para a carteira: " + " · ".join(partes_impl) + "."
-        add_caixa_texto(sl, impl_txt, SH - Cm(2.7), cor_borda=C_GOLD, cor_bg=C_CARD2)
+        partes.append("Juro real baixo favorece ativos de risco")
+    if partes:
+        impl = "Implicação para a carteira: " + " · ".join(partes) + "."
+        add_caixa_texto(sl, impl, SH - Cm(2.8), cor_borda=C_GOLD, cor_bg=C_CARD2)
 
 # ── SLIDE 5: PATRIMÔNIO & RENTABILIDADE ───────────────────────────────────────
 def s_patrimonio(prs, d):
