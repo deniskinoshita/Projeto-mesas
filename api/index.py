@@ -231,6 +231,7 @@ _HP_PROD_FILE   = "/tmp/brauna_hp_produtos.json"
 _HP_ALERTS_FILE = "/tmp/brauna_hp_alertas.json"
 _HP_KNOW_FILE   = "/tmp/brauna_hp_knowledge.json"
 _HP_CALLS_FILE  = "/tmp/brauna_hp_calls.json"
+_HP_GESTORES_FILE = "/tmp/brauna_hp_gestores.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -3504,6 +3505,43 @@ def hp_calls():
     _save(_HP_CALLS_FILE, calls)
     return jsonify({"ok": True, "call": novo})
 
+@app.route("/api/hp/gestores", methods=["GET","POST"])
+def hp_gestores():
+    if request.method == "GET":
+        return jsonify(_load(_HP_GESTORES_FILE, []))
+    data = request.get_json()
+    if data.get("id") and data.get("_delete"):
+        gestores = _load(_HP_GESTORES_FILE, [])
+        gestores = [g for g in gestores if g.get("id") != data["id"]]
+        _save(_HP_GESTORES_FILE, gestores)
+        return jsonify({"ok": True})
+    CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"]
+    alocacao = {}
+    for c in CLASSES:
+        v = data.get("alocacao", {}).get(c, 0)
+        alocacao[c] = round(float(v or 0), 1)
+    novo = {
+        "id":         str(uuid.uuid4())[:8],
+        "nome":       data.get("nome","").strip(),
+        "gestora":    data.get("gestora","").strip(),
+        "referencia": data.get("referencia","").strip(),
+        "perfil":     data.get("perfil","moderada"),
+        "alocacao":   alocacao,
+        "observacao": data.get("observacao","").strip(),
+        "data":       datetime.now().strftime("%d/%m/%Y"),
+    }
+    gestores = _load(_HP_GESTORES_FILE, [])
+    # Atualiza se mesmo nome+gestora, senão insere (máx 5)
+    existente = next((i for i,g in enumerate(gestores) if g.get("gestora")==novo["gestora"] and g.get("perfil")==novo["perfil"]), None)
+    if existente is not None:
+        gestores[existente] = novo
+    else:
+        if len(gestores) >= 5:
+            return jsonify({"ok": False, "error": "Máximo de 5 carteiras atingido. Remova uma antes de adicionar."}), 400
+        gestores.append(novo)
+    _save(_HP_GESTORES_FILE, gestores)
+    return jsonify({"ok": True, "gestora": novo})
+
 @app.route("/api/hp/knowledge", methods=["GET"])
 def hp_knowledge_list():
     return jsonify(_load(_HP_KNOW_FILE, []))
@@ -6221,7 +6259,80 @@ textarea{resize:vertical}
 .know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 </style>
 
-<!-- ══ 3. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
+<!-- ══ 3. CARTEIRAS DE GESTORES ═══════════════════════════════════════════════ -->
+<div class="card" style="border-color:#1A2E3A">
+  <div class="card-title"><span>🏦</span> Carteiras de Gestores — Base de Referência</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">
+    Cadastre até <b style="color:#8BcFEF">5 carteiras de referência</b> de gestoras (Levante, BTG, XP Research, etc.). Serão usadas nas análises e sempre citadas como fonte.
+  </p>
+
+  <!-- Formulário adicionar carteira -->
+  <div style="background:#060C10;border:1px solid #1A2E3A;border-radius:10px;padding:16px;margin-bottom:16px">
+    <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:12px">➕ Adicionar / Atualizar Carteira</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <label>Nome da Carteira</label>
+        <input type="text" id="gest-nome" placeholder="ex: Carteira Moderada Levante">
+      </div>
+      <div>
+        <label>Gestora / Fonte</label>
+        <input type="text" id="gest-gestora" placeholder="ex: Levante Asset">
+      </div>
+      <div>
+        <label>Referência / Data</label>
+        <input type="text" id="gest-ref" placeholder="ex: Junho 2026">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <label>Perfil alvo</label>
+        <select id="gest-perfil" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
+          <option value="super_conservadora">Super Conservadora</option>
+          <option value="conservadora">Conservadora</option>
+          <option value="moderada" selected>Moderada</option>
+          <option value="arrojada">Arrojada</option>
+          <option value="agressiva">Agressiva</option>
+          <option value="geral">Geral (todas)</option>
+        </select>
+      </div>
+      <div>
+        <label>Observação</label>
+        <input type="text" id="gest-obs" placeholder="ex: Carteira conservadora com viés para renda fixa">
+      </div>
+    </div>
+    <!-- Alocação por classe -->
+    <div style="font-size:11px;color:#8BcFEF;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Alocação % por Classe</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px" id="gest-aloc-grid">
+      <div><label style="color:#4A7055">Pós Fixado</label><input type="number" id="galoc-pos_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Inflação</label><input type="number" id="galoc-inflacao" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Pré Fixado</label><input type="number" id="galoc-pre_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Ações</label><input type="number" id="galoc-acoes" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">FIIs</label><input type="number" id="galoc-fiis" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Multimercado</label><input type="number" id="galoc-multimercado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Internacional</label><input type="number" id="galoc-internacional" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Alternativos</label><input type="number" id="galoc-alternativos" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      <div><label style="color:#4A7055">Criptomoedas</label><input type="number" id="galoc-criptomoedas" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <button class="btn" onclick="salvarGestora()">💾 Salvar Carteira</button>
+      <span id="gest-total-label" style="font-size:12px;color:#4A7055">Total: <b id="gest-total">0</b>%</span>
+      <span id="gest-save-st" style="font-size:12px"></span>
+    </div>
+  </div>
+
+  <!-- Comparativo das carteiras salvas -->
+  <div id="gest-lista-wrap">
+    <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Carteiras Salvas (<span id="gest-count">0</span>/5)</div>
+    <div id="gest-lista"><div style="color:#1E3A4A;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div></div>
+    <!-- Tabela comparativa -->
+    <div id="gest-comparativo" style="display:none;margin-top:14px">
+      <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚖️ Comparativo entre Carteiras</div>
+      <div style="overflow-x:auto"><table id="gest-table" style="width:100%;border-collapse:collapse;font-size:11px"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📐</span> Portfólios Modelo por Indexador</div>
   <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:14px">
@@ -7452,6 +7563,133 @@ async function init(){
   CLASSES.forEach(cls=>colorirVies(cls.key));
   carregarAlertas();
   carregarCalls();
+  carregarGestores();
+}
+
+// ── Carteiras de Gestores ─────────────────────────────────────────────────────
+const GEST_CLASSES = [
+  {key:"pos_fixado",lbl:"Pós Fixado"}, {key:"inflacao",lbl:"Inflação"},
+  {key:"pre_fixado",lbl:"Pré Fixado"}, {key:"acoes",lbl:"Ações"},
+  {key:"fiis",lbl:"FIIs"}, {key:"multimercado",lbl:"Multimercado"},
+  {key:"internacional",lbl:"Internacional"}, {key:"alternativos",lbl:"Alternativos"},
+  {key:"criptomoedas",lbl:"Cripto"},
+];
+const GEST_CORES = ["#8BcFEF","#5DCAA5","#D4B483","#FF9966","#BB86FC","#4FC3F7","#A5D6A7","#FFD180","#F48FB1"];
+
+let _gestores = [];
+
+function atualizarTotalGest(){
+  const tot = GEST_CLASSES.reduce((s,c)=>s+parseFloat(document.getElementById(`galoc-${c.key}`)?.value||0),0);
+  const el = document.getElementById("gest-total");
+  if(el){ el.textContent = tot.toFixed(1); el.style.color = Math.abs(tot-100)<0.1?"#5DCAA5":"#FF6B6B"; }
+}
+
+async function carregarGestores(){
+  try{
+    const r = await fetch("/api/hp/gestores"); _gestores = await r.json();
+    renderGestores();
+  }catch(e){}
+}
+
+function renderGestores(){
+  const lista = document.getElementById("gest-lista");
+  const count = document.getElementById("gest-count");
+  if(count) count.textContent = _gestores.length;
+  if(!lista) return;
+  if(!_gestores.length){
+    lista.innerHTML = '<div style="color:#1E3A4A;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div>';
+    const comp = document.getElementById("gest-comparativo");
+    if(comp) comp.style.display = "none";
+    return;
+  }
+  lista.innerHTML = _gestores.map((g,i)=>`
+    <div style="background:#060C10;border:1px solid #1A2E3A;border-left:3px solid ${GEST_CORES[i%GEST_CORES.length]};border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:13px;color:${GEST_CORES[i%GEST_CORES.length]};font-weight:700">${g.nome||g.gestora}</span>
+          <span style="font-size:10px;background:#1A2E3A;border-radius:8px;padding:2px 8px;color:#8BcFEF">${g.perfil}</span>
+          <span style="font-size:10px;color:#2A5A6A">📅 ${g.referencia||g.data}</span>
+        </div>
+        <div style="font-size:10px;color:#3A7A8A;margin-bottom:6px">Fonte: <b>${g.gestora}</b>${g.observacao?" · "+g.observacao:""}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${GEST_CLASSES.filter(c=>(g.alocacao[c.key]||0)>0).map(c=>
+            `<span style="font-size:10px;background:#0A1A20;border:1px solid #1A3A4A;border-radius:8px;padding:2px 8px;color:#8BcFEF">${c.lbl}: <b>${g.alocacao[c.key]}%</b></span>`
+          ).join("")}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="btn-ghost" onclick="editarGestora(${i})" style="font-size:10px;padding:4px 10px">✏️ Editar</button>
+        <button class="btn-ghost" onclick="deletarGestora('${g.id}')" style="font-size:10px;padding:4px 10px;color:#FF6B6B;border-color:#FF6B6B44">🗑️</button>
+      </div>
+    </div>`).join("");
+  renderComparativo();
+}
+
+function renderComparativo(){
+  const comp = document.getElementById("gest-comparativo");
+  const tbl  = document.getElementById("gest-table");
+  if(!comp||!tbl||_gestores.length < 2){ if(comp) comp.style.display="none"; return; }
+  comp.style.display = "";
+  const header = `<thead><tr>
+    <th style="text-align:left;padding:6px 10px;color:#3A7A8A;font-size:10px;border-bottom:1px solid #1A2E3A">Classe</th>
+    ${_gestores.map((g,i)=>`<th style="text-align:center;padding:6px 10px;color:${GEST_CORES[i%GEST_CORES.length]};font-size:10px;border-bottom:1px solid #1A2E3A">${g.gestora}<br><span style="font-weight:400;color:#2A5A6A">${g.referencia||""}</span></th>`).join("")}
+    ${_gestores.length>1?`<th style="text-align:center;padding:6px 10px;color:#FFD180;font-size:10px;border-bottom:1px solid #1A2E3A">Média</th>`:""}
+  </tr></thead>`;
+  const rows = GEST_CLASSES.map(c=>{
+    const vals = _gestores.map(g=>g.alocacao[c.key]||0);
+    const media = vals.reduce((a,b)=>a+b,0)/vals.length;
+    const max = Math.max(...vals);
+    return `<tr style="border-bottom:1px solid #0D1E28">
+      <td style="padding:5px 10px;color:#6A9AAA;font-size:11px">${c.lbl}</td>
+      ${vals.map(v=>`<td style="text-align:center;padding:5px 10px;font-size:11px;color:${v===max&&max>0?"#5DCAA5":"#AAA"};font-weight:${v===max&&max>0?"700":"400"}">${v>0?v+"%":"—"}</td>`).join("")}
+      ${_gestores.length>1?`<td style="text-align:center;padding:5px 10px;font-size:11px;color:#FFD180;font-weight:600">${media>0?media.toFixed(1)+"%":"—"}</td>`:""}
+    </tr>`;
+  });
+  tbl.innerHTML = header + "<tbody>" + rows.join("") + "</tbody>";
+}
+
+function editarGestora(i){
+  const g = _gestores[i];
+  document.getElementById("gest-nome").value = g.nome||"";
+  document.getElementById("gest-gestora").value = g.gestora||"";
+  document.getElementById("gest-ref").value = g.referencia||"";
+  document.getElementById("gest-perfil").value = g.perfil||"moderada";
+  document.getElementById("gest-obs").value = g.observacao||"";
+  GEST_CLASSES.forEach(c=>{
+    const el = document.getElementById(`galoc-${c.key}`);
+    if(el) el.value = g.alocacao[c.key]||0;
+  });
+  atualizarTotalGest();
+  document.getElementById("gest-nome").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+async function deletarGestora(id){
+  if(!confirm("Remover esta carteira?")) return;
+  await fetch("/api/hp/gestores", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({id, _delete:true})});
+  carregarGestores();
+}
+
+async function salvarGestora(){
+  const nome    = document.getElementById("gest-nome").value.trim();
+  const gestora = document.getElementById("gest-gestora").value.trim();
+  if(!nome||!gestora){ alert("Preencha Nome da Carteira e Gestora."); return; }
+  const alocacao = {};
+  GEST_CLASSES.forEach(c=>{ alocacao[c.key] = parseFloat(document.getElementById(`galoc-${c.key}`)?.value||0); });
+  const total = Object.values(alocacao).reduce((a,b)=>a+b,0);
+  if(Math.abs(total-100)>5){ if(!confirm(`Total = ${total.toFixed(1)}% (diferente de 100%). Salvar assim?`)) return; }
+  const st = document.getElementById("gest-save-st");
+  st.textContent = "⏳ Salvando...";
+  try{
+    const r = await fetch("/api/hp/gestores",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+      nome, gestora, referencia: document.getElementById("gest-ref").value.trim(),
+      perfil: document.getElementById("gest-perfil").value,
+      observacao: document.getElementById("gest-obs").value.trim(), alocacao,
+    })});
+    const d = await r.json();
+    if(d.ok){ st.innerHTML='<span class="status-ok">✓ Salvo!</span>'; carregarGestores(); }
+    else { st.innerHTML=`<span class="status-err">${d.error}</span>`; }
+  }catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
+  setTimeout(()=>st.textContent="",3000);
 }
 
 init();
