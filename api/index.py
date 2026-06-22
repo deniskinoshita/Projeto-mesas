@@ -3393,11 +3393,15 @@ def gerar_pptx():
 
     try:
         hp_cenario = _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
+        macro_bcb = buscar_macro_bcb()
         body["cenario_macro"] = {
             "global":         hp_cenario.get("global",""),
             "brasil":         hp_cenario.get("brasil",""),
             "posicionamento": hp_cenario.get("posicionamento",""),
             "vieses":         hp_cenario.get("vieses",{}),
+            "sinais":         hp_cenario.get("sinais", []),
+            "selic_meta":     macro_bcb.get("selic_meta"),
+            "ipca_12m":       macro_bcb.get("ipca_12m"),
         }
         rent = body.get("rent", {})
         port_rent = rent.get("portfolio", {}) if isinstance(rent, dict) else {}

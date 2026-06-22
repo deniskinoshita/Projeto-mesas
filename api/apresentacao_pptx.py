@@ -154,36 +154,60 @@ def s_agenda(prs, d, agenda_items):
 # ── SLIDE 3: CENÁRIO GLOBAL ───────────────────────────────────────────────────
 def s_cenario_global(prs, d):
     sl = new_slide(prs); bg(sl)
-    header(sl, "CENÁRIO GLOBAL", "Panorama macroeconômico internacional")
+    header(sl, "CENÁRIO GLOBAL", "Panorama macroeconômico internacional — Levante Asset")
     footer(sl, d.get("nome_cliente",""), d.get("data_ref",""))
 
-    cenario = d.get("cenario_macro", {})
-    global_txt = cenario.get("global","Informação não disponível.")
+    cenario    = d.get("cenario_macro", {})
+    global_txt = cenario.get("global", "Informação não disponível.")
+    vieses     = cenario.get("vieses", {})
+    sinais     = cenario.get("sinais", [])
 
-    add_rect(sl, MARGIN, Cm(3.0), SW - Cm(1.4), Cm(5.5), C_CARD, C_GRAY, 0.3)
-    add_text(sl, global_txt, MARGIN + Cm(0.5), Cm(3.3), SW - Cm(2.4), Cm(5.0),
-             size=11.5, color=C_LGRAY, wrap=True)
-
-    # Vieses por classe — metade inferior
-    vieses = cenario.get("vieses", {})
     VCOR = {"positivo": C_GREEN, "neutro": C_AMBER, "negativo": C_RED}
-    VIC  = {"positivo": "▲  Positivo", "neutro": "→  Neutro", "negativo": "▼  Negativo"}
+    VIC  = {"positivo": "▲ Positivo", "neutro": "→ Neutro", "negativo": "▼ Negativo"}
 
-    add_text(sl, "VIESES POR CLASSE DE ATIVO", MARGIN, Cm(9.2), SW - Cm(1.4), Cm(0.6),
-             size=8, bold=True, color=C_GOLD)
+    # ── Bloco narrativo principal ──────────────────────────────────────────────
+    add_rect(sl, MARGIN, Cm(3.0), SW - Cm(1.4), Cm(0.06), C_GOLD)
+    add_rect(sl, MARGIN, Cm(3.06), SW - Cm(1.4), Cm(4.6), C_CARD, C_GRAY, 0.3)
+    add_text(sl, "ANÁLISE MACROECONÔMICA GLOBAL", MARGIN + Cm(0.4), Cm(3.25),
+             Cm(20), Cm(0.5), size=8, bold=True, color=C_GOLD)
+    add_text(sl, global_txt, MARGIN + Cm(0.4), Cm(3.85), SW - Cm(2.2), Cm(3.6),
+             size=10.5, color=C_WHITE, wrap=True)
+
+    # ── Sinais de mercado (badges) ─────────────────────────────────────────────
+    if sinais:
+        add_text(sl, "SINAIS DE MERCADO", MARGIN, Cm(7.85), SW, Cm(0.5),
+                 size=8, bold=True, color=C_LGRAY)
+        bx = MARGIN; by = Cm(8.45)
+        for sinal in sinais[:8]:
+            lbl = str(sinal).strip()
+            sw_badge = Cm(len(lbl) * 0.22 + 0.8)
+            add_rect(sl, bx, by, sw_badge, Cm(0.55), C_CARD2, C_GRAY, 0.3)
+            add_text(sl, lbl, bx + Cm(0.25), by + Cm(0.07), sw_badge - Cm(0.4),
+                     Cm(0.42), size=8, color=C_LGRAY)
+            bx += sw_badge + Cm(0.2)
+            if bx > SW - Cm(3): bx = MARGIN; by += Cm(0.7)
+        vieses_y = by + Cm(0.8)
+    else:
+        vieses_y = Cm(8.5)
+
+    # ── Vieses por classe ─────────────────────────────────────────────────────
+    add_text(sl, "VIESES POR CLASSE DE ATIVO — POSICIONAMENTO HP", MARGIN, vieses_y - Cm(0.55),
+             SW - Cm(1.4), Cm(0.5), size=8, bold=True, color=C_GOLD)
 
     items = list(vieses.items())
-    n = len(items) or 1
-    vw = (SW - Cm(1.4)) / max(n, 1) - Cm(0.2)
+    n     = max(len(items), 1)
+    vw    = (SW - Cm(1.4)) / n - Cm(0.18)
+    vcard_h = SH - vieses_y - Cm(0.75)
+
     for i, (cls, v) in enumerate(items):
-        vx = MARGIN + i * (vw + Cm(0.2))
+        vx  = MARGIN + i * (vw + Cm(0.18))
         cor = VCOR.get(v, C_LGRAY)
-        add_rect(sl, vx, Cm(9.85), vw, Cm(3.2), C_CARD, cor, 0.4)
-        add_rect(sl, vx, Cm(9.85), vw, Cm(0.18), cor)
-        add_text(sl, CLS_LABEL.get(cls, cls), vx + Cm(0.3), Cm(10.15),
-                 vw - Cm(0.6), Cm(0.65), size=9.5, bold=True, color=C_WHITE)
-        add_text(sl, VIC.get(v,"→"), vx + Cm(0.3), Cm(10.9),
-                 vw - Cm(0.6), Cm(0.6), size=9, color=cor)
+        add_rect(sl, vx, vieses_y, vw, vcard_h, C_CARD, cor, 0.5)
+        add_rect(sl, vx, vieses_y, vw, Cm(0.18), cor)
+        add_text(sl, CLS_LABEL.get(cls, cls), vx + Cm(0.2), vieses_y + Cm(0.32),
+                 vw - Cm(0.4), Cm(0.65), size=9, bold=True, color=C_WHITE, align=PP_ALIGN.CENTER)
+        add_text(sl, VIC.get(v, "→"), vx + Cm(0.2), vieses_y + Cm(1.05),
+                 vw - Cm(0.4), Cm(0.6), size=9, bold=True, color=cor, align=PP_ALIGN.CENTER)
 
 # ── SLIDE 4: CENÁRIO BRASIL & HP ─────────────────────────────────────────────
 def s_cenario_brasil(prs, d):
@@ -191,26 +215,68 @@ def s_cenario_brasil(prs, d):
     header(sl, "BRASIL & POSICIONAMENTO", "Visão Head de Produtos — Levante Asset")
     footer(sl, d.get("nome_cliente",""), d.get("data_ref",""))
 
-    cenario = d.get("cenario_macro", {})
-    col_w = (SW - Cm(2)) / 2 - Cm(0.3)
+    cenario     = d.get("cenario_macro", {})
+    selic       = cenario.get("selic_meta")
+    ipca        = cenario.get("ipca_12m")
+    brasil_txt  = cenario.get("brasil", "Informação não disponível.")
+    pos_txt     = cenario.get("posicionamento", "Informação não disponível.")
+    vieses      = cenario.get("vieses", {})
+    VCOR        = {"positivo": C_GREEN, "neutro": C_AMBER, "negativo": C_RED}
+
+    # ── Métricas macroeconômicas do Brasil (BCB em tempo real) ────────────────
+    juro_real = round(selic - ipca, 2) if selic and ipca else None
+    metricas_br = [
+        ("SELIC META", f"{selic:.2f}%" if selic else "—", C_GOLD),
+        ("IPCA 12M",   f"{ipca:.2f}%"  if ipca  else "—", C_AMBER if ipca and ipca > 5 else C_GREEN),
+        ("JURO REAL",  f"{juro_real:.2f}%" if juro_real else "—",
+         C_GREEN if juro_real and juro_real > 6 else C_AMBER),
+        ("POSIÇÃO HP", "Definida", C_GOLD),
+    ]
+    mw = (SW - Cm(1.4)) / 4 - Cm(0.25)
+    for i, (lbl, val, cor) in enumerate(metricas_br):
+        mx = MARGIN + i * (mw + Cm(0.25))
+        add_rect(sl, mx, Cm(3.0), mw, Cm(1.8), C_CARD, cor, 0.4)
+        add_rect(sl, mx, Cm(3.0), mw, Cm(0.12), cor)
+        add_text(sl, lbl,  mx + Cm(0.3), Cm(3.2),  mw - Cm(0.6), Cm(0.5),  size=7.5, color=C_LGRAY)
+        add_text(sl, val,  mx + Cm(0.3), Cm(3.75), mw - Cm(0.6), Cm(0.85), size=15, bold=True, color=cor)
+
+    # ── Análise Brasil (coluna esquerda) ──────────────────────────────────────
+    col_w  = (SW - Cm(2)) / 2 - Cm(0.3)
     cx1, cx2 = MARGIN, MARGIN + col_w + Cm(0.6)
-    card_h = SH - Cm(3.5) - Cm(0.7)
+    card_top = Cm(5.05)
+    card_h   = SH - card_top - Cm(0.75)
 
-    # Brasil
-    add_text(sl, "BRASIL", cx1, Cm(3.0), col_w, Cm(0.55), size=9, bold=True, color=C_LGRAY)
-    add_rect(sl, cx1, Cm(3.6), col_w, card_h, C_CARD, C_GRAY, 0.3)
-    add_text(sl, cenario.get("brasil","Informação não disponível."),
-             cx1 + Cm(0.4), Cm(3.95), col_w - Cm(0.8), card_h - Cm(0.6),
-             size=10.5, color=C_LGRAY, wrap=True)
+    add_rect(sl, cx1, card_top, col_w, Cm(0.06), C_LGRAY)
+    add_text(sl, "🇧🇷  CENÁRIO BRASIL", cx1, card_top + Cm(0.1),
+             col_w, Cm(0.5), size=8.5, bold=True, color=C_LGRAY)
+    add_rect(sl, cx1, card_top + Cm(0.65), col_w, card_h - Cm(0.65), C_CARD, C_GRAY, 0.3)
+    add_text(sl, brasil_txt,
+             cx1 + Cm(0.4), card_top + Cm(0.95), col_w - Cm(0.8), card_h - Cm(1.2),
+             size=10, color=C_WHITE, wrap=True)
 
-    # Posicionamento HP
-    add_text(sl, "POSICIONAMENTO HEAD DE PRODUTOS", cx2, Cm(3.0), col_w, Cm(0.55),
-             size=9, bold=True, color=C_GOLD)
-    add_rect(sl, cx2, Cm(3.6), col_w, card_h, C_CARD2, C_GOLD, 0.4)
-    add_rect(sl, cx2, Cm(3.6), col_w, Cm(0.15), C_GOLD)
-    add_text(sl, cenario.get("posicionamento","Informação não disponível."),
-             cx2 + Cm(0.4), Cm(3.95), col_w - Cm(0.8), card_h - Cm(0.6),
-             size=10.5, color=C_LGRAY, wrap=True)
+    # ── Posicionamento HP (coluna direita) ────────────────────────────────────
+    add_rect(sl, cx2, card_top, col_w, Cm(0.06), C_GOLD)
+    add_text(sl, "★  POSICIONAMENTO HEAD DE PRODUTOS", cx2, card_top + Cm(0.1),
+             col_w, Cm(0.5), size=8.5, bold=True, color=C_GOLD)
+    add_rect(sl, cx2, card_top + Cm(0.65), col_w, card_h - Cm(0.65), C_CARD2, C_GOLD, 0.4)
+    add_rect(sl, cx2, card_top + Cm(0.65), col_w, Cm(0.15), C_GOLD)
+    add_text(sl, pos_txt,
+             cx2 + Cm(0.4), card_top + Cm(1.0), col_w - Cm(0.8), card_h - Cm(1.4),
+             size=10, color=C_WHITE, wrap=True)
+
+    # ── Implicação para a carteira do cliente ────────────────────────────────
+    vieses_pos = [CLS_LABEL.get(c, c) for c, v in vieses.items() if v == "positivo"]
+    vieses_neg = [CLS_LABEL.get(c, c) for c, v in vieses.items() if v == "negativo"]
+    partes_impl = []
+    if vieses_pos: partes_impl.append(f"Classes favorecidas: {', '.join(vieses_pos)}")
+    if vieses_neg: partes_impl.append(f"Classes com cautela: {', '.join(vieses_neg)}")
+    if juro_real and juro_real > 7:
+        partes_impl.append(f"Juro real de {juro_real:.1f}% remunera bem ativos conservadores")
+    elif juro_real and juro_real < 5:
+        partes_impl.append("Juro real comprimido favorece ativos de risco")
+    if partes_impl:
+        impl_txt = "Implicação para a carteira: " + " · ".join(partes_impl) + "."
+        add_caixa_texto(sl, impl_txt, SH - Cm(2.7), cor_borda=C_GOLD, cor_bg=C_CARD2)
 
 # ── SLIDE 5: PATRIMÔNIO & RENTABILIDADE ───────────────────────────────────────
 def s_patrimonio(prs, d):
