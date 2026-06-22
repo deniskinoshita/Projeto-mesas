@@ -230,6 +230,7 @@ _HP_CENARIO_FILE= "/tmp/brauna_hp_cenario.json"
 _HP_PROD_FILE   = "/tmp/brauna_hp_produtos.json"
 _HP_ALERTS_FILE = "/tmp/brauna_hp_alertas.json"
 _HP_KNOW_FILE   = "/tmp/brauna_hp_knowledge.json"
+_HP_CALLS_FILE  = "/tmp/brauna_hp_calls.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -2638,19 +2639,63 @@ function renderizar(data){
   if(opors.length){ diag+=`<p style="font-size:10px;color:#3A6A48;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
   document.getElementById("diagnostico").innerHTML=diag||`<p style="color:#5DCAA5">✓ Carteira alinhada ao modelo.</p>`;
 
-  // Recomendações
+  // Recomendações — inclui painel de calls HP
   const rl=document.getElementById("recomendacoes-list");
+  let recHtml = "";
+
+  // Painel de calls HP relevantes (vem de analiseData._xp.calls_relevantes)
+  const callsRel = analiseData._xp?.calls_relevantes || [];
+  if(callsRel.length){
+    const DIR_COR   = {compra:"#5DCAA5", neutro:"#AAA", venda:"#FF6B6B"};
+    const DIR_LABEL = {compra:"▲ COMPRA", neutro:"→ NEUTRO", venda:"▼ VENDA"};
+    recHtml += `<div style="border:2px solid #5DCAA5;border-radius:10px;overflow:hidden;margin-bottom:16px">
+      <div style="background:#0A2018;padding:10px 14px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:15px">📈</span>
+        <span style="font-size:13px;font-weight:700;color:#5DCAA5">Calls do HP para este cliente</span>
+        <span style="font-size:11px;color:#2A5A3A;margin-left:4px">${callsRel.length} call(s) relevante(s)</span>
+      </div>
+      <div style="padding:10px 14px;display:flex;flex-direction:column;gap:8px">
+        ${callsRel.map(c=>{
+          const cor = DIR_COR[c.direcao]||"#AAA";
+          const upCor = (c.upside||0) >= 0 ? "#5DCAA5" : "#FF6B6B";
+          const naCarteira = (analiseData._xp?.acoes||[]).some(a=>a.ticker===c.ticker) || (analiseData._xp?.fiis||[]).some(f=>f.ticker===c.ticker);
+          const badge = naCarteira
+            ? `<span style="font-size:10px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;padding:2px 8px;border-radius:10px">✓ já na carteira</span>`
+            : `<span style="font-size:10px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E44;padding:2px 8px;border-radius:10px">oportunidade de entrada</span>`;
+          return `<div style="background:#0A0F0B;border:1px solid #1A2E3A;border-left:3px solid ${cor};border-radius:0 8px 8px 0;padding:10px 12px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              <span style="font-size:14px;font-weight:900;color:${cor}">${c.ticker}</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${cor}22;color:${cor}">${DIR_LABEL[c.direcao]||c.direcao}</span>
+              ${c.nome ? `<span style="font-size:12px;color:#CCC">${c.nome}</span>` : ""}
+              ${badge}
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:4px">
+              ${c.preco_entrada ? `<span style="color:#888">Entrada: <b style="color:#F0F0F0">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.preco_alvo ? `<span style="color:#888">→ Alvo: <b style="color:#F0F0F0">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.upside !== undefined ? `<span style="color:${upCor};font-weight:700">Upside ${c.upside>=0?"+":""}${c.upside}%</span>` : ""}
+              ${c.stop ? `<span style="color:#888">Stop: <b style="color:#FF6B6B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.prazo ? `<span style="color:#888">Prazo: ${c.prazo}</span>` : ""}
+            </div>
+            ${c.tese ? `<p style="font-size:11px;color:#888;margin:0 0 3px;line-height:1.5;font-style:italic">"${c.tese.length>160?c.tese.slice(0,160)+"...":c.tese}"</p>` : ""}
+            ${c.fonte ? `<div style="font-size:10px;color:#2A5A3A">${c.fonte}</div>` : ""}
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+  }
+
   if(recomendacoes&&recomendacoes.length){
-    rl.innerHTML=recomendacoes.map(r=>`
+    recHtml+=recomendacoes.map(r=>`
       <div class="rec-card">
         <div class="rec-header">${r.urgencia} <span style="color:#C9A96E">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
         <div class="rec-ctx">${r.explicacao}</div>
         ${r.carta_insight?`<div class="rec-carta">📄 Carta da gestão: "${r.carta_insight}"</div>`:""}
         <div class="rec-prods">${(r.produtos||[]).map(p=>`<span class="prod-tag">${p}</span>`).join("")}</div>
       </div>`).join("");
-  } else {
-    rl.innerHTML=`<p style="color:#5DCAA5;font-size:14px">✓ Nenhuma recomendação necessária — carteira alinhada.</p>`;
+  } else if(!callsRel.length){
+    recHtml+=`<p style="color:#5DCAA5;font-size:14px">✓ Nenhuma recomendação necessária — carteira alinhada.</p>`;
   }
+  rl.innerHTML = recHtml;
 
   // Modelo de Servir
   const sl=document.getElementById("servir-list");
@@ -3397,11 +3442,49 @@ def hp_alertas():
         "origem":     data.get("origem","Head de Produtos"),
         "data":       datetime.now().strftime("%d/%m/%Y %H:%M"),
         "lido":       False,
+        "assessor_destino": data.get("assessor_destino", ""),  # "" = global, "lucas" = só Lucas
     }
     alertas.insert(0, novo)
     alertas = alertas[:100]  # manter últimos 100
     _save(_HP_ALERTS_FILE, alertas)
     return jsonify({"ok": True, "alerta": novo})
+
+@app.route("/api/hp/calls", methods=["GET","POST"])
+def hp_calls():
+    if request.method == "GET":
+        return jsonify(_load(_HP_CALLS_FILE, []))
+    # POST — adicionar ou remover call
+    data = request.get_json()
+    if data.get("id") and data.get("_delete"):
+        calls = _load(_HP_CALLS_FILE, [])
+        calls = [c for c in calls if c.get("id") != data["id"]]
+        _save(_HP_CALLS_FILE, calls)
+        return jsonify({"ok": True})
+    # Novo call
+    entrada = float(data.get("preco_entrada") or 0)
+    alvo    = float(data.get("preco_alvo") or 0)
+    upside  = round((alvo / entrada - 1) * 100, 1) if entrada > 0 else 0
+    novo = {
+        "id":            str(uuid.uuid4())[:8],
+        "ticker":        data.get("ticker","").upper().strip(),
+        "nome":          data.get("nome",""),
+        "direcao":       data.get("direcao","compra"),  # compra | venda | neutro
+        "preco_entrada": entrada,
+        "preco_alvo":    alvo,
+        "upside":        upside,
+        "stop":          float(data.get("stop") or 0),
+        "prazo":         data.get("prazo",""),
+        "tese":          data.get("tese",""),
+        "perfis":        data.get("perfis", []),
+        "fonte":         data.get("fonte",""),
+        "data":          datetime.now().strftime("%d/%m/%Y"),
+        "ativo":         True,
+    }
+    calls = _load(_HP_CALLS_FILE, [])
+    calls.insert(0, novo)
+    calls = calls[:200]
+    _save(_HP_CALLS_FILE, calls)
+    return jsonify({"ok": True, "call": novo})
 
 @app.route("/api/hp/knowledge", methods=["GET"])
 def hp_knowledge_list():
@@ -3582,7 +3665,15 @@ def analyze_xp():
                 })
 
     # ── Alertas para o assessor ────────────────────────────────────────────────
-    alertas_hp       = _load(_HP_ALERTS_FILE, [])
+    # Filtro por assessor_destino: pega globais (vazio) + direcionados ao assessor deste cliente
+    assessor_atual = (dados.get("assessor","") or assessor).lower().strip()
+    alertas_hp_raw   = _load(_HP_ALERTS_FILE, [])
+    alertas_hp       = [
+        a for a in alertas_hp_raw
+        if not a.get("assessor_destino","").strip()
+        or a.get("assessor_destino","").lower().strip() == assessor_atual
+        or assessor_atual in a.get("assessor_destino","").lower()
+    ]
     docs_publicados  = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
     tickers_carteira = [a["ticker"] for a in dados.get("acoes", [])] + \
                        [f["ticker"] for f in dados.get("fiis", [])]
@@ -3676,6 +3767,18 @@ def analyze_xp():
     _ord = {"urgente": 0, "atencao": 1, "info": 2}
     alertas_unicos.sort(key=lambda a: _ord.get(a.get("tipo","info"), 2))
 
+    # Calls de ações relevantes para o cliente
+    calls_hp = [c for c in _load(_HP_CALLS_FILE, []) if c.get("ativo", True)]
+    calls_relevantes = []
+    perfil_cliente = label_perfil.lower() if label_perfil else ""
+
+    for call in calls_hp:
+        # Aparece se: o cliente já tem o ticker OU o perfil está na lista de perfis do call
+        ticker_ok  = any(call.get("ticker","") in a.get("ticker","") for a in dados.get("acoes",[]))
+        perfil_ok  = not call.get("perfis") or any(p in perfil_cliente for p in call.get("perfis",[]))
+        if ticker_ok or perfil_ok:
+            calls_relevantes.append(call)
+
     resultado = {
         "conta":       dados["conta"],
         "assessor":    dados["assessor"] or assessor,
@@ -3697,6 +3800,7 @@ def analyze_xp():
             "vieses":        cenario.get("vieses",{}),
         },
         "alertas_relevantes": alertas_unicos,
+        "calls_relevantes":   calls_relevantes,
         "analisado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
     return jsonify(resultado)
@@ -6075,7 +6179,107 @@ textarea{resize:vertical}
   </div>
 </div>
 
-<!-- ══ 4. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
+<!-- ══ 4. CALLS DE AÇÕES ══════════════════════════════════════════════════════ -->
+<div class="card" style="border-color:#1A2E3A">
+  <div class="card-title"><span>📈</span> Calls de Ações</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
+    Registre calls de compra, venda ou neutro por ticker. O agente entrega o call ao assessor quando o cliente já tem o ativo na carteira ou quando o perfil está na lista de destinatários.
+  </p>
+
+  <!-- Formulário novo call -->
+  <div style="background:#060F0B;border:1px solid #1A2E3A;border-radius:10px;padding:16px;margin-bottom:16px">
+    <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:12px">➕ Novo Call</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Ticker</label>
+        <input id="call-ticker" type="text" placeholder="ex: VALE3" oninput="this.value=this.value.toUpperCase()" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Nome da empresa</label>
+        <input id="call-nome" type="text" placeholder="ex: Vale S.A." style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Direção</label>
+        <div style="display:flex;gap:6px">
+          <button id="call-dir-compra" onclick="setCallDir('compra')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #5DCAA5;background:#0A2018;color:#5DCAA5;font-size:12px;font-weight:700;cursor:pointer">▲ COMPRA</button>
+          <button id="call-dir-neutro" onclick="setCallDir('neutro')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #2A5A3A;background:#111;color:#888;font-size:12px;font-weight:700;cursor:pointer">→ NEUTRO</button>
+          <button id="call-dir-venda" onclick="setCallDir('venda')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #2A1010;background:#1A0808;color:#FF6B6B;font-size:12px;font-weight:700;cursor:pointer">▼ VENDA</button>
+        </div>
+        <input type="hidden" id="call-direcao" value="compra">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Preço de entrada (R$)</label>
+        <input id="call-entrada" type="number" step="0.01" placeholder="62.50" oninput="calcCallUpside()" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Preço alvo (R$)</label>
+        <input id="call-alvo" type="number" step="0.01" placeholder="74.00" oninput="calcCallUpside()" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Upside calculado</label>
+        <div id="call-upside-display" style="padding:8px;border-radius:6px;background:#0A2A18;border:1px solid #1A3A28;font-size:14px;font-weight:700;color:#5DCAA5;text-align:center">—</div>
+      </div>
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Stop (R$)</label>
+        <input id="call-stop" type="number" step="0.01" placeholder="57.00" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Prazo</label>
+        <input id="call-prazo" type="text" placeholder="ex: 6 meses, 12 meses" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Fonte</label>
+        <input id="call-fonte" type="text" placeholder="ex: Levante Asset — Jun 2026" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px">
+      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tese de investimento</label>
+      <textarea id="call-tese" rows="3" placeholder="Descreva a tese resumidamente..." style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:6px">Perfis alvo (quem deve receber)</label>
+      <div style="display:flex;gap:10px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="call-perf-arrojada" style="accent-color:#C9A96E"> Arrojada
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="call-perf-agressiva" style="accent-color:#C9A96E"> Agressiva
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="call-perf-moderada" style="accent-color:#C9A96E"> Moderada
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="call-perf-conservadora" style="accent-color:#C9A96E"> Conservadora
+        </label>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn" onclick="adicionarCall()" style="max-width:200px">📈 Adicionar Call</button>
+      <span id="call-st" style="font-size:11px"></span>
+    </div>
+  </div>
+
+  <!-- Lista de calls ativos -->
+  <div style="font-size:11px;color:#3A6A48;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+    <span>Calls ativos</span>
+    <button onclick="carregarCalls()" class="btn-ghost">↻ Atualizar</button>
+  </div>
+  <div id="calls-feed" style="display:flex;flex-direction:column;gap:8px">
+    <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando calls...</div>
+  </div>
+</div>
+
+<!-- ══ 4b. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A2A18">
   <div class="card-title"><span>📚</span> Base de Conhecimento — Central de Materiais HP</div>
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
@@ -6198,6 +6402,10 @@ textarea{resize:vertical}
           <option value="urgente">🚨 Urgente — revisar carteiras</option>
         </select>
       </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Direcionar para assessor (opcional)</label>
+      <input id="alert-assessor" type="text" placeholder="Deixe em branco para todos · ex: lucas" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
     </div>
     <div style="margin-bottom:10px">
       <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Mensagem / Atualização</label>
@@ -6844,21 +7052,24 @@ const ALERT_COLORS = { info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B" };
 const ALERT_LABELS = { info:"ℹ️ Informativo", atencao:"⚠️ Atenção", urgente:"🚨 Urgente" };
 
 async function registrarAlerta(){
-  const produto  = document.getElementById("alert-produto").value.trim();
-  const classe   = document.getElementById("alert-classe").value;
-  const tipo     = document.getElementById("alert-tipo").value;
-  const mensagem = document.getElementById("alert-msg").value.trim();
-  const st       = document.getElementById("alert-st");
+  const produto          = document.getElementById("alert-produto").value.trim();
+  const classe           = document.getElementById("alert-classe").value;
+  const tipo             = document.getElementById("alert-tipo").value;
+  const mensagem         = document.getElementById("alert-msg").value.trim();
+  const assessor_destino = (document.getElementById("alert-assessor")?.value||"").trim().toLowerCase();
+  const st               = document.getElementById("alert-st");
   if(!produto || !mensagem){ st.innerHTML=`<span class="status-err">Preencha produto e mensagem.</span>`; return; }
   try{
-    const r = await fetch("/api/hp/alertas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({produto, classe, tipo, mensagem, origem:"Head de Produtos"})});
+    const r = await fetch("/api/hp/alertas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({produto, classe, tipo, mensagem, origem:"Head de Produtos", assessor_destino})});
     const d = await r.json();
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ Alerta registrado</span>`;
+      st.innerHTML = `<span class="status-ok">✓ Alerta registrado${assessor_destino?" para "+assessor_destino:""}</span>`;
       document.getElementById("alert-produto").value = "";
       document.getElementById("alert-msg").value = "";
       document.getElementById("alert-tipo").value = "info";
       document.getElementById("alert-classe").value = "";
+      const elAss = document.getElementById("alert-assessor");
+      if(elAss) elAss.value = "";
       carregarAlertas();
     }
   } catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
@@ -6881,6 +7092,7 @@ async function carregarAlertas(){
             <span style="font-size:12px;font-weight:700;color:${ALERT_COLORS[a.tipo]||"#CCC"}">${ALERT_LABELS[a.tipo]||a.tipo}</span>
             <span style="font-size:11px;color:#D4B483;font-weight:700">${a.produto||""}</span>
             ${a.classe ? `<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${a.classe}</span>` : ""}
+            ${a.assessor_destino ? `<span style="background:#1A2E1A;color:#C9A96E;font-size:10px;padding:2px 7px;border-radius:10px">→ ${a.assessor_destino}</span>` : ""}
             <span style="font-size:10px;color:#1E4A30;margin-left:auto">${a.data||""} · ${a.origem||"HP"}</span>
           </div>
           <p style="font-size:12px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
@@ -6894,6 +7106,123 @@ async function carregarAlertas(){
 async function deletarAlerta(id){
   await fetch("/api/hp/alertas", {method:"DELETE", headers:{"Content-Type":"application/json"}, body: JSON.stringify({id})});
   carregarAlertas();
+}
+
+// ── Calls de Ações ────────────────────────────────────────────────────────────
+let _callDir = "compra";
+function setCallDir(dir){
+  _callDir = dir;
+  document.getElementById("call-direcao").value = dir;
+  const styles = {
+    compra: {border:"#5DCAA5", bg:"#0A2018", color:"#5DCAA5"},
+    neutro: {border:"#888",    bg:"#1A1A1A", color:"#AAA"},
+    venda:  {border:"#FF6B6B", bg:"#1A0808", color:"#FF6B6B"},
+  };
+  ["compra","neutro","venda"].forEach(d=>{
+    const btn = document.getElementById("call-dir-"+d);
+    if(!btn) return;
+    const s = styles[d];
+    const active = d === dir;
+    btn.style.borderColor = active ? s.border : "#1A1A1A";
+    btn.style.background  = active ? s.bg     : "#111";
+    btn.style.color       = active ? s.color  : "#444";
+  });
+}
+setCallDir("compra");
+
+function calcCallUpside(){
+  const entrada = parseFloat(document.getElementById("call-entrada").value) || 0;
+  const alvo    = parseFloat(document.getElementById("call-alvo").value)    || 0;
+  const el      = document.getElementById("call-upside-display");
+  if(entrada > 0 && alvo > 0){
+    const up = ((alvo / entrada - 1) * 100).toFixed(1);
+    const cor = up >= 0 ? "#5DCAA5" : "#FF6B6B";
+    el.textContent = (up >= 0 ? "+" : "") + up + "%";
+    el.style.color = cor;
+  } else {
+    el.textContent = "—"; el.style.color = "#5DCAA5";
+  }
+}
+
+async function adicionarCall(){
+  const ticker  = document.getElementById("call-ticker").value.trim().toUpperCase();
+  const nome    = document.getElementById("call-nome").value.trim();
+  const direcao = document.getElementById("call-direcao").value;
+  const entrada = parseFloat(document.getElementById("call-entrada").value) || 0;
+  const alvo    = parseFloat(document.getElementById("call-alvo").value)    || 0;
+  const stop    = parseFloat(document.getElementById("call-stop").value)    || 0;
+  const prazo   = document.getElementById("call-prazo").value.trim();
+  const tese    = document.getElementById("call-tese").value.trim();
+  const fonte   = document.getElementById("call-fonte").value.trim();
+  const st      = document.getElementById("call-st");
+  const perfis  = [];
+  ["arrojada","agressiva","moderada","conservadora"].forEach(p=>{
+    if(document.getElementById("call-perf-"+p)?.checked) perfis.push(p);
+  });
+  if(!ticker){ st.innerHTML=`<span class="status-err">Informe o ticker.</span>`; return; }
+  if(entrada <= 0){ st.innerHTML=`<span class="status-err">Informe o preço de entrada.</span>`; return; }
+  try{
+    const r = await fetch("/api/hp/calls", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ticker, nome, direcao, preco_entrada:entrada, preco_alvo:alvo, stop, prazo, tese, perfis, fonte})
+    });
+    const d = await r.json();
+    if(d.ok){
+      st.innerHTML = `<span class="status-ok">✓ Call ${ticker} adicionado</span>`;
+      ["call-ticker","call-nome","call-entrada","call-alvo","call-stop","call-prazo","call-tese","call-fonte"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+      ["arrojada","agressiva","moderada","conservadora"].forEach(p=>{ const el=document.getElementById("call-perf-"+p); if(el) el.checked=false; });
+      document.getElementById("call-upside-display").textContent="—";
+      setCallDir("compra");
+      carregarCalls();
+    }
+  } catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
+  setTimeout(()=>st.textContent="", 4000);
+}
+
+async function carregarCalls(){
+  const feed = document.getElementById("calls-feed");
+  if(!feed) return;
+  try{
+    const r = await fetch("/api/hp/calls");
+    const lista = await r.json();
+    if(!lista.length){
+      feed.innerHTML = `<div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Nenhum call cadastrado ainda.</div>`;
+      return;
+    }
+    const DIR_COR   = {compra:"#5DCAA5", neutro:"#AAA", venda:"#FF6B6B"};
+    const DIR_LABEL = {compra:"▲ COMPRA", neutro:"→ NEUTRO", venda:"▼ VENDA"};
+    feed.innerHTML = lista.filter(c=>c.ativo!==false).map(c=>{
+      const cor = DIR_COR[c.direcao] || "#AAA";
+      const upCor = (c.upside||0) >= 0 ? "#5DCAA5" : "#FF6B6B";
+      const perfBadges = (c.perfis||[]).map(p=>`<span style="font-size:10px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E44;padding:1px 7px;border-radius:8px">${p}</span>`).join(" ");
+      return `<div style="background:#0A0F0B;border:1px solid #1A2E3A;border-left:3px solid ${cor};border-radius:0 10px 10px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-size:15px;font-weight:900;color:${cor}">${c.ticker}</span>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${cor}22;color:${cor}">${DIR_LABEL[c.direcao]||c.direcao}</span>
+            ${c.nome ? `<span style="font-size:12px;color:#AAA">${c.nome}</span>` : ""}
+            ${perfBadges}
+            <span style="font-size:10px;color:#1E4A30;margin-left:auto">${c.data||""}</span>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:6px">
+            ${c.preco_entrada ? `<span style="color:#888">Entrada: <b style="color:#F0F0F0">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+            ${c.preco_alvo ? `<span style="color:#888">→ Alvo: <b style="color:#F0F0F0">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+            ${c.upside !== undefined ? `<span style="color:${upCor};font-weight:700">Upside ${c.upside >= 0 ? "+" : ""}${c.upside}%</span>` : ""}
+            ${c.stop ? `<span style="color:#888">Stop: <b style="color:#FF6B6B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+            ${c.prazo ? `<span style="color:#888">Prazo: <b style="color:#AAA">${c.prazo}</b></span>` : ""}
+          </div>
+          ${c.tese ? `<p style="font-size:11px;color:#888;margin:0 0 4px;line-height:1.5;font-style:italic">"${c.tese.length>120?c.tese.slice(0,120)+"...":c.tese}"</p>` : ""}
+          ${c.fonte ? `<div style="font-size:10px;color:#2A5A3A">${c.fonte}</div>` : ""}
+        </div>
+        <button onclick="deletarCall('${c.id}')" title="Remover" style="background:none;border:none;color:#1E4A30;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#1E4A30'">✕</button>
+      </div>`;
+    }).join("");
+  } catch(e){ feed.innerHTML=`<div style="color:#FF6B6B;font-size:11px;padding:12px">Erro ao carregar calls.</div>`; }
+}
+
+async function deletarCall(id){
+  await fetch("/api/hp/calls", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({id, _delete:true})});
+  carregarCalls();
 }
 
 // ── Salvar só produtos ────────────────────────────────────────────────────────
@@ -7021,6 +7350,7 @@ async function init(){
   }
   CLASSES.forEach(cls=>colorirVies(cls.key));
   carregarAlertas();
+  carregarCalls();
 }
 
 init();
