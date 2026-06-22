@@ -264,15 +264,53 @@ HP_CENARIO_DEFAULT = {
 }
 
 # ── persistência ──────────────────────────────────────────────────────────────
-def _load(path, default):
+def _kv_client():
+    url   = os.environ.get("KV_REST_API_URL")
+    token = os.environ.get("KV_REST_API_TOKEN")
+    if not url or not token:
+        return None
     try:
-        with open(path, encoding="utf-8") as f: return json.load(f)
-    except: return default
+        from upstash_redis import Redis
+        return Redis(url=url, token=token)
+    except Exception:
+        return None
+
+def _key(path: str) -> str:
+    """Converte /tmp/brauna_hp_cenario.json → brauna:hp_cenario"""
+    name = os.path.basename(path).replace("brauna_", "").replace(".json", "")
+    return f"brauna:{name}"
+
+def _load(path, default):
+    kv = _kv_client()
+    if kv:
+        try:
+            val = kv.get(_key(path))
+            if val is not None:
+                return json.loads(val) if isinstance(val, str) else val
+        except Exception:
+            pass
+    # Fallback: arquivo local /tmp (para desenvolvimento)
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
 
 def _save(path, data):
+    kv = _kv_client()
+    if kv:
+        try:
+            kv.set(_key(path), json.dumps(data, ensure_ascii=False))
+            return
+        except Exception:
+            pass
+    # Fallback: arquivo local /tmp
     try:
-        with open(path, "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=2)
-    except: pass
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
 def load_clientes():  return _load(_DATA_FILE, [])
 def save_clientes(d): _save(_DATA_FILE, d)
@@ -1846,37 +1884,102 @@ function renderPainelCliente(d){
     html += `<div style="font-size:12px;color:#3A6A48;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
   }
 
-  // ── Comparativo vs. última carteira salva
-  if(temHist && d.comparativo?.length){
-    const ult = d.ultima_carteira;
-    html += `
-    <div style="background:#081F18;border-radius:8px;padding:10px 14px;border:1px solid #1E1E1E">
-      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
-        Comparativo — Última reunião (${ult.data_ref || ult.salvo_em}) vs. Hoje (${d.data_ref})
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
-        ${d.comparativo.filter(c=>c.anterior>0||c.atual>0).map(c=>{
-          const dCor = c.delta>1?"#FF6B6B":c.delta<-1?"#5DCAA5":"#3A6A48";
-          const sinal = c.delta>0?"+":"";
-          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#0B2A1F;border-radius:6px;font-size:11px">
-            <span style="color:#888">${c.label}</span>
-            <span style="color:#3A6A48">${c.anterior.toFixed(1)}%</span>
-            <span style="color:#1E4A30">→</span>
-            <span style="color:#F0F0F0;font-weight:700">${c.atual.toFixed(1)}%</span>
-            <span style="color:${dCor};font-weight:700;min-width:38px;text-align:right">${sinal}${c.delta.toFixed(1)}%</span>
+  // ── Painel 3 colunas: Recomendada | Histórico | Atual
+  {
+    const perfil   = d.ficha_salva?.perfil || "";
+    const modelo   = (_hpPortfolios && perfil && _hpPortfolios[perfil]) ? _hpPortfolios[perfil] : null;
+    const ult      = temHist ? d.ultima_carteira : null;
+    const compAtual= d.composicao_atual || {};
+
+    // Filtra classes com pelo menos um valor > 0 em qualquer coluna
+    const classesVisiveis = CATS.filter(cat => {
+      const m = modelo ? (modelo[cat]||0) : 0;
+      const h = ult ? (ult.composicao?.[cat]||0) : 0;
+      const a = compAtual[cat]||0;
+      return m>0 || h>0 || a>0;
+    });
+
+    if(classesVisiveis.length){
+      const ultData  = ult ? (ult.data_ref || ult.salvo_em?.split(" ")[0] || "—") : null;
+      const patAnterior = ult ? (ult.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0}) : null;
+      const patAtual    = (d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+      const patDelta    = ult ? (d.patrimonio||0)-(ult.patrimonio||0) : null;
+
+      html += `
+      <div style="background:#081F18;border-radius:10px;padding:12px 14px;border:1px solid #1E1E1E;margin-bottom:4px">
+        <!-- Header colunas -->
+        <div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;margin-bottom:10px;align-items:end">
+          <div></div>
+          <div style="text-align:center">
+            <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Recomendada</div>
+            <div style="font-size:10px;color:#8B9FE8;font-weight:700">${perfil ? perfil.replace("_"," ") : "HP Modelo"}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Histórico</div>
+            <div style="font-size:10px;color:#D4B483;font-weight:700">${ultData || "—"}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Atual (XP)</div>
+            <div style="font-size:10px;color:#5DCAA5;font-weight:700">${d.data_ref || "Hoje"}</div>
+          </div>
+        </div>
+
+        <!-- Linhas por classe -->
+        ${classesVisiveis.map(cat => {
+          const label  = LABELS[cat] || cat;
+          const valMod = modelo ? (modelo[cat]||0) : null;
+          const valHist= ult ? (ult.composicao?.[cat]||0) : null;
+          const valAt  = compAtual[cat]||0;
+          const deltaHist = (valHist !== null && valAt !== null) ? valAt - valHist : null;
+          const deltaMod  = (valMod  !== null && valAt !== null) ? valAt - valMod  : null;
+          const dCorHist  = deltaHist === null ? "" : deltaHist > 1 ? "#FF6B6B" : deltaHist < -1 ? "#5DCAA5" : "#3A6A48";
+          const sHist     = deltaHist === null ? "" : (deltaHist > 0 ? "▲" : deltaHist < 0 ? "▼" : "→");
+          // barra de progresso: max 100%, escala visual
+          const barMod  = valMod  !== null ? Math.min(valMod,100)  : 0;
+          const barHist = valHist !== null ? Math.min(valHist,100) : 0;
+          const barAt   = Math.min(valAt,100);
+          return `<div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;align-items:center;padding:5px 0;border-top:1px solid #0F2A1F">
+            <span style="font-size:11px;color:#AAA">${label}</span>
+            <!-- Recomendada -->
+            <div style="text-align:center">
+              ${valMod !== null ? `
+              <div style="font-size:12px;font-weight:700;color:#8B9FE8">${valMod.toFixed(1)}%</div>
+              <div style="height:4px;background:#1A1A2E;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#8B9FE8;border-radius:2px;width:${barMod}%"></div></div>
+              ` : `<span style="font-size:10px;color:#2A5A3A">—</span>`}
+            </div>
+            <!-- Histórico -->
+            <div style="text-align:center">
+              ${valHist !== null ? `
+              <div style="font-size:12px;font-weight:700;color:#D4B483">${valHist.toFixed(1)}%</div>
+              <div style="height:4px;background:#1E1A0A;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#D4B483;border-radius:2px;width:${barHist}%"></div></div>
+              ` : `<span style="font-size:10px;color:#2A5A3A">sem dados</span>`}
+            </div>
+            <!-- Atual -->
+            <div style="text-align:center">
+              <div style="display:flex;align-items:center;justify-content:center;gap:4px">
+                <span style="font-size:12px;font-weight:700;color:#5DCAA5">${valAt.toFixed(1)}%</span>
+                ${deltaHist !== null && Math.abs(deltaHist) >= 0.5 ? `<span style="font-size:10px;color:${dCorHist};font-weight:700">${sHist}${Math.abs(deltaHist).toFixed(1)}</span>` : ""}
+              </div>
+              <div style="height:4px;background:#0A1E0F;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#5DCAA5;border-radius:2px;width:${barAt}%"></div></div>
+            </div>
           </div>`;
         }).join("")}
-      </div>
-      <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#3A6A48">
-        <span>Patrimônio anterior: <b style="color:#888">R$ ${(ult.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
-        <span>Atual: <b style="color:#C9A96E">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
-        ${(d.patrimonio||0)-(ult.patrimonio||0) ? `<span style="color:${(d.patrimonio||0)>(ult.patrimonio||0)?"#5DCAA5":"#FF6B6B"}">
-          ${(d.patrimonio||0)>(ult.patrimonio||0)?"+":""}R$ ${((d.patrimonio||0)-(ult.patrimonio||0)).toLocaleString("pt-BR",{maximumFractionDigits:0})}
-        </span>` : ""}
-      </div>
-    </div>`;
-  } else if(!temHist){
-    html += `<div style="font-size:11px;color:#2A5A3A;padding:6px 0">📌 Após analisar, o sistema salvará esta carteira como referência para o próximo comparativo.</div>`;
+
+        <!-- Rodapé patrimônio -->
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid #1E1E1E;display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;font-size:11px">
+          <span style="color:#3A6A48">Patrimônio</span>
+          <div></div>
+          <div style="text-align:center;color:#D4B483">${patAnterior ? "R$ "+patAnterior : "—"}</div>
+          <div style="text-align:center">
+            <span style="color:#5DCAA5;font-weight:700">R$ ${patAtual}</span>
+            ${patDelta !== null && Math.abs(patDelta) > 0 ? `<span style="color:${patDelta>0?"#5DCAA5":"#FF6B6B"};margin-left:4px">${patDelta>0?"+":""}R$ ${Math.abs(patDelta).toLocaleString("pt-BR",{maximumFractionDigits:0})}</span>` : ""}
+          </div>
+        </div>
+      </div>`;
+    }
+  }
+  if(!temHist){
+    html += `<div style="font-size:11px;color:#2A5A3A;padding:4px 0">📌 Após analisar, esta carteira será salva como referência para o próximo comparativo.</div>`;
   }
 
   box.innerHTML = html;
