@@ -1609,10 +1609,20 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
 
 function setupDrop(dropId,inputId,fnameId){
   const drop=document.getElementById(dropId), input=document.getElementById(inputId), fname=document.getElementById(fnameId);
-  input.addEventListener("change",()=>{
-    fname.textContent=input.files[0]?.name||"";
-    if(input.files[0]) identificarCliente(input.files[0]);
-  });
+  function handleFile(file){
+    if(!file) return;
+    // Feedback imediato
+    if(fname) fname.textContent = "⏳ " + file.name + " — identificando...";
+    drop.style.borderColor="#D6B27A";
+    // Mostra botão desabilitado imediatamente
+    const wrap = document.getElementById("btn-proxima-etapa-wrap");
+    const btn  = document.getElementById("btn-proxima-etapa");
+    if(wrap) wrap.style.display="block";
+    if(btn){ btn.textContent="⏳ Identificando cliente..."; btn.disabled=true; btn.style.opacity=".6"; }
+    // Processa em background
+    identificarCliente(file);
+  }
+  input.addEventListener("change",()=>{ if(input.files[0]) handleFile(input.files[0]); });
   drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("drag");});
   drop.addEventListener("dragleave",()=>drop.classList.remove("drag"));
   drop.addEventListener("drop",e=>{
@@ -1683,15 +1693,21 @@ function mostrarBotaoProximaEtapa(d){
   const wrap = document.getElementById("btn-proxima-etapa-wrap");
   const btn  = document.getElementById("btn-proxima-etapa");
   if(!wrap) return;
-
-  if(d){
-    const nome = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
-    const retorno = d.tem_historico && d.ultima_carteira;
-    if(btn) btn.innerHTML = retorno
-      ? `🔄 Continuar com ${nome} — Retorno →`
-      : `🆕 Continuar com ${nome} — Primeiro acesso →`;
-  }
   wrap.style.display = "block";
+
+  if(btn){
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    if(d && d.conta){
+      const nome = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
+      const retorno = d.tem_historico && d.ultima_carteira;
+      btn.innerHTML = retorno
+        ? `🔄 Continuar com ${nome} — Retorno →`
+        : `🆕 Continuar com ${nome} — Primeiro acesso →`;
+    } else {
+      btn.innerHTML = "Continuar para Etapa 2 →";
+    }
+  }
 }
 
 function avancarEtapa2(){
