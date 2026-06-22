@@ -1554,8 +1554,8 @@ if(document.readyState === "loading"){
   else setTimeout(atualizarGraficoServir, 600);
 }
 
-// Cache do portfólio HP
-let _hpPortfolios = null;
+// Cache do portfólio HP — declarado como var para evitar TDZ (chamado antes da inicialização)
+var _hpPortfolios = null;
 fetch("/api/hp/portfolios").then(r=>r.json()).then(d=>{ _hpPortfolios = d.perfis||null; atualizarModelo(); }).catch(()=>{});
 
 function atualizarModelo(){
