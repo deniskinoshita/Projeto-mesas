@@ -667,7 +667,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     import matplotlib.pyplot as plt
     import numpy as np
 
-    PRETO=colors.HexColor("#0D0D0D"); DOURADO=colors.HexColor("#C9A96E"); DESC=colors.HexColor("#A07840")
+    PRETO=colors.HexColor("#081F18"); DOURADO=colors.HexColor("#C9A96E"); DESC=colors.HexColor("#A07840")
     CESC=colors.HexColor("#1A1A1A"); CMED=colors.HexColor("#2C2C2C"); BRANCO=colors.white
     VERM=colors.HexColor("#FF6B6B"); VERDE=colors.HexColor("#5DCAA5"); AMARELO=colors.HexColor("#FFD966")
     LARANJA=colors.HexColor("#FF8C00")
@@ -681,7 +681,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     s_sub=S("S",fontSize=10,tc=DESC,alignment=TA_CENTER,spaceAfter=2)
     s_sec=S("Se",fontSize=11,tc=DOURADO,spaceBefore=10,spaceAfter=4)
     s_body=S("B",fontSize=9,leading=13)
-    s_rod=S("R",fontSize=7,tc=colors.HexColor("#666"),alignment=TA_CENTER)
+    s_rod=S("R",fontSize=7,tc=colors.HexColor("#4A7055"),alignment=TA_CENTER)
     s_frag=S("F",fontSize=9,leading=13,tc=VERM)
     s_opor=S("O",fontSize=9,leading=13,tc=VERDE)
     s_sug=S("Su",fontSize=9,leading=14,tc=DOURADO)
@@ -771,14 +771,14 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     lbs=[d["label"] for d in desvios]; rea=[d["real"] for d in desvios]; alv=[d["alvo"] for d in desvios]
     x=np.arange(len(lbs)); w=0.35
     fig,ax=plt.subplots(figsize=(10,4))
-    fig.patch.set_facecolor("#0D0D0D"); ax.set_facecolor("#1A1A1A")
+    fig.patch.set_facecolor("#081F18"); ax.set_facecolor("#1A1A1A")
     ax.bar(x-w/2,rea,w,color="#C9A96E",zorder=3,linewidth=0)
-    ax.bar(x+w/2,alv,w,color="#444",zorder=3,linewidth=0)
+    ax.bar(x+w/2,alv,w,color="#2A5A3A",zorder=3,linewidth=0)
     ax.set_xticks(x); ax.set_xticklabels(lbs,rotation=28,ha="right",color="white",fontsize=8)
     ax.tick_params(colors="white"); ax.spines[:].set_color("#2C2C2C")
-    ax.yaxis.grid(True,color="#2A2A2A",zorder=0); ax.set_axisbelow(True); ax.set_ylabel("%",color="white")
+    ax.yaxis.grid(True,color="#1C4A34",zorder=0); ax.set_axisbelow(True); ax.set_ylabel("%",color="white")
     fig.tight_layout(pad=1)
-    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#0D0D0D"); plt.close(fig); ib.seek(0)
+    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#081F18"); plt.close(fig); ib.seek(0)
     elems.append(Image(ib,width=15*cm,height=6*cm)); elems.append(Spacer(1,0.3*cm))
 
     elems.append(Paragraph("Desvios por Indexador",s_sec))
@@ -839,32 +839,32 @@ HTML = r"""<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0D0D0D;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#111;border-bottom:1px solid #222;padding:14px 28px;display:flex;align-items:center;gap:12px}
+body{background:#081F18;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#111;border-bottom:1px solid #1A4030;padding:14px 28px;display:flex;align-items:center;gap:12px}
 header h1{font-size:18px;color:#C9A96E;font-weight:700;letter-spacing:.5px}
-header p{font-size:11px;color:#555;margin-top:2px}
+header p{font-size:11px;color:#3A6A48;margin-top:2px}
 .container{max-width:1020px;margin:0 auto;padding:28px 20px}
-.card{background:#141414;border:1px solid #222;border-radius:12px;padding:22px;margin-bottom:18px}
+.card{background:#0B2A1F;border:1px solid #1A4030;border-radius:12px;padding:22px;margin-bottom:18px}
 .card h2{font-size:12px;color:#C9A96E;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 label{font-size:12px;color:#777;display:block;margin-bottom:5px}
-input,select{width:100%;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:8px;padding:9px 12px;color:#F0F0F0;font-size:13px;outline:none;transition:border .2s}
+input,select{width:100%;background:#1A1A1A;border:1px solid #1C4A34;border-radius:8px;padding:9px 12px;color:#F0F0F0;font-size:13px;outline:none;transition:border .2s}
 input:focus,select:focus{border-color:#C9A96E}
 select option{background:#1A1A1A}
-.upload-area{border:1.5px dashed #2A2A2A;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#111}
+.upload-area{border:1.5px dashed #1C4A34;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#111}
 .upload-area:hover,.upload-area.drag{border-color:#C9A96E;background:#1A1A1A}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
-.upload-area p{font-size:13px;color:#666}
+.upload-area p{font-size:13px;color:#4A7055}
 .upload-area .fname{color:#C9A96E;font-weight:600;font-size:13px;margin-top:6px}
-.btn{width:100%;background:#C9A96E;color:#0D0D0D;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.btn{width:100%;background:#C9A96E;color:#081F18;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.88}.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-out{background:transparent;color:#C9A96E;border:1px solid #C9A96E}
 .btn-out:hover{background:#1A1A1A}
 .metric{background:#1A1A1A;border-radius:10px;padding:14px;text-align:center}
-.metric .lbl{font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.metric .lbl{font-size:10px;color:#3A6A48;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
 .metric .val{font-size:20px;font-weight:700;color:#C9A96E}
 .metric .val.danger{color:#FF6B6B}.metric .val.ok{color:#5DCAA5}
 .desvio-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1A1A1A;font-size:12px}
@@ -872,44 +872,44 @@ select option{background:#1A1A1A}
 .dn{width:106px;font-weight:500}.da{width:46px;color:#777;font-size:11px}
 .db-w{flex:1;background:#1A1A1A;border-radius:3px;height:5px;overflow:hidden}
 .db{height:100%;background:#C9A96E;border-radius:3px;transition:width .5s}
-.dalvo{width:52px;color:#444;font-size:10px}
+.dalvo{width:52px;color:#2A5A3A;font-size:10px}
 .dpp{width:60px;text-align:right;font-weight:700;font-size:11px}
-.red{color:#FF6B6B}.grn{color:#5DCAA5}.dim{color:#333}
+.red{color:#FF6B6B}.grn{color:#5DCAA5}.dim{color:#1E4A30}
 .alert{border-radius:8px;padding:10px 14px;margin:5px 0;font-size:12px;line-height:1.5}
 .alert.danger{background:#2A1010;border-left:3px solid #FF6B6B;color:#FFB3B3}
 .alert.success{background:#0A2018;border-left:3px solid #5DCAA5;color:#9FE1CB}
 .alert.gold{background:#1A160A;border-left:3px solid #C9A96E;color:#C9A96E}
 .alert.warn{background:#1A1500;border-left:3px solid #FFD966;color:#FFD966}
-.rec-card{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #2A2A2A}
+.rec-card{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #1C4A34}
 .rec-header{font-size:13px;font-weight:700;margin-bottom:6px}
 .rec-ctx{font-size:12px;color:#AAA;line-height:1.5;margin-bottom:6px}
 .rec-carta{font-size:11px;color:#888;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#111;border-radius:6px;border-left:2px solid #C9A96E}
 .rec-prods{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.prod-tag{background:#0D0D0D;border:1px solid #333;border-radius:20px;padding:3px 10px;font-size:11px;color:#C9A96E}
-.gestor-card{background:#1A1A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #333}
+.prod-tag{background:#081F18;border:1px solid #1E4A30;border-radius:20px;padding:3px 10px;font-size:11px;color:#C9A96E}
+.gestor-card{background:#1A1A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #1E4A30}
 .gestor-nome{font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:3px}
 .gestor-msg{font-size:11px;color:#888;line-height:1.4}
 .gestor-impl{font-size:11px;color:#5DCAA5;margin-top:3px}
-.macro-badge{display:inline-flex;align-items:center;gap:6px;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:20px;padding:4px 12px;font-size:12px;margin:3px}
+.macro-badge{display:inline-flex;align-items:center;gap:6px;background:#1A1A1A;border:1px solid #1C4A34;border-radius:20px;padding:4px 12px;font-size:12px;margin:3px}
 .macro-badge span{color:#C9A96E;font-weight:700}
 #results{display:none}
 .spinner{display:none;text-align:center;padding:32px;color:#C9A96E}
 .spinner.show{display:block}
-.loader{width:36px;height:36px;border:3px solid #222;border-top-color:#C9A96E;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+.loader{width:36px;height:36px;border:3px solid #1A4030;border-top-color:#C9A96E;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .chart-wrap{position:relative;width:100%;height:250px}
 .tab-btns{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.tab-btn{background:#1A1A1A;border:1px solid #2A2A2A;border-radius:8px;padding:6px 14px;font-size:12px;color:#888;cursor:pointer;transition:all .2s}
-.tab-btn.active{background:#C9A96E;color:#0D0D0D;border-color:#C9A96E;font-weight:700}
+.tab-btn{background:#1A1A1A;border:1px solid #1C4A34;border-radius:8px;padding:6px 14px;font-size:12px;color:#888;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:#C9A96E;color:#081F18;border-color:#C9A96E;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
-.rodape{text-align:center;font-size:11px;color:#333;margin-top:32px;padding-top:14px;border-top:1px solid #1A1A1A}
+.rodape{text-align:center;font-size:11px;color:#1E4A30;margin-top:32px;padding-top:14px;border-top:1px solid #1A1A1A}
 /* Checklist Modelo de Servir */
 .pilar-toggle{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;background:#111;border:1px solid #1E1E1E;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
-.pilar-toggle:hover{border-color:#2A2A2A}
-.pilar-toggle.done{border-color:#2A4030;background:#0A1A10}
+.pilar-toggle:hover{border-color:#1C4A34}
+.pilar-toggle.done{border-color:#2A4030;background:#0A2A18}
 .pilar-toggle.pending-crit{border-color:#4A1010;background:#1A0808}
 .pilar-toggle.pending-high{border-color:#3A3A00;background:#141400}
-.pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
+.pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid #1E4A30;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
 .pilar-check.checked{background:#5DCAA5;border-color:#5DCAA5;color:#000;font-weight:700}
 .pilar-icon{font-size:20px;flex-shrink:0}
 .pilar-info{flex:1}
@@ -917,30 +917,30 @@ select option{background:#1A1A1A}
 .pilar-nome .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 .badge-crit{background:#FF2222;color:#fff}
 .badge-high{background:#FFD966;color:#000}
-.badge-med{background:#444;color:#aaa}
+.badge-med{background:#2A5A3A;color:#aaa}
 .badge-dir{background:#C9A96E;color:#000}
-.pilar-desc{font-size:11px;color:#555;line-height:1.4}
-.pilar-falta{display:none;margin-top:10px;padding:10px;background:#0D0D0D;border-radius:8px;border-left:3px solid #FF6B6B}
+.pilar-desc{font-size:11px;color:#3A6A48;line-height:1.4}
+.pilar-falta{display:none;margin-top:10px;padding:10px;background:#081F18;border-radius:8px;border-left:3px solid #FF6B6B}
 .pilar-falta.show{display:block}
 .pilar-falta.warn{border-left-color:#FFD966}
-.pilar-falta.med{border-left-color:#555}
+.pilar-falta.med{border-left-color:#3A6A48}
 .pilar-falta p{font-size:11px;color:#AAA;line-height:1.6;margin-bottom:6px}
-.pilar-falta .acao{font-size:11px;color:#C9A96E;line-height:1.5;padding:8px;background:#1A1600;border-radius:6px;margin-top:6px}
-.pilar-falta .diretriz-badge{font-size:10px;color:#C9A96E;font-weight:700;margin-top:6px;padding:4px 8px;background:#1A1600;border:1px solid #C9A96E;border-radius:4px;display:inline-block}
+.pilar-falta .acao{font-size:11px;color:#C9A96E;line-height:1.5;padding:8px;background:#1A2E1A;border-radius:6px;margin-top:6px}
+.pilar-falta .diretriz-badge{font-size:10px;color:#C9A96E;font-weight:700;margin-top:6px;padding:4px 8px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:4px;display:inline-block}
 /* Placard de score */
-.servir-score{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:10px;background:#111;border:1px solid #2A2A2A;margin-bottom:14px}
+.servir-score{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:10px;background:#111;border:1px solid #1C4A34;margin-bottom:14px}
 .score-num{font-size:36px;font-weight:700;color:#C9A96E;min-width:56px;text-align:center}
 .score-info{flex:1}
-.score-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.score-bar-w{height:6px;background:#222;border-radius:3px;overflow:hidden}
+.score-label{font-size:11px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.score-bar-w{height:6px;background:#1A4030;border-radius:3px;overflow:hidden}
 .score-bar{height:100%;border-radius:3px;transition:width .5s}
 .score-pendentes{font-size:11px;color:#888;margin-top:5px}
 /* Pilar result card */
-.pilar-result{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:8px;border-left:4px solid #333}
+.pilar-result{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:8px;border-left:4px solid #1E4A30}
 .pilar-result.ok{border-left-color:#5DCAA5}
 .pilar-result.crit{border-left-color:#FF4444}
 .pilar-result.high{border-left-color:#FFD966}
-.pilar-result.med{border-left-color:#555}
+.pilar-result.med{border-left-color:#3A6A48}
 .pilar-result-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .pilar-result-nome{font-size:13px;font-weight:700}
 .pilar-result-status{font-size:10px;padding:2px 8px;border-radius:10px}
@@ -949,76 +949,76 @@ select option{background:#1A1A1A}
 .pilar-result-impacto{font-size:11px;color:#888;line-height:1.5;margin-bottom:6px}
 .pilar-result-acao{font-size:11px;color:#C9A96E;padding:8px;background:#111;border-radius:6px}
 /* Cross Sell chips */
-.cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #2A2A2A;background:#111;cursor:pointer;font-size:12px;font-weight:600;color:#777;transition:all .2s;user-select:none}
+.cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #1C4A34;background:#111;cursor:pointer;font-size:12px;font-weight:600;color:#777;transition:all .2s;user-select:none}
 .cs-chip:hover{border-color:#C9A96E;color:#C9A96E}
-.cs-chip.ativo{background:#1A1600;border-color:#C9A96E;color:#C9A96E}
+.cs-chip.ativo{background:#1A2E1A;border-color:#C9A96E;color:#C9A96E}
 .cs-chip .cs-icon{font-size:16px}
-.cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #333;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
-.cs-chip.ativo .cs-check{background:#C9A96E;border-color:#C9A96E;color:#0D0D0D;font-weight:900}
+.cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #1E4A30;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
+.cs-chip.ativo .cs-check{background:#C9A96E;border-color:#C9A96E;color:#081F18;font-weight:900}
 /* Cross sell result cards */
-.cs-area{background:#1A1A1A;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #2A2A2A}
+.cs-area{background:#1A1A1A;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #1C4A34}
 .cs-area.tem{border-left:4px solid #5DCAA5;opacity:.7}
 .cs-area.nao-tem{border-left:4px solid #C9A96E}
 .cs-area-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .cs-area-nome{font-size:14px;font-weight:700;flex:1}
 .cs-status-tag{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700}
 .cs-tem-tag{background:#0A2018;color:#5DCAA5}
-.cs-falta-tag{background:#1A1600;color:#C9A96E}
+.cs-falta-tag{background:#1A2E1A;color:#C9A96E}
 .cs-pitch{font-size:12px;color:#C9A96E;font-style:italic;padding:10px 12px;background:#111;border-radius:8px;border-left:3px solid #C9A96E;margin-bottom:10px;line-height:1.6}
 .cs-ops{list-style:none;padding:0}
 .cs-ops li{font-size:11px;color:#888;padding:5px 0;border-bottom:1px solid #1A1A1A;line-height:1.5}
 .cs-ops li:last-child{border:none}
 .cs-ops li::before{content:"→ ";color:#C9A96E}
 /* Especialista FP */
-.fp-bloco{background:#111;border-radius:10px;padding:14px;margin-top:10px;border:1px solid #2A2A2A}
+.fp-bloco{background:#111;border-radius:10px;padding:14px;margin-top:10px;border:1px solid #1C4A34}
 .fp-bloco-titulo{font-size:12px;font-weight:700;color:#C9A96E;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .fp-bloco p{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px}
 .fp-bloco .fp-item{padding:6px 0;border-bottom:1px solid #1A1A1A;font-size:11px;color:#AAA;line-height:1.5}
 .fp-bloco .fp-item:last-child{border:none}
 .fp-bloco .fp-item b{color:#F0F0F0}
-.fp-bloco .fp-pitch{font-size:11px;color:#5DCAA5;padding:8px;background:#0A1A10;border-radius:6px;border-left:2px solid #5DCAA5;margin-top:8px}
+.fp-bloco .fp-pitch{font-size:11px;color:#5DCAA5;padding:8px;background:#0A2A18;border-radius:6px;border-left:2px solid #5DCAA5;margin-top:8px}
 .fp-alerta{font-size:11px;color:#FF6B6B;padding:8px 10px;background:#2A1010;border-radius:6px;margin-top:6px;border-left:2px solid #FF6B6B}
-.cs-score-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-radius:10px;border:1px solid #2A2A2A;margin-bottom:14px}
+.cs-score-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-radius:10px;border:1px solid #1C4A34;margin-bottom:14px}
 /* Sugestões de Alocação */
-.sg-bloco{background:#111;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #2A2A2A}
+.sg-bloco{background:#111;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #1C4A34}
 .sg-bloco-title{font-size:11px;font-weight:700;color:#C9A96E;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sg-card{background:#1A1A1A;border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid #2A2A2A;position:relative}
+.sg-card{background:#1A1A1A;border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid #1C4A34;position:relative}
 .sg-card.urg-alta{border-left-color:#FF6B6B}
 .sg-card.urg-media{border-left-color:#FFD966}
 .sg-card.urg-baixa{border-left-color:#5DCAA5}
 .sg-card .sg-topo{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.sg-card .sg-acao{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;background:#2A2A2A;color:#AAA}
+.sg-card .sg-acao{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;background:#1C4A34;color:#AAA}
 .sg-card .sg-produto{font-size:13px;font-weight:700;color:#F0F0F0;flex:1}
-.sg-card .sg-idx{font-size:10px;color:#C9A96E;padding:2px 7px;border-radius:6px;background:#1A1600;border:1px solid #C9A96E}
+.sg-card .sg-idx{font-size:10px;color:#C9A96E;padding:2px 7px;border-radius:6px;background:#1A2E1A;border:1px solid #C9A96E}
 .sg-card .sg-motivo{font-size:11px;color:#888;line-height:1.5;margin-top:4px}
 .sg-card .sg-de{font-size:11px;color:#FF6B6B;margin-bottom:4px}
-.sg-card .sg-fonte{font-size:10px;color:#555;margin-top:4px}
+.sg-card .sg-fonte{font-size:10px;color:#3A6A48;margin-top:4px}
 .sg-ja-tem{opacity:.6;border-left-color:#5DCAA5 !important}
 .sg-ja-tem-badge{font-size:10px;color:#5DCAA5;background:#0A2018;border-radius:6px;padding:2px 8px;margin-bottom:4px;display:inline-block}
-.sg-est-box{background:#1A1A1A;border-radius:8px;padding:14px;border:1px solid #2A2A2A;font-size:12px;color:#CCC;line-height:1.7;white-space:pre-wrap}
+.sg-est-box{background:#1A1A1A;border-radius:8px;padding:14px;border:1px solid #1C4A34;font-size:12px;color:#CCC;line-height:1.7;white-space:pre-wrap}
 .sg-fii-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
-.sg-fii-table th{text-align:left;color:#555;font-weight:600;padding:5px 8px;border-bottom:1px solid #2A2A2A;font-size:10px;text-transform:uppercase}
+.sg-fii-table th{text-align:left;color:#3A6A48;font-weight:600;padding:5px 8px;border-bottom:1px solid #1C4A34;font-size:10px;text-transform:uppercase}
 .sg-fii-table td{padding:7px 8px;border-bottom:1px solid #1A1A1A;color:#CCC}
 .sg-fii-table tr:last-child td{border:none}
 .sg-fii-table .fii-ticker{color:#C9A96E;font-weight:700}
-.sg-header-box{background:#1A1600;border:1px solid #C9A96E;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sg-header-box{background:#1A2E1A;border:1px solid #C9A96E;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .sg-vazio{font-size:13px;color:#5DCAA5;padding:16px;text-align:center}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 /* ── Fluxo em 2 etapas ── */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
-.step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#141414;border:1px solid #222;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
-.step-item.active{background:#1A1600;border-color:#C9A96E}
-.step-item.done{background:#0A1A10;border-color:#2A4030}
-.step-circle{width:26px;height:26px;border-radius:50%;background:#222;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#555;flex-shrink:0;transition:all .3s}
-.step-item.active .step-circle{background:#C9A96E;border-color:#C9A96E;color:#0D0D0D}
+.step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#0B2A1F;border:1px solid #1A4030;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
+.step-item.active{background:#1A2E1A;border-color:#C9A96E}
+.step-item.done{background:#0A2A18;border-color:#2A4030}
+.step-circle{width:26px;height:26px;border-radius:50%;background:#1A4030;border:2px solid #1E4A30;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#3A6A48;flex-shrink:0;transition:all .3s}
+.step-item.active .step-circle{background:#C9A96E;border-color:#C9A96E;color:#081F18}
 .step-item.done .step-circle{background:#5DCAA5;border-color:#5DCAA5;color:#000}
-.step-label{font-size:12px;font-weight:700;color:#444;letter-spacing:.3px;transition:all .3s}
+.step-label{font-size:12px;font-weight:700;color:#2A5A3A;letter-spacing:.3px;transition:all .3s}
 .step-item.active .step-label{color:#C9A96E}
 .step-item.done .step-label{color:#5DCAA5}
-.step-line{flex:1;height:1px;background:#222;min-width:20px}
+.step-line{flex:1;height:1px;background:#1A4030;min-width:20px}
 .step2-banner{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
-.step2-banner.first{background:#0A1A10;border:1px solid #2A4030}
-.step2-banner.return{background:#1A1600;border:1px solid #3A2A00}
+.step2-banner.first{background:#0A2A18;border:1px solid #2A4030}
+.step2-banner.return{background:#1A2E1A;border:1px solid #3A2A00}
 </style>
 </head>
 <body>
@@ -1029,8 +1029,8 @@ select option{background:#1A1A1A}
   </div>
   <nav style="display:flex;gap:8px">
     <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #C9A96E;color:#C9A96E;text-decoration:none;font-weight:700">📊 Assessor</a>
-    <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A2A;color:#555;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#8B9FE8';this.style.color='#8B9FE8'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#555'">👥 Líder</a>
-    <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A2A;color:#555;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#5DCAA5';this.style.color='#5DCAA5'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#555'">⚙️ Admin</a>
+    <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#8B9FE8';this.style.color='#8B9FE8'" onmouseout="this.style.borderColor='#1C4A34';this.style.color='#3A6A48'">👥 Líder</a>
+    <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#5DCAA5';this.style.color='#5DCAA5'" onmouseout="this.style.borderColor='#1C4A34';this.style.color='#3A6A48'">⚙️ Admin</a>
     <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#888'">Sair</button>
   </nav>
 </header>
@@ -1051,17 +1051,17 @@ select option{background:#1A1A1A}
 
 <!-- Formulário -->
 <!-- Mensagem do Admin (se houver) -->
-<div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#1A1600;border:1px solid #C9A96E;border-radius:10px">
+<div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:10px">
   <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
   <p id="msg-admin-txt" style="font-size:12px;color:#CCC;line-height:1.6"></p>
-  <p id="msg-admin-data" style="font-size:10px;color:#555;margin-top:4px"></p>
+  <p id="msg-admin-data" style="font-size:10px;color:#3A6A48;margin-top:4px"></p>
 </div>
 
 <div class="card">
   <h2>Dados do cliente</h2>
 
   <!-- Seletor de cliente salvo -->
-  <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#0D0D0D;border-radius:10px;border:1px solid #1E1E1E">
+  <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
     <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700">📁 Clientes salvos — clique para carregar</p>
     <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
@@ -1083,13 +1083,13 @@ select option{background:#1A1A1A}
       </select>
     </div>
     <div><label>Objetivo do cliente</label><input type="text" id="objetivo" placeholder="Ex: aposentadoria, compra de imóvel..."></div>
-    <div id="carta-ativa-info" style="display:flex;align-items:flex-end"><p style="font-size:11px;color:#555">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
+    <div id="carta-ativa-info" style="display:flex;align-items:flex-end"><p style="font-size:11px;color:#3A6A48">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
   </div>
 
   <div id="macro-badges" style="margin-bottom:14px"></div>
 
   <div style="background:#111;border-radius:8px;padding:10px 14px;margin-bottom:14px">
-    <p style="font-size:10px;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">MODELO LEVANTE — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
+    <p style="font-size:10px;color:#3A6A48;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">MODELO LEVANTE — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
     <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px"></div>
   </div>
 
@@ -1105,11 +1105,11 @@ select option{background:#1A1A1A}
   </div>
 
   <!-- Status da identificação -->
-  <div id="box-cliente-identificado" style="margin-top:10px;background:#111;border:1px solid #2A2A2A;border-radius:10px;padding:14px;display:none;transition:all .3s"></div>
+  <div id="box-cliente-identificado" style="margin-top:10px;background:#111;border:1px solid #1C4A34;border-radius:10px;padding:14px;display:none;transition:all .3s"></div>
 
   <!-- Botão para avançar — aparece após PDF carregado -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
-    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#C9A96E;color:#0D0D0D;font-size:15px;padding:15px">
+    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#C9A96E;color:#081F18;font-size:15px;padding:15px">
       Continuar para Etapa 2 — Perfil &amp; Cross Sell →
     </button>
   </div>
@@ -1141,11 +1141,11 @@ select option{background:#1A1A1A}
         <canvas id="chart-servir" width="150" height="150"></canvas>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;line-height:1">
           <div id="servir-score-num" style="font-size:32px;font-weight:900;color:#C9A96E">0</div>
-          <div style="font-size:10px;color:#555;margin-top:2px">de 6 pilares</div>
+          <div style="font-size:10px;color:#3A6A48;margin-top:2px">de 6 pilares</div>
         </div>
       </div>
       <div id="servir-legenda" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;text-align:left"></div>
-      <p style="font-size:10px;color:#444;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
+      <p style="font-size:10px;color:#2A5A3A;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
     </div>
 
     <!-- Checklist de pilares — renderizado pelo servidor -->
@@ -1158,7 +1158,7 @@ select option{background:#1A1A1A}
 <!-- Cross Sell — card separado -->
 <div class="card">
   <h2>💼 Cross Sell — Produtos Ativos na Braúna</h2>
-  <p style="font-size:11px;color:#555;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#F0F0F0">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
+  <p style="font-size:11px;color:#3A6A48;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#F0F0F0">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
   <div id="cross-sell-form" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
   <button class="btn" id="btn-ana" onclick="analisar()">Analisar carteira</button>
 </div>
@@ -1181,7 +1181,7 @@ select option{background:#1A1A1A}
     <div id="hp-alertas" style="margin-bottom:12px"></div>
 
     <!-- Desvios vs Modelo HP -->
-    <div style="font-size:11px;color:#666;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:11px;color:#4A7055;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
       <span>Comparativo vs. <span id="hp-ref" style="color:#D4B483"></span></span>
       <span id="hp-perfil-badge" style="background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700"></span>
     </div>
@@ -1208,13 +1208,13 @@ select option{background:#1A1A1A}
     <!-- Cenário macro HP -->
     <div id="hp-cenario" style="display:none;margin-top:12px">
       <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">🌐 Visão Macro — Head de Produtos</div>
-      <div id="hp-cenario-txt" style="background:#080808;border-radius:8px;padding:12px;font-size:11px;color:#AAA;line-height:1.6;border:1px solid #2A2A18"></div>
+      <div id="hp-cenario-txt" style="background:#060F0B;border-radius:8px;padding:12px;font-size:11px;color:#AAA;line-height:1.6;border:1px solid #2A2A18"></div>
     </div>
   </div>
 
   <div class="card" style="text-align:center">
     <h2>Exportar Análise</h2>
-    <p style="font-size:12px;color:#555;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
+    <p style="font-size:12px;color:#3A6A48;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
@@ -1229,7 +1229,7 @@ select option{background:#1A1A1A}
     <h2>Composição atual vs. modelo</h2>
     <div style="display:flex;gap:16px;margin-bottom:8px;font-size:11px">
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#C9A96E;display:inline-block"></span>Carteira atual</span>
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#444;display:inline-block"></span>Modelo Levante</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#2A5A3A;display:inline-block"></span>Modelo Levante</span>
     </div>
     <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Comparativo de alocação"></canvas></div>
   </div>
@@ -1243,7 +1243,7 @@ select option{background:#1A1A1A}
         <div style="position:relative;width:220px;height:220px">
           <canvas id="chart-classes" width="220" height="220"></canvas>
           <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
-            <div style="font-size:11px;color:#555;line-height:1.3">carteira<br>atual</div>
+            <div style="font-size:11px;color:#3A6A48;line-height:1.3">carteira<br>atual</div>
           </div>
         </div>
         <!-- Legenda da pizza -->
@@ -1257,7 +1257,7 @@ select option{background:#1A1A1A}
   <!-- Plano de Ação para atingir o objetivo -->
   <div class="card" id="card-plano">
     <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#C9A96E;text-transform:capitalize"></span></h2>
-    <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#1A1600;border:1px solid #C9A96E;border-radius:8px">
+    <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:8px">
       <p style="font-size:10px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
       <p id="plano-objetivo-txt" style="font-size:13px;color:#F0F0F0"></p>
     </div>
@@ -1306,10 +1306,10 @@ select option{background:#1A1A1A}
 
   <!-- ── Gerar Apresentação de Reunião — ao final ── -->
   <div style="padding:20px 0 8px">
-    <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#C9A96E;color:#0A0A08;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
+    <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#C9A96E;color:#071E17;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
       🎯 Gerar Apresentação de Reunião (.pptx)
     </button>
-    <p style="font-size:11px;color:#555;text-align:center;margin-top:8px">PowerPoint · Cenário macro · Análise da carteira · Sugestões de realocação · Identidade Braúna</p>
+    <p style="font-size:11px;color:#3A6A48;text-align:center;margin-top:8px">PowerPoint · Cenário macro · Análise da carteira · Sugestões de realocação · Identidade Braúna</p>
     <span id="apres-st" style="display:block;font-size:12px;color:#888;text-align:center;margin-top:6px"></span>
   </div>
 
@@ -1415,7 +1415,7 @@ fetch("/api/admin/mensagem").then(r=>r.json()).then(d=>{
 fetch("/api/admin/contexto-info").then(r=>r.json()).then(d=>{
   const nome=d.carta&&d.carta.nome?d.carta.nome+" ("+d.carta.atualizado+")":"Nenhuma carta carregada — contate o Admin";
   const el=document.getElementById("carta-ativa-nome");
-  if(el){ el.textContent=nome; el.style.color=d.carta&&d.carta.nome?"#5DCAA5":"#555"; }
+  if(el){ el.textContent=nome; el.style.color=d.carta&&d.carta.nome?"#5DCAA5":"#3A6A48"; }
 }).catch(()=>{});
 
 // ─── Modelo de Servir ──────────────────────────────────────────────────────────
@@ -1435,20 +1435,20 @@ function atualizarGraficoServir(){
     completos ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5DCAA5;flex-shrink:0"></span>${completos} concluído(s)</span>` : "",
     critPend  ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#FF4444;flex-shrink:0"></span>${critPend} crítico(s)</span>` : "",
     highPend  ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#FFD966;flex-shrink:0"></span>${highPend} importante(s)</span>` : "",
-    medPend   ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#444;flex-shrink:0"></span>${medPend} médio(s)</span>` : "",
+    medPend   ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#2A5A3A;flex-shrink:0"></span>${medPend} médio(s)</span>` : "",
   ].filter(Boolean).join("");
 
   const canvas = document.getElementById("chart-servir");
   if(!canvas || typeof Chart === "undefined") return;
 
   const vals   = [completos, critPend, highPend, medPend];
-  const cores  = ["#5DCAA5","#FF4444","#FFD966","#444"];
+  const cores  = ["#5DCAA5","#FF4444","#FFD966","#2A5A3A"];
   const labels = ["Concluídos","Críticos","Importantes","Médios"];
   const filtDados  = vals.filter(v=>v>0);
   const filtCores  = cores.filter((_,i)=>vals[i]>0);
   const filtLabels = labels.filter((_,i)=>vals[i]>0);
   const chartData  = filtDados.length ? filtDados : [6];
-  const chartCores = filtDados.length ? filtCores : ["#222"];
+  const chartCores = filtDados.length ? filtCores : ["#1A4030"];
   const chartLbls  = filtDados.length ? filtLabels : ["Nenhum"];
 
   if(_servirChart){ try{ _servirChart.destroy(); }catch(e){} }
@@ -1469,16 +1469,16 @@ function renderPilaresForm(){
 
   const html = PILARES.map(function(p){
     const feito  = !!checklist[p.id];
-    const impCor = p.importancia==="CRÍTICA" ? "#FF6B6B" : p.importancia==="ALTA" ? "#FFD966" : "#666";
+    const impCor = p.importancia==="CRÍTICA" ? "#FF6B6B" : p.importancia==="ALTA" ? "#FFD966" : "#4A7055";
     const impTxt = p.importancia==="CRÍTICA" ? "🔴 CRÍTICO" : p.importancia==="ALTA" ? "🟡 IMPORTANTE" : "⚪ MÉDIO";
-    const bg     = feito ? "#0A1A10" : p.importancia==="CRÍTICA" ? "#1A0A0A" : p.importancia==="ALTA" ? "#151500" : "#181818";
+    const bg     = feito ? "#0A2A18" : p.importancia==="CRÍTICA" ? "#1A0A0A" : p.importancia==="ALTA" ? "#151500" : "#181818";
     const border = feito ? "#2A5040" : p.importancia==="CRÍTICA" ? "#4A1212" : p.importancia==="ALTA" ? "#3A3A00" : "#282828";
 
     return '<div onclick="togglePilar(\'' + p.id + '\')" style="' +
       'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;' +
       'background:' + bg + ';border:1.5px solid ' + border + ';cursor:pointer;transition:all .2s;user-select:none">' +
       // Checkbox
-      '<div style="width:24px;height:24px;border-radius:6px;border:2px solid ' + (feito?"#5DCAA5":"#444") + ';' +
+      '<div style="width:24px;height:24px;border-radius:6px;border:2px solid ' + (feito?"#5DCAA5":"#2A5A3A") + ';' +
       'background:' + (feito?"#5DCAA5":"transparent") + ';display:flex;align-items:center;justify-content:center;' +
       'color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px">' +
       (feito ? "✓" : "") + '</div>' +
@@ -1489,14 +1489,14 @@ function renderPilaresForm(){
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">' +
           '<span style="font-size:13px;font-weight:700;color:' + (feito?"#5DCAA5":"#F0F0F0") + '">' + p.nome + '</span>' +
           '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1E1E1E;color:' + impCor + ';font-weight:700">' + impTxt + '</span>' +
-          (p.dir ? '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
+          (p.dir ? '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
         '</div>' +
-        '<div style="font-size:11px;color:#666;line-height:1.4">' + p.desc + '</div>' +
+        '<div style="font-size:11px;color:#4A7055;line-height:1.4">' + p.desc + '</div>' +
         (!feito ?
           '<div style="background:#111;border-radius:6px;padding:8px 10px;border-left:3px solid ' + impCor + ';margin-top:8px">' +
             '<div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
-            '<div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A1600;border-radius:5px">→ ' + p.acao + '</div>' +
-            (p.dir ? '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A1600">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
+            '<div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A2E1A;border-radius:5px">→ ' + p.acao + '</div>' +
+            (p.dir ? '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A2E1A">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
           '</div>' : "") +
       '</div>' +
     '</div>';
@@ -1516,7 +1516,7 @@ function togglePilar(id){
   checklist[id] = !checklist[id];
   const feito = checklist[id];
   const imp   = (PILARES.find(p=>p.id===id)||{}).importancia||"MÉDIA";
-  const bg     = feito ? "#0A1A10" : imp==="CRÍTICA" ? "#1A0A0A" : imp==="ALTA" ? "#151500" : "#181818";
+  const bg     = feito ? "#0A2A18" : imp==="CRÍTICA" ? "#1A0A0A" : imp==="ALTA" ? "#151500" : "#181818";
   const border = feito ? "#2A5040" : imp==="CRÍTICA" ? "#4A1212" : imp==="ALTA" ? "#3A3A00" : "#282828";
   const el = document.getElementById("pilar-"+id);
   if(el){
@@ -1526,7 +1526,7 @@ function togglePilar(id){
   const chk = document.getElementById("chk-"+id);
   if(chk){
     chk.style.background   = feito ? "#5DCAA5" : "transparent";
-    chk.style.borderColor  = feito ? "#5DCAA5" : "#444";
+    chk.style.borderColor  = feito ? "#5DCAA5" : "#2A5A3A";
     chk.textContent        = feito ? "✓" : "";
     chk.style.color        = "#000";
   }
@@ -1582,10 +1582,10 @@ function atualizarModelo(){
     .filter(([k,v]) => typeof v==="number" && v>0 && k!=="label")
     .sort((a,b) => b[1]-a[1]);
   g.innerHTML = itens.map(([k,v])=>{
-    const cor = COR_CLS[k]||"#555";
+    const cor = COR_CLS[k]||"#3A6A48";
     return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
       '<span style="font-size:11px;color:#888;min-width:110px;flex-shrink:0">'+(LABELS[k]||k)+'</span>'+
-      '<div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden">'+
+      '<div style="flex:1;height:6px;background:#1A4030;border-radius:3px;overflow:hidden">'+
         '<div style="width:'+Math.min(v,100)+'%;height:100%;background:'+cor+';border-radius:3px;transition:width .4s"></div>'+
       '</div>'+
       '<span style="font-size:11px;font-weight:700;color:'+cor+';min-width:36px;text-align:right">'+v+'%</span>'+
@@ -1602,7 +1602,7 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
   const b=document.getElementById("macro-badges");
   if(d.selic_meta) b.innerHTML+=`<span class="macro-badge">Selic <span>${d.selic_meta.toFixed(2)}% a.a.</span></span>`;
   if(d.ipca_12m)   b.innerHTML+=`<span class="macro-badge">IPCA 12M <span>${d.ipca_12m.toFixed(2)}%</span></span>`;
-  if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#555">Gestores ref. <span style="color:#888">${d.ref_contexto}</span></span>`;
+  if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#3A6A48">Gestores ref. <span style="color:#888">${d.ref_contexto}</span></span>`;
 }).catch(()=>{});
 
 // Handler global do input XPerformance — chamado pelo onchange inline no HTML
@@ -1662,7 +1662,7 @@ async function identificarCliente(file){
         const feito = !!checklist[p.id];
         if(!feito) return;
         const el  = document.getElementById("pilar-"+p.id);
-        if(el){ el.style.background="#0A1A10"; el.style.border="1.5px solid #2A5040"; }
+        if(el){ el.style.background="#0A2A18"; el.style.border="1.5px solid #2A5040"; }
         const chk = document.getElementById("chk-"+p.id);
         if(chk){ chk.style.background="#5DCAA5"; chk.style.borderColor="#5DCAA5"; chk.textContent="✓"; chk.style.color="#000"; }
         const nEl = document.getElementById("nome-"+p.id);
@@ -1745,7 +1745,7 @@ function ativarEtapa2(d){
     if(iconEl) iconEl.textContent = "🆕";
     if(tituloEl) tituloEl.textContent = nomeCliente + " — Primeiro acesso";
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Preencha o Modelo de Servir e o Cross Sell abaixo";
-    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E;border-radius:20px;font-weight:700">Novo cliente</span>';
+    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E;border-radius:20px;font-weight:700">Novo cliente</span>';
   } else {
     if(banner){ banner.className="step2-banner return"; }
     if(iconEl) iconEl.textContent = "🔄";
@@ -1759,7 +1759,7 @@ function ativarEtapa2(d){
     const scoreCor = nFeitos >= 5 ? "#5DCAA5" : nFeitos >= 3 ? "#FFD966" : "#FF6B6B";
     if(badgesEl) badgesEl.innerHTML =
       `<span style="font-size:11px;padding:4px 12px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:20px;font-weight:700">Última reunião: ${ultData}</span>` +
-      `<span style="font-size:11px;padding:4px 12px;background:#0D0D0D;color:${scoreCor};border:1px solid #2A2A2A;border-radius:20px;font-weight:700">${nFeitos}/${PILARES.length} pilares</span>`;
+      `<span style="font-size:11px;padding:4px 12px;background:#081F18;color:${scoreCor};border:1px solid #1C4A34;border-radius:20px;font-weight:700">${nFeitos}/${PILARES.length} pilares</span>`;
   }
 
   // Exibe a etapa 2
@@ -1787,7 +1787,7 @@ function renderPainelCliente(d){
     <div style="font-size:22px">📋</div>
     <div style="flex:1">
       <div style="font-size:14px;font-weight:700;color:#C9A96E">${d.nome_cliente || "Cliente " + d.conta}</div>
-      <div style="font-size:11px;color:#555">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
+      <div style="font-size:11px;color:#3A6A48">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:16px;font-weight:700;color:#F0F0F0">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</div>
@@ -1803,8 +1803,8 @@ function renderPainelCliente(d){
 
   if(temFicha){
     html += `
-    <div style="background:#0D0D0D;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #1E1E1E">
-      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
+    <div style="background:#081F18;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #1E1E1E">
+      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${PILARES.map(p=>{
           const feito = !!chk[p.id];
@@ -1815,40 +1815,40 @@ function renderPainelCliente(d){
       </div>
       <div style="margin-top:8px;font-size:11px;color:${scoreCor};font-weight:700">${nFeitos}/${nTotal} pilares completos</div>
       ${d.ficha_salva.cross_ativos?.length ? `
-        <div style="margin-top:8px;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
+        <div style="margin-top:8px;font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
           ${d.ficha_salva.cross_ativos.map(id=>{
             const a = CROSS_AREAS.find(x=>x.id===id);
-            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E">${a.icone} ${a.nome}</span>` : "";
+            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E">${a.icone} ${a.nome}</span>` : "";
           }).join("")}
         </div>` : ""}
     </div>`;
   } else {
-    html += `<div style="font-size:12px;color:#555;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
+    html += `<div style="font-size:12px;color:#3A6A48;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
   }
 
   // ── Comparativo vs. última carteira salva
   if(temHist && d.comparativo?.length){
     const ult = d.ultima_carteira;
     html += `
-    <div style="background:#0D0D0D;border-radius:8px;padding:10px 14px;border:1px solid #1E1E1E">
-      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+    <div style="background:#081F18;border-radius:8px;padding:10px 14px;border:1px solid #1E1E1E">
+      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
         Comparativo — Última reunião (${ult.data_ref || ult.salvo_em}) vs. Hoje (${d.data_ref})
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">
         ${d.comparativo.filter(c=>c.anterior>0||c.atual>0).map(c=>{
-          const dCor = c.delta>1?"#FF6B6B":c.delta<-1?"#5DCAA5":"#555";
+          const dCor = c.delta>1?"#FF6B6B":c.delta<-1?"#5DCAA5":"#3A6A48";
           const sinal = c.delta>0?"+":"";
-          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#141414;border-radius:6px;font-size:11px">
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#0B2A1F;border-radius:6px;font-size:11px">
             <span style="color:#888">${c.label}</span>
-            <span style="color:#555">${c.anterior.toFixed(1)}%</span>
-            <span style="color:#333">→</span>
+            <span style="color:#3A6A48">${c.anterior.toFixed(1)}%</span>
+            <span style="color:#1E4A30">→</span>
             <span style="color:#F0F0F0;font-weight:700">${c.atual.toFixed(1)}%</span>
             <span style="color:${dCor};font-weight:700;min-width:38px;text-align:right">${sinal}${c.delta.toFixed(1)}%</span>
           </div>`;
         }).join("")}
       </div>
-      <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#555">
+      <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:#3A6A48">
         <span>Patrimônio anterior: <b style="color:#888">R$ ${(ult.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
         <span>Atual: <b style="color:#C9A96E">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</b></span>
         ${(d.patrimonio||0)-(ult.patrimonio||0) ? `<span style="color:${(d.patrimonio||0)>(ult.patrimonio||0)?"#5DCAA5":"#FF6B6B"}">
@@ -1857,7 +1857,7 @@ function renderPainelCliente(d){
       </div>
     </div>`;
   } else if(!temHist){
-    html += `<div style="font-size:11px;color:#444;padding:6px 0">📌 Após analisar, o sistema salvará esta carteira como referência para o próximo comparativo.</div>`;
+    html += `<div style="font-size:11px;color:#2A5A3A;padding:6px 0">📌 Após analisar, o sistema salvará esta carteira como referência para o próximo comparativo.</div>`;
   }
 
   box.innerHTML = html;
@@ -1882,9 +1882,9 @@ async function buscarClientesSalvos(){
     if(!lista.length){ box.style.display="none"; return; }
     ul.innerHTML = lista.map(c=>`
       <button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
-        style="padding:6px 12px;border-radius:20px;border:1px solid #2A2A2A;background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='#C9A96E'" onmouseout="this.style.borderColor='#2A2A2A'">
-        ${c.nome} <span style="color:#555;font-size:10px">${c.perfil}</span>
+        style="padding:6px 12px;border-radius:20px;border:1px solid #1C4A34;background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='#C9A96E'" onmouseout="this.style.borderColor='#1C4A34'">
+        ${c.nome} <span style="color:#3A6A48;font-size:10px">${c.perfil}</span>
       </button>`).join("");
     box.style.display="block";
   }catch(e){}
@@ -1905,7 +1905,7 @@ function carregarFicha(jsonStr){
       if(!feito) return; // estado inicial já é "não feito"
       const imp  = p.importancia || "MÉDIA";
       const el   = document.getElementById("pilar-"+p.id);
-      if(el){ el.style.background="#0A1A10"; el.style.border="1.5px solid #2A5040"; }
+      if(el){ el.style.background="#0A2A18"; el.style.border="1.5px solid #2A5040"; }
       const chk  = document.getElementById("chk-"+p.id);
       if(chk){ chk.style.background="#5DCAA5"; chk.style.borderColor="#5DCAA5"; chk.textContent="✓"; chk.style.color="#000"; }
       const nEl  = document.getElementById("nome-"+p.id);
@@ -1943,8 +1943,8 @@ function renderAnaliseHP(xp){
     ["Rent. Mês",  xp.rent?.portfolio?.mes  ? xp.rent.portfolio.mes.toFixed(2)+"%" : "—"],
     ["Rent. 12M",  xp.rent?.portfolio?.["12m"] ? xp.rent.portfolio["12m"].toFixed(2)+"%" : "—"],
   ].map(([lbl,val])=>`
-    <div style="background:#0A0A08;border:1px solid #2A2A18;border-radius:8px;padding:8px 14px;min-width:90px">
-      <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
+    <div style="background:#071E17;border:1px solid #2A2A18;border-radius:8px;padding:8px 14px;min-width:90px">
+      <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
       <div style="font-size:13px;color:#D4B483;font-weight:700;margin-top:2px">${val}</div>
     </div>
   `).join("");
@@ -1958,9 +1958,9 @@ function renderAnaliseHP(xp){
   if(xp.alertas_relevantes && xp.alertas_relevantes.length){
     const ACOR = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
     alertasDiv.innerHTML = xp.alertas_relevantes.map(a=>`
-      <div style="border-left:3px solid ${ACOR[a.tipo]||"#444"};background:#0A0A08;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:6px">
+      <div style="border-left:3px solid ${ACOR[a.tipo]||"#2A5A3A"};background:#071E17;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:6px">
         <span style="font-size:11px;font-weight:700;color:${ACOR[a.tipo]||"#CCC"}">🔔 ${a.produto}</span>
-        <span style="font-size:10px;color:#555;margin-left:8px">${a.data||""}</span>
+        <span style="font-size:10px;color:#3A6A48;margin-left:8px">${a.data||""}</span>
         <p style="font-size:11px;color:#AAA;margin:2px 0 0">${a.mensagem}</p>
       </div>
     `).join("");
@@ -1974,11 +1974,11 @@ function renderAnaliseHP(xp){
     <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #111;font-size:12px">
       <span style="width:130px;color:#CCC">${d.label}</span>
       <span style="width:44px;color:#D4B483;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
-      <div style="flex:1;background:#1A1A18;border-radius:3px;height:5px;overflow:hidden;position:relative">
-        <div style="position:absolute;height:100%;background:#444;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
+      <div style="flex:1;background:#0F3525;border-radius:3px;height:5px;overflow:hidden;position:relative">
+        <div style="position:absolute;height:100%;background:#2A5A3A;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
         <div style="position:absolute;height:100%;background:${STATUS_COLOR[d.status]};border-radius:3px;width:${Math.min(d.atual,100)}%"></div>
       </div>
-      <span style="width:44px;color:#555;font-size:10px;text-align:right">meta ${d.alvo.toFixed(1)}%</span>
+      <span style="width:44px;color:#3A6A48;font-size:10px;text-align:right">meta ${d.alvo.toFixed(1)}%</span>
       <span style="width:56px;font-weight:700;font-size:11px;color:${d.desvio>0?"#FF6B6B":"#5DCAA5"};text-align:right">${d.desvio>0?"+":""}${d.desvio.toFixed(1)}%</span>
       <span style="font-size:13px">${STATUS_ICON[d.status]||""}</span>
     </div>
@@ -1990,14 +1990,14 @@ function renderAnaliseHP(xp){
     const SINAL = v => v > 0 ? `<span style="color:#5DCAA5">+${v.toFixed(2)}%</span>` : `<span style="color:#FF6B6B">${v.toFixed(2)}%</span>`;
     document.getElementById("hp-acoes-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:#0A0A08">
-          <th style="text-align:left;padding:6px 8px;color:#666;font-size:10px">Ticker</th>
-          <th style="text-align:right;padding:6px 8px;color:#666;font-size:10px">Qtd.</th>
-          <th style="text-align:right;padding:6px 8px;color:#666;font-size:10px">Saldo</th>
-          <th style="text-align:right;padding:6px 8px;color:#666;font-size:10px">% Cart.</th>
+        <thead><tr style="background:#071E17">
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ticker</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Qtd.</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Saldo</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
         </tr></thead>
         <tbody>${xp.acoes.map((a,i)=>`
-          <tr style="background:${i%2?"#070707":"#0A0A08"}">
+          <tr style="background:${i%2?"#070707":"#071E17"}">
             <td style="padding:6px 8px;color:#D4B483;font-weight:700">${a.ticker}</td>
             <td style="padding:6px 8px;color:#888;text-align:right">${a.qtd||"—"}</td>
             <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
@@ -2012,14 +2012,14 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-fiis-bloco").style.display = "";
     document.getElementById("hp-fiis-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:#0A0A08">
-          <th style="text-align:left;padding:6px 8px;color:#666;font-size:10px">Ticker</th>
-          <th style="text-align:right;padding:6px 8px;color:#666;font-size:10px">Qtd.</th>
-          <th style="text-align:right;padding:6px 8px;color:#666;font-size:10px">Saldo</th>
-          <th style="text-align:right;padding:6px 8px;color:#666;font-size:10px">% Cart.</th>
+        <thead><tr style="background:#071E17">
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ticker</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Qtd.</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Saldo</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
         </tr></thead>
         <tbody>${xp.fiis.map((f,i)=>`
-          <tr style="background:${i%2?"#070707":"#0A0A08"}">
+          <tr style="background:${i%2?"#070707":"#071E17"}">
             <td style="padding:6px 8px;color:#7DCFEF;font-weight:700">${f.ticker}</td>
             <td style="padding:6px 8px;color:#888;text-align:right">${f.qtd||"—"}</td>
             <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
@@ -2036,7 +2036,7 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-sugestoes-lista").innerHTML = sugs.map(s=>{
       const p = s.produto || {};
       return `
-        <div style="background:#0A0A08;border:1px solid #2A2A18;border-left:3px solid #D4B483;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
+        <div style="background:#071E17;border:1px solid #2A2A18;border-left:3px solid #D4B483;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:10px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
             <span style="font-size:12px;color:#FF6B6B;font-weight:700">gap ${s.gap.toFixed(1)}%</span>
@@ -2044,7 +2044,7 @@ function renderAnaliseHP(xp){
             ${p.taxa ? `<span style="font-size:11px;color:#5DCAA5">${p.taxa}</span>` : ""}
           </div>
           ${p.motivo ? `<p style="font-size:11px;color:#888;line-height:1.5;margin:0">${p.motivo}</p>` : ""}
-          ${p.indicado_por ? `<p style="font-size:10px;color:#444;margin-top:4px">Indicado por: ${p.indicado_por} ${p.indicado_em ? "· "+p.indicado_em : ""}</p>` : ""}
+          ${p.indicado_por ? `<p style="font-size:10px;color:#2A5A3A;margin-top:4px">Indicado por: ${p.indicado_por} ${p.indicado_em ? "· "+p.indicado_em : ""}</p>` : ""}
         </div>`;
     }).join("");
   }
@@ -2056,7 +2056,7 @@ function renderAnaliseHP(xp){
     const vieses = c.vieses || {};
     const VCOR = {positivo:"#5DCAA5", neutro:"#D4B483", negativo:"#FF6B6B"};
     const viesHtml = Object.entries(vieses).map(([cls,v])=>
-      `<span style="font-size:10px;background:#111;border:1px solid #222;border-radius:10px;padding:2px 8px;color:${VCOR[v]||"#888"}">${cls}: ${v}</span>`
+      `<span style="font-size:10px;background:#111;border:1px solid #1A4030;border-radius:10px;padding:2px 8px;color:${VCOR[v]||"#888"}">${cls}: ${v}</span>`
     ).join(" ");
     document.getElementById("hp-cenario-txt").innerHTML = `
       ${c.posicionamento ? `<p style="margin-bottom:8px"><b style="color:#D4B483">Posicionamento:</b> ${c.posicionamento}</p>` : ""}
@@ -2159,7 +2159,7 @@ function renderSugestoes(sg){
     <span style="font-size:20px">💡</span>
     <div>
       <div style="font-size:12px;font-weight:700;color:#C9A96E">${sg.titulo||"Sugestões do Gestor"}</div>
-      <div style="font-size:10px;color:#555">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
+      <div style="font-size:10px;color:#3A6A48">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
     </div>
   </div>`;
 
@@ -2174,7 +2174,7 @@ function renderSugestoes(sg){
           <span class="sg-acao">${item.acao==="substituir"?"↔ Substituir":"+ Alocar"}</span>
           <span class="sg-produto">${item.para||"—"}</span>
           ${item.indexador?`<span class="sg-idx">${item.indexador}</span>`:""}
-          <span style="font-size:10px;color:#555">${urgTxt}</span>
+          <span style="font-size:10px;color:#3A6A48">${urgTxt}</span>
         </div>
         ${item.de?`<div class="sg-de">↓ Sair / reduzir: ${item.de}</div>`:""}
         <div class="sg-motivo">${item.motivo||""}</div>
@@ -2205,7 +2205,7 @@ function renderSugestoes(sg){
   // ── Estruturadas ──────────────────────────────────────────
   if(sg.estruturadas){
     html += `<div class="sg-bloco">
-      <div class="sg-bloco-title">⚙️ Operações Estruturadas <span style="font-size:10px;font-weight:400;color:#555;text-transform:none;letter-spacing:0">(cliente tem ações na carteira)</span></div>
+      <div class="sg-bloco-title">⚙️ Operações Estruturadas <span style="font-size:10px;font-weight:400;color:#3A6A48;text-transform:none;letter-spacing:0">(cliente tem ações na carteira)</span></div>
       <div class="sg-est-box">${sg.estruturadas}</div>
     </div>`;
   }
@@ -2287,7 +2287,7 @@ function renderClassesAtivos(desvios, patrimonio){
         datasets: [{
           data: pizzaData,
           backgroundColor: pizzaCores,
-          borderColor: "#0D0D0D",
+          borderColor: "#081F18",
           borderWidth: 3,
           hoverOffset: 10,
         }]
@@ -2311,7 +2311,7 @@ function renderClassesAtivos(desvios, patrimonio){
     if(legEl) legEl.innerHTML = dados.map(g=>{
       if(g.real < 0.1) return "";
       const desvio = g.real - g.alvo;
-      const dCor = Math.abs(desvio)<1.5?"#555":desvio>0?"#FFD966":"#FF6B6B";
+      const dCor = Math.abs(desvio)<1.5?"#3A6A48":desvio>0?"#FFD966":"#FF6B6B";
       return `<div style="display:flex;align-items:center;gap:7px">
         <span style="width:12px;height:12px;border-radius:3px;background:${g.cor};flex-shrink:0;display:inline-block"></span>
         <span style="font-size:11px;color:#AAA;flex:1">${g.nome}</span>
@@ -2326,14 +2326,14 @@ function renderClassesAtivos(desvios, patrimonio){
   el.innerHTML = dados.map(g=>{
     const desvio = g.real - g.alvo;
     const sinal  = desvio > 0 ? "+" : "";
-    const dCor   = Math.abs(desvio)<1.5 ? "#555" : desvio>0 ? "#FFD966" : "#FF6B6B";
+    const dCor   = Math.abs(desvio)<1.5 ? "#3A6A48" : desvio>0 ? "#FFD966" : "#FF6B6B";
     const realVal = patrimonio>0 ? `R$ ${(patrimonio*g.real/100).toLocaleString("pt-BR",{maximumFractionDigits:0})}` : "—";
     return `<div style="background:#111;border-radius:10px;padding:12px 14px;border:1px solid #1E1E1E">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:18px">${g.icone}</span>
         <div style="flex:1;min-width:0">
           <div style="font-size:11px;font-weight:700;color:#F0F0F0">${g.nome}</div>
-          <div style="font-size:10px;color:#444">${realVal}</div>
+          <div style="font-size:10px;color:#2A5A3A">${realVal}</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:17px;font-weight:800;color:${g.cor}">${g.real.toFixed(1)}%</div>
@@ -2344,10 +2344,10 @@ function renderClassesAtivos(desvios, patrimonio){
         <div style="height:100%;background:${g.cor};border-radius:3px;width:${Math.min(g.real/70*100,100)}%;transition:width .6s ease"></div>
       </div>
       <div style="height:3px;background:#1A1A1A;border-radius:3px;overflow:hidden">
-        <div style="height:100%;background:#2A2A2A;border-radius:3px;width:${Math.min(g.alvo/70*100,100)}%"></div>
+        <div style="height:100%;background:#1C4A34;border-radius:3px;width:${Math.min(g.alvo/70*100,100)}%"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:10px">
-        <span style="color:${g.cor}">atual</span><span style="color:#333">meta ${g.alvo.toFixed(1)}%</span>
+        <span style="color:${g.cor}">atual</span><span style="color:#1E4A30">meta ${g.alvo.toFixed(1)}%</span>
       </div>
     </div>`;
   }).join("");
@@ -2369,11 +2369,11 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
     const val=patrimonio>0?` ≈ R$ ${(patrimonio*abs/100).toLocaleString("pt-BR",{maximumFractionDigits:0})}`:"";
     const col=tipo==="aumentar"?"#5DCAA5":"#FF6B6B";
     const seta=tipo==="aumentar"?"▲":"▼";
-    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#0D0D0D;border-radius:8px;margin-bottom:6px;border:1px solid #1E1E1E">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#081F18;border-radius:8px;margin-bottom:6px;border:1px solid #1E1E1E">
       <span style="color:${col};font-size:16px;font-weight:700">${seta}</span>
       <div style="flex:1">
         <div style="font-size:12px;font-weight:700;color:#F0F0F0">${d.label}</div>
-        <div style="font-size:10px;color:#555">${d.real.toFixed(1)}% atual → meta ${d.alvo.toFixed(1)}%${val}</div>
+        <div style="font-size:10px;color:#3A6A48">${d.real.toFixed(1)}% atual → meta ${d.alvo.toFixed(1)}%${val}</div>
       </div>
       <span style="font-size:13px;font-weight:800;color:${col}">${tipo==="aumentar"?"+":""}${(-d.desvio).toFixed(1)}%</span>
     </div>`;
@@ -2383,17 +2383,17 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   pg.innerHTML=`
     <div>
       <p style="font-size:10px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▲ Aumentar / Comprar</p>
-      ${aumentar.length?aumentar.map(d=>makeItem(d,"aumentar")).join(""):'<p style="font-size:12px;color:#444">Nenhum ativo abaixo da meta</p>'}
+      ${aumentar.length?aumentar.map(d=>makeItem(d,"aumentar")).join(""):'<p style="font-size:12px;color:#2A5A3A">Nenhum ativo abaixo da meta</p>'}
     </div>
     <div>
       <p style="font-size:10px;color:#FF6B6B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▼ Reduzir / Resgatar</p>
-      ${reduzir.length?reduzir.map(d=>makeItem(d,"reduzir")).join(""):'<p style="font-size:12px;color:#444">Nenhum ativo acima da meta</p>'}
+      ${reduzir.length?reduzir.map(d=>makeItem(d,"reduzir")).join(""):'<p style="font-size:12px;color:#2A5A3A">Nenhum ativo acima da meta</p>'}
     </div>`;
 
   const pv=document.getElementById("plano-valores");
   if(alinhado.length){
-    pv.innerHTML=`<p style="font-size:10px;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">✓ Classes alinhadas ao modelo</p>`
-      +alinhado.map(d=>`<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:12px;background:#1A1A1A;border:1px solid #2A2A2A;font-size:11px;color:#555">${d.label} ${d.real.toFixed(1)}%</span>`).join("");
+    pv.innerHTML=`<p style="font-size:10px;color:#3A6A48;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">✓ Classes alinhadas ao modelo</p>`
+      +alinhado.map(d=>`<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:12px;background:#1A1A1A;border:1px solid #1C4A34;font-size:11px;color:#3A6A48">${d.label} ${d.real.toFixed(1)}%</span>`).join("");
   } else { pv.innerHTML=""; }
 }
 
@@ -2417,18 +2417,18 @@ function renderizar(data){
     const scoreColor=score_servir>=5?"ok":score_servir>=3?"":"danger";
     const pendentes_list = checklist_servir.filter(p=>p.status==="pendente");
     const barColor = score_servir>=5?"#5DCAA5":score_servir>=3?"#FFD966":"#FF6B6B";
-    const bordaColor = pendentes_criticos>0?"#FF4444":score_servir>=5?"#2A5040":"#2A2A2A";
-    const bgColor = pendentes_criticos>0?"#2A1010":score_servir>=5?"#0A1A10":"#141414";
+    const bordaColor = pendentes_criticos>0?"#FF4444":score_servir>=5?"#2A5040":"#1C4A34";
+    const bgColor = pendentes_criticos>0?"#2A1010":score_servir>=5?"#0A2A18":"#0B2A1F";
 
     let insightsHtml = "";
     if(pendentes_list.length > 0){
-      insightsHtml = `<div style="margin-top:14px;border-top:1px solid #2A2A2A;padding-top:12px">
+      insightsHtml = `<div style="margin-top:14px;border-top:1px solid #1C4A34;padding-top:12px">
         <div style="font-size:10px;color:#FF6B6B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
           ⚠ Insights — o que fazer para completar o modelo
         </div>`;
       pendentes_list.forEach(p=>{
         const imp_cor = p.importancia.startsWith("CRÍTICA")?"#FF6B6B":p.importancia==="ALTA"?"#FFD966":"#888";
-        insightsHtml += `<div style="margin-bottom:10px;padding:10px 12px;background:#0D0D0D;border-left:3px solid ${imp_cor};border-radius:0 6px 6px 0">
+        insightsHtml += `<div style="margin-bottom:10px;padding:10px 12px;background:#081F18;border-left:3px solid ${imp_cor};border-radius:0 6px 6px 0">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
             <span style="font-size:16px">${p.icone}</span>
             <span style="font-size:12px;font-weight:700;color:#F0F0F0">${p.nome}</span>
@@ -2436,7 +2436,7 @@ function renderizar(data){
           </div>
           <div style="font-size:11px;color:#888;margin-bottom:4px">${p.impacto_falta}</div>
           <div style="font-size:11px;color:#C9A96E;font-weight:600">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:6px;padding:6px 8px;background:#1A1600;border:1px solid #C9A96E33;border-radius:5px;font-size:10px;color:#C9A96E">★ 1ª DIRETRIZ BRAÚNA — Provocar o cliente sobre o Financial Planning.</div>`:""}
+          ${p.diretriz?`<div style="margin-top:6px;padding:6px 8px;background:#1A2E1A;border:1px solid #C9A96E33;border-radius:5px;font-size:10px;color:#C9A96E">★ 1ª DIRETRIZ BRAÚNA — Provocar o cliente sobre o Financial Planning.</div>`:""}
         </div>`;
       });
       insightsHtml += `</div>`;
@@ -2449,8 +2449,8 @@ function renderizar(data){
       <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
         <div class="val ${scoreColor}" style="font-size:28px;line-height:1">${score_servir}/6</div>
         <div style="flex:1">
-          <div style="font-size:11px;color:#555;margin-bottom:5px">pilares completos</div>
-          <div style="height:6px;background:#222;border-radius:3px;overflow:hidden">
+          <div style="font-size:11px;color:#3A6A48;margin-bottom:5px">pilares completos</div>
+          <div style="height:6px;background:#1A4030;border-radius:3px;overflow:hidden">
             <div style="width:${score_servir/6*100}%;height:100%;background:${barColor};border-radius:3px"></div>
           </div>
         </div>
@@ -2467,7 +2467,7 @@ function renderizar(data){
   chartInst=new Chart(document.getElementById("chart"),{
     type:"bar",
     data:{labels:lbs,datasets:[{label:"Atual",data:rea,backgroundColor:"#C9A96E",borderRadius:4},{label:"Modelo",data:alv,backgroundColor:"rgba(100,100,100,0.4)",borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+": "+ctx.parsed.y.toFixed(2)+"%"}}},scales:{x:{ticks:{color:"#666",font:{size:10}}},y:{ticks:{color:"#666",callback:v=>v+"%"},beginAtZero:true}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+": "+ctx.parsed.y.toFixed(2)+"%"}}},scales:{x:{ticks:{color:"#4A7055",font:{size:10}}},y:{ticks:{color:"#4A7055",callback:v=>v+"%"},beginAtZero:true}}}
   });
 
   // Diversificação por classe e plano de ação
@@ -2487,8 +2487,8 @@ function renderizar(data){
   const frags=desvios.filter(d=>d.desvio<-1.5), opors=desvios.filter(d=>d.desvio>1.5);
   let diag="";
   if(alertas&&alertas.length){ alertas.forEach(a=>{diag+=`<div class="alert warn">${a}</div>`;}); }
-  if(frags.length){ diag+=`<p style="font-size:10px;color:#555;margin:8px 0 4px;text-transform:uppercase">Fragilidades</p>`; frags.forEach(f=>{diag+=`<div class="alert danger">▸ <b>${f.label}</b>: falta ${Math.abs(f.desvio).toFixed(1)}%</div>`;}); }
-  if(opors.length){ diag+=`<p style="font-size:10px;color:#555;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
+  if(frags.length){ diag+=`<p style="font-size:10px;color:#3A6A48;margin:8px 0 4px;text-transform:uppercase">Fragilidades</p>`; frags.forEach(f=>{diag+=`<div class="alert danger">▸ <b>${f.label}</b>: falta ${Math.abs(f.desvio).toFixed(1)}%</div>`;}); }
+  if(opors.length){ diag+=`<p style="font-size:10px;color:#3A6A48;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
   document.getElementById("diagnostico").innerHTML=diag||`<p style="color:#5DCAA5">✓ Carteira alinhada ao modelo.</p>`;
 
   // Recomendações
@@ -2534,7 +2534,7 @@ function renderizar(data){
           </div>
           <div class="pilar-result-impacto">${p.impacto_falta}</div>
           <div class="pilar-result-acao">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#1A1600;border:1px solid #C9A96E;border-radius:6px;font-size:11px;color:#C9A96E">
+          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:6px;font-size:11px;color:#C9A96E">
             <b>★ 1ª DIRETRIZ BRAÚNA — QUALIDADE</b><br>Provocar o cliente sobre o Financial Planning. Perguntar ao assessor: O FP deste cliente já foi feito? Quando? Isso é primordial para traçar o caminho do destino que o cliente deseja alcançar.
           </div>`:""}
         </div>`;
@@ -2564,7 +2564,7 @@ function renderizar(data){
         <div class="gestor-nome">${g.gestor} — ${g.tema}</div>
         <div class="gestor-msg">${g.mensagem}</div>
         <div class="gestor-impl">→ ${g.implicacao_alocacao}</div>
-        <div style="font-size:10px;color:#333;margin-top:4px">${g.fonte}</div>
+        <div style="font-size:10px;color:#1E4A30;margin-top:4px">${g.fonte}</div>
       </div>`).join("");
   }
 
@@ -2641,8 +2641,8 @@ function renderCrossSellResult(areas, tem, naoTem){
   let html=`<div class="cs-score-bar">
     <span style="font-size:28px;font-weight:700;color:${barColor};min-width:44px;text-align:center">${score}/5</span>
     <div style="flex:1">
-      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Áreas ativas na Braúna</div>
-      <div style="height:6px;background:#222;border-radius:3px;overflow:hidden"><div style="width:${score/5*100}%;height:100%;background:${barColor};border-radius:3px"></div></div>
+      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Áreas ativas na Braúna</div>
+      <div style="height:6px;background:#1A4030;border-radius:3px;overflow:hidden"><div style="width:${score/5*100}%;height:100%;background:${barColor};border-radius:3px"></div></div>
       <div style="font-size:11px;color:#888;margin-top:5px">${naoTem.length} oportunidade(s) de negócio em aberto</div>
     </div>
   </div>`;
@@ -2783,7 +2783,7 @@ def login_page():
 
 def _pilar_html_inicial(p):
     imp = p.get("importancia", "CRÍTICA")
-    imp_cor  = "#FF6B6B" if imp=="CRÍTICA" else "#FFD966" if imp=="ALTA" else "#666"
+    imp_cor  = "#FF6B6B" if imp=="CRÍTICA" else "#FFD966" if imp=="ALTA" else "#4A7055"
     imp_txt  = "🔴 CRÍTICO" if imp=="CRÍTICA" else "🟡 IMPORTANTE" if imp=="ALTA" else "⚪ MÉDIO"
     bg       = "#1A0A0A" if imp=="CRÍTICA" else "#151500" if imp=="ALTA" else "#181818"
     border   = "#4A1212" if imp=="CRÍTICA" else "#3A3A00" if imp=="ALTA" else "#282828"
@@ -2794,10 +2794,10 @@ def _pilar_html_inicial(p):
     desc     = p.get("descricao", p.get("desc",""))
     impacto  = p.get("impacto_falta", p.get("impacto",""))
     acao     = p.get("acao","")
-    dir_tag  = '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A1600;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' if eh_dir else ""
-    dir_note = '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A1600">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' if eh_dir else ""
+    dir_tag  = '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' if eh_dir else ""
+    dir_note = '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A2E1A">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' if eh_dir else ""
     return f'''<div onclick="togglePilar('{pid}')" id="pilar-{pid}" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;background:{bg};border:1.5px solid {border};cursor:pointer;transition:all .2s;user-select:none">
-  <div id="chk-{pid}" style="width:24px;height:24px;border-radius:6px;border:2px solid #444;background:transparent;display:flex;align-items:center;justify-content:center;color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px"></div>
+  <div id="chk-{pid}" style="width:24px;height:24px;border-radius:6px;border:2px solid #2A5A3A;background:transparent;display:flex;align-items:center;justify-content:center;color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px"></div>
   <div style="font-size:20px;flex-shrink:0;margin-top:2px">{icone}</div>
   <div style="flex:1;min-width:0">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
@@ -2805,10 +2805,10 @@ def _pilar_html_inicial(p):
       <span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1E1E1E;color:{imp_cor};font-weight:700">{imp_txt}</span>
       {dir_tag}
     </div>
-    <div style="font-size:11px;color:#666;line-height:1.4">{desc}</div>
+    <div style="font-size:11px;color:#4A7055;line-height:1.4">{desc}</div>
     <div id="det-{pid}" style="background:#111;border-radius:6px;padding:8px 10px;border-left:3px solid {imp_cor};margin-top:8px">
       <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px">{impacto}</div>
-      <div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A1600;border-radius:5px">→ {acao}</div>
+      <div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A2E1A;border-radius:5px">→ {acao}</div>
       {dir_note}
     </div>
   </div>
@@ -4075,20 +4075,20 @@ HTML_LOGIN = r"""<!DOCTYPE html>
 <title>Braúna Investimentos — Acesso</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#0D0D0D;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+html,body{height:100%;background:#081F18;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
 body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 
 /* Logo */
 .logo-area{text-align:center;margin-bottom:40px}
 .logo-title{font-size:28px;font-weight:800;color:#C9A96E;letter-spacing:2px;text-transform:uppercase}
-.logo-sub{font-size:13px;color:#444;margin-top:6px;letter-spacing:1px}
+.logo-sub{font-size:13px;color:#2A5A3A;margin-top:6px;letter-spacing:1px}
 .logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#C9A96E,transparent);margin:14px auto 0}
 
 /* Cards de papel */
 .roles{display:flex;gap:16px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
 .role-card{
   width:200px;padding:28px 20px;border-radius:16px;
-  border:1.5px solid #222;background:#111;
+  border:1.5px solid #1A4030;background:#111;
   cursor:pointer;text-align:center;transition:all .25s;
   position:relative;overflow:hidden;
 }
@@ -4099,7 +4099,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .role-card.selected{transform:translateY(-3px)}
 
 /* Assessor */
-.role-card.assessor.selected{border-color:#C9A96E;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#1A1600}
+.role-card.assessor.selected{border-color:#C9A96E;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#1A2E1A}
 .role-card.assessor:hover{border-color:#C9A96E}
 /* Líder */
 .role-card.lider.selected{border-color:#8B9FE8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#0D0D1F}
@@ -4114,7 +4114,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 
 .role-icon{font-size:36px;margin-bottom:12px;display:block}
 .role-name{font-size:15px;font-weight:700;margin-bottom:4px}
-.role-desc{font-size:11px;color:#555;line-height:1.4}
+.role-desc{font-size:11px;color:#3A6A48;line-height:1.4}
 .role-check{
   position:absolute;top:10px;right:10px;
   width:18px;height:18px;border-radius:50%;
@@ -4131,7 +4131,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .senha-box{
   width:100%;max-width:380px;
   background:#111;border-radius:14px;padding:28px;
-  border:1px solid #222;
+  border:1px solid #1A4030;
   animation:fadeUp .25s ease;
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -4139,22 +4139,22 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .senha-label span{font-size:16px}
 .senha-input-wrap{position:relative;margin-bottom:14px}
 .senha-input{
-  width:100%;background:#0A0A0A;border:1.5px solid #2A2A2A;
+  width:100%;background:#0A0A0A;border:1.5px solid #1C4A34;
   border-radius:10px;padding:13px 44px 13px 16px;
   color:#F0F0F0;font-size:16px;letter-spacing:4px;outline:none;
   transition:border .2s;
 }
-.senha-input::placeholder{letter-spacing:1px;font-size:13px;color:#333}
+.senha-input::placeholder{letter-spacing:1px;font-size:13px;color:#1E4A30}
 .senha-input:focus{border-color:var(--role-color)}
 .toggle-pw{
   position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  background:none;border:none;color:#444;cursor:pointer;font-size:16px;padding:0;
+  background:none;border:none;color:#2A5A3A;cursor:pointer;font-size:16px;padding:0;
 }
 .btn-entrar{
   width:100%;padding:14px;border:none;border-radius:10px;
   font-size:14px;font-weight:800;cursor:pointer;
   letter-spacing:.5px;text-transform:uppercase;
-  transition:all .2s;background:var(--role-color);color:#0D0D0D;
+  transition:all .2s;background:var(--role-color);color:#081F18;
 }
 .btn-entrar:hover{opacity:.88;transform:translateY(-1px)}
 .btn-entrar:disabled{opacity:.3;cursor:not-allowed;transform:none}
@@ -4162,7 +4162,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   font-size:12px;color:#FF6B6B;text-align:center;margin-top:10px;
   height:18px;transition:opacity .2s;
 }
-.rodape{font-size:11px;color:#2A2A2A;margin-top:32px;text-align:center}
+.rodape{font-size:11px;color:#1C4A34;margin-top:32px;text-align:center}
 </style>
 </head>
 <body>
@@ -4302,9 +4302,9 @@ HTML_LIDER = r"""<!DOCTYPE html>
 body{background:#0A0A14;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#0D0D1F;border-bottom:1px solid #1E1E3A;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:17px;color:#8B9FE8;font-weight:700}
-header p{font-size:11px;color:#444;margin-top:2px}
+header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .nav{display:flex;gap:8px;align-items:center}
-.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A4A;color:#666;text-decoration:none;transition:all .2s}
+.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A4A;color:#4A7055;text-decoration:none;transition:all .2s}
 .nav a:hover{border-color:#8B9FE8;color:#8B9FE8}
 .nav a.active{background:#8B9FE8;color:#000;border-color:#8B9FE8;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
@@ -4314,7 +4314,7 @@ header p{font-size:11px;color:#444;margin-top:2px}
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .stat{background:#0A0A1A;border-radius:8px;padding:10px 12px;text-align:center;border:1px solid #1E1E3A}
 .stat .n{font-size:22px;font-weight:700;color:#8B9FE8}
-.stat .l{font-size:10px;color:#555;margin-top:2px}
+.stat .l{font-size:10px;color:#3A6A48;margin-top:2px}
 /* Ranking assessores */
 .rank-item{
   display:flex;align-items:center;gap:14px;
@@ -4328,10 +4328,10 @@ header p{font-size:11px;color:#444;margin-top:2px}
 .rank-pos.top2{color:#8B9FE8}
 .rank-pos.top3{color:#5DCAA5}
 .rank-nome{font-size:14px;font-weight:700;color:#F0F0F0;flex:1}
-.rank-meta{font-size:11px;color:#555}
+.rank-meta{font-size:11px;color:#3A6A48}
 .rank-bars{flex:2;display:flex;flex-direction:column;gap:4px}
 .rank-bar-row{display:flex;align-items:center;gap:8px;font-size:11px}
-.rank-bar-row .lbl{width:80px;color:#555;text-align:right;flex-shrink:0}
+.rank-bar-row .lbl{width:80px;color:#3A6A48;text-align:right;flex-shrink:0}
 .rank-bar-bg{flex:1;height:5px;background:#1A1A2E;border-radius:3px;overflow:hidden}
 .rank-bar-fill{height:100%;border-radius:3px;transition:width .6s}
 .rank-badges{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
@@ -4348,7 +4348,7 @@ header p{font-size:11px;color:#444;margin-top:2px}
 .cliente-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
 .cliente-nome{font-size:14px;font-weight:700;color:#F0F0F0}
 .cliente-perfil{font-size:11px;padding:2px 10px;border-radius:10px;background:#1A1A3A;color:#8B9FE8;font-weight:700}
-.cliente-objetivo{font-size:11px;color:#555;flex:1}
+.cliente-objetivo{font-size:11px;color:#3A6A48;flex:1}
 .c-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700}
 .c-ok{background:#0A2018;color:#5DCAA5}
 .c-atencao{background:#1A1500;color:#FFD966}
@@ -4366,10 +4366,10 @@ header p{font-size:11px;color:#444;margin-top:2px}
 .tl-dot.critico{background:#FF6B6B}
 .tl-dot.first{width:13px;height:13px;left:-18px;top:3px}
 .tl-content{background:#0D0D20;border:1px solid #1E1E3A;border-radius:8px;padding:10px 12px}
-.tl-data{font-size:10px;color:#444;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.tl-data{font-size:10px;color:#2A5A3A;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .tl-data b{color:#8B9FE8;font-size:11px}
 .tl-metrics{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px}
-.tl-m{font-size:11px;color:#666}
+.tl-m{font-size:11px;color:#4A7055}
 .tl-m span{color:#F0F0F0;font-weight:700}
 /* Delta de carteira */
 .delta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
@@ -4382,7 +4382,7 @@ header p{font-size:11px;color:#444;margin-top:2px}
 .delta-up-bad{color:#FFD966;border:1px solid #1A1500}
 .delta-dn-ok{color:#5DCAA5;border:1px solid #0A2018}
 .delta-dn-bad{color:#FF6B6B;border:1px solid #2A1010}
-.delta-neutral{color:#555;border:1px solid #1A1A2E}
+.delta-neutral{color:#3A6A48;border:1px solid #1A1A2E}
 /* Nota do líder */
 .nota-input{
   width:100%;background:#0A0A1A;border:1px solid #1E1E3A;
@@ -4391,7 +4391,7 @@ header p{font-size:11px;color:#444;margin-top:2px}
 }
 .nota-input:focus{border-color:#8B9FE8}
 /* Vazio */
-.vazio{text-align:center;color:#333;padding:40px;font-size:13px}
+.vazio{text-align:center;color:#1E4A30;padding:40px;font-size:13px}
 .progress-anel{text-align:right}
 @media(max-width:760px){.stat-row{grid-template-columns:1fr 1fr}.rank-bars{display:none}}
 </style>
@@ -4403,7 +4403,7 @@ header p{font-size:11px;color:#444;margin-top:2px}
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider" class="active">👥 Líder</a>
     <a href="/admin">⚙️ Admin</a>
-    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#666;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#666'">Sair</button>
+    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#4A7055;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#4A7055'">Sair</button>
   </nav>
 </header>
 <div class="container">
@@ -4590,7 +4590,7 @@ function renderClientesAssessor(clientes, assessorNome){
           deltas.push(`<span class="delta-item ${cls}">${sinal} ${LABEL_COMP[k]||k} ${diff>0?"+":""}${diff.toFixed(1)}%</span>`);
         });
         if(deltas.length){
-          deltaHtml = `<div style="margin-top:4px;font-size:10px;color:#444">Variação vs análise anterior:</div><div class="delta-row">${deltas.join("")}</div>`;
+          deltaHtml = `<div style="margin-top:4px;font-size:10px;color:#2A5A3A">Variação vs análise anterior:</div><div class="delta-row">${deltas.join("")}</div>`;
         } else {
           deltaHtml = `<div style="font-size:10px;color:#2A2A4A;margin-top:4px">Sem variações significativas vs análise anterior</div>`;
         }
@@ -4646,7 +4646,7 @@ function renderClientesAssessor(clientes, assessorNome){
     <div class="cliente-perfil">${c.perfil||"—"}</div>
     ${c.objetivo?`<div class="cliente-objetivo">🎯 ${c.objetivo}</div>`:""}
     <span class="c-badge ${statusCls}" style="margin-left:auto">${statusTxt}</span>
-    <span style="font-size:11px;color:#555">${entradas.length} análise(s)</span>
+    <span style="font-size:11px;color:#3A6A48">${entradas.length} análise(s)</span>
   </div>
   ${timelineHtml}
   <input class="nota-input" value="${notaVal}"
@@ -4676,16 +4676,16 @@ HTML_ADMIN = r"""<!DOCTYPE html>
 body{background:#0A0E0A;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#0D120D;border-bottom:1px solid #1A2A1A;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header h1{font-size:17px;color:#5DCAA5;font-weight:700}
-header p{font-size:11px;color:#444;margin-top:2px}
+header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1A2A1A;color:#666;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
+.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1A2A1A;color:#4A7055;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
 .nav a:hover,.nav button:hover{border-color:#5DCAA5;color:#5DCAA5}
 .nav a.active{background:#5DCAA5;color:#000;border-color:#5DCAA5;font-weight:700}
 .container{max-width:1100px;margin:0 auto;padding:24px 20px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .card{background:#0D140D;border:1px solid #1A2A1A;border-radius:12px;padding:20px;margin-bottom:16px}
 .card-title{font-size:11px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-label{font-size:11px;color:#666;display:block;margin-bottom:5px}
+label{font-size:11px;color:#4A7055;display:block;margin-bottom:5px}
 input[type=text],textarea,select{width:100%;background:#080E08;border:1px solid #1A2A1A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
 input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .btn{display:inline-flex;align-items:center;gap:6px;background:#5DCAA5;color:#000;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
@@ -4693,7 +4693,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .btn:disabled{opacity:.35;cursor:not-allowed}
 .btn-out{background:transparent;color:#5DCAA5;border:1px solid #5DCAA5}
 .btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
-.btn-ghost{background:transparent;border:1px solid #1A2A1A;color:#555;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost{background:transparent;border:1px solid #1A2A1A;color:#3A6A48;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-ghost:hover{border-color:#5DCAA5;color:#5DCAA5}
 /* Upload área */
 .upload-area{border:1.5px dashed #1A2A1A;border-radius:10px;padding:22px;text-align:center;cursor:pointer;position:relative;background:#080E08;transition:all .2s}
@@ -4701,7 +4701,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .ui{pointer-events:none}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
-.upload-area p{font-size:12px;color:#555}
+.upload-area p{font-size:12px;color:#3A6A48}
 .upload-area .fname{color:#5DCAA5;font-weight:600;font-size:12px;margin-top:4px;min-height:18px}
 /* Barra de ferramentas da aba */
 .tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#070C07;border:1px dashed #1A2A1A;border-radius:8px;margin-bottom:12px}
@@ -4716,7 +4716,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .pdf-preview .pdf-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 /* Sugestão items */
 .sg-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #1A2A1A;background:#080E08;color:#666;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #1A2A1A;background:#080E08;color:#4A7055;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
 .sg-tab.active{background:#5DCAA5;color:#000;border-color:#5DCAA5;font-weight:700}
 .sg-panel{display:none}.sg-panel.active{display:block}
 .sg-item{background:#080E08;border:1px solid #1A2A1A;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
@@ -4725,7 +4725,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .sg-del:hover{color:#FF6B6B;background:#1A0505}
 .sg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .sg-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
-.sg-mini label{font-size:10px;color:#555;margin-bottom:3px}
+.sg-mini label{font-size:10px;color:#3A6A48;margin-bottom:3px}
 .perfis-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 .perfis-row label{display:flex;align-items:center;gap:4px;font-size:11px;color:#777;cursor:pointer;margin-bottom:0}
 /* Histórico */
@@ -4733,7 +4733,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .hist-item.ativa{border-color:#5DCAA5}
 .tag-ativa{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:#0A2018;color:#5DCAA5}
 /* Info box */
-.info-box{background:#080E08;border-radius:8px;padding:12px 14px;font-size:12px;color:#666;line-height:1.6;border:1px solid #1A2A1A}
+.info-box{background:#080E08;border-radius:8px;padding:12px 14px;font-size:12px;color:#4A7055;line-height:1.6;border:1px solid #1A2A1A}
 .info-box b{color:#5DCAA5}
 .status-ok{color:#5DCAA5}.status-err{color:#FF6B6B}
 @media(max-width:640px){.grid-2,.sg-grid-2,.sg-grid-3{grid-template-columns:1fr}.tab-toolbar{flex-direction:column;align-items:flex-start}}
@@ -4758,7 +4758,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
   <!-- Carta da Gestão -->
   <div class="card" style="margin-bottom:0">
     <div class="card-title">📄 Carta da Gestão — Upload Mensal</div>
-    <p style="font-size:11px;color:#444;margin-bottom:12px;line-height:1.5">Suba o PDF da carta mensal (Levante, BTG, XP Research…). O sistema extrai os insights e usa em todas as análises de carteira dos assessores.</p>
+    <p style="font-size:11px;color:#2A5A3A;margin-bottom:12px;line-height:1.5">Suba o PDF da carta mensal (Levante, BTG, XP Research…). O sistema extrai os insights e usa em todas as análises de carteira dos assessores.</p>
     <div class="upload-area" id="drop-carta">
       <input type="file" id="pdf-carta" accept=".pdf" onchange="onCartaSelect()">
       <div class="ui">
@@ -4774,7 +4774,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
     <div id="carta-preview" style="display:none;margin-top:8px">
       <div class="info-box" id="carta-info" style="font-size:11px;color:#5DCAA5"></div>
     </div>
-    <div style="margin-top:12px" id="status-contexto"><div class="info-box" style="color:#333;font-style:italic">Carregando status...</div></div>
+    <div style="margin-top:12px" id="status-contexto"><div class="info-box" style="color:#1E4A30;font-style:italic">Carregando status...</div></div>
   </div>
 
   <!-- Comunicado -->
@@ -4792,7 +4792,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
       <button class="btn btn-sm" onclick="salvarMensagem()">📤 Publicar</button>
       <span id="st-msg" style="font-size:11px"></span>
     </div>
-    <div style="margin-top:12px" id="status-msg"><div class="info-box" style="color:#333;font-style:italic">Carregando...</div></div>
+    <div style="margin-top:12px" id="status-msg"><div class="info-box" style="color:#1E4A30;font-style:italic">Carregando...</div></div>
   </div>
 
 </div>
@@ -4800,7 +4800,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 <!-- Sugestões de Alocação -->
 <div class="card">
   <div class="card-title">💡 Sugestões de Alocação para Assessores</div>
-  <p style="font-size:11px;color:#444;margin-bottom:14px;line-height:1.5">Monte as sugestões por categoria. Em cada aba você pode subir um PDF (relatório de casa de análise) ou uma planilha, ou preencher manualmente. Ao publicar, ficam disponíveis para todos os assessores filtradas pelo perfil do cliente.</p>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Monte as sugestões por categoria. Em cada aba você pode subir um PDF (relatório de casa de análise) ou uma planilha, ou preencher manualmente. Ao publicar, ficam disponíveis para todos os assessores filtradas pelo perfil do cliente.</p>
 
   <div style="margin-bottom:14px">
     <label>Título da publicação</label>
@@ -4903,7 +4903,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <button class="btn-ghost" onclick="copiarPdf('fii')">📋 Copiar</button>
       </div>
     </div>
-    <p style="font-size:11px;color:#555;margin-bottom:6px">Uma linha por fundo: <b style="color:#5DCAA5">TICKER | Segmento | % sugerido | Motivo</b></p>
+    <p style="font-size:11px;color:#3A6A48;margin-bottom:6px">Uma linha por fundo: <b style="color:#5DCAA5">TICKER | Segmento | % sugerido | Motivo</b></p>
     <textarea id="sg-fii" rows="8" placeholder="MXRF11 | Papel | 0.5% | Alta distribuição, baixa volatilidade&#10;HGLG11 | Logística | 1.0% | Contratos longos, boa gestão&#10;XPML11 | Shopping | 0.8% | Recuperação do varejo&#10;BTLG11 | Logística | 0.7% | Portfólio diversificado"></textarea>
   </div>
 
@@ -4958,7 +4958,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <button class="btn-ghost" onclick="copiarPdf('est')">📋 Copiar</button>
       </div>
     </div>
-    <p style="font-size:11px;color:#555;margin-bottom:6px">Descreva as operações estruturadas disponíveis — exibido para clientes com ações na carteira.</p>
+    <p style="font-size:11px;color:#3A6A48;margin-bottom:6px">Descreva as operações estruturadas disponíveis — exibido para clientes com ações na carteira.</p>
     <textarea id="sg-est" rows="8" placeholder="PETR4 — Financiamento com venda de call coberta OTM 10%, vencimento mensal.&#10;VALE3 — Trava de alta com compra de call ATM e venda de call OTM 15%.&#10;ITUB4 — Proteção com put ATM para carteiras acima de R$ 100k na ação."></textarea>
   </div>
 
@@ -4973,7 +4973,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 <!-- Histórico -->
 <div class="card">
   <div class="card-title">📋 Histórico de Publicações</div>
-  <div id="sg-historico"><p style="color:#333;font-size:12px;font-style:italic">Carregando...</p></div>
+  <div id="sg-historico"><p style="color:#1E4A30;font-size:12px;font-style:italic">Carregando...</p></div>
 </div>
 
 </div><!-- /container -->
@@ -5025,7 +5025,7 @@ async function init(){
     if(info.carta && info.carta.nome){
       ctxEl.innerHTML = `<div class="info-box"><b>Carta ativa:</b> ${info.carta.nome}<br><span style="color:#5DCAA5">Atualizado: ${info.carta.atualizado}</span></div>`;
     } else {
-      ctxEl.innerHTML = `<div class="info-box" style="color:#333">Nenhuma carta carregada.</div>`;
+      ctxEl.innerHTML = `<div class="info-box" style="color:#1E4A30">Nenhuma carta carregada.</div>`;
     }
 
     // Status comunicado
@@ -5035,10 +5035,10 @@ async function init(){
       document.getElementById("txt-mensagem").value   = info.mensagem.mensagem   || "";
       msgEl.innerHTML = `<div class="info-box"><b>Publicado em:</b> ${info.mensagem.atualizado}</div>`;
     } else {
-      msgEl.innerHTML = `<div class="info-box" style="color:#333">Nenhum comunicado publicado.</div>`;
+      msgEl.innerHTML = `<div class="info-box" style="color:#1E4A30">Nenhum comunicado publicado.</div>`;
     }
   } catch(e){
-    document.getElementById("status-contexto").innerHTML = '<div class="info-box" style="color:#555">Erro ao carregar status.</div>';
+    document.getElementById("status-contexto").innerHTML = '<div class="info-box" style="color:#3A6A48">Erro ao carregar status.</div>';
   }
 }
 
@@ -5301,16 +5301,16 @@ async function carregarHistorico(){
   const data = await fetch("/api/sugestoes").then(r=>r.json()).catch(()=>({historico:[]}));
   const el   = document.getElementById("sg-historico");
   const hist = data.historico || [];
-  if(!hist.length){ el.innerHTML='<p style="color:#333;font-size:12px;font-style:italic">Nenhuma publicação ainda.</p>'; return; }
+  if(!hist.length){ el.innerHTML='<p style="color:#1E4A30;font-size:12px;font-style:italic">Nenhuma publicação ainda.</p>'; return; }
   el.innerHTML = hist.map(s=>{
     const total = (s.rf?.length||0)+(s.rv?.length||0)+(s.intl?.length||0)+(s.internacional?.length||0)+(s.fiis?.length||0);
     const ativaHtml = s.ativa
       ? `<span class="tag-ativa">● ATIVA</span>`
-      : `<span style="font-size:10px;color:#2A2A2A">inativa</span>`;
+      : `<span style="font-size:10px;color:#1C4A34">inativa</span>`;
     return `<div class="hist-item ${s.ativa?'ativa':''}">
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:${s.ativa?'#5DCAA5':'#555'}">${s.titulo||"—"}</div>
-        <div style="font-size:10px;color:#444;margin-top:3px">${s.criado_em||""} · RF:${s.rf?.length||0} RV:${s.rv?.length||0} FIIs:${s.fiis?.length||0} Intl:${s.internacional?.length||s.intl?.length||0} · ${total} sugestões</div>
+        <div style="font-size:13px;font-weight:700;color:${s.ativa?'#5DCAA5':'#3A6A48'}">${s.titulo||"—"}</div>
+        <div style="font-size:10px;color:#2A5A3A;margin-top:3px">${s.criado_em||""} · RF:${s.rf?.length||0} RV:${s.rv?.length||0} FIIs:${s.fiis?.length||0} Intl:${s.internacional?.length||s.intl?.length||0} · ${total} sugestões</div>
       </div>
       ${ativaHtml}
     </div>`;
@@ -5417,12 +5417,12 @@ HTML_HEAD = r"""<!DOCTYPE html>
 <title>Braúna — Head de Produtos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0A0A08;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+body{background:#071E17;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#0F0F0A;border-bottom:1px solid #2A2A18;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header h1{font-size:17px;color:#D4B483;font-weight:700}
-header p{font-size:11px;color:#444;margin-top:2px}
+header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A18;color:#666;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
+.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A18;color:#4A7055;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
 .nav a:hover,.nav button:hover{border-color:#D4B483;color:#D4B483}
 .nav a.active{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
@@ -5431,36 +5431,36 @@ header p{font-size:11px;color:#444;margin-top:2px}
 .card-title span{font-size:16px}
 /* Tabs */
 .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.tab{padding:7px 16px;border-radius:8px;border:1px solid #2A2A18;background:#080808;color:#666;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.tab{padding:7px 16px;border-radius:8px;border:1px solid #2A2A18;background:#060F0B;color:#4A7055;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
 .tab.active{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
 /* Portfólio modelo — tabela */
 .porto-table{width:100%;border-collapse:collapse;font-size:12px}
-.porto-table th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #2A2A18;color:#666}
+.porto-table th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #2A2A18;color:#4A7055}
 .porto-table th.classe{text-align:left;color:#D4B483;width:140px}
 .porto-table td{padding:6px 8px;border-bottom:1px solid #1A1A10;text-align:center}
 .porto-table td.classe-label{text-align:left;font-size:11px;color:#CCC;padding-left:4px}
-.porto-table td input[type=number]{width:70px;background:#080808;border:1px solid #2A2A18;border-radius:5px;padding:5px 6px;color:#F0F0F0;font-size:12px;text-align:center;outline:none}
+.porto-table td input[type=number]{width:70px;background:#060F0B;border:1px solid #2A2A18;border-radius:5px;padding:5px 6px;color:#F0F0F0;font-size:12px;text-align:center;outline:none}
 .porto-table td input[type=number]:focus{border-color:#D4B483}
 .porto-table .total-row td{font-weight:700;font-size:12px;border-top:2px solid #2A2A18;padding-top:8px}
 .total-val{color:#D4B483}
 .total-ok{color:#5DCAA5}.total-err{color:#FF6B6B}
 /* Viés badges */
-.vies-select{background:#080808;border:1px solid #2A2A18;border-radius:5px;padding:4px 6px;color:#CCC;font-size:11px;outline:none;cursor:pointer}
+.vies-select{background:#060F0B;border:1px solid #2A2A18;border-radius:5px;padding:4px 6px;color:#CCC;font-size:11px;outline:none;cursor:pointer}
 .vies-select:focus{border-color:#D4B483}
 /* Inputs gerais */
-label{font-size:11px;color:#666;display:block;margin-bottom:5px}
-input[type=text],textarea,select:not(.vies-select){width:100%;background:#080808;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
+label{font-size:11px;color:#4A7055;display:block;margin-bottom:5px}
+input[type=text],textarea,select:not(.vies-select){width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
 input[type=text]:focus,textarea:focus{border-color:#D4B483}
 textarea{resize:vertical}
 /* Produto item */
-.prod-item{background:#080808;border:1px solid #2A2A18;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
+.prod-item{background:#060F0B;border:1px solid #2A2A18;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .prod-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#2A2A18;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
 .prod-del:hover{color:#FF6B6B}
 .prod-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
 .prod-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.prod-mini label{font-size:10px;color:#555;margin-bottom:3px}
+.prod-mini label{font-size:10px;color:#3A6A48;margin-bottom:3px}
 /* Botões */
 .btn{display:inline-flex;align-items:center;gap:6px;background:#D4B483;color:#000;border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn:hover{opacity:.88;transform:translateY(-1px)}
@@ -5468,25 +5468,25 @@ textarea{resize:vertical}
 .btn-out{background:transparent;color:#D4B483;border:1px solid #D4B483}
 .btn-out:hover{background:#D4B483;color:#000}
 .btn-sm{padding:6px 14px;font-size:12px}
-.btn-ghost{background:transparent;border:1px solid #2A2A18;color:#555;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost{background:transparent;border:1px solid #2A2A18;color:#3A6A48;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-ghost:hover{border-color:#D4B483;color:#D4B483}
 .btn-add{background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .2s;margin-bottom:10px;font-family:inherit}
 .btn-add:hover{background:#D4B483;color:#000}
 /* Status */
 .status-ok{color:#5DCAA5}.status-err{color:#FF6B6B}
-.info-box{background:#080808;border-radius:8px;padding:12px 14px;font-size:12px;color:#555;line-height:1.6;border:1px solid #2A2A18}
+.info-box{background:#060F0B;border-radius:8px;padding:12px 14px;font-size:12px;color:#3A6A48;line-height:1.6;border:1px solid #2A2A18}
 .info-box b{color:#D4B483}
 /* Publish bar */
 .publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .publish-bar .pub-info{flex:1}
 .publish-bar .pub-info h3{font-size:14px;color:#D4B483;font-weight:700}
-.publish-bar .pub-info p{font-size:11px;color:#666;margin-top:3px}
+.publish-bar .pub-info p{font-size:11px;color:#4A7055;margin-top:3px}
 /* Referência */
 .ref-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .ref-row input{max-width:320px;font-size:12px;padding:6px 10px}
 .ref-badge{font-size:10px;padding:3px 10px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:10px;white-space:nowrap}
 /* Viés indicator */
-.vies-pos{color:#5DCAA5}.vies-neg{color:#FF6B6B}.vies-neu{color:#666}
+.vies-pos{color:#5DCAA5}.vies-neg{color:#FF6B6B}.vies-neu{color:#4A7055}
 @media(max-width:640px){.prod-grid-3,.prod-grid-2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -5513,16 +5513,16 @@ textarea{resize:vertical}
 <!-- ══ 0. UPLOAD RÁPIDO DE PDF ═══════════════════════════════════════════════ -->
 <div class="card" style="border-color:#3A3A20">
   <div class="card-title"><span>⚡</span> Upload Rápido de PDF</div>
-  <p style="font-size:11px;color:#444;margin-bottom:14px;line-height:1.5">
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
     Suba qualquer PDF — carta de gestora, relatório de casa de análise, nota de research. O sistema extrai o conteúdo e você escolhe onde usar.
   </p>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
     <!-- Drop zone -->
     <div style="flex:0 0 220px">
-      <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#080808;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+      <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
         <input type="file" id="pdf-rapido" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapido(this)">
         <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <p style="font-size:12px;color:#555">Arraste o PDF ou clique</p>
+        <p style="font-size:12px;color:#3A6A48">Arraste o PDF ou clique</p>
         <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px" id="pdf-rapido-nome"></p>
       </div>
       <div style="margin-top:8px;text-align:center">
@@ -5533,7 +5533,7 @@ textarea{resize:vertical}
     <div id="pdf-rapido-box" style="flex:1;min-width:280px;display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:11px;color:#D4B483;font-weight:700">Conteúdo extraído — escolha onde usar:</span>
-        <button onclick="fecharRapido()" style="background:none;border:none;color:#555;cursor:pointer;font-size:14px">✕</button>
+        <button onclick="fecharRapido()" style="background:none;border:none;color:#3A6A48;cursor:pointer;font-size:14px">✕</button>
       </div>
       <textarea id="pdf-rapido-texto" rows="7" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:8px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none" placeholder="Texto extraído aparece aqui..."></textarea>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
@@ -5549,7 +5549,7 @@ textarea{resize:vertical}
 <!-- ══ 1. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📐</span> Portfólios Modelo por Indexador</div>
-  <p style="font-size:11px;color:#444;line-height:1.5;margin-bottom:14px">
+  <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:14px">
     Define o benchmark de alocação por classe/indexador para cada perfil. O agente compara a carteira real do cliente contra estes percentuais e aponta os gaps.
   </p>
 
@@ -5571,7 +5571,7 @@ textarea{resize:vertical}
           <th>Moderada</th>
           <th>Arrojada</th>
           <th>Agressiva</th>
-          <th style="color:#666;font-size:9px">Viés Macro</th>
+          <th style="color:#4A7055;font-size:9px">Viés Macro</th>
         </tr>
       </thead>
       <tbody id="porto-body"></tbody>
@@ -5593,7 +5593,7 @@ textarea{resize:vertical}
 <!-- ══ 2. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>🌐</span> Cenário Macro</div>
-  <p style="font-size:11px;color:#444;margin-bottom:14px;line-height:1.5">
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
     Este cenário é usado pelo agente para embasar as sugestões e scripts dos assessores. Atualize mensalmente com base na carta da gestora.
   </p>
 
@@ -5621,7 +5621,7 @@ textarea{resize:vertical}
 <!-- ══ 3. PRODUTOS EM DESTAQUE ════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>⭐</span> Produtos em Destaque do Mês</div>
-  <p style="font-size:11px;color:#444;margin-bottom:14px;line-height:1.5">
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
     Para cada classe/indexador, cadastre os produtos disponíveis e recomendados. O agente usa estes produtos para sugerir ao assessor como fechar o gap da carteira do cliente.
   </p>
 
@@ -5647,7 +5647,7 @@ textarea{resize:vertical}
 
   <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid #2A2A18;flex-wrap:wrap">
     <button class="btn" id="btn-salvar-prod" onclick="salvarProdutos()">💾 Salvar produtos</button>
-    <span style="font-size:11px;color:#444">Salva apenas os produtos em destaque. Use "Publicar" no final para enviar tudo de uma vez.</span>
+    <span style="font-size:11px;color:#2A5A3A">Salva apenas os produtos em destaque. Use "Publicar" no final para enviar tudo de uma vez.</span>
     <span id="prod-save-st" style="font-size:12px;margin-left:auto"></span>
   </div>
 </div>
@@ -5655,16 +5655,16 @@ textarea{resize:vertical}
 <!-- ══ 4. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📚</span> Base de Conhecimento</div>
-  <p style="font-size:11px;color:#444;margin-bottom:14px;line-height:1.5">
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
     Cartas de gestoras, relatórios de casas de análise, notas de research. O agente usa estes documentos para embasar análises com mais profundidade.
   </p>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
     <div>
       <label>Upload de PDF (carta, relatório, nota)</label>
-      <div style="border:1.5px dashed #2A2A18;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#080808;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A2A18'">
+      <div style="border:1.5px dashed #2A2A18;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A2A18'">
         <input type="file" id="base-pdf" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadBase(this)">
         <div style="font-size:24px;margin-bottom:6px">📄</div>
-        <p style="font-size:12px;color:#555">Arraste ou clique para subir PDF</p>
+        <p style="font-size:12px;color:#3A6A48">Arraste ou clique para subir PDF</p>
         <p style="font-size:11px;color:#D4B483;margin-top:4px;min-height:16px" id="base-fname"></p>
       </div>
       <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
@@ -5674,7 +5674,7 @@ textarea{resize:vertical}
     <div>
       <label>Documentos na base</label>
       <div id="base-lista" class="info-box" style="min-height:100px;max-height:200px;overflow-y:auto">
-        <span style="color:#333;font-style:italic">Nenhum documento ainda.</span>
+        <span style="color:#1E4A30;font-style:italic">Nenhum documento ainda.</span>
       </div>
     </div>
   </div>
@@ -5683,21 +5683,21 @@ textarea{resize:vertical}
 <!-- ══ 5. MONITORAMENTO DE PRODUTOS ══════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A1A30">
   <div class="card-title"><span>🔔</span> Monitoramento & Alertas de Produtos</div>
-  <p style="font-size:11px;color:#444;margin-bottom:16px;line-height:1.5">
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">
     Registre atualizações de mercado sobre os produtos indicados. Cada alerta fica vinculado ao produto e aparece no painel do Head de Produtos. Assessores verão um aviso quando o produto do cliente sofrer uma atualização relevante.
   </p>
 
   <!-- Formulário novo alerta -->
-  <div style="background:#080808;border:1px solid #2A1A30;border-radius:10px;padding:16px;margin-bottom:16px">
+  <div style="background:#060F0B;border:1px solid #2A1A30;border-radius:10px;padding:16px;margin-bottom:16px">
     <div style="font-size:12px;color:#B08FCF;font-weight:700;margin-bottom:12px">➕ Registrar atualização de mercado</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <label style="font-size:10px;color:#555;display:block;margin-bottom:4px">Produto / Ticker</label>
-        <input id="alert-produto" type="text" placeholder="ex: NTN-B 2035, VALE3, MXRF11" style="width:100%;background:#0D0D0D;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Produto / Ticker</label>
+        <input id="alert-produto" type="text" placeholder="ex: NTN-B 2035, VALE3, MXRF11" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
       </div>
       <div>
-        <label style="font-size:10px;color:#555;display:block;margin-bottom:4px">Classe</label>
-        <select id="alert-classe" style="width:100%;background:#0D0D0D;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Classe</label>
+        <select id="alert-classe" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
           <option value="">— Selecionar —</option>
           <option value="pos_fixado">Pós Fixado</option>
           <option value="inflacao">Inflação</option>
@@ -5710,8 +5710,8 @@ textarea{resize:vertical}
         </select>
       </div>
       <div>
-        <label style="font-size:10px;color:#555;display:block;margin-bottom:4px">Tipo de alerta</label>
-        <select id="alert-tipo" style="width:100%;background:#0D0D0D;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tipo de alerta</label>
+        <select id="alert-tipo" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
           <option value="info">ℹ️ Informativo</option>
           <option value="atencao">⚠️ Atenção</option>
           <option value="urgente">🚨 Urgente — revisar carteiras</option>
@@ -5719,8 +5719,8 @@ textarea{resize:vertical}
       </div>
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:10px;color:#555;display:block;margin-bottom:4px">Mensagem / Atualização</label>
-      <textarea id="alert-msg" rows="3" placeholder="ex: COPOM elevou Selic +50bps. Revisar alocação em pré-fixado acima de 2 anos. Clientes arrojados e agressivos devem reduzir duration." style="width:100%;background:#0D0D0D;border:1px solid #2A1A30;border-radius:6px;padding:10px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Mensagem / Atualização</label>
+      <textarea id="alert-msg" rows="3" placeholder="ex: COPOM elevou Selic +50bps. Revisar alocação em pré-fixado acima de 2 anos. Clientes arrojados e agressivos devem reduzir duration." style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:10px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <button class="btn" onclick="registrarAlerta()">🔔 Registrar alerta</button>
@@ -5729,12 +5729,12 @@ textarea{resize:vertical}
   </div>
 
   <!-- Feed de alertas -->
-  <div style="font-size:11px;color:#555;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:11px;color:#3A6A48;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
     <span>Histórico de alertas registrados</span>
     <button onclick="carregarAlertas()" class="btn-ghost">↻ Atualizar</button>
   </div>
   <div id="alertas-feed" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
-    <div style="color:#333;font-size:11px;text-align:center;padding:20px">Carregando alertas...</div>
+    <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando alertas...</div>
   </div>
 </div>
 
@@ -5837,7 +5837,7 @@ function colorirVies(cls){
   const el = document.getElementById("vies-"+cls);
   if(!el) return;
   const v = el.value;
-  el.style.color = v==="positivo" ? "#5DCAA5" : v==="negativo" ? "#FF6B6B" : "#666";
+  el.style.color = v==="positivo" ? "#5DCAA5" : v==="negativo" ? "#FF6B6B" : "#4A7055";
 }
 
 function coletarPortfolios(){
@@ -5908,19 +5908,19 @@ function buildProdHtml(cls, id, p){
       <div class="prod-grid-3">
         <div class="prod-mini"><label>Ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: VALE3, WEGE3, PETR4" style="text-transform:uppercase"></div>
         <div class="prod-mini"><label>Nome da empresa</label><input type="text" id="pe-${cls}-${id}" value="${v("emissor")}" placeholder="Ex: Vale S.A."></div>
-        <div class="prod-mini"><label>Setor</label><select id="pt-${cls}-${id}" style="background:#080808;border:1px solid #1A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${setores}</select></div>
+        <div class="prod-mini"><label>Setor</label><select id="pt-${cls}-${id}" style="background:#060F0B;border:1px solid #1A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${setores}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Preço atual (R$)</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 68,40"></div>
         <div class="prod-mini"><label>Preço-alvo (R$)</label><input type="text" id="pv-${cls}-${id}" value="${v("vencimento")}" placeholder="Ex: 85,00"></div>
         <div class="prod-mini"><label>Upside estimado</label><input type="text" id="pup-${cls}-${id}" value="${v("upside")}" placeholder="Ex: +24%"></div>
-        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#080808;border:1px solid #1A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${coberturas}</select></div>
+        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#060F0B;border:1px solid #1A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${coberturas}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Dividend Yield esperado</label><input type="text" id="pdy-${cls}-${id}" value="${v("dy")}" placeholder="Ex: 8,5% a.a."></div>
         <div class="prod-mini"><label>Prazo da tese</label><input type="text" id="ppz-${cls}-${id}" value="${v("prazo")}" placeholder="Ex: 12-18 meses"></div>
       </div>
-      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#080808;border:1px solid #1A2A18;border-radius:6px;padding:8px;color:#F0F0F0;font-size:12px;resize:vertical;outline:none" placeholder="Por que recomendar? Quais os gatilhos de valorização?">${v("motivo")}</textarea></div>
+      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#060F0B;border:1px solid #1A2A18;border-radius:6px;padding:8px;color:#F0F0F0;font-size:12px;resize:vertical;outline:none" placeholder="Por que recomendar? Quais os gatilhos de valorização?">${v("motivo")}</textarea></div>
       <div class="prod-mini" style="margin-top:6px"><label>Riscos / Pontos de atenção</label><input type="text" id="prisk-${cls}-${id}" value="${v("riscos")}" placeholder="Ex: Exposição ao câmbio, risco regulatório, ciclo de commodities"></div>
     </div>`;
   }
@@ -5933,19 +5933,19 @@ function buildProdHtml(cls, id, p){
       <div class="prod-grid-3">
         <div class="prod-mini"><label>Ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: MXRF11, HGLG11" style="text-transform:uppercase"></div>
         <div class="prod-mini"><label>Nome do fundo</label><input type="text" id="pe-${cls}-${id}" value="${v("emissor")}" placeholder="Ex: Maxi Renda FII"></div>
-        <div class="prod-mini"><label>Segmento</label><select id="pt-${cls}-${id}" style="background:#080808;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${segmentos}</select></div>
+        <div class="prod-mini"><label>Segmento</label><select id="pt-${cls}-${id}" style="background:#060F0B;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${segmentos}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Preço atual (R$)</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 9,85"></div>
         <div class="prod-mini"><label>P/VP</label><input type="text" id="pv-${cls}-${id}" value="${v("vencimento")}" placeholder="Ex: 0,92"></div>
         <div class="prod-mini"><label>Dividend Yield (a.a.)</label><input type="text" id="pdy-${cls}-${id}" value="${v("dy")}" placeholder="Ex: 12,8%"></div>
-        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#080808;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${recs}</select></div>
+        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#060F0B;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${recs}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Rendimento mensal esperado (R$/cota)</label><input type="text" id="pup-${cls}-${id}" value="${v("upside")}" placeholder="Ex: R$ 0,105/cota"></div>
         <div class="prod-mini"><label>Gestora</label><input type="text" id="ppz-${cls}-${id}" value="${v("prazo")}" placeholder="Ex: CSHG, Kinea, BTG Pactual"></div>
       </div>
-      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#080808;border:1px solid #1A1A2A;border-radius:6px;padding:8px;color:#F0F0F0;font-size:12px;resize:vertical;outline:none" placeholder="Portfólio, qualidade dos contratos, vacância, gestão...">${v("motivo")}</textarea></div>
+      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#060F0B;border:1px solid #1A1A2A;border-radius:6px;padding:8px;color:#F0F0F0;font-size:12px;resize:vertical;outline:none" placeholder="Portfólio, qualidade dos contratos, vacância, gestão...">${v("motivo")}</textarea></div>
       <div class="prod-mini" style="margin-top:6px"><label>Riscos</label><input type="text" id="prisk-${cls}-${id}" value="${v("riscos")}" placeholder="Ex: Alta de juros reduz atratividade, vacância elevada, risco de crédito dos CRIs"></div>
     </div>`;
   }
@@ -5955,7 +5955,7 @@ function buildProdHtml(cls, id, p){
     <button class="prod-del" onclick="delProduto('${cls}',${id})">✕</button>
     <div class="prod-grid-3">
       <div class="prod-mini"><label>Nome do produto / ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: CDB Banco BTG 108% CDI"></div>
-      <div class="prod-mini"><label>Tipo</label><select id="pt-${cls}-${id}" style="background:#080808;border:1px solid #2A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${tipos}</select></div>
+      <div class="prod-mini"><label>Tipo</label><select id="pt-${cls}-${id}" style="background:#060F0B;border:1px solid #2A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${tipos}</select></div>
       <div class="prod-mini"><label>Taxa / retorno esperado</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 108% CDI / IPCA+7% / 13,5% a.a."></div>
     </div>
     <div class="prod-grid-2">
@@ -6025,7 +6025,7 @@ function initProdButtons(){
     preview.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:11px;color:#D4B483;font-weight:700">📄 Conteúdo extraído — ${cls.label}</span>
-        <button onclick="document.getElementById('prod-pdf-preview-${cls.key}').style.display='none'" style="background:none;border:none;color:#555;cursor:pointer;font-size:14px">✕</button>
+        <button onclick="document.getElementById('prod-pdf-preview-${cls.key}').style.display='none'" style="background:none;border:none;color:#3A6A48;cursor:pointer;font-size:14px">✕</button>
       </div>
       <textarea id="prod-pdf-texto-${cls.key}" rows="6" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:7px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
@@ -6202,7 +6202,7 @@ async function uploadBase(input){
 
 function renderBase(){
   const el = document.getElementById("base-lista");
-  if(!_base.length){ el.innerHTML='<span style="color:#333;font-style:italic">Nenhum documento ainda.</span>'; return; }
+  if(!_base.length){ el.innerHTML='<span style="color:#1E4A30;font-style:italic">Nenhum documento ainda.</span>'; return; }
   el.innerHTML = _base.map((d,i)=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1A1A10">
       <span style="font-size:11px;color:#CCC">📄 ${d.nome}</span>
@@ -6243,21 +6243,21 @@ async function carregarAlertas(){
     const r = await fetch("/api/hp/alertas");
     const lista = await r.json();
     if(!lista.length){
-      feed.innerHTML = `<div style="color:#333;font-size:11px;text-align:center;padding:20px">Nenhum alerta registrado ainda.</div>`;
+      feed.innerHTML = `<div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Nenhum alerta registrado ainda.</div>`;
       return;
     }
     feed.innerHTML = lista.map(a=>`
-      <div style="background:#0A0A0A;border-left:3px solid ${ALERT_COLORS[a.tipo]||"#444"};border-radius:0 8px 8px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
+      <div style="background:#0A0A0A;border-left:3px solid ${ALERT_COLORS[a.tipo]||"#2A5A3A"};border-radius:0 8px 8px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:12px;font-weight:700;color:${ALERT_COLORS[a.tipo]||"#CCC"}">${ALERT_LABELS[a.tipo]||a.tipo}</span>
             <span style="font-size:11px;color:#D4B483;font-weight:700">${a.produto||""}</span>
             ${a.classe ? `<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${a.classe}</span>` : ""}
-            <span style="font-size:10px;color:#333;margin-left:auto">${a.data||""} · ${a.origem||"HP"}</span>
+            <span style="font-size:10px;color:#1E4A30;margin-left:auto">${a.data||""} · ${a.origem||"HP"}</span>
           </div>
           <p style="font-size:12px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
         </div>
-        <button onclick="deletarAlerta('${a.id}')" title="Remover" style="background:none;border:none;color:#333;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#333'">✕</button>
+        <button onclick="deletarAlerta('${a.id}')" title="Remover" style="background:none;border:none;color:#1E4A30;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#1E4A30'">✕</button>
       </div>
     `).join("");
   } catch(e){ feed.innerHTML=`<div style="color:#FF6B6B;font-size:11px;padding:12px">Erro ao carregar alertas.</div>`; }
