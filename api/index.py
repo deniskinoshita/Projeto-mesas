@@ -1514,52 +1514,44 @@ if(document.readyState === "loading"){
   else setTimeout(atualizarGraficoServir, 600);
 }
 
-// Cache do portfólio HP para não buscar múltiplas vezes
+// Cache do portfólio HP
 let _hpPortfolios = null;
+fetch("/api/hp/portfolios").then(r=>r.json()).then(d=>{ _hpPortfolios = d.perfis||null; atualizarModelo(); }).catch(()=>{});
 
-async function carregarHpPortfolios(){
-  if(_hpPortfolios) return _hpPortfolios;
-  try{
-    const r = await fetch("/api/hp/portfolios");
-    const d = await r.json();
-    _hpPortfolios = d.perfis || {};
-    return _hpPortfolios;
-  } catch(e){ return {}; }
-}
-
-async function atualizarModelo(){
+function atualizarModelo(){
   const sel = document.getElementById("perfil");
   if(!sel) return;
-  const p   = sel.value;
+  const p = sel.value;
+
+  // Label — atualiza imediatamente, síncrono
   const lbl = document.getElementById("perfil-lbl");
+  const NOMES = {conservadora:"CONSERVADORA",moderada:"MODERADA",arrojada:"ARROJADA",agressiva:"AGRESSIVA",super_conservadora:"SUPER CONSERVADORA"};
+  if(lbl) lbl.textContent = NOMES[p] || p.toUpperCase();
 
-  // Tenta buscar o modelo do HP publicado; fallback para MODELOS hardcoded
-  const perfis = await carregarHpPortfolios();
-  const m = (perfis[p] && Object.keys(perfis[p]).length > 1) ? perfis[p] : MODELOS[p];
-  const ref = _hpPortfolios && Object.keys(_hpPortfolios).length ? " — Levante Asset" : "";
+  // Modelo: HP publicado tem prioridade; senão usa fallback local
+  const hp = _hpPortfolios && _hpPortfolios[p];
+  const m  = (hp && Object.keys(hp).filter(k=>k!=="label").length > 0) ? hp : MODELOS[p];
+  if(!m) return;
 
-  if(lbl) lbl.textContent = (m?.label || p).toUpperCase() + ref;
   const g = document.getElementById("modelo-grid");
-  if(!g || !m) return;
+  if(!g) return;
 
   const COR_CLS = {
     pos_fixado:"#D6B27A", inflacao:"#F0A830", pre_fixado:"#B8A0E8",
     acoes:"#5DCAA5", fiis:"#7DCFEF", multimercado:"#E8C96B",
     internacional:"#FF8E8E", alternativos:"#4EC9B0", criptomoedas:"#888"
   };
-
   const itens = Object.entries(m)
-    .filter(([k,v]) => typeof v === "number" && v > 0 && k !== "label")
+    .filter(([k,v]) => typeof v==="number" && v>0 && k!=="label")
     .sort((a,b) => b[1]-a[1]);
-
   g.innerHTML = itens.map(([k,v])=>{
-    const cor = COR_CLS[k] || "#555";
+    const cor = COR_CLS[k]||"#555";
     return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
-      '<span style="font-size:11px;color:#888;min-width:110px;flex-shrink:0">' + (LABELS[k]||k) + '</span>' +
-      '<div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden">' +
-        '<div style="width:' + Math.min(v,100) + '%;height:100%;background:' + cor + ';border-radius:3px;transition:width .4s"></div>' +
-      '</div>' +
-      '<span style="font-size:11px;font-weight:700;color:' + cor + ';min-width:36px;text-align:right">' + v + '%</span>' +
+      '<span style="font-size:11px;color:#888;min-width:110px;flex-shrink:0">'+(LABELS[k]||k)+'</span>'+
+      '<div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden">'+
+        '<div style="width:'+Math.min(v,100)+'%;height:100%;background:'+cor+';border-radius:3px;transition:width .4s"></div>'+
+      '</div>'+
+      '<span style="font-size:11px;font-weight:700;color:'+cor+';min-width:36px;text-align:right">'+v+'%</span>'+
     '</div>';
   }).join("");
 }
