@@ -3568,35 +3568,56 @@ def hp_knowledge_apply():
     texto = doc.get("texto", "")
 
     if destino == "cenario":
-        # Tenta segmentar o texto em global / brasil / posicionamento por palavras-chave
-        linhas = texto.split("\n")
-        seg_global, seg_brasil, seg_pos = [], [], []
-        modo = None
-        for linha in linhas:
-            l = linha.lower()
-            if any(k in l for k in ["global","internacional","eua","estados unidos","fed","banco central europeu","china","emergente"]):
-                modo = "global"
-            elif any(k in l for k in ["brasil","selic","ipca","ibovespa","câmbio","real","fiscal","copom"]):
-                modo = "brasil"
-            elif any(k in l for k in ["posicionamento","portfólio","alocação","recomendamos","reduzindo","aumentando","fundo"]):
-                modo = "pos"
-            if modo == "global" and linha.strip(): seg_global.append(linha)
-            elif modo == "brasil" and linha.strip(): seg_brasil.append(linha)
-            elif modo == "pos" and linha.strip(): seg_pos.append(linha)
+        fonte = doc.get("fonte") or doc.get("nome","")
 
-        # Fallback: divide o texto em terços
-        if not seg_global and not seg_brasil:
-            n = len(linhas)
-            seg_global = linhas[:n//3]
-            seg_brasil = linhas[n//3: 2*n//3]
-            seg_pos    = linhas[2*n//3:]
+        # Usa Claude para extrair os 3 campos de forma inteligente
+        api_key = os.environ.get("ANTHROPIC_API_KEY","")
+        if api_key and len(texto) > 100:
+            try:
+                import anthropic as _anthropic
+                client = _anthropic.Anthropic(api_key=api_key)
+                prompt = f"""Você é analista de investimentos. Leia a carta da gestora abaixo e extraia 3 resumos objetivos em português, cada um com no máximo 3 frases:
 
+1. CENÁRIO GLOBAL: principais pontos sobre economia mundial, Fed, inflação global, bolsas internacionais, geopolítica
+2. CENÁRIO BRASIL: principais pontos sobre economia brasileira, Selic/COPOM, IPCA, Ibovespa, fiscal, câmbio
+3. POSICIONAMENTO: o que a gestora está fazendo/recomendando (aumentando, reduzindo, neutro) por classe de ativo
+
+Responda SOMENTE no formato JSON:
+{{"global": "...", "brasil": "...", "posicionamento": "..."}}
+
+CARTA:
+{texto[:6000]}"""
+                msg = client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=600,
+                    messages=[{"role":"user","content": prompt}]
+                )
+                raw = msg.content[0].text.strip()
+                import re as _re
+                m = _re.search(r'\{.*\}', raw, _re.DOTALL)
+                if m:
+                    parsed = json.loads(m.group())
+                    return jsonify({
+                        "ok": True,
+                        "global":         parsed.get("global","")[:1200],
+                        "brasil":         parsed.get("brasil","")[:1200],
+                        "posicionamento": parsed.get("posicionamento","")[:1200],
+                        "fonte": fonte,
+                        "ia": True,
+                    })
+            except Exception:
+                pass  # fallback abaixo
+
+        # Fallback simples: divide em terços
+        linhas = [l for l in texto.split("\n") if l.strip()]
+        n = max(len(linhas), 1)
         return jsonify({
             "ok": True,
-            "global":         " ".join(seg_global)[:1200].strip(),
-            "brasil":         " ".join(seg_brasil)[:1200].strip(),
-            "posicionamento": " ".join(seg_pos)[:1200].strip(),
-            "fonte":          doc.get("fonte") or doc.get("nome",""),
+            "global":         " ".join(linhas[:n//3])[:1200].strip(),
+            "brasil":         " ".join(linhas[n//3: 2*n//3])[:1200].strip(),
+            "posicionamento": " ".join(linhas[2*n//3:])[:1200].strip(),
+            "fonte": fonte,
+            "ia": False,
         })
 
     return jsonify({"ok": True, "texto": texto[:3000]})
