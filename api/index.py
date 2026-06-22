@@ -3248,45 +3248,50 @@ def analyze_xp():
 @app.route("/api/gerar-apresentacao", methods=["POST"])
 def gerar_apresentacao():
     """Gera PDF de apresentação de reunião com dados HP + IA."""
-    from apresentacao import gerar_apresentacao as _gerar
+    try:
+        from apresentacao import gerar_apresentacao as _gerar
+    except Exception as e:
+        app.logger.error(f"Erro ao importar apresentacao: {e}")
+        return jsonify({"error": f"Erro ao carregar módulo de apresentação: {e}"}), 500
+
     body = request.get_json()
     if not body:
         return jsonify({"error": "Dados não enviados"}), 400
 
-    # Enriquece com dados HP publicados
-    hp_porto  = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
-    hp_cenario= _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
-    hp_prods  = _load(_HP_PROD_FILE, {})
-    alertas_hp= _load(_HP_ALERTS_FILE, [])
-
-    body["cenario_macro"] = {
-        "global":        hp_cenario.get("global",""),
-        "brasil":        hp_cenario.get("brasil",""),
-        "posicionamento":hp_cenario.get("posicionamento",""),
-        "vieses":        hp_cenario.get("vieses",{}),
-    }
-
-    # Alertas relevantes para os ativos do cliente
-    tickers = [a.get("ticker","") for a in body.get("acoes",[])] + \
-              [f.get("ticker","") for f in body.get("fiis",[])]
-    body["alertas_relevantes"] = [
-        a for a in alertas_hp
-        if any(t in a.get("produto","") for t in tickers)
-        or a.get("classe","") in [d.get("cls","") for d in body.get("desvios",[]) if d.get("status")=="fora"]
-    ]
-
-    # Garante campos de rentabilidade
-    rent = body.get("rent", {})
-    port_rent = rent.get("portfolio", {}) if isinstance(rent, dict) else {}
-    cdi_rent  = rent.get("cdi", {}) if isinstance(rent, dict) else {}
-    rent_12m  = port_rent.get("12m", 0)
-    cdi_12m   = cdi_rent.get("12m", 0)
-    body["rent_12m"] = rent_12m
-    body["pct_cdi"]  = round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0
-
     try:
+        # Enriquece com dados HP publicados
+        hp_cenario= _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
+        alertas_hp= _load(_HP_ALERTS_FILE, [])
+
+        body["cenario_macro"] = {
+            "global":        hp_cenario.get("global",""),
+            "brasil":        hp_cenario.get("brasil",""),
+            "posicionamento":hp_cenario.get("posicionamento",""),
+            "vieses":        hp_cenario.get("vieses",{}),
+        }
+
+        # Alertas relevantes para os ativos do cliente
+        tickers = [a.get("ticker","") for a in body.get("acoes",[])] + \
+                  [f.get("ticker","") for f in body.get("fiis",[])]
+        body["alertas_relevantes"] = [
+            a for a in alertas_hp
+            if any(t in a.get("produto","") for t in tickers)
+            or a.get("classe","") in [d.get("cls","") for d in body.get("desvios",[]) if d.get("status")=="fora"]
+        ]
+
+        # Garante campos de rentabilidade
+        rent = body.get("rent", {})
+        port_rent = rent.get("portfolio", {}) if isinstance(rent, dict) else {}
+        cdi_rent  = rent.get("cdi", {}) if isinstance(rent, dict) else {}
+        rent_12m  = port_rent.get("12m", 0)
+        cdi_12m   = cdi_rent.get("12m", 0)
+        body["rent_12m"] = rent_12m
+        body["pct_cdi"]  = round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0
+
         pdf_bytes = _gerar(body)
     except Exception as e:
+        import traceback
+        app.logger.error(f"Erro ao gerar apresentação: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
     nome = body.get("nome_cliente","cliente").replace(" ","-").lower()
