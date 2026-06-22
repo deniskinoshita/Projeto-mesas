@@ -119,15 +119,45 @@ def s_capa(prs, d):
     add_text(sl, nome, Cm(1.7), Cm(8.4), Cm(26), Cm(1.6), size=24, color=C_GOLD)
     pat = d.get("patrimonio",0)
     data= d.get("data_ref","")
-    perfil = str(d.get("perfil","")).capitalize()
+    perfil_raw = str(d.get("perfil","")).lower()
+    perfil = perfil_raw.capitalize()
     assessor = d.get("assessor","")
     add_text(sl, f"Patrimônio: {fmt(pat)}   ·   Data: {data}", Cm(1.7), Cm(10.3),
              Cm(26), Cm(0.7), size=11, color=C_LGRAY)
     add_text(sl, f"Perfil: {perfil}   ·   Assessor: {assessor}", Cm(1.7), Cm(11.1),
              Cm(26), Cm(0.7), size=10, color=C_LGRAY)
-    add_rect(sl, 0, SH - Cm(1.3), SW, Cm(1.3), C_CARD)
+
+    # Badge de perfil colorido
+    _PERFIL_COR = {"conservadora": C_BLUE, "moderada": C_GOLD, "arrojada": C_GREEN, "agressiva": C_RED}
+    cor_perfil = _PERFIL_COR.get(perfil_raw, C_LGRAY)
+    add_rect(sl, Cm(1.7), Cm(12.0), Cm(4.5), Cm(0.65), cor_perfil)
+    add_text(sl, f"PERFIL  {perfil.upper()}", Cm(1.85), Cm(12.08), Cm(4.2), Cm(0.5),
+             size=9, bold=True, color=C_BG)
+
+    # Objetivo se disponível
+    objetivo = d.get("objetivo","")
+    y_obj = Cm(12.0)
+    if objetivo:
+        add_rect(sl, Cm(6.5), Cm(12.0), Cm(8), Cm(0.65), C_CARD2, C_GRAY, 0.3)
+        add_text(sl, f"Objetivo: {objetivo}", Cm(6.75), Cm(12.08), Cm(7.7), Cm(0.5),
+                 size=9, color=C_WHITE)
+
+    # Texto descritivo
+    descr = (f"Esta apresentação consolida a análise completa da carteira de {nome}, "
+             f"cobrindo cenário macro, performance, desvios em relação ao modelo e próximos passos.")
+    add_rect(sl, Cm(1.7), Cm(12.9), SW - Cm(2.5), Cm(1.4), C_CARD, C_GRAY, 0.3)
+    add_text(sl, descr, Cm(2.0), Cm(13.05), SW - Cm(3.1), Cm(1.1),
+             size=10, color=C_LGRAY, wrap=True)
+
+    # Rodapé com assinatura do assessor
+    add_rect(sl, 0, SH - Cm(1.5), SW, Cm(1.5), C_CARD)
+    add_rect(sl, Cm(1.7), SH - Cm(1.35), Cm(0.04), Cm(1.0), C_GOLD)
+    add_text(sl, assessor, Cm(1.95), SH - Cm(1.3), Cm(14), Cm(0.6),
+             size=11, bold=True, color=C_GOLD)
+    add_text(sl, "Assessor de Investimentos — Braúna Investimentos", Cm(1.95), SH - Cm(0.72),
+             Cm(16), Cm(0.5), size=8.5, color=C_LGRAY)
     add_text(sl, "Documento confidencial · Uso exclusivo do cliente · Não constitui recomendação formal de investimento",
-             Cm(1.7), SH - Cm(1.1), SW - Cm(2), Cm(0.7), size=7.5, color=C_GRAY)
+             SW - Cm(18), SH - Cm(0.72), Cm(17), Cm(0.5), size=7.5, color=C_GRAY, align=PP_ALIGN.RIGHT)
 
 # ── SLIDE 2: AGENDA ───────────────────────────────────────────────────────────
 def s_agenda(prs, d, agenda_items):
@@ -135,21 +165,50 @@ def s_agenda(prs, d, agenda_items):
     header(sl, "AGENDA DA REUNIÃO", f"Apresentação — {d.get('nome_cliente','')} · {d.get('data_ref','')}")
     footer(sl, d.get("nome_cliente",""), d.get("data_ref",""))
 
+    nome   = d.get("nome_cliente","")
+    perfil = str(d.get("perfil","")).capitalize()
+    pat    = fmt(d.get("patrimonio",0))
+    data_r = d.get("data_ref","")
+
+    # Card de abertura com contexto da reunião
+    add_rect(sl, MARGIN, Cm(2.85), SW - Cm(1.4), Cm(0.06), C_GOLD)
+    add_rect(sl, MARGIN, Cm(2.91), SW - Cm(1.4), Cm(0.72), C_CARD2, C_GRAY, 0.3)
+    add_text(sl, f"Reunião de revisão de carteira  ·  {nome}  ·  Perfil {perfil}  ·  Patrimônio {pat}  ·  Referência {data_r}",
+             MARGIN + Cm(0.4), Cm(2.98), SW - Cm(2.2), Cm(0.56),
+             size=10, color=C_GOLD, bold=True)
+
+    # Descrições detalhadas por tópico de agenda
+    _SUBS = {
+        "Cenário Global":    "Panorama macro internacional — Fed, BCE, China e impactos esperados",
+        "Brasil & HP":       "Selic, IPCA, juro real e posicionamento do Head de Produtos Levante",
+        "Patrimônio":        "Evolução do patrimônio, rentabilidade mensal, anual e em 12/24 meses",
+        "Composição":        "Distribuição atual por classe de ativo e valor financeiro alocado",
+        "Carteira vs. Modelo": "Aderência ao perfil — quais classes estão dentro, acima ou abaixo",
+        "Desvios":           "Classes fora do modelo e o que resgatar ou aportar para realinhar",
+        "Renda Variável":    "Ações e FIIs presentes na carteira — tickers e % de alocação",
+        "Modelo de Servir":  "Score dos 6 pilares de relacionamento e pilares críticos pendentes",
+        "Sugestões":         "Produtos recomendados pelo Head de Produtos para o seu perfil",
+        "Cross Sell":        "Soluções Braúna ainda não ativadas — oportunidades de aprofundamento",
+        "Resumo Executivo":  "Síntese dos principais indicadores — rentabilidade, desvios e score",
+        "Próximos Passos":   "Encaminhamentos acordados com prazos e responsáveis definidos",
+    }
+
     col_w = (SW - Cm(2)) / 2 - Cm(0.3)
     cx1, cx2 = MARGIN, MARGIN + col_w + Cm(0.6)
     mid = math.ceil(len(agenda_items)/2)
 
     for col, (cx, items) in enumerate([(cx1, agenda_items[:mid]), (cx2, agenda_items[mid:])]):
         for i, (num, lbl, sub) in enumerate(items):
-            ry = Cm(3.1) + i * Cm(2.0)
-            add_rect(sl, cx, ry, col_w, Cm(1.85), C_CARD, C_GRAY, 0.3)
-            add_rect(sl, cx, ry, Cm(1.3), Cm(1.85), C_GOLD)
-            add_text(sl, str(num), cx, ry + Cm(0.45), Cm(1.3), Cm(0.9),
+            ry = Cm(3.9) + i * Cm(1.9)
+            add_rect(sl, cx, ry, col_w, Cm(1.78), C_CARD, C_GRAY, 0.3)
+            add_rect(sl, cx, ry, Cm(1.3), Cm(1.78), C_GOLD)
+            add_text(sl, str(num), cx, ry + Cm(0.4), Cm(1.3), Cm(0.9),
                      size=14, bold=True, color=C_BG, align=PP_ALIGN.CENTER)
-            add_text(sl, lbl, cx + Cm(1.5), ry + Cm(0.18), col_w - Cm(1.7), Cm(0.75),
+            add_text(sl, lbl, cx + Cm(1.5), ry + Cm(0.15), col_w - Cm(1.7), Cm(0.72),
                      size=12, bold=True, color=C_WHITE)
-            add_text(sl, sub, cx + Cm(1.5), ry + Cm(0.95), col_w - Cm(1.7), Cm(0.6),
-                     size=9, color=C_LGRAY)
+            sub_det = _SUBS.get(lbl, sub)
+            add_text(sl, sub_det, cx + Cm(1.5), ry + Cm(0.9), col_w - Cm(1.7), Cm(0.65),
+                     size=8.5, color=C_LGRAY)
 
 # ── SLIDE 3: CENÁRIO GLOBAL ───────────────────────────────────────────────────
 def s_cenario_global(prs, d):
@@ -167,17 +226,46 @@ def s_cenario_global(prs, d):
 
     # ── Bloco narrativo principal ──────────────────────────────────────────────
     add_rect(sl, MARGIN, Cm(3.0), SW - Cm(1.4), Cm(0.06), C_GOLD)
-    add_rect(sl, MARGIN, Cm(3.06), SW - Cm(1.4), Cm(4.6), C_CARD, C_GRAY, 0.3)
-    add_text(sl, "ANÁLISE MACROECONÔMICA GLOBAL", MARGIN + Cm(0.4), Cm(3.25),
+    add_rect(sl, MARGIN, Cm(3.06), SW - Cm(1.4), Cm(2.7), C_CARD, C_GRAY, 0.3)
+    add_text(sl, "ANÁLISE MACROECONÔMICA GLOBAL", MARGIN + Cm(0.4), Cm(3.22),
              Cm(20), Cm(0.5), size=8, bold=True, color=C_GOLD)
-    add_text(sl, global_txt, MARGIN + Cm(0.4), Cm(3.85), SW - Cm(2.2), Cm(3.6),
-             size=10.5, color=C_WHITE, wrap=True)
+    add_text(sl, global_txt, MARGIN + Cm(0.4), Cm(3.82), SW - Cm(2.2), Cm(1.8),
+             size=11, color=C_WHITE, wrap=True)
+
+    # ── 3 cards de regiões ────────────────────────────────────────────────────
+    regioes = [
+        ("Estados Unidos",  "Fed mantém postura restritiva. Mercado de trabalho resiliente sustenta consumo.",  "cautela"),
+        ("Europa / BCE",    "BCE inicia cortes graduais. Atividade fraca na Alemanha pressiona zona do euro.",   "neutro"),
+        ("Ásia / China",    "China retoma crescimento moderado. Estímulos fiscais suportam demanda interna.",    "positivo"),
+    ]
+    # Tenta extrair contexto do global_txt para enriquecer
+    gtl = global_txt.lower()
+    if "fed" in gtl or "estados unidos" in gtl or "americana" in gtl:
+        sent_us = "cautela" if any(x in gtl for x in ["hawkish","cautela","restrictiv"]) else "positivo"
+    else:
+        sent_us = "neutro"
+    regioes[0] = (regioes[0][0], regioes[0][1], sent_us)
+
+    VCOR2 = {"positivo": C_GREEN, "cautela": C_AMBER, "neutro": C_LGRAY}
+    VIC2  = {"positivo": "▲ Positivo", "cautela": "→ Cautela", "neutro": "→ Neutro"}
+    rw = (SW - Cm(1.4)) / 3 - Cm(0.2)
+    for i, (reg, desc, sent) in enumerate(regioes):
+        rx = MARGIN + i * (rw + Cm(0.2))
+        cor_r = VCOR2.get(sent, C_LGRAY)
+        add_rect(sl, rx, Cm(6.0), rw, Cm(2.1), C_CARD2, cor_r, 0.4)
+        add_rect(sl, rx, Cm(6.0), rw, Cm(0.15), cor_r)
+        add_text(sl, reg, rx + Cm(0.3), Cm(6.22), rw - Cm(0.6), Cm(0.55),
+                 size=10, bold=True, color=C_WHITE)
+        add_text(sl, VIC2.get(sent,"→"), rx + Cm(0.3), Cm(6.82), rw - Cm(0.6), Cm(0.45),
+                 size=9, bold=True, color=cor_r)
+        add_text(sl, desc, rx + Cm(0.3), Cm(7.32), rw - Cm(0.6), Cm(0.65),
+                 size=8.5, color=C_LGRAY, wrap=True)
 
     # ── Sinais de mercado (badges) ─────────────────────────────────────────────
     if sinais:
-        add_text(sl, "SINAIS DE MERCADO", MARGIN, Cm(7.85), SW, Cm(0.5),
+        add_text(sl, "SINAIS DE MERCADO", MARGIN, Cm(8.3), SW, Cm(0.5),
                  size=8, bold=True, color=C_LGRAY)
-        bx = MARGIN; by = Cm(8.45)
+        bx = MARGIN; by = Cm(8.9)
         for sinal in sinais[:8]:
             lbl = str(sinal).strip()
             sw_badge = Cm(len(lbl) * 0.22 + 0.8)
@@ -188,7 +276,7 @@ def s_cenario_global(prs, d):
             if bx > SW - Cm(3): bx = MARGIN; by += Cm(0.7)
         vieses_y = by + Cm(0.8)
     else:
-        vieses_y = Cm(8.5)
+        vieses_y = Cm(8.9)
 
     # ── Vieses por classe ─────────────────────────────────────────────────────
     add_text(sl, "VIESES POR CLASSE DE ATIVO — POSICIONAMENTO HP", MARGIN, vieses_y - Cm(0.55),
@@ -516,6 +604,25 @@ def s_vs_modelo(prs, d):
         add_text(sl, sit, xs[4], ry+Cm(0.2), tw_num, Cm(0.6),
                  size=9.5, bold=abs(dev)>3, color=cor_sit, align=PP_ALIGN.CENTER)
 
+    # Parágrafo narrativo após a tabela
+    n_total  = len(cats_visiveis)
+    n_ok     = sum(1 for c in cats_visiveis if abs(comp.get(c,0) - modelo.get(c,0)) <= 3)
+    n_acima  = sum(1 for c in cats_visiveis if comp.get(c,0) - modelo.get(c,0) > 3)
+    n_abaixo = sum(1 for c in cats_visiveis if comp.get(c,0) - modelo.get(c,0) < -3)
+    maiores_dev = sorted(
+        [(c, abs(comp.get(c,0) - modelo.get(c,0))) for c in cats_visiveis if abs(comp.get(c,0) - modelo.get(c,0)) > 3],
+        key=lambda x: x[1], reverse=True
+    )
+    maiores_txt = ", ".join(f"{CLS_LABEL.get(c,c)} ({v:+.1f}%p)" for c,v in maiores_dev[:3]) if maiores_dev else "nenhuma"
+    narr_vs = (
+        f"De {n_total} classes analisadas, {n_ok} estão dentro do modelo, "
+        f"{n_acima} {'está acima' if n_acima==1 else 'estão acima'} e "
+        f"{n_abaixo} {'está abaixo' if n_abaixo==1 else 'estão abaixo'}. "
+        f"As classes com maior desvio são: {maiores_txt}."
+    )
+    table_bottom = top_y + Cm(0.65) + len(cats_visiveis) * row_h + Cm(0.2)
+    add_caixa_texto(sl, narr_vs, table_bottom, cor_borda=C_AMBER if (n_acima+n_abaixo) > 0 else C_GREEN, cor_bg=C_CARD2)
+
 # ── SLIDE 8: DESVIOS — O QUE AJUSTAR ─────────────────────────────────────────
 def s_desvios(prs, d):
     sl = new_slide(prs); bg(sl)
@@ -612,6 +719,40 @@ def s_rv(prs, d):
 
     render_tbl(cx1, "AÇÕES", acoes, C_GREEN)
     render_tbl(cx2, "FUNDOS IMOBILIÁRIOS (FIIs)", fiis, C_BLUE)
+
+    # Parágrafo narrativo — sempre presente
+    perfil  = str(d.get("perfil","")).lower()
+    modelo  = d.get("modelo_hp", {})
+    comp    = d.get("composicao", {})
+    meta_rv   = modelo.get("acoes", 0)
+    meta_fiis = modelo.get("fiis", 0)
+    total_rv   = comp.get("acoes", 0)
+    total_fiis = comp.get("fiis", 0)
+    partes_rv = []
+    if acoes:
+        partes_rv.append(
+            f"A carteira possui exposição em {len(acoes)} {'ação' if len(acoes)==1 else 'ações'}, "
+            f"com alocação total de {total_rv:.1f}% em Renda Variável."
+        )
+    else:
+        partes_rv.append(
+            f"O cliente não possui exposição a Renda Variável no momento. "
+            f"O modelo {perfil.capitalize()} prevê {meta_rv:.1f}% em ações — oportunidade de alocação gradual."
+        )
+    if fiis:
+        partes_rv.append(
+            f"Fundos Imobiliários representam {total_fiis:.1f}% da carteira, "
+            f"com {len(fiis)} {'fundo' if len(fiis)==1 else 'fundos'} na posição."
+        )
+    else:
+        partes_rv.append(
+            f"Sem FIIs na carteira. O modelo prevê {meta_fiis:.1f}% — "
+            f"oportunidade de diversificação com geração de renda."
+        )
+    narr_rv = " ".join(partes_rv)
+    add_caixa_texto(sl, narr_rv, SH - Cm(2.7),
+                    cor_borda=C_GREEN if (acoes or fiis) else C_AMBER,
+                    cor_bg=C_CARD2)
 
 # ── SLIDE 10: MODELO DE SERVIR ────────────────────────────────────────────────
 def s_modelo_servir(prs, d):
@@ -776,6 +917,24 @@ def s_cross_sell(prs, d):
         add_text(sl, status, cx+Cm(0.3), top_y+card_h-Cm(1.0), col_w-Cm(0.6), Cm(0.65),
                  size=9, bold=ativo, color=cor, align=PP_ALIGN.CENTER)
 
+    # Parágrafo de oportunidade
+    cross_n   = sum(1 for nome_a, _, _ in AREAS if nome_a in cross_ativos)
+    n_inativos = len(AREAS) - cross_n
+    if cross_n >= 4:
+        narr_cross = (
+            f"Cliente bem engajado nos produtos Braúna ({cross_n}/5 ativos). "
+            f"Foco em manutenção, satisfação e aprofundamento dos serviços já contratados."
+        )
+    else:
+        narr_cross = (
+            f"{n_inativos} de 5 produtos ainda sem ativação — potencial de aprofundamento do "
+            f"relacionamento e geração de receita recorrente. "
+            f"Produtos ativos: {cross_n}/5."
+        )
+    add_caixa_texto(sl, narr_cross, top_y + card_h + Cm(0.3),
+                    cor_borda=C_GREEN if cross_n >= 4 else C_AMBER,
+                    cor_bg=C_CARD2)
+
 # ── SLIDE 13: RESUMO EXECUTIVO ────────────────────────────────────────────────
 def s_resumo(prs, d):
     sl = new_slide(prs); bg(sl)
@@ -863,28 +1022,53 @@ def s_proximos(prs, d):
     footer(sl, d.get("nome_cliente",""), d.get("data_ref",""))
 
     passos_default = [
-        "Assinar a proposta de realocação apresentada hoje",
-        "Agendar revisão de carteira em 60 dias",
-        "Verificar documentação para Open Investments (OPIN)",
-        "Enviar simulação de IR para ativos a serem resgatados",
-        "Confirmar interesse nos produtos de Cross Sell apresentados",
+        ("Assinar a proposta de realocação apresentada hoje",
+         "Assessor encaminha modelo por e-mail · Prazo: 5 dias úteis"),
+        ("Agendar revisão de carteira em 60 dias",
+         "Assessor agenda contato de acompanhamento · Prazo: 60 dias"),
+        ("Verificar documentação para Open Investments (OPIN)",
+         "Cliente acessa app e autoriza conexão · Prazo: 7 dias"),
+        ("Enviar simulação de IR para ativos a serem resgatados",
+         "Assessor prepara planilha de ganho de capital · Prazo: 3 dias"),
+        ("Confirmar interesse nos produtos de Cross Sell apresentados",
+         "Cliente retorna confirmação ao assessor · Prazo: 10 dias"),
     ]
     passos_ia = d.get("ia_proximos_passos","")
-    passos = ([l.strip("•- ") for l in passos_ia.split("\n") if l.strip()]
-              if passos_ia else passos_default)
+    if passos_ia:
+        linhas = [l.strip("•- ") for l in passos_ia.split("\n") if l.strip()]
+        passos = [(l, "Assessor responsável · Prazo: conforme acordado") for l in linhas]
+    else:
+        passos = passos_default
 
-    row_h = Cm(1.85)
-    for i, p in enumerate(passos[:5]):
-        ry = Cm(3.2) + i * (row_h + Cm(0.15))
+    row_h = Cm(2.0)
+    for i, (p, sub) in enumerate(passos[:5]):
+        ry = Cm(3.1) + i * (row_h + Cm(0.1))
         add_rect(sl, MARGIN, ry, SW-Cm(1.4), row_h, C_CARD, C_CARD2, 0.3)
         add_rect(sl, MARGIN, ry, Cm(1.5), row_h, C_GOLD)
-        add_text(sl, f"0{i+1}", MARGIN, ry+Cm(0.45), Cm(1.5), Cm(0.9),
+        add_text(sl, f"0{i+1}", MARGIN, ry+Cm(0.5), Cm(1.5), Cm(0.9),
                  size=15, bold=True, color=C_BG, align=PP_ALIGN.CENTER)
-        add_text(sl, p, MARGIN+Cm(1.8), ry+Cm(0.55), SW-Cm(3.5), Cm(0.8), size=12, color=C_WHITE)
+        add_text(sl, p, MARGIN+Cm(1.8), ry+Cm(0.28), SW-Cm(3.5), Cm(0.85), size=12, bold=True, color=C_WHITE)
+        add_text(sl, sub, MARGIN+Cm(1.8), ry+Cm(1.18), SW-Cm(3.5), Cm(0.6), size=9, color=C_LGRAY, italic=True)
 
-    add_rect(sl, MARGIN, SH-Cm(1.9), Cm(9), Cm(0.04), C_GRAY)
-    add_text(sl, d.get("assessor","Assessor Braúna"), MARGIN, SH-Cm(1.8), Cm(9), Cm(0.6), size=10, color=C_LGRAY)
-    add_text(sl, "Assessor de Investimentos — Braúna Investimentos", MARGIN, SH-Cm(1.2), Cm(11), Cm(0.5), size=8, color=C_GRAY)
+    # Próxima revisão sugerida
+    import datetime
+    try:
+        dr = d.get("data_ref","")
+        partes_d = dr.split("/")
+        if len(partes_d) == 3:
+            base_dt = datetime.date(int(partes_d[2]), int(partes_d[1]), int(partes_d[0]))
+        else:
+            base_dt = datetime.date.today()
+        proxima = base_dt + datetime.timedelta(days=60)
+        proxima_str = proxima.strftime("%d/%m/%Y")
+    except Exception:
+        proxima_str = "em 60 dias"
+
+    add_rect(sl, MARGIN, SH-Cm(1.55), SW-Cm(1.4), Cm(0.04), C_GRAY)
+    add_text(sl, f"Próxima revisão sugerida em 60 dias — {proxima_str}",
+             MARGIN, SH-Cm(1.45), SW-Cm(1.4), Cm(0.5), size=9, bold=True, color=C_GOLD)
+    add_text(sl, d.get("assessor","Assessor Braúna"), MARGIN, SH-Cm(0.95), Cm(9), Cm(0.5), size=9, color=C_LGRAY)
+    add_text(sl, "Assessor de Investimentos — Braúna Investimentos", MARGIN, SH-Cm(0.52), Cm(12), Cm(0.42), size=8, color=C_GRAY)
 
 # ── SLIDE 15: ENCERRAMENTO ────────────────────────────────────────────────────
 def s_encerramento(prs, d):
@@ -893,14 +1077,44 @@ def s_encerramento(prs, d):
     add_rect(sl, 0, 0, Cm(1.3), SH, C_CARD)
     add_rect(sl, 0, SH/2 - Cm(0.04), SW, Cm(0.08), C_GOLD)
 
-    add_text(sl, "OBRIGADO", Cm(1.7), SH/2 - Cm(4), SW-Cm(2), Cm(3),
-             size=40, bold=True, color=C_WHITE, align=PP_ALIGN.CENTER)
-    add_text(sl, d.get("assessor","Assessor Braúna"), Cm(1.7), SH/2 + Cm(0.5), SW-Cm(2), Cm(1.2),
-             size=16, color=C_GOLD, align=PP_ALIGN.CENTER)
-    add_text(sl, "Assessor de Investimentos — Braúna Investimentos", Cm(1.7), SH/2 + Cm(1.8),
-             SW-Cm(2), Cm(0.8), size=10, color=C_LGRAY, align=PP_ALIGN.CENTER)
+    add_text(sl, "OBRIGADO", Cm(1.7), SH/2 - Cm(4.5), SW-Cm(2), Cm(3),
+             size=44, bold=True, color=C_WHITE, align=PP_ALIGN.CENTER)
+
+    # Texto de encerramento
+    add_text(sl, "Estamos comprometidos com a realização dos seus objetivos financeiros.",
+             Cm(1.7), SH/2 - Cm(1.3), SW-Cm(2), Cm(0.8),
+             size=12, color=C_LGRAY, align=PP_ALIGN.CENTER)
+    add_text(sl, "Nosso time está à disposição.",
+             Cm(1.7), SH/2 - Cm(0.5), SW-Cm(2), Cm(0.65),
+             size=11, color=C_LGRAY, align=PP_ALIGN.CENTER)
+
+    # Nome e email do assessor em destaque
+    assessor = d.get("assessor","Assessor Braúna")
+    email_assessor = d.get("email_assessor", d.get("assessor_email", "contato@braunainvestimentos.com.br"))
+    add_text(sl, assessor, Cm(1.7), SH/2 + Cm(0.5), SW-Cm(2), Cm(0.95),
+             size=18, bold=True, color=C_GOLD, align=PP_ALIGN.CENTER)
+    add_text(sl, email_assessor, Cm(1.7), SH/2 + Cm(1.5), SW-Cm(2), Cm(0.65),
+             size=11, color=C_LGRAY, align=PP_ALIGN.CENTER)
+    add_text(sl, "Assessor de Investimentos — Braúna Investimentos", Cm(1.7), SH/2 + Cm(2.2),
+             SW-Cm(2), Cm(0.6), size=9.5, color=C_GRAY, align=PP_ALIGN.CENTER)
+
+    # 3 cards pequenos no rodapé
+    cards_enc = [
+        ("Contato direto",             "Fale com seu assessor a qualquer momento"),
+        ("Proxima reuniao em 60 dias", "Revisao periodica da carteira agendada"),
+        ("Relatorio mensal XPerformance", "Acompanhe sua carteira pelo portal"),
+    ]
+    cw_enc = (SW - Cm(2.8)) / 3 - Cm(0.2)
+    for i, (titulo_enc, desc_enc) in enumerate(cards_enc):
+        cx_enc = Cm(1.7) + i * (cw_enc + Cm(0.2))
+        add_rect(sl, cx_enc, SH - Cm(3.0), cw_enc, Cm(1.8), C_CARD2, C_GRAY, 0.3)
+        add_text(sl, titulo_enc, cx_enc + Cm(0.3), SH - Cm(2.85), cw_enc - Cm(0.6), Cm(0.7),
+                 size=9.5, bold=True, color=C_GOLD, wrap=True)
+        add_text(sl, desc_enc, cx_enc + Cm(0.3), SH - Cm(2.15), cw_enc - Cm(0.6), Cm(0.75),
+                 size=8.5, color=C_LGRAY, wrap=True)
+
     add_text(sl, "Documento confidencial · Não constitui recomendação formal de investimento",
-             Cm(1.7), SH - Cm(1.0), SW-Cm(2), Cm(0.6), size=7.5, color=C_GRAY, align=PP_ALIGN.CENTER)
+             Cm(1.7), SH - Cm(0.75), SW-Cm(2), Cm(0.55), size=7.5, color=C_GRAY, align=PP_ALIGN.CENTER)
 
 # ── GERADOR PRINCIPAL ─────────────────────────────────────────────────────────
 def gerar_apresentacao_pptx(d: dict) -> bytes:
