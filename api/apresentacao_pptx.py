@@ -93,6 +93,16 @@ def fmt(v):
 
 def pct_cor(v): return C_GREEN if v >= 0 else C_RED
 
+def add_caixa_texto(slide, texto, y, cor_borda=None, cor_bg=None, tamanho=9.5):
+    """Bloco de texto narrativo com fundo semitransparente."""
+    bg_c = cor_bg or C_CARD
+    bord = cor_borda or C_GRAY
+    add_rect(slide, MARGIN, y, SW - Cm(1.4), Cm(0.06), bord)
+    box_h = Cm(1.8)
+    add_rect(slide, MARGIN, y + Cm(0.06), SW - Cm(1.4), box_h, bg_c, bord, 0.3)
+    add_text(slide, texto, MARGIN + Cm(0.4), y + Cm(0.25), SW - Cm(2.2), box_h - Cm(0.3),
+             size=tamanho, color=C_WHITE, wrap=True)
+
 def new_slide(prs): return prs.slides.add_slide(prs.slide_layouts[6])
 
 # ── SLIDE 1: CAPA ─────────────────────────────────────────────────────────────
@@ -285,6 +295,23 @@ def s_patrimonio(prs, d):
         add_text(sl, lbl, sx+Cm(0.3), Cm(10.3), sw2-Cm(0.6), Cm(0.5), size=8, color=C_LGRAY)
         add_text(sl, val, sx+Cm(0.3), Cm(10.85), sw2-Cm(0.6), Cm(0.7), size=14, bold=True, color=cor)
 
+    # Narrativa de desempenho
+    nome = d.get("nome_cliente", "O cliente")
+    r_mes = pr.get("mes", 0); r_ano = pr.get("ano", 0); r_12 = pr.get("12m", 0)
+    c_12  = cr.get("12m", 1) or 1
+    pct_12 = round(r_12 / c_12 * 100, 0)
+    perf_txt = "acima" if pct_12 >= 100 else "abaixo"
+    q_cdi = "expressivamente acima" if pct_12 >= 110 else ("acima" if pct_12 >= 90 else ("próximo" if pct_12 >= 75 else "abaixo"))
+    narrativa = (
+        f"{nome} encerrou o período com patrimônio de {fmt(pat)}, registrando rentabilidade de "
+        f"{r_mes:.2f}% no mês e {r_ano:.2f}% no ano. Em 12 meses, o portfólio rendeu {r_12:.2f}% — "
+        f"equivalente a {pct_12:.0f}% do CDI, desempenho {q_cdi} do referencial. "
+        f"{'O resultado demonstra boa aderência à estratégia definida.' if pct_12 >= 80 else 'Este resultado merece atenção e revisão da estratégia de alocação.'}"
+    ) if pat else "Sem dados de rentabilidade disponíveis para este período."
+    add_caixa_texto(sl, narrativa, Cm(12.1),
+                    cor_borda=C_GREEN if pct_12 >= 80 else C_AMBER,
+                    cor_bg=C_CARD2)
+
 # ── SLIDE 6: COMPOSIÇÃO DA CARTEIRA ──────────────────────────────────────────
 def s_composicao(prs, d):
     sl = new_slide(prs); bg(sl)
@@ -324,6 +351,21 @@ def s_composicao(prs, d):
         # Barra
         add_rect(sl, bar_x, ry+Cm(0.25), bar_w * (v/max_v), Cm(0.42), cor)
         add_text(sl, f"{v:.1f}%", bar_x + bar_w*(v/max_v) + Cm(0.15), ry+Cm(0.22), Cm(1.5), Cm(0.5), size=8, color=C_LGRAY)
+
+    # Narrativa de composição
+    if cats_com_valor:
+        principal_cat, principal_v = cats_com_valor[0]
+        principal_nome = CLS_LABEL.get(principal_cat, principal_cat)
+        n_classes = len(cats_com_valor)
+        diversificacao = "bem diversificada" if n_classes >= 5 else ("moderadamente diversificada" if n_classes >= 3 else "concentrada")
+        narrativa_comp = (
+            f"A carteira está {diversificacao}, distribuída em {n_classes} classes de ativos. "
+            f"A maior exposição é em {principal_nome} ({principal_v:.1f}%"
+            f"{f', equivalente a {fmt(pat * principal_v / 100)}' if pat else ''}"
+            f"). {'A diversificação entre classes reduz o risco idiossincrático e amplia as fontes de retorno.' if n_classes >= 4 else 'Recomenda-se avaliar oportunidades de diversificação em outras classes de ativos.'}"
+        )
+        add_caixa_texto(sl, narrativa_comp, top_y + Cm(0.65) + len(cats_com_valor) * row_h + Cm(0.2),
+                        cor_borda=C_GOLD, cor_bg=C_CARD2)
 
 # ── SLIDE 7: CARTEIRA vs MODELO ───────────────────────────────────────────────
 def s_vs_modelo(prs, d):
@@ -407,8 +449,23 @@ def s_desvios(prs, d):
                      col_w-Cm(2.8), Cm(0.65), size=11, bold=True, color=C_WHITE)
             add_text(sl, f"{desp:.1f}%", col+col_w-Cm(1.6), ry+Cm(0.12),
                      Cm(1.4), Cm(0.65), size=11, bold=True, color=cor, align=PP_ALIGN.RIGHT)
-            add_text(sl, f"Atual {atual:.1f}%  →  Modelo {mod:.1f}%  ·  {fmt(val)}",
+            add_text(sl, f"Atual {atual:.1f}%  →  Modelo {mod:.1f}%  ·  {fmt(val) if val else '—'}",
                      col+Cm(0.4), ry+Cm(0.85), col_w-Cm(0.6), Cm(0.5), size=8.5, color=C_LGRAY)
+
+    # Narrativa de desvios
+    n_exc = len(exc); n_def = len(def_)
+    if exc or def_:
+        maior_exc = f"{CLS_LABEL.get(exc[0].get('classe',''), '')} (+{abs(exc[0].get('desvio_pp', exc[0].get('desvio',0))):.1f}%)" if exc else None
+        maior_def = f"{CLS_LABEL.get(def_[0].get('classe',''), '')} (-{abs(def_[0].get('desvio_pp', def_[0].get('desvio',0))):.1f}%)" if def_ else None
+        partes = []
+        if maior_exc: partes.append(f"A classe com maior excesso é {maior_exc}, que deve ser parcialmente resgatada")
+        if maior_def: partes.append(f"{'e a' if partes else 'A'} maior sub-alocação está em {maior_def}, recomendando-se aporte adicional")
+        narrativa_dev = ". ".join(partes) + (
+            f". No total, {n_exc + n_def} {'ajuste é necessário' if n_exc+n_def==1 else 'ajustes são necessários'} para realinhar a carteira ao perfil do investidor."
+            if partes else ""
+        )
+        add_caixa_texto(sl, narrativa_dev, SH - Cm(2.7),
+                        cor_borda=C_AMBER, cor_bg=C_CARD2)
 
 # ── SLIDE 9: AÇÕES & FIIs ─────────────────────────────────────────────────────
 def s_rv(prs, d):
@@ -496,6 +553,32 @@ def s_modelo_servir(prs, d):
         status_txt = "✓ Concluído" if feito else "Pendente"
         add_text(sl, status_txt, cx+Cm(0.3), ry+Cm(1.7), col_w-Cm(0.6), Cm(0.5),
                  size=9, bold=feito, color=C_GREEN if feito else C_RED)
+
+    # Narrativa do modelo de servir
+    pendentes = [nome for pid, nome, imp, icone in PILARES if not checklist.get(pid)]
+    criticos  = [nome for pid, nome, imp, icone in PILARES if not checklist.get(pid) and imp == "CRÍTICA"]
+    if score == 6:
+        narrativa_ms = (
+            f"Excelente! Todos os 6 pilares do Modelo de Servir estão concluídos. "
+            f"O cliente está com engajamento máximo — menor risco de ruptura e maior potencial de cross sell. "
+            f"Foco agora em manter a regularidade e aprofundar o relacionamento."
+        )
+        cor_ms = C_GREEN
+    elif criticos:
+        narrativa_ms = (
+            f"{score}/6 pilares concluídos. Ainda pendentes: {', '.join(pendentes)}. "
+            f"ATENÇÃO: {' e '.join(criticos)} {'é pilar crítico' if len(criticos)==1 else 'são pilares críticos'} — "
+            f"sem {'ele' if len(criticos)==1 else 'eles'}, o assessor tem visão incompleta do patrimônio e dos objetivos do cliente. "
+            f"Prioridade máxima na próxima interação."
+        )
+        cor_ms = C_RED
+    else:
+        narrativa_ms = (
+            f"{score}/6 pilares concluídos. Itens pendentes: {', '.join(pendentes)}. "
+            f"Completar esses pilares fortalece o vínculo com o cliente e reduz o risco de portabilidade."
+        )
+        cor_ms = C_AMBER
+    add_caixa_texto(sl, narrativa_ms, SH - Cm(2.7), cor_borda=cor_ms, cor_bg=C_CARD2)
 
 # ── SLIDE 11: SUGESTÕES ───────────────────────────────────────────────────────
 def s_sugestoes(prs, d):
@@ -640,6 +723,30 @@ def s_resumo(prs, d):
         add_text(sl, lbl_txt, bx2+Cm(0.55), ly, Cm(4.0), Cm(0.45), size=8, color=C_LGRAY)
         bx2 += Cm(4.3)
         if bx2 > SW - Cm(5): bx2 = MARGIN; ly += Cm(0.6)
+
+    # Narrativa do resumo executivo
+    nome_cli = d.get("nome_cliente", "O cliente")
+    perfil   = d.get("perfil", "")
+    pontos_positivos = []
+    pontos_atencao   = []
+    if pct_cdi >= 90: pontos_positivos.append(f"rentabilidade saudável ({pct_cdi:.0f}% do CDI em 12M)")
+    else:             pontos_atencao.append(f"rentabilidade abaixo do esperado ({pct_cdi:.0f}% do CDI)")
+    if score >= 5:    pontos_positivos.append(f"Modelo de Servir bem estruturado ({score}/6 pilares)")
+    elif score <= 2:  pontos_atencao.append(f"Modelo de Servir crítico ({score}/6 pilares — risco de ruptura)")
+    else:             pontos_atencao.append(f"Modelo de Servir parcial ({score}/6 pilares)")
+    if n_fora == 0:   pontos_positivos.append("carteira alinhada ao modelo")
+    elif n_fora >= 3: pontos_atencao.append(f"{n_fora} classes fora do modelo — realocação necessária")
+    if cross_n >= 3:  pontos_positivos.append(f"cross sell ativo ({cross_n}/5 produtos)")
+    else:             pontos_atencao.append(f"oportunidade de cross sell ({cross_n}/5 produtos ativos)")
+
+    partes_resumo = []
+    if pontos_positivos: partes_resumo.append("Pontos positivos: " + "; ".join(pontos_positivos))
+    if pontos_atencao:   partes_resumo.append("Atenção: " + "; ".join(pontos_atencao))
+    narrativa_resumo = f"{nome_cli} ({perfil}): " + ". ".join(partes_resumo) + "." if partes_resumo else ""
+    if narrativa_resumo:
+        add_caixa_texto(sl, narrativa_resumo, SH - Cm(2.7),
+                        cor_borda=C_GREEN if not pontos_atencao else (C_AMBER if len(pontos_atencao)<=1 else C_RED),
+                        cor_bg=C_CARD2)
 
 # ── SLIDE 14: PRÓXIMOS PASSOS ─────────────────────────────────────────────────
 def s_proximos(prs, d):
