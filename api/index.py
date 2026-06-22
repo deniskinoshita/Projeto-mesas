@@ -1004,6 +1004,21 @@ select option{background:#1A1A1A}
 .sg-header-box{background:#1A1600;border:1px solid #D6B27A;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .sg-vazio{font-size:13px;color:#5DCAA5;padding:16px;text-align:center}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+/* ── Fluxo em 2 etapas ── */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#141414;border:1px solid #222;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
+.step-item.active{background:#1A1600;border-color:#D6B27A}
+.step-item.done{background:#0A1A10;border-color:#2A4030}
+.step-circle{width:26px;height:26px;border-radius:50%;background:#222;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#555;flex-shrink:0;transition:all .3s}
+.step-item.active .step-circle{background:#D6B27A;border-color:#D6B27A;color:#0D0D0D}
+.step-item.done .step-circle{background:#5DCAA5;border-color:#5DCAA5;color:#000}
+.step-label{font-size:12px;font-weight:700;color:#444;letter-spacing:.3px;transition:all .3s}
+.step-item.active .step-label{color:#D6B27A}
+.step-item.done .step-label{color:#5DCAA5}
+.step-line{flex:1;height:1px;background:#222;min-width:20px}
+.step2-banner{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.step2-banner.first{background:#0A1A10;border:1px solid #2A4030}
+.step2-banner.return{background:#1A1600;border:1px solid #3A2A00}
 </style>
 </head>
 <body>
@@ -1020,6 +1035,19 @@ select option{background:#1A1A1A}
   </nav>
 </header>
 <div class="container">
+
+<!-- Indicador de etapas -->
+<div class="steps">
+  <div class="step-item active" id="step-item-1">
+    <div class="step-circle" id="step-c1">1</div>
+    <span class="step-label">Dados do Cliente</span>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item" id="step-item-2">
+    <div class="step-circle" id="step-c2">2</div>
+    <span class="step-label">Perfil &amp; Cross Sell</span>
+  </div>
+</div>
 
 <!-- Formulário -->
 <!-- Mensagem do Admin (se houver) -->
@@ -1090,7 +1118,20 @@ select option{background:#1A1A1A}
   </script>
 </div>
 
-<!-- Modelo de Servir — card separado, sempre visível -->
+<!-- ETAPA 2 — aparece após identificar o cliente pelo XPerformance -->
+<div id="step2-wrapper" style="display:none">
+
+<!-- Banner de status do cliente -->
+<div id="step2-banner" class="step2-banner first">
+  <div id="step2-icon" style="font-size:28px">👤</div>
+  <div style="flex:1">
+    <p id="step2-titulo" style="font-size:14px;font-weight:700;color:#F0F0F0;margin-bottom:2px"></p>
+    <p id="step2-sub" style="font-size:11px;color:#888"></p>
+  </div>
+  <div id="step2-badges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+</div>
+
+<!-- Modelo de Servir — visível apenas na etapa 2 -->
 <div class="card" id="card-servir">
   <h2>Modelo de Servir Braúna</h2>
 
@@ -1124,6 +1165,8 @@ select option{background:#1A1A1A}
   <div id="cross-sell-form" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
   <button class="btn" id="btn-ana" onclick="analisar()">Analisar carteira</button>
 </div>
+
+</div><!-- /step2-wrapper -->
 
 <div class="spinner" id="spinner"><div class="loader"></div><p>Analisando carteira e consultando contexto de mercado...</p></div>
 
@@ -1589,8 +1632,9 @@ setupDrop("drop1","pdf-xp","fname-xp");
 let _clienteIdentificado = null;
 
 async function identificarCliente(file){
-  const box = document.getElementById("box-cliente-identificado");
-  if(box) box.innerHTML = '<div style="font-size:12px;color:#555;padding:8px">Identificando cliente...</div>';
+  // Mostra loading no upload
+  const fname = document.getElementById("fname-xp");
+  if(fname) fname.textContent = "Identificando cliente...";
 
   const fd = new FormData();
   fd.append("pdf", file);
@@ -1599,12 +1643,12 @@ async function identificarCliente(file){
     const d = await r.json();
     _clienteIdentificado = d;
 
-    // Preenche campos do formulário automaticamente
-    if(d.ficha_salva?.nome) document.getElementById("nome").value = d.ficha_salva.nome;
+    // ── Preenche campos com dados salvos
+    if(d.ficha_salva?.nome)    document.getElementById("nome").value = d.ficha_salva.nome;
     if(d.ficha_salva?.perfil){ document.getElementById("perfil").value = d.ficha_salva.perfil; atualizarModelo(); }
     if(d.ficha_salva?.objetivo) document.getElementById("objetivo").value = d.ficha_salva.objetivo || "";
 
-    // Restaura checklist do modelo de servir salvo
+    // ── Restaura checklist do modelo de servir
     if(d.ficha_salva?.checklist){
       Object.assign(checklist, d.ficha_salva.checklist);
       PILARES.forEach(p=>{
@@ -1622,19 +1666,73 @@ async function identificarCliente(file){
       atualizarGraficoServir();
     }
 
-    // Restaura cross-sell salvo
+    // ── Restaura cross-sell salvo
     if(d.ficha_salva?.cross_ativos?.length){
       CROSS_AREAS.forEach(a=>{ crossSell[a.id]=false; });
       d.ficha_salva.cross_ativos.forEach(id=>{ crossSell[id]=true; });
       renderCrossForm();
     }
 
-    // Renderiza painel de histórico
-    renderPainelCliente(d);
+    // ── Transição para Etapa 2
+    ativarEtapa2(d);
+
   }catch(e){
-    if(box) box.innerHTML = "";
     console.error("Identificação falhou:", e);
   }
+}
+
+function ativarEtapa2(d){
+  // Atualiza indicadores de etapa
+  const i1 = document.getElementById("step-item-1");
+  const i2 = document.getElementById("step-item-2");
+  const c1 = document.getElementById("step-c1");
+  if(i1){ i1.classList.remove("active"); i1.classList.add("done"); }
+  if(c1) c1.textContent = "✓";
+  if(i2){ i2.classList.add("active"); }
+
+  // Monta banner de status
+  const temFicha   = d.ficha_salva && Object.keys(d.ficha_salva).length > 0;
+  const temHist    = d.tem_historico && d.ultima_carteira;
+  const primAccess = !temFicha && !temHist;
+  const nomeCliente = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
+
+  const banner  = document.getElementById("step2-banner");
+  const iconEl  = document.getElementById("step2-icon");
+  const tituloEl= document.getElementById("step2-titulo");
+  const subEl   = document.getElementById("step2-sub");
+  const badgesEl= document.getElementById("step2-badges");
+
+  if(primAccess){
+    if(banner){ banner.className="step2-banner first"; }
+    if(iconEl) iconEl.textContent = "🆕";
+    if(tituloEl) tituloEl.textContent = nomeCliente + " — Primeiro acesso";
+    if(subEl) subEl.textContent = "Conta " + d.conta + " · Preencha o Modelo de Servir e o Cross Sell abaixo";
+    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#1A1600;color:#D6B27A;border:1px solid #D6B27A;border-radius:20px;font-weight:700">Novo cliente</span>';
+  } else {
+    if(banner){ banner.className="step2-banner return"; }
+    if(iconEl) iconEl.textContent = "🔄";
+    if(tituloEl) tituloEl.textContent = nomeCliente + " — Retorno";
+    const ult = d.ultima_carteira;
+    const ultData = ult?.data_ref || ult?.salvo_em || "—";
+    const pat = (d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+    if(subEl) subEl.textContent = "Conta " + d.conta + " · Ref. " + d.data_ref + " · Patrimônio R$ " + pat;
+    const chk = d.ficha_salva?.checklist || {};
+    const nFeitos = PILARES.filter(p=>chk[p.id]).length;
+    const scoreCor = nFeitos >= 5 ? "#5DCAA5" : nFeitos >= 3 ? "#FFD966" : "#FF6B6B";
+    if(badgesEl) badgesEl.innerHTML =
+      `<span style="font-size:11px;padding:4px 12px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:20px;font-weight:700">Última reunião: ${ultData}</span>` +
+      `<span style="font-size:11px;padding:4px 12px;background:#0D0D0D;color:${scoreCor};border:1px solid #2A2A2A;border-radius:20px;font-weight:700">${nFeitos}/${PILARES.length} pilares</span>`;
+  }
+
+  // Exibe a etapa 2
+  const wrapper = document.getElementById("step2-wrapper");
+  if(wrapper){
+    wrapper.style.display = "block";
+    setTimeout(()=> wrapper.scrollIntoView({behavior:"smooth", block:"start"}), 100);
+  }
+
+  // Renderiza painel de histórico no box abaixo do upload
+  renderPainelCliente(d);
 }
 
 function renderPainelCliente(d){
