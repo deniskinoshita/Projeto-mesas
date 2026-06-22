@@ -6134,7 +6134,93 @@ textarea{resize:vertical}
   </div>
 </div>
 
-<!-- ══ 2. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
+<!-- ══ 2. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
+<div class="card" style="border-color:#2A2A18">
+  <div class="card-title"><span>📚</span> Base de Conhecimento — Central de Materiais HP</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
+    Suba cartas de gestoras, relatórios e notas de research. Cada documento fica salvo na base e pode ser aplicado com um clique ao <b style="color:#D4B483">Cenário Macro</b> ou publicado para os assessores consultarem.
+  </p>
+
+  <!-- Upload zone + metadados -->
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
+    <!-- Drop zone -->
+    <div>
+      <label>PDF do material</label>
+      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+        <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
+        <div style="font-size:28px;margin-bottom:8px">📄</div>
+        <p style="font-size:12px;color:#3A6A48">Arraste ou clique — múltiplos PDFs</p>
+        <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · vários de uma vez</p>
+        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
+      </div>
+      <div style="margin-top:8px;text-align:center">
+        <span id="know-st" style="font-size:11px"></span>
+      </div>
+    </div>
+    <!-- Metadados -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label>Nome do documento</label>
+        <input type="text" id="know-nome" placeholder="ex: Carta Levante Junho 2026">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label>Tipo</label>
+          <select id="know-tipo" style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
+            <option value="carta">Carta de Gestora</option>
+            <option value="research">Nota de Research</option>
+            <option value="cenario">Cenário Macro</option>
+            <option value="relatorio">Relatório Mensal</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div>
+          <label>Fonte / Gestora</label>
+          <input type="text" id="know-fonte" placeholder="ex: Levante Asset">
+        </div>
+      </div>
+      <div>
+        <label style="margin-bottom:6px">Classes relacionadas</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="know-classes-btns">
+          <button type="button" class="know-cls-btn" data-cls="pos_fixado">Pós Fixado</button>
+          <button type="button" class="know-cls-btn" data-cls="inflacao">Inflação</button>
+          <button type="button" class="know-cls-btn" data-cls="pre_fixado">Pré Fixado</button>
+          <button type="button" class="know-cls-btn" data-cls="acoes">Ações</button>
+          <button type="button" class="know-cls-btn" data-cls="fiis">FIIs</button>
+          <button type="button" class="know-cls-btn" data-cls="multimercado">Multimercado</button>
+          <button type="button" class="know-cls-btn" data-cls="internacional">Internacional</button>
+          <button type="button" class="know-cls-btn" data-cls="alternativos">Alternativos</button>
+          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#2A2A18;color:#D4B483;border-color:#D4B483">Geral</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <button class="btn" id="know-btn-upload" onclick="knowSalvar()" disabled>⬆️ Adicionar à Base</button>
+        <span id="know-save-st" style="font-size:12px"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de documentos -->
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
+      <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+    </div>
+    <div id="know-lista">
+      <div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda. Suba o primeiro PDF acima.</div>
+    </div>
+  </div>
+</div>
+
+<style>
+.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #2A2A18;background:#0A0A0A;color:#4A7055;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.know-cls-btn.sel{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
+.know-doc-card{background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.know-doc-card:hover{border-color:#2A2A18}
+.know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
+</style>
+
+<!-- ══ 3. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📐</span> Portfólios Modelo por Indexador</div>
   <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:14px">
@@ -6311,92 +6397,6 @@ textarea{resize:vertical}
     <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando calls...</div>
   </div>
 </div>
-
-<!-- ══ 4b. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#2A2A18">
-  <div class="card-title"><span>📚</span> Base de Conhecimento — Central de Materiais HP</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
-    Suba cartas de gestoras, relatórios e notas de research. Cada documento fica salvo na base e pode ser aplicado com um clique ao <b style="color:#D4B483">Cenário Macro</b> ou publicado para os assessores consultarem.
-  </p>
-
-  <!-- Upload zone + metadados -->
-  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
-    <!-- Drop zone -->
-    <div>
-      <label>PDF do material</label>
-      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
-        <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
-        <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <p style="font-size:12px;color:#3A6A48">Arraste ou clique — múltiplos PDFs</p>
-        <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · vários de uma vez</p>
-        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
-      </div>
-      <div style="margin-top:8px;text-align:center">
-        <span id="know-st" style="font-size:11px"></span>
-      </div>
-    </div>
-    <!-- Metadados -->
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div>
-        <label>Nome do documento</label>
-        <input type="text" id="know-nome" placeholder="ex: Carta Levante Junho 2026">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <label>Tipo</label>
-          <select id="know-tipo" style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
-            <option value="carta">Carta de Gestora</option>
-            <option value="research">Nota de Research</option>
-            <option value="cenario">Cenário Macro</option>
-            <option value="relatorio">Relatório Mensal</option>
-            <option value="outro">Outro</option>
-          </select>
-        </div>
-        <div>
-          <label>Fonte / Gestora</label>
-          <input type="text" id="know-fonte" placeholder="ex: Levante Asset">
-        </div>
-      </div>
-      <div>
-        <label style="margin-bottom:6px">Classes relacionadas</label>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="know-classes-btns">
-          <button type="button" class="know-cls-btn" data-cls="pos_fixado">Pós Fixado</button>
-          <button type="button" class="know-cls-btn" data-cls="inflacao">Inflação</button>
-          <button type="button" class="know-cls-btn" data-cls="pre_fixado">Pré Fixado</button>
-          <button type="button" class="know-cls-btn" data-cls="acoes">Ações</button>
-          <button type="button" class="know-cls-btn" data-cls="fiis">FIIs</button>
-          <button type="button" class="know-cls-btn" data-cls="multimercado">Multimercado</button>
-          <button type="button" class="know-cls-btn" data-cls="internacional">Internacional</button>
-          <button type="button" class="know-cls-btn" data-cls="alternativos">Alternativos</button>
-          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#2A2A18;color:#D4B483;border-color:#D4B483">Geral</button>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
-        <button class="btn" id="know-btn-upload" onclick="knowSalvar()" disabled>⬆️ Adicionar à Base</button>
-        <span id="know-save-st" style="font-size:12px"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Lista de documentos -->
-  <div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
-      <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
-    </div>
-    <div id="know-lista">
-      <div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda. Suba o primeiro PDF acima.</div>
-    </div>
-  </div>
-</div>
-
-<style>
-.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #2A2A18;background:#0A0A0A;color:#4A7055;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
-.know-cls-btn.sel{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
-.know-doc-card{background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
-.know-doc-card:hover{border-color:#2A2A18}
-.know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
-</style>
 
 <!-- ══ 5. MONITORAMENTO DE PRODUTOS ══════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A1A30">
