@@ -2127,19 +2127,18 @@ async function analisar(){
       }).catch(()=>{});
     }
 
-    // Salva ficha atualizada (modelo de servir + cross-sell + código da conta)
-    if(_clienteIdentificado?.conta){
-      fetch("/api/ficha", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          conta: _clienteIdentificado.conta,
-          nome, perfil, objetivo, assessor,
-          checklist,
-          cross_ativos: Object.keys(crossSell).filter(k=>crossSell[k]),
-        })
-      }).catch(()=>{});
-    }
+    // Salva ficha atualizada (modelo de servir + cross-sell)
+    // Salva sempre — usa conta se disponível, senão salva por nome+assessor
+    fetch("/api/ficha", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        conta: _clienteIdentificado?.conta || "",
+        nome, perfil, objetivo, assessor,
+        checklist,
+        cross_ativos: Object.keys(crossSell).filter(k=>crossSell[k]),
+      })
+    }).catch(()=>{});
   }catch(e){ alert("Erro: "+e.message); }
   finally{
     document.getElementById("spinner").classList.remove("show");
@@ -2836,17 +2835,29 @@ def ficha_endpoint():
         d = request.get_json()
         # Chave primária: código da conta (preferencial) ou assessor|nome
         conta = d.get("conta","").strip()
-        key = f"conta:{conta}" if conta else f"{d.get('assessor','')}|{d.get('nome','')}".lower().strip()
+        key_nome = f"{d.get('assessor','')}|{d.get('nome','')}".lower().strip()
+        key = f"conta:{conta}" if conta else key_nome
+
+        # Mescla com ficha existente por nome (evita perder dados se salvou antes sem conta)
+        ficha_anterior = fichas.get(key) or fichas.get(key_nome) or {}
+        cross_novo = d.get("cross_ativos", [])
+        cross_final = cross_novo if cross_novo else ficha_anterior.get("cross_ativos", [])
+        checklist_novo = d.get("checklist", {})
+        checklist_final = {**ficha_anterior.get("checklist", {}), **checklist_novo} if checklist_novo else ficha_anterior.get("checklist", {})
+
         fichas[key] = {
             "conta": conta,
             "nome": d.get("nome",""),
             "assessor": d.get("assessor",""),
             "perfil": d.get("perfil","conservadora"),
             "objetivo": d.get("objetivo",""),
-            "checklist": d.get("checklist",{}),
-            "cross_ativos": d.get("cross_ativos",[]),
+            "checklist": checklist_final,
+            "cross_ativos": cross_final,
             "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
         }
+        # Remove a ficha por nome se agora temos a chave por conta
+        if conta and key_nome in fichas and key_nome != key:
+            del fichas[key_nome]
         save_fichas(fichas)
         return jsonify({"ok":True})
     # GET: retorna fichas de um assessor OU de uma conta específica
