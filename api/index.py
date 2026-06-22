@@ -6074,47 +6074,27 @@ textarea{resize:vertical}
 <div class="card" style="border-color:#3A3A20">
   <div class="card-title"><span>⚡</span> Upload Rápido de PDF</div>
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
-    Suba qualquer PDF — carta de gestora, relatório de casa de análise, nota de research. O sistema extrai o conteúdo e você escolhe onde usar.
+    Selecione até <b style="color:#D4B483">5 PDFs de uma vez</b> — cartas de gestora, research, relatórios. O sistema extrai o conteúdo de cada um e você escolhe onde usar.
   </p>
 
   <!-- Drop zone -->
   <div id="drop-rapido" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s;margin-bottom:12px" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
-    <input type="file" id="pdf-rapido" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
-    <div style="font-size:32px;margin-bottom:8px">📄</div>
-    <p style="font-size:13px;color:#3A6A48">Arraste o PDF ou clique para selecionar</p>
-    <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · carta de gestora, research, relatório</p>
+    <input type="file" id="pdf-rapido" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadRapidoSelecionar(this)">
+    <div style="font-size:32px;margin-bottom:8px">📂</div>
+    <p style="font-size:13px;color:#3A6A48">Arraste PDFs ou clique para selecionar</p>
+    <p style="font-size:10px;color:#1E4A30;margin-top:4px">até 5 arquivos · .pdf · cartas, research, relatórios</p>
   </div>
 
-  <!-- Arquivo selecionado + botão extrair -->
-  <div id="pdf-rapido-selecionado" style="display:none;background:#0A140A;border:1px solid #2A3A20;border-radius:10px;padding:14px;margin-bottom:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:22px">📎</span>
-        <div>
-          <div id="pdf-rapido-nome" style="font-size:13px;color:#D4B483;font-weight:700"></div>
-          <div id="pdf-rapido-st" style="font-size:11px;color:#4A7055;margin-top:2px"></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn" id="btn-extrair-rapido" onclick="uploadRapido()">⚡ Extrair conteúdo</button>
-        <button class="btn-ghost" onclick="fecharRapido()">✕ Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Preview + ações (após extração) -->
-  <div id="pdf-rapido-box" style="display:none">
+  <!-- Lista de arquivos selecionados -->
+  <div id="pdf-rapido-lista" style="display:none;margin-bottom:12px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:11px;color:#D4B483;font-weight:700">✅ Conteúdo extraído — escolha onde usar:</span>
-      <button onclick="fecharRapido()" style="background:none;border:none;color:#3A6A48;cursor:pointer;font-size:14px">✕</button>
+      <span id="pdf-rapido-contador" style="font-size:11px;color:#D4B483;font-weight:700"></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" id="btn-extrair-todos" onclick="uploadRapidoTodos()">⚡ Extrair todos</button>
+        <button class="btn-ghost" onclick="fecharRapido()">✕ Limpar</button>
+      </div>
     </div>
-    <textarea id="pdf-rapido-texto" rows="6" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:8px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none" placeholder="Texto extraído aparece aqui..."></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      <button class="btn btn-sm" onclick="usarComoCenario()">🌐 → Cenário Macro</button>
-      <button class="btn btn-sm btn-out" onclick="usarComoBase()">📚 → Base de Conhecimento</button>
-      <button class="btn-ghost" onclick="copiarRapido()">📋 Copiar texto</button>
-      <button class="btn-ghost" onclick="fecharRapido()" style="margin-left:auto">Fechar</button>
-    </div>
+    <div id="pdf-rapido-itens"></div>
   </div>
 </div>
 
@@ -7319,52 +7299,98 @@ async function publicar(){
 }
 
 // ── Upload Rápido ─────────────────────────────────────────────────────────────
-let _arquivoRapido = null;
+let _arquivosRapido = [];
 
 function uploadRapidoSelecionar(input){
-  const f = input.files[0]; if(!f) return;
-  _arquivoRapido = f;
-  document.getElementById("pdf-rapido-nome").textContent = f.name;
-  document.getElementById("pdf-rapido-st").textContent = `${(f.size/1024).toFixed(0)} KB`;
-  document.getElementById("pdf-rapido-selecionado").style.display = "";
-  document.getElementById("pdf-rapido-box").style.display = "none";
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  const MAX = 5;
+  if(files.length > MAX){ alert(`Selecione no máximo ${MAX} arquivos por vez.`); input.value=""; return; }
+  _arquivosRapido = files.map(f => ({file: f, status: "pendente", texto: "", chars: 0}));
+  renderListaRapido();
+  document.getElementById("pdf-rapido-lista").style.display = "";
+  document.getElementById("pdf-rapido-contador").textContent =
+    `${files.length} arquivo${files.length>1?"s":""} selecionado${files.length>1?"s":""}`;
 }
 
-async function uploadRapido(){
-  const f = _arquivoRapido; if(!f) return;
-  const st = document.getElementById("pdf-rapido-st");
-  const btn = document.getElementById("btn-extrair-rapido");
-  st.textContent = "⏳ Extraindo texto...";
-  btn.disabled = true;
+function renderListaRapido(){
+  const el = document.getElementById("pdf-rapido-itens");
+  el.innerHTML = _arquivosRapido.map((item, i) => {
+    const cor = item.status==="ok" ? "#5DCAA5" : item.status==="erro" ? "#FF6B6B" : item.status==="processando" ? "#D4B483" : "#4A7055";
+    const icone = item.status==="ok" ? "✅" : item.status==="erro" ? "❌" : item.status==="processando" ? "⏳" : "📄";
+    const info = item.status==="ok" ? `${item.chars} caracteres` : item.status==="erro" ? item.erro : `${(item.file.size/1024).toFixed(0)} KB`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0A140A;border:1px solid #1A2A1A;border-radius:8px;margin-bottom:6px;gap:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <span style="font-size:18px">${icone}</span>
+        <div style="min-width:0">
+          <div style="font-size:12px;color:#D4B483;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
+          <div style="font-size:10px;color:${cor};margin-top:2px">${info}</div>
+        </div>
+      </div>
+      ${item.status==="ok" ? `<div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="rapidoUsarCenario(${i})" style="font-size:10px;padding:4px 10px">🌐 Cenário</button>
+        <button class="btn btn-sm btn-out" onclick="rapidoUsarBase(${i})" style="font-size:10px;padding:4px 10px">📚 Base</button>
+        <button class="btn-ghost" onclick="rapidoCopiar(${i})" style="font-size:10px;padding:4px 8px">📋</button>
+      </div>` : item.status==="pendente" ? `<button class="btn-ghost" onclick="uploadRapidoUm(${i})" style="font-size:10px;padding:4px 10px">⚡ Extrair</button>` : ""}
+    </div>`;
+  }).join("");
+}
+
+async function uploadRapidoUm(i){
+  const item = _arquivosRapido[i];
+  item.status = "processando";
+  renderListaRapido();
   try{
     const fd = new FormData();
-    fd.append("arquivo", f);
+    fd.append("arquivo", item.file);
     fd.append("categoria", "geral");
     const r = await fetch("/api/admin/upload-sugestao-doc", {method:"POST", body:fd});
     const d = await r.json();
     if(d.ok){
-      document.getElementById("pdf-rapido-texto").value = d.texto || "";
-      document.getElementById("pdf-rapido-box").style.display = "";
-      st.innerHTML = `<span class="status-ok">✓ ${d.chars||0} caracteres extraídos</span>`;
-      _base.push({nome: f.name, chars: d.chars||0, data: new Date().toLocaleDateString("pt-BR")});
+      item.status = "ok"; item.texto = d.texto||""; item.chars = d.chars||0;
+      _base.push({nome: item.file.name, chars: item.chars, data: new Date().toLocaleDateString("pt-BR")});
       renderBase();
-    } else {
-      st.innerHTML = `<span class="status-err">Erro: ${d.error||"falha"}</span>`;
-    }
-  } catch(e){
-    st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`;
-  }
-  btn.disabled = false;
-  document.getElementById("pdf-rapido").value = "";
+    } else { item.status="erro"; item.erro = d.error||"falha"; }
+  } catch(e){ item.status="erro"; item.erro = e.message; }
+  renderListaRapido();
 }
 
+async function uploadRapidoTodos(){
+  const btn = document.getElementById("btn-extrair-todos");
+  btn.disabled = true;
+  for(let i=0; i<_arquivosRapido.length; i++){
+    if(_arquivosRapido[i].status === "pendente") await uploadRapidoUm(i);
+  }
+  btn.disabled = false;
+}
+
+function rapidoUsarCenario(i){
+  const txt = _arquivosRapido[i].texto;
+  if(!txt){ alert("Nenhum texto extraído."); return; }
+  document.getElementById("cenario-global").value = txt.slice(0,1200);
+  document.getElementById("cenario-global").scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+function rapidoUsarBase(i){
+  const item = _arquivosRapido[i];
+  document.getElementById("know-nome").value = item.file.name.replace(".pdf","");
+  document.getElementById("know-fonte").value = "";
+  document.getElementById("cenario-global").scrollIntoView({behavior:"smooth", block:"start"});
+  document.querySelector('[data-cls="geral"]')?.click();
+  alert(`Preencha os metadados na Base de Conhecimento abaixo e clique em "Adicionar à Base".`);
+}
+
+function rapidoCopiar(i){
+  const txt = _arquivosRapido[i].texto;
+  if(txt) navigator.clipboard.writeText(txt).then(()=>alert("Texto copiado!"));
+}
+
+async function uploadRapido(){ await uploadRapidoTodos(); }
+
 function fecharRapido(){
-  _arquivoRapido = null;
-  document.getElementById("pdf-rapido-box").style.display = "none";
-  document.getElementById("pdf-rapido-selecionado").style.display = "none";
-  document.getElementById("pdf-rapido-nome").textContent = "";
-  document.getElementById("pdf-rapido-st").textContent = "";
-  document.getElementById("pdf-rapido-texto").value = "";
+  _arquivosRapido = [];
+  document.getElementById("pdf-rapido-lista").style.display = "none";
+  document.getElementById("pdf-rapido-itens").innerHTML = "";
   document.getElementById("pdf-rapido").value = "";
 }
 
