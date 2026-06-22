@@ -6106,7 +6106,35 @@ textarea{resize:vertical}
   </div>
 </div>
 
-<!-- ══ 1. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
+<!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-title"><span>🌐</span> Cenário Macro</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
+    Este cenário é usado pelo agente para embasar as sugestões e scripts dos assessores. Atualize mensalmente com base na carta da gestora.
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+    <div>
+      <label>🌍 Cenário Global</label>
+      <textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..."></textarea>
+    </div>
+    <div>
+      <label>🇧🇷 Cenário Brasil</label>
+      <textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..."></textarea>
+    </div>
+    <div>
+      <label>📌 Posicionamento da Gestora</label>
+      <textarea id="cenario-pos" rows="5" placeholder="O que está sendo reduzido / aumentado..."></textarea>
+    </div>
+  </div>
+
+  <div>
+    <label>Fonte / Referência do cenário</label>
+    <input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px">
+  </div>
+</div>
+
+<!-- ══ 2. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📐</span> Portfólios Modelo por Indexador</div>
   <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:14px">
@@ -6147,34 +6175,6 @@ textarea{resize:vertical}
         </tr>
       </tfoot>
     </table>
-  </div>
-</div>
-
-<!-- ══ 2. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
-<div class="card">
-  <div class="card-title"><span>🌐</span> Cenário Macro</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
-    Este cenário é usado pelo agente para embasar as sugestões e scripts dos assessores. Atualize mensalmente com base na carta da gestora.
-  </p>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-    <div>
-      <label>🌍 Cenário Global</label>
-      <textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..."></textarea>
-    </div>
-    <div>
-      <label>🇧🇷 Cenário Brasil</label>
-      <textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..."></textarea>
-    </div>
-    <div>
-      <label>📌 Posicionamento da Gestora</label>
-      <textarea id="cenario-pos" rows="5" placeholder="O que está sendo reduzido / aumentado..."></textarea>
-    </div>
-  </div>
-
-  <div>
-    <label>Fonte / Referência do cenário</label>
-    <input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px">
   </div>
 </div>
 
