@@ -1,0 +1,171 @@
+{
+  "referencia": "2026-06",
+  "gestor_principal": "Levante Asset — Felipe Bevilacqua",
+  "nota": "Atualizado com Carta Mensal Levante Asset jun/2026. Macro via BCB API (automático). Atualizar mensalmente.",
+
+  "tese_central": "Persistência inflacionária global impulsionada por choques geopolíticos e energéticos (conflito Oriente Médio), que limita o espaço para flexibilização monetária. No Brasil, risco fiscal elevado + ano eleitoral + IPCA pressionado mantêm Selic em patamar alto. Ciclo de cortes do Bacen deve se encerrar na próxima reunião.",
+
+  "cenario_global": {
+    "petroleo": "Brent em US$ 90–95/barril. Conflito EUA-Irã mantém pressão estrutural nos preços de energia.",
+    "eua": "PCE abril: 3,8% (12M), núcleo 3,3%. Fed mantém postura hawkish — juros elevados por mais tempo. Risco de retomada de altas. Atividade resiliente impulsionada por IA.",
+    "china": "Produção industrial +4,1% a/a (abaixo de 5,7% em março). Varejo +0,2% a/a. Setor imobiliário em queda. Perde tração.",
+    "europa": "BCE deve subir juros 2x em 2026. Inflação zona do euro: 3,2% a/a.",
+    "dolar": "Dólar forte globalmente. Treasuries longas com term premium elevado. Impacto negativo nos fluxos para emergentes."
+  },
+
+  "cenario_brasil": {
+    "pib": "PIB 1T26: +1,1% t/t e +1,8% a/a. Carrego estatístico de 1,4 pp para 2026. Demanda doméstica forte.",
+    "inflacao": "IPCA abril: 0,67% no mês, 4,39% em 12M. IPCA-15 maio: 0,62% (acima do esperado). Núcleos e serviços em patamar elevado.",
+    "selic": "Selic deve permanecer em patamar elevado. Levante acredita que ciclo de cortes se encerra na próxima reunião do Copom com pausa sinalizando avaliação dos dados.",
+    "fiscal": "Risco fiscal crescente. Criatividade contábil para não romper meta de superávit. Ano eleitoral aumenta probabilidade de medidas expansionistas.",
+    "bolsa": "Ibovespa recuou 7,2% em reais e 8,6% em dólares em maio. Saída de capital estrangeiro + ruído político. Levante vê correção como oportunidade tática de médio prazo.",
+    "credito": "Spreads estabilizando após meses de volatilidade. IDEX-DI e IDEX-Infra em estabilização."
+  },
+
+  "posicionamento_levante": {
+    "mudanca_junho": "Redução marginal em FIIs e Multimercados. Aumento em Renda Variável após correção de 7,2% — valuations mais adequados para retorno de médio/longo prazo.",
+    "racionais": [
+      "Curvas de juros e inflação implícita em alta em toda extensão — penaliza FIIs e multimercados aplicados em juros.",
+      "Bolsa brasileira com precificação mais atraente após saída de estrangeiros.",
+      "Persistência inflacionária global favorece proteção via IPCA+.",
+      "Dólar forte reforça importância de exposição internacional como hedge."
+    ]
+  },
+
+  "visao_gestores": [
+    {
+      "gestor": "Levante Asset (Felipe Bevilacqua)",
+      "tema": "Inflação Global e Selic Alta",
+      "mensagem": "Tese central na persistência inflacionária global (Brent US$90-95, PPI EUA +6% a/a). No Brasil, IPCA em 4,39% e núcleos contaminados. Ciclo de cortes do Bacen deve encerrar na próxima reunião. Risco fiscal e eleitoral pressionam curvas longas. Reduzindo FIIs e Multimercados, aumentando Renda Variável após correção de 7,2% no Ibovespa.",
+      "implicacao_alocacao": "Prioridade em IPCA+. Pós-fixado ainda atrativo. Renda Variável tática após correção. Reduzir FIIs e Multimercado. Internacional como hedge cambial.",
+      "fonte": "Carta Mensal Levante Asset — jun/2026"
+    },
+    {
+      "gestor": "Verde Asset (Luis Stuhlberger)",
+      "tema": "Juros Elevados por Mais Tempo",
+      "mensagem": "Ambiente de juro estruturalmente alto no Brasil e nos EUA. Fed sem espaço para cortes com PCE em 3,8%. Prefere NTN-B longas como proteção real e carrego em pós-fixado enquanto Selic permanecer elevada. Cautela com renda variável doméstica dado risco fiscal crescente.",
+      "implicacao_alocacao": "Favorece inflação (NTN-B) e pós-fixado. Neutro/negativo para ações Brasil e FIIs.",
+      "fonte": "Carta Verde — mai/2026"
+    },
+    {
+      "gestor": "SPX Capital",
+      "tema": "Juro Real e Internacional",
+      "mensagem": "Juro real brasileiro elevado versus pares emergentes. Prefere NTN-B intermediárias (2029-2033). Internacional como hedge cambial relevante: dólar forte com Fed hawkish e tensões geopolíticas elevam aversão ao risco global.",
+      "implicacao_alocacao": "Inflação (IPCA+) e internacional como diversificador essencial.",
+      "fonte": "Carta SPX — mai/2026"
+    },
+    {
+      "gestor": "Kapitalo Investimentos",
+      "tema": "Pré-fixado e Bolsa Seletiva",
+      "mensagem": "Acredita que Selic está próxima do pico. Espaço para queda em 2026 favorece pré-fixados e NTN-B. Vê oportunidade em bolsa Brasil de forma seletiva — setores exportadores (commodities, agro) mais resilientes ao cenário externo.",
+      "implicacao_alocacao": "Oportunidade em pré-fixado e inflação. Início de posição seletiva em ações exportadoras.",
+      "fonte": "Carta Kapitalo — mai/2026"
+    },
+    {
+      "gestor": "Absolute Investimentos",
+      "tema": "Alerta em Crédito Estruturado",
+      "mensagem": "Alerta para risco em fundos alternativos ilíquidos (FIPs, FIDCs subordinados) para perfis conservadores. Crédito high grade com liquidez é preferível. Spreads estabilizando mas risco de re-abertura caso fiscal piore.",
+      "implicacao_alocacao": "Cautela total com alternativos ilíquidos. Preferência por pós-fixado high grade e IPCA+ com liquidez.",
+      "fonte": "Carta Absolute — mai/2026"
+    },
+    {
+      "gestor": "Ibiuna Investimentos",
+      "tema": "NTN-B e Câmbio",
+      "mensagem": "Juro real brasileiro entre os mais altos do mundo. NTN-B longa atrativa para horizonte 3-5 anos. Internacional como proteção cambial num cenário de dólar forte e saída de capital de emergentes.",
+      "implicacao_alocacao": "Inflação longa e internacional como eixos principais. Pós-fixado como reserva de liquidez.",
+      "fonte": "Carta Ibiuna — mai/2026"
+    },
+    {
+      "gestor": "BTG Asset",
+      "tema": "Redução de Risco, Foco em Carrego",
+      "mensagem": "Reduz exposição a multimercado macro e FIIs. Aumenta alocação em renda fixa de carrego: pós-fixado e IPCA+. Internacional via renda fixa global dólar hedgeada para diversificação sem risco cambial excessivo.",
+      "implicacao_alocacao": "Pós-fixado, inflação e internacional renda fixa. Reduz multimercado e FIIs.",
+      "fonte": "Carta BTG Asset — mai/2026"
+    },
+    {
+      "gestor": "XP Asset",
+      "tema": "Diversificação e Concentração",
+      "mensagem": "Excesso de concentração em pós-fixado é risco estrutural. NTN-B de médio prazo (2029) como ponto de entrada para proteção inflacionária. Bolsa seletiva após correção de maio.",
+      "implicacao_alocacao": "Diversificar saindo do pós-fixado para inflação e pré-fixado. Bolsa tática.",
+      "fonte": "Carta XP Asset — mai/2026"
+    }
+  ],
+
+  "alertas_especiais": [
+    "⚠️ SELIC: Levante e BTG apontam fim do ciclo de cortes na próxima reunião do Copom. Pós-fixado mantém atratividade de curto prazo.",
+    "⚠️ FIIS: Levante REDUZIU FIIs. Curvas pressionadas penalizam ativos reais. Perfis conservadores devem evitar.",
+    "⚠️ MULTIMERCADO: Levante e BTG REDUZIRAM exposição. Priorizar fundos de carrego sobre fundos macro.",
+    "⚠️ FIPs/ALTERNATIVOS: Absolute alerta — fundos alternativos ilíquidos inadequados para conservador/moderado com Selic elevada.",
+    "✅ IPCA+: CONVERGÊNCIA de todos os gestores. NTN-B com juro real acima de 6% a/a é a oportunidade do momento.",
+    "✅ BOLSA: Levante e Kapitalo veem oportunidade tática após correção de 7,2% em maio. Apenas para moderado/arrojado/agressivo."
+  ],
+
+  "recomendacoes_por_classe": {
+    "pos_fixado": {
+      "contexto_gestor": "Consenso: ainda atrativo com Selic elevada e fim do ciclo de cortes sinalizado. Mas não deve concentrar acima do modelo — risco de perda de retorno real se inflação persistir.",
+      "produtos_sugeridos": [
+        "Tesouro Selic 2031 (liquidez diária)",
+        "CDB pós-fixado bancos médios (100-110% CDI)",
+        "LCI/LCA pós-fixada isentas de IR",
+        "Fundo DI simples (baixo custo, liquidez D+0)"
+      ]
+    },
+    "inflacao": {
+      "contexto_gestor": "CONVERGÊNCIA TOTAL: NTN-B é a oportunidade do momento. Juro real acima de 6% a/a. Levante, Verde, SPX, Ibiuna e BTG convergem nessa tese. IPCA 4,39% em 12M com núcleos contaminados reforça urgência de proteção.",
+      "produtos_sugeridos": [
+        "Tesouro IPCA+ 2029 (prazo médio, liquidez, menor duration)",
+        "Tesouro IPCA+ 2035 (maior juro real, horizonte longo)",
+        "NTN-B via fundo de inflação (gestão ativa de duration)",
+        "Debêntures incentivadas IPCA+ isentas de IR (perfil moderado+)",
+        "CRI/CRA IPCA+ high grade (isentos de IR)"
+      ]
+    },
+    "pre_fixado": {
+      "contexto_gestor": "Kapitalo vê oportunidade com Selic próxima do pico. Levante sinaliza pausa — pré-fixado de médio prazo pode capturar ganho de capital no início do ciclo de queda.",
+      "produtos_sugeridos": [
+        "Tesouro Prefixado 2027 (médio prazo, menos duration risk)",
+        "CDB prefixado 2-3 anos bancos médios",
+        "LCI/LCA prefixada (isenção IR, prazo 2 anos)"
+      ]
+    },
+    "multimercado": {
+      "contexto_gestor": "ATENÇÃO: Levante e BTG REDUZIRAM multimercado em junho. Priorizar fundos de carrego/crédito sobre fundos macro aplicados em juros. Curvas pressionadas penalizam posições aplicadas.",
+      "produtos_sugeridos": [
+        "Fundo de crédito high grade D+30 (carrego, baixo risco)",
+        "Fundo renda fixa ativa (sem risco direcional de juros)",
+        "Multimercado macro low vol apenas para moderado+"
+      ]
+    },
+    "internacional": {
+      "contexto_gestor": "Dólar forte com Fed hawkish + saída de capital de emergentes. SPX e Ibiuna destacam internacional como hedge essencial. Renda fixa global hedgeada oferece diversificação sem risco cambial excessivo.",
+      "produtos_sugeridos": [
+        "Fundo renda fixa global dólar hedgeado (ex: Trend Global Bonds, Sparta)",
+        "ETF de renda fixa internacional (BNDX11)",
+        "Fundo multimercado com exposição global hedgeada"
+      ]
+    },
+    "acoes": {
+      "contexto_gestor": "Levante aumentou ações após correção de 7,2% no Ibovespa em maio. Oportunidade tática de médio prazo. Seletividade é chave: exportadores (commodities, agro) mais resilientes. APENAS para perfis moderado/arrojado/agressivo.",
+      "produtos_sugeridos": [
+        "Fundo de ações ativo com viés exportador/commodities",
+        "ETF BOVA11 para exposição ampla com custo baixo",
+        "Small caps via fundo especializado (arrojado/agressivo)"
+      ]
+    },
+    "fiis": {
+      "contexto_gestor": "LEVANTE REDUZIU FIIs em junho. Curvas pressionadas penalizam ativos reais. FIIs de papel (CRI IPCA+) mais defensivos que FIIs de tijolo. Cautela elevada com Selic alta.",
+      "produtos_sugeridos": [
+        "FIIs de papel IPCA+ (KNCR11, KNIP11, MXRF11) — mais defensivos",
+        "Evitar FIIs de tijolo com vacância e renovação de contratos no curto prazo"
+      ]
+    },
+    "alternativos": {
+      "contexto_gestor": "ALERTA CRÍTICO: Absolute e Levante alertam. FIPs e FIDCs subordinados são inadequados para conservadora e moderada. Selic alta torna o custo de oportunidade muito elevado para ativos ilíquidos de longo prazo.",
+      "produtos_sugeridos": [
+        "SOMENTE arrojado/agressivo com horizonte 5+ anos e liquidez reservada",
+        "FIPs de infraestrutura com fluxo previsível (energia, saneamento)",
+        "FIDCs sênior high grade com rating AAA"
+      ]
+    }
+  }
+}

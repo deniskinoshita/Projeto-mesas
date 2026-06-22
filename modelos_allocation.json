@@ -1,0 +1,46 @@
+{
+  "conservadora": {
+    "pos_fixado": 70.00,
+    "inflacao": 16.00,
+    "pre_fixado": 7.00,
+    "acoes": 0.00,
+    "fiis": 0.00,
+    "multimercado": 3.00,
+    "internacional": 4.00,
+    "alternativos": 0.00,
+    "criptomoedas": 0.00
+  },
+  "moderada": {
+    "pos_fixado": 44.00,
+    "inflacao": 23.00,
+    "pre_fixado": 10.00,
+    "acoes": 5.00,
+    "fiis": 1.50,
+    "multimercado": 6.00,
+    "internacional": 9.00,
+    "alternativos": 1.00,
+    "criptomoedas": 0.50
+  },
+  "arrojada": {
+    "pos_fixado": 28.00,
+    "inflacao": 28.00,
+    "pre_fixado": 12.00,
+    "acoes": 8.00,
+    "fiis": 2.50,
+    "multimercado": 9.50,
+    "internacional": 10.25,
+    "alternativos": 1.00,
+    "criptomoedas": 0.75
+  },
+  "agressiva": {
+    "pos_fixado": 13.00,
+    "inflacao": 31.00,
+    "pre_fixado": 13.00,
+    "acoes": 14.00,
+    "fiis": 3.50,
+    "multimercado": 10.50,
+    "internacional": 13.00,
+    "alternativos": 1.00,
+    "criptomoedas": 1.00
+  }
+}
