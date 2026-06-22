@@ -229,6 +229,7 @@ _HP_PORT_FILE   = "/tmp/brauna_hp_portfolios.json"
 _HP_CENARIO_FILE= "/tmp/brauna_hp_cenario.json"
 _HP_PROD_FILE   = "/tmp/brauna_hp_produtos.json"
 _HP_ALERTS_FILE = "/tmp/brauna_hp_alertas.json"
+_HP_KNOW_FILE   = "/tmp/brauna_hp_knowledge.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -3155,7 +3156,11 @@ def hp_cenario():
         data = request.get_json()
         _save(_HP_CENARIO_FILE, data)
         return jsonify({"ok": True})
-    return jsonify(_load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT))
+    cenario = _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
+    # Inclui fontes publicadas da base de conhecimento
+    docs_pub = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
+    cenario["fontes"] = [{"nome": d.get("nome",""), "tipo": d.get("tipo",""), "fonte": d.get("fonte",""), "data": d.get("data","")} for d in docs_pub]
+    return jsonify(cenario)
 
 @app.route("/api/hp/produtos", methods=["GET","POST"])
 def hp_produtos():
@@ -3204,6 +3209,115 @@ def hp_alertas():
     alertas = alertas[:100]  # manter últimos 100
     _save(_HP_ALERTS_FILE, alertas)
     return jsonify({"ok": True, "alerta": novo})
+
+@app.route("/api/hp/knowledge", methods=["GET"])
+def hp_knowledge_list():
+    return jsonify(_load(_HP_KNOW_FILE, []))
+
+@app.route("/api/hp/knowledge/upload", methods=["POST"])
+def hp_knowledge_upload():
+    pdf_file = request.files.get("pdf")
+    nome     = request.form.get("nome", "")
+    tipo     = request.form.get("tipo", "carta")
+    classes  = request.form.get("classes", "")   # comma-separated
+    fonte    = request.form.get("fonte", "")
+    if not pdf_file:
+        return jsonify({"error": "PDF não enviado"}), 400
+    try:
+        import pdfplumber, io
+        raw = pdf_file.read()
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            texto = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        texto = texto.strip()
+        if len(texto) < 50:
+            return jsonify({"error": "PDF sem texto extraível"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Falha ao ler PDF: {str(e)}"}), 400
+
+    docs = _load(_HP_KNOW_FILE, [])
+    doc = {
+        "id":       str(uuid.uuid4())[:8],
+        "nome":     nome or pdf_file.filename,
+        "tipo":     tipo,
+        "classes":  [c.strip() for c in classes.split(",") if c.strip()],
+        "fonte":    fonte,
+        "chars":    len(texto),
+        "texto":    texto[:12000],   # máx 12k chars para não explodir o JSON
+        "data":     datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "publicado": False,
+    }
+    docs.insert(0, doc)
+    docs = docs[:50]   # manter últimos 50 documentos
+    _save(_HP_KNOW_FILE, docs)
+    return jsonify({"ok": True, "id": doc["id"], "chars": len(texto), "doc": doc})
+
+@app.route("/api/hp/knowledge/delete", methods=["POST"])
+def hp_knowledge_delete():
+    id_del = request.get_json().get("id")
+    docs = _load(_HP_KNOW_FILE, [])
+    docs = [d for d in docs if d.get("id") != id_del]
+    _save(_HP_KNOW_FILE, docs)
+    return jsonify({"ok": True})
+
+@app.route("/api/hp/knowledge/apply", methods=["POST"])
+def hp_knowledge_apply():
+    """Extrai trechos do documento e aplica ao cenário macro ou retorna para o frontend usar."""
+    body   = request.get_json()
+    doc_id = body.get("id")
+    destino= body.get("destino", "cenario")   # cenario | alerta | produto
+
+    docs = _load(_HP_KNOW_FILE, [])
+    doc  = next((d for d in docs if d.get("id") == doc_id), None)
+    if not doc:
+        return jsonify({"error": "Documento não encontrado"}), 404
+
+    texto = doc.get("texto", "")
+
+    if destino == "cenario":
+        # Tenta segmentar o texto em global / brasil / posicionamento por palavras-chave
+        linhas = texto.split("\n")
+        seg_global, seg_brasil, seg_pos = [], [], []
+        modo = None
+        for linha in linhas:
+            l = linha.lower()
+            if any(k in l for k in ["global","internacional","eua","estados unidos","fed","banco central europeu","china","emergente"]):
+                modo = "global"
+            elif any(k in l for k in ["brasil","selic","ipca","ibovespa","câmbio","real","fiscal","copom"]):
+                modo = "brasil"
+            elif any(k in l for k in ["posicionamento","portfólio","alocação","recomendamos","reduzindo","aumentando","fundo"]):
+                modo = "pos"
+            if modo == "global" and linha.strip(): seg_global.append(linha)
+            elif modo == "brasil" and linha.strip(): seg_brasil.append(linha)
+            elif modo == "pos" and linha.strip(): seg_pos.append(linha)
+
+        # Fallback: divide o texto em terços
+        if not seg_global and not seg_brasil:
+            n = len(linhas)
+            seg_global = linhas[:n//3]
+            seg_brasil = linhas[n//3: 2*n//3]
+            seg_pos    = linhas[2*n//3:]
+
+        return jsonify({
+            "ok": True,
+            "global":         " ".join(seg_global)[:1200].strip(),
+            "brasil":         " ".join(seg_brasil)[:1200].strip(),
+            "posicionamento": " ".join(seg_pos)[:1200].strip(),
+            "fonte":          doc.get("fonte") or doc.get("nome",""),
+        })
+
+    return jsonify({"ok": True, "texto": texto[:3000]})
+
+@app.route("/api/hp/knowledge/publicar", methods=["POST"])
+def hp_knowledge_publicar():
+    """Marca um documento como publicado (visível para assessores)."""
+    body   = request.get_json()
+    doc_id = body.get("id")
+    docs   = _load(_HP_KNOW_FILE, [])
+    for d in docs:
+        if d.get("id") == doc_id:
+            d["publicado"] = True
+    _save(_HP_KNOW_FILE, docs)
+    return jsonify({"ok": True})
 
 @app.route("/api/analyze-xp", methods=["POST"])
 def analyze_xp():
@@ -3330,12 +3444,14 @@ def gerar_apresentacao():
         # Enriquece com dados HP publicados
         hp_cenario= _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
         alertas_hp= _load(_HP_ALERTS_FILE, [])
+        docs_pub  = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
 
         body["cenario_macro"] = {
             "global":        hp_cenario.get("global",""),
             "brasil":        hp_cenario.get("brasil",""),
             "posicionamento":hp_cenario.get("posicionamento",""),
             "vieses":        hp_cenario.get("vieses",{}),
+            "fontes":        [{"nome": d.get("nome",""), "tipo": d.get("tipo",""), "fonte": d.get("fonte",""), "data": d.get("data","")} for d in docs_pub],
         }
 
         # Alertas relevantes para os ativos do cliente
@@ -3393,7 +3509,8 @@ def gerar_pptx():
 
     try:
         hp_cenario = _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
-        macro_bcb = buscar_macro_bcb()
+        macro_bcb  = buscar_macro_bcb()
+        docs_pub   = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
         body["cenario_macro"] = {
             "global":         hp_cenario.get("global",""),
             "brasil":         hp_cenario.get("brasil",""),
@@ -3402,6 +3519,7 @@ def gerar_pptx():
             "sinais":         hp_cenario.get("sinais", []),
             "selic_meta":     macro_bcb.get("selic_meta"),
             "ipca_12m":       macro_bcb.get("ipca_12m"),
+            "fontes":         [{"nome": d.get("nome",""), "tipo": d.get("tipo",""), "fonte": d.get("fonte","")} for d in docs_pub],
         }
         rent = body.get("rent", {})
         port_rent = rent.get("portfolio", {}) if isinstance(rent, dict) else {}
@@ -5679,32 +5797,90 @@ textarea{resize:vertical}
 </div>
 
 <!-- ══ 4. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
-<div class="card">
-  <div class="card-title"><span>📚</span> Base de Conhecimento</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
-    Cartas de gestoras, relatórios de casas de análise, notas de research. O agente usa estes documentos para embasar análises com mais profundidade.
+<div class="card" style="border-color:#2A2A18">
+  <div class="card-title"><span>📚</span> Base de Conhecimento — Central de Materiais HP</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
+    Suba cartas de gestoras, relatórios e notas de research. Cada documento fica salvo na base e pode ser aplicado com um clique ao <b style="color:#D4B483">Cenário Macro</b> ou publicado para os assessores consultarem.
   </p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+  <!-- Upload zone + metadados -->
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
+    <!-- Drop zone -->
     <div>
-      <label>Upload de PDF (carta, relatório, nota)</label>
-      <div style="border:1.5px dashed #2A2A18;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A2A18'">
-        <input type="file" id="base-pdf" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadBase(this)">
-        <div style="font-size:24px;margin-bottom:6px">📄</div>
-        <p style="font-size:12px;color:#3A6A48">Arraste ou clique para subir PDF</p>
-        <p style="font-size:11px;color:#D4B483;margin-top:4px;min-height:16px" id="base-fname"></p>
+      <label>PDF do material</label>
+      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+        <input type="file" id="know-pdf" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
+        <div style="font-size:28px;margin-bottom:8px">📄</div>
+        <p style="font-size:12px;color:#3A6A48">Arraste ou clique</p>
+        <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · max 10 MB</p>
+        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
       </div>
-      <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
-        <span id="base-st" style="font-size:11px"></span>
+      <div style="margin-top:8px;text-align:center">
+        <span id="know-st" style="font-size:11px"></span>
       </div>
     </div>
-    <div>
-      <label>Documentos na base</label>
-      <div id="base-lista" class="info-box" style="min-height:100px;max-height:200px;overflow-y:auto">
-        <span style="color:#1E4A30;font-style:italic">Nenhum documento ainda.</span>
+    <!-- Metadados -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label>Nome do documento</label>
+        <input type="text" id="know-nome" placeholder="ex: Carta Levante Junho 2026">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label>Tipo</label>
+          <select id="know-tipo" style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
+            <option value="carta">Carta de Gestora</option>
+            <option value="research">Nota de Research</option>
+            <option value="cenario">Cenário Macro</option>
+            <option value="relatorio">Relatório Mensal</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div>
+          <label>Fonte / Gestora</label>
+          <input type="text" id="know-fonte" placeholder="ex: Levante Asset">
+        </div>
+      </div>
+      <div>
+        <label style="margin-bottom:6px">Classes relacionadas</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="know-classes-btns">
+          <button type="button" class="know-cls-btn" data-cls="pos_fixado">Pós Fixado</button>
+          <button type="button" class="know-cls-btn" data-cls="inflacao">Inflação</button>
+          <button type="button" class="know-cls-btn" data-cls="pre_fixado">Pré Fixado</button>
+          <button type="button" class="know-cls-btn" data-cls="acoes">Ações</button>
+          <button type="button" class="know-cls-btn" data-cls="fiis">FIIs</button>
+          <button type="button" class="know-cls-btn" data-cls="multimercado">Multimercado</button>
+          <button type="button" class="know-cls-btn" data-cls="internacional">Internacional</button>
+          <button type="button" class="know-cls-btn" data-cls="alternativos">Alternativos</button>
+          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#2A2A18;color:#D4B483;border-color:#D4B483">Geral</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <button class="btn" id="know-btn-upload" onclick="knowSalvar()" disabled>⬆️ Adicionar à Base</button>
+        <span id="know-save-st" style="font-size:12px"></span>
       </div>
     </div>
   </div>
+
+  <!-- Lista de documentos -->
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
+      <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+    </div>
+    <div id="know-lista">
+      <div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda. Suba o primeiro PDF acima.</div>
+    </div>
+  </div>
 </div>
+
+<style>
+.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #2A2A18;background:#0A0A0A;color:#4A7055;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.know-cls-btn.sel{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
+.know-doc-card{background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.know-doc-card:hover{border-color:#2A2A18}
+.know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
+</style>
 
 <!-- ══ 5. MONITORAMENTO DE PRODUTOS ══════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A1A30">
@@ -6207,34 +6383,163 @@ function coletarProdutos(){
 }
 
 // ── Base de Conhecimento ──────────────────────────────────────────────────────
-async function uploadBase(input){
+const KNOW_TIPO_COLORS = {carta:"#5DCAA5", research:"#8B9FE8", cenario:"#D4B483", relatorio:"#B08FCF", outro:"#888"};
+const KNOW_TIPO_LABELS = {carta:"Carta de Gestora", research:"Research", cenario:"Cenário Macro", relatorio:"Relatório", outro:"Outro"};
+let _knowFile = null;
+
+// seleção de classes
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.querySelectorAll(".know-cls-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>btn.classList.toggle("sel"));
+  });
+  carregarKnowledge();
+});
+
+function knowUpload(input){
   const f = input.files[0]; if(!f) return;
-  document.getElementById("base-fname").textContent = f.name;
-  const st = document.getElementById("base-st");
-  st.textContent = "⏳ Processando...";
-  try{
-    const fd = new FormData();
-    fd.append("carta", f);
-    const r = await fetch("/api/admin/upload-contexto", {method:"POST", body:fd});
-    const d = await r.json();
-    if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ ${d.chars} caracteres extraídos</span>`;
-      _base.push({nome: f.name, chars: d.chars, data: new Date().toLocaleDateString("pt-BR")});
-      renderBase();
-    } else { st.innerHTML = `<span class="status-err">Erro: ${d.error}</span>`; }
-  } catch(e){ st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`; }
-  input.value = "";
+  _knowFile = f;
+  document.getElementById("know-fname").textContent = f.name;
+  if(!document.getElementById("know-nome").value)
+    document.getElementById("know-nome").value = f.name.replace(/\.pdf$/i,"");
+  document.getElementById("know-btn-upload").disabled = false;
+  document.getElementById("know-st").innerHTML = `<span style="color:#5DCAA5">✓ Pronto para subir</span>`;
 }
 
-function renderBase(){
-  const el = document.getElementById("base-lista");
-  if(!_base.length){ el.innerHTML='<span style="color:#1E4A30;font-style:italic">Nenhum documento ainda.</span>'; return; }
-  el.innerHTML = _base.map((d,i)=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1A1A10">
-      <span style="font-size:11px;color:#CCC">📄 ${d.nome}</span>
-      <span style="font-size:10px;color:#5DCAA5">${d.chars} chars · ${d.data}</span>
-    </div>
-  `).join("");
+async function knowSalvar(){
+  if(!_knowFile){ document.getElementById("know-save-st").innerHTML=`<span class="status-err">Selecione um PDF primeiro.</span>`; return; }
+  const btn = document.getElementById("know-btn-upload");
+  const st  = document.getElementById("know-save-st");
+  btn.disabled = true;
+  st.innerHTML = "⏳ Processando PDF...";
+  try{
+    const classes = [...document.querySelectorAll(".know-cls-btn.sel")].map(b=>b.dataset.cls).join(",");
+    const fd = new FormData();
+    fd.append("pdf",     _knowFile);
+    fd.append("nome",    document.getElementById("know-nome").value.trim());
+    fd.append("tipo",    document.getElementById("know-tipo").value);
+    fd.append("fonte",   document.getElementById("know-fonte").value.trim());
+    fd.append("classes", classes);
+    const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
+    const d = await r.json();
+    if(d.ok){
+      st.innerHTML = `<span class="status-ok">✓ ${d.chars.toLocaleString()} caracteres extraídos</span>`;
+      // reset form
+      _knowFile = null;
+      document.getElementById("know-pdf").value = "";
+      document.getElementById("know-fname").textContent = "";
+      document.getElementById("know-nome").value = "";
+      document.getElementById("know-fonte").value = "";
+      document.getElementById("know-st").textContent = "";
+      document.querySelectorAll(".know-cls-btn.sel").forEach(b=>b.classList.remove("sel"));
+      btn.disabled = true;
+      carregarKnowledge();
+      setTimeout(()=>st.textContent="", 5000);
+    } else {
+      st.innerHTML = `<span class="status-err">Erro: ${d.error}</span>`;
+      btn.disabled = false;
+    }
+  } catch(e){
+    st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`;
+    btn.disabled = false;
+  }
+}
+
+async function carregarKnowledge(){
+  try{
+    const r = await fetch("/api/hp/knowledge");
+    const docs = await r.json();
+    const ct = document.getElementById("know-count");
+    if(ct) ct.textContent = docs.length ? `${docs.length} documento${docs.length>1?"s":""}` : "";
+    renderKnowledge(docs);
+  } catch(e){ console.warn("knowledge:", e); }
+}
+
+function renderKnowledge(docs){
+  const el = document.getElementById("know-lista");
+  if(!el) return;
+  if(!docs.length){
+    el.innerHTML = `<div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda. Suba o primeiro PDF acima.</div>`;
+    return;
+  }
+  el.innerHTML = docs.map(d=>{
+    const cor = KNOW_TIPO_COLORS[d.tipo]||"#888";
+    const label = KNOW_TIPO_LABELS[d.tipo]||d.tipo;
+    const clsTags = (d.classes||[]).map(c=>`<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${c}</span>`).join(" ");
+    const pubBadge = d.publicado ? `<span style="font-size:10px;background:#0A2A0A;color:#5DCAA5;padding:2px 8px;border-radius:10px;border:1px solid #1A4A1A">✓ publicado</span>` : `<span style="font-size:10px;color:#2A5A3A">rascunho</span>`;
+    return `<div class="know-doc-card">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:24px;flex-shrink:0">📄</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+            <span style="font-size:13px;font-weight:700;color:#F0F0F0">${d.nome||"Documento"}</span>
+            <span class="know-tipo-badge" style="background:${cor}22;color:${cor};border:1px solid ${cor}44">${label}</span>
+            ${pubBadge}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+            ${d.fonte ? `<span style="font-size:11px;color:#D4B483">📎 ${d.fonte}</span>` : ""}
+            <span style="font-size:10px;color:#2A5A3A">${d.chars?.toLocaleString()||0} chars · ${d.data||""}</span>
+            ${clsTags}
+          </div>
+          <!-- Ações -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm" onclick="knowAplicarCenario('${d.id}')">→ Cenário Macro</button>
+            <button class="btn btn-sm btn-out" onclick="knowVerTexto('${d.id}')">👁 Ver texto</button>
+            ${!d.publicado ? `<button class="btn-ghost" onclick="knowPublicar('${d.id}')">📢 Publicar</button>` : ""}
+            <button class="btn-ghost" style="color:#FF6B6B;border-color:#FF6B6B" onclick="knowDeletar('${d.id}')">🗑 Remover</button>
+          </div>
+        </div>
+      </div>
+      <!-- Preview expansível -->
+      <div id="know-preview-${d.id}" style="display:none;margin-top:10px;background:#050A05;border:1px solid #1A2A1A;border-radius:8px;padding:10px;font-size:11px;color:#AAA;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
+    </div>`;
+  }).join("");
+}
+
+async function knowAplicarCenario(id){
+  const st = document.getElementById("know-save-st");
+  st.innerHTML = "⏳ Aplicando ao cenário...";
+  try{
+    const r = await fetch("/api/hp/knowledge/apply", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({id, destino:"cenario"})});
+    const d = await r.json();
+    if(d.ok){
+      if(d.global) document.getElementById("cenario-global").value = d.global;
+      if(d.brasil) document.getElementById("cenario-brasil").value = d.brasil;
+      if(d.posicionamento) document.getElementById("cenario-pos").value = d.posicionamento;
+      if(d.fonte) document.getElementById("cenario-ref").value = d.fonte;
+      st.innerHTML = `<span class="status-ok">✓ Cenário preenchido — revise e publique</span>`;
+      // Scroll até o cenário
+      document.querySelector('[id="cenario-global"]')?.scrollIntoView({behavior:"smooth", block:"center"});
+      setTimeout(()=>st.textContent="", 6000);
+    } else { st.innerHTML=`<span class="status-err">Erro: ${d.error}</span>`; }
+  } catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
+}
+
+async function knowPublicar(id){
+  try{
+    const r = await fetch("/api/hp/knowledge/publicar", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({id})});
+    const d = await r.json();
+    if(d.ok) carregarKnowledge();
+  } catch(e){ console.warn(e); }
+}
+
+async function knowDeletar(id){
+  if(!confirm("Remover este documento da base?")) return;
+  try{
+    await fetch("/api/hp/knowledge/delete", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({id})});
+    carregarKnowledge();
+  } catch(e){ console.warn(e); }
+}
+
+function knowVerTexto(id){
+  const el = document.getElementById(`know-preview-${id}`);
+  if(!el) return;
+  if(el.style.display === "none"){
+    // busca o texto da lista em cache
+    fetch("/api/hp/knowledge").then(r=>r.json()).then(docs=>{
+      const doc = docs.find(d=>d.id===id);
+      if(doc){ el.textContent = doc.texto||"(sem texto)"; el.style.display = "block"; }
+    });
+  } else { el.style.display = "none"; }
 }
 
 // ── Alertas de Monitoramento ──────────────────────────────────────────────────

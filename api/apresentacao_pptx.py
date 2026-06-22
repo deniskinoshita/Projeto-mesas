@@ -1113,6 +1113,13 @@ def s_encerramento(prs, d):
         add_text(sl, desc_enc, cx_enc + Cm(0.3), SH - Cm(2.15), cw_enc - Cm(0.6), Cm(0.75),
                  size=8.5, color=C_LGRAY, wrap=True)
 
+    # Fontes da base de conhecimento HP
+    fontes = (d.get("cenario_macro") or {}).get("fontes", [])
+    if fontes:
+        fontes_txt = "Fontes: " + " · ".join(f.get("nome","") or f.get("fonte","") for f in fontes[:4] if f.get("nome") or f.get("fonte"))
+        add_text(sl, fontes_txt, Cm(1.7), SH - Cm(1.3), SW-Cm(2), Cm(0.5),
+                 size=7.5, color=C_GRAY, align=PP_ALIGN.CENTER)
+
     add_text(sl, "Documento confidencial · Não constitui recomendação formal de investimento",
              Cm(1.7), SH - Cm(0.75), SW-Cm(2), Cm(0.55), size=7.5, color=C_GRAY, align=PP_ALIGN.CENTER)
 
