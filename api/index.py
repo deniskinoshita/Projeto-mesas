@@ -3022,7 +3022,8 @@ async function baixarPpt(){
 # ── Rotas ─────────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def login_page():
-    return render_template_string(HTML_LOGIN)
+    from flask import redirect
+    return redirect("/admin")
 
 def _pilar_html_inicial(p):
     imp = p.get("importancia", "CRÍTICA")
@@ -3072,6 +3073,8 @@ def login():
         if nome:
             return jsonify({"ok": True, "role": "assessor", "nome": nome, "codigo": senha})
         return jsonify({"ok": False, "msg": "Código de assessor inválido"}), 401
+    if role == "admin":
+        return jsonify({"ok": True, "role": "admin"})
     if SENHAS.get(role) == d.get("senha",""):
         return jsonify({"ok": True, "role": role})
     return jsonify({"ok": False, "msg": "Senha incorreta"}), 401
@@ -5272,8 +5275,8 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
   <nav class="nav">
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider">👥 Líder</a>
+    <a href="/head-produtos">🏛️ Head</a>
     <a href="/admin" class="active">⚙️ Admin</a>
-    <button onclick="sair()">Sair</button>
   </nav>
 </header>
 
@@ -5506,14 +5509,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 </div><!-- /container -->
 
 <script>
-// ── Auth ──────────────────────────────────────────────────────────────────────
-(function(){
-  if(localStorage.getItem("brauna_role")!=="admin"){
-    localStorage.removeItem("brauna_role");
-    window.location.replace("/");
-  }
-})();
-function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+// Admin sem autenticação — acesso direto
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const PERFIS     = ["conservadora","moderada","arrojada","agressiva"];
