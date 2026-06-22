@@ -1372,7 +1372,7 @@ select option{background:#1A1A1A}
 // Auth guard
 (function(){
   const role = localStorage.getItem("brauna_role");
-  if(role !== "assessor") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+  if(role !== "assessor" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
   // Auto-preenche nome do assessor salvo no login
   const nomeLogin = localStorage.getItem("brauna_nome");
   if(nomeLogin){
@@ -5034,7 +5034,7 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 // Auth guard
 (function(){
   const role = localStorage.getItem("brauna_role");
-  if(role !== "lider") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+  if(role !== "lider" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
 
@@ -5584,7 +5584,8 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 </div><!-- /container -->
 
 <script>
-// Admin sem autenticação — acesso direto
+// Admin sem autenticação — seta role para permitir navegar em todas as páginas
+localStorage.setItem("brauna_role", "admin");
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const PERFIS     = ["conservadora","moderada","arrojada","agressiva"];
@@ -6565,7 +6566,8 @@ textarea{resize:vertical}
 <script>
 // ── Auth ──────────────────────────────────────────────────────────────────────
 (function(){
-  if(localStorage.getItem("brauna_role") !== "head"){
+  const _r = localStorage.getItem("brauna_role");
+  if(_r !== "head" && _r !== "admin"){
     localStorage.removeItem("brauna_role");
     window.location.replace("/");
   }
