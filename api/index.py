@@ -1251,9 +1251,13 @@ select option{background:#1A1A1A}
     </div>
 
     <!-- Cenário macro HP -->
-    <div id="hp-cenario" style="display:none;margin-top:12px">
-      <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">🌐 Visão Macro — Head de Produtos</div>
-      <div id="hp-cenario-txt" style="background:#060F0B;border-radius:8px;padding:12px;font-size:11px;color:#AAA;line-height:1.6;border:1px solid #2A2A18"></div>
+    <div id="hp-cenario" style="display:none;margin-top:14px">
+      <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between">
+        <span>🌐 Cenário Macro — Head de Produtos</span>
+        <span id="hp-cenario-ref" style="font-size:10px;color:#2A5A3A;font-weight:400;text-transform:none"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="hp-cenario-cards"></div>
+      <div id="hp-cenario-vieses" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
     </div>
   </div>
 
@@ -2197,20 +2201,31 @@ function renderAnaliseHP(xp){
     }).join("");
   }
 
-  // Cenário macro HP
+  // Cenário macro HP — 3 cards estruturados
   const c = xp.cenario_macro;
-  if(c && (c.brasil || c.posicionamento)){
+  if(c && (c.global || c.brasil || c.posicionamento)){
     document.getElementById("hp-cenario").style.display = "";
+    const ref = document.getElementById("hp-cenario-ref");
+    if(ref && c.referencia) ref.textContent = c.referencia;
+
+    const cards = [
+      {titulo:"🌍 Global",         texto: c.global,         cor:"#8B9FE8"},
+      {titulo:"🇧🇷 Brasil",        texto: c.brasil,         cor:"#5DCAA5"},
+      {titulo:"📌 Posicionamento", texto: c.posicionamento, cor:"#D4B483"},
+    ];
+    document.getElementById("hp-cenario-cards").innerHTML = cards.map(card => card.texto ? `
+      <div style="background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:12px;border-top:2px solid ${card.cor}">
+        <div style="font-size:10px;color:${card.cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${card.titulo}</div>
+        <p style="font-size:11px;color:#CCC;line-height:1.7">${card.texto}</p>
+      </div>` : "").join("");
+
     const vieses = c.vieses || {};
     const VCOR = {positivo:"#5DCAA5", neutro:"#D4B483", negativo:"#FF6B6B"};
-    const viesHtml = Object.entries(vieses).map(([cls,v])=>
-      `<span style="font-size:10px;background:#111;border:1px solid #1A4030;border-radius:10px;padding:2px 8px;color:${VCOR[v]||"#888"}">${cls}: ${v}</span>`
-    ).join(" ");
-    document.getElementById("hp-cenario-txt").innerHTML = `
-      ${c.posicionamento ? `<p style="margin-bottom:8px"><b style="color:#D4B483">Posicionamento:</b> ${c.posicionamento}</p>` : ""}
-      ${c.brasil ? `<p style="margin-bottom:8px"><b style="color:#D4B483">Brasil:</b> ${c.brasil}</p>` : ""}
-      ${viesHtml ? `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${viesHtml}</div>` : ""}
-    `;
+    const VLBL = {pos_fixado:"Pós Fix",inflacao:"Inflação",pre_fixado:"Pré Fix",acoes:"Ações",fiis:"FIIs",multimercado:"Multi",internacional:"Intl",alternativos:"Altern",criptomoedas:"Cripto"};
+    document.getElementById("hp-cenario-vieses").innerHTML = Object.entries(vieses)
+      .filter(([,v])=>v)
+      .map(([cls,v])=>`<span style="font-size:10px;background:#0A1A0A;border:1px solid ${VCOR[v]||"#333"}44;border-radius:10px;padding:3px 9px;color:${VCOR[v]||"#888"}">${VLBL[cls]||cls}: ${v}</span>`)
+      .join("");
   }
 
   card.scrollIntoView({behavior:"smooth", block:"start"});
@@ -3801,6 +3816,7 @@ def analyze_xp():
             "brasil":        cenario.get("brasil",""),
             "posicionamento":cenario.get("posicionamento",""),
             "vieses":        cenario.get("vieses",{}),
+            "referencia":    cenario.get("referencia",""),
         },
         "alertas_relevantes": alertas_unicos,
         "calls_relevantes":   calls_relevantes,
