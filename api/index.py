@@ -1212,6 +1212,14 @@ select option{background:#1A1A1A}
     </div>
   </div>
 
+  <div class="card" style="text-align:center">
+    <h2>Exportar Análise</h2>
+    <p style="font-size:12px;color:#555;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
+    </div>
+  </div>
+
   <div class="card">
     <h2>Resumo</h2>
     <div class="grid-4" id="metrics"></div>
@@ -1293,14 +1301,6 @@ select option{background:#1A1A1A}
 
     <div class="tab-panel" id="tab-sugestoes">
       <div id="sugestoes-list"></div>
-    </div>
-  </div>
-
-  <div class="card" style="text-align:center">
-    <h2>Exportar Análise</h2>
-    <p style="font-size:12px;color:#555;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
   </div>
 
