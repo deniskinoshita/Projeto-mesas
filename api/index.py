@@ -1655,6 +1655,19 @@ async function identificarCliente(file){
     const d = await r.json();
     _clienteIdentificado = d;
 
+    // ── PDF sem carteira (conta = "-" ou vazio, sem composição)
+    const semDados = !d.conta || d.conta === "-" || d.conta === "";
+    const semComp  = !d.composicao_atual || Object.values(d.composicao_atual).every(v => v === 0);
+    if(fname){
+      if(semDados || semComp){
+        fname.style.color = "#E8A87C";
+        fname.textContent = "⚠️ PDF sem carteira — cliente sem posição na XP nesta data. Preencha os dados manualmente.";
+      } else {
+        fname.style.color = "#5DCAA5";
+        fname.textContent = `✓ Carteira lida — Conta ${d.conta} | R$ ${d.patrimonio?.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+      }
+    }
+
     // ── Preenche campos com dados salvos
     if(d.ficha_salva?.nome)    document.getElementById("nome").value = d.ficha_salva.nome;
     if(d.ficha_salva?.perfil){ document.getElementById("perfil").value = d.ficha_salva.perfil; atualizarModelo(); }
