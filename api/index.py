@@ -237,6 +237,7 @@ _HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
 _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
 _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
 _CLIENTS_FILE         = "/tmp/brauna_clients.json"
+_ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -3508,6 +3509,83 @@ def okrs_endpoint():
         return jsonify({"ok":True})
     return jsonify(load_okrs())
 
+@app.route("/api/assessores_dados", methods=["GET","POST"])
+def assessores_dados_endpoint():
+    """Dados financeiros dos assessores (patrimônio, receita, OKR por classe)."""
+    if request.method == "POST":
+        data = request.get_json() or {}
+        _save(_ASSESSORES_FILE, data)
+        return jsonify({"ok": True, "total": len(data.get("assessores", []))})
+    return jsonify(_load(_ASSESSORES_FILE, {"assessores": [], "atualizado_em": ""}))
+
+@app.route("/api/importar_assessores_xlsx", methods=["POST"])
+def importar_assessores_xlsx():
+    """Importa planilha Excel de dados financeiros dos assessores."""
+    try:
+        import openpyxl
+        from io import BytesIO
+        arquivo = request.files.get("planilha")
+        if not arquivo:
+            return jsonify({"ok": False, "erro": "Nenhum arquivo enviado"}), 400
+        wb = openpyxl.load_workbook(BytesIO(arquivo.read()), data_only=True)
+        ws = wb.active
+        assessores = []
+        for row in ws.iter_rows(min_row=2, max_row=50, values_only=True):
+            nome = row[0]
+            if not nome or not isinstance(nome, str) or not str(nome).strip():
+                continue
+            patrimonio    = row[1] or 0
+            rf_saldo      = row[2] or 0
+            rf_pct        = round((row[3] or 0) * 100, 2)
+            rf_receita    = round(row[4] or 0, 2)
+            rf_volume_mes = round(row[5] or 0, 2)
+            rv_saldo      = row[6] or 0
+            rv_pct        = round((row[7] or 0) * 100, 2)
+            rv_receita    = round(row[8] or 0, 2)
+            rv_volume_mes = round(row[9] or 0, 2)
+            estrut_pct_max= round((row[10] or 0) * 100, 2)
+            estrut_volume = round(row[11] or 0, 2)
+            estrut_receita= round(row[12] or 0, 2)
+            fii_saldo     = row[13] or 0
+            fii_pct       = round((row[14] or 0) * 100, 2)
+            fii_receita   = round(row[15] or 0, 2)
+            fii_volume_mes= round(row[16] or 0, 2)
+            intl_saldo    = row[17] or 0
+            intl_pct      = round((row[18] or 0) * 100, 2)
+            intl_receita  = round(row[19] or 0, 2)
+            intl_volume_mes= round(row[20] or 0, 2)
+            receita_total = round(row[22] or 0, 2)
+            roa_anual     = round((row[23] or 0) * 100, 4)
+            okr_mensal    = round(row[24] or 0, 2)
+            okr_anual     = round(row[26] or 0, 2)
+            okr_semestre  = round(row[27] or 0, 2)
+            pct_realizado = round((receita_total / okr_mensal * 100) if okr_mensal > 0 else 0, 1)
+            assessores.append({
+                "nome": str(nome).strip(),
+                "patrimonio": patrimonio,
+                "rf":   {"saldo": round(rf_saldo,2), "pct": rf_pct, "receita": rf_receita, "volume_mes": rf_volume_mes},
+                "rv":   {"saldo": round(rv_saldo,2), "pct": rv_pct, "receita": rv_receita, "volume_mes": rv_volume_mes},
+                "estruturadas": {"pct_max": estrut_pct_max, "volume": estrut_volume, "receita": estrut_receita},
+                "fii":  {"saldo": round(fii_saldo,2), "pct": fii_pct, "receita": fii_receita, "volume_mes": fii_volume_mes},
+                "internacional": {"saldo": round(intl_saldo,2), "pct": intl_pct, "receita": intl_receita, "volume_mes": intl_volume_mes},
+                "receita_total": receita_total,
+                "roa_anual": roa_anual,
+                "okr_mensal": okr_mensal,
+                "okr_anual": okr_anual,
+                "okr_semestre": okr_semestre,
+                "pct_realizado_okr": pct_realizado,
+            })
+        payload = {
+            "assessores": assessores,
+            "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "fonte": arquivo.filename,
+        }
+        _save(_ASSESSORES_FILE, payload)
+        return jsonify({"ok": True, "total": len(assessores)})
+    except Exception as e:
+        app.logger.error(f"importar_assessores_xlsx: {e}")
+        return jsonify({"ok": False, "erro": str(e)}), 500
+
 @app.route("/api/admin/activity", methods=["GET","POST"])
 def admin_activity():
     """Registra e retorna atividade de assessores e líderes."""
@@ -5663,7 +5741,13 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 
 <!-- Ranking assessores -->
 <div class="card">
-  <h2>🏆 Ranking dos Assessores — Engajamento com o sistema</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+    <h2 style="margin:0">🏆 Ranking dos Assessores</h2>
+    <label style="font-size:12px;color:#4A7055;cursor:pointer;display:flex;align-items:center;gap:6px">
+      <input type="file" id="input-planilha" accept=".xlsx" style="display:none" onchange="importarPlanilha(this)">
+      <span style="padding:5px 14px;border:1px solid #2A3A2A;border-radius:6px;background:#0A1A0A;color:#5DCAA5;font-size:12px" onclick="document.getElementById('input-planilha').click()">📥 Atualizar planilha</span>
+    </label>
+  </div>
   <div id="ranking-container">
     <p class="vazio">Carregando dados...</p>
   </div>
@@ -5680,6 +5764,27 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
     body:JSON.stringify({role:"lider",nome,acao:"acesso",detalhe:"Abriu a pagina do Lider"})});
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+
+function importarPlanilha(input){
+  const file = input.files[0];
+  if(!file) return;
+  const formData = new FormData();
+  formData.append("planilha", file);
+  const btn = document.querySelector("[onclick=\"document.getElementById('input-planilha').click()\"]");
+  if(btn) btn.textContent = "Importando...";
+  fetch("/api/importar_assessores_xlsx", {method:"POST", body:formData})
+    .then(r=>r.json())
+    .then(function(res){
+      if(res.ok){
+        if(btn) btn.textContent = "✅ "+res.total+" importados";
+        setTimeout(function(){ window.location.reload(); }, 1500);
+      } else {
+        if(btn) btn.textContent = "❌ Erro";
+        alert(res.erro||"Erro ao importar planilha");
+      }
+    }).catch(function(){ if(btn) btn.textContent = "❌ Erro"; });
+  input.value = "";
+}
 
 const LABEL_COMP = {
   pos_fixado:"Pos Fixado", inflacao:"Inflacao", pre_fixado:"Pre Fixado",
@@ -5700,6 +5805,7 @@ let notas = {};
 let sugestoesHist = [];
 let porAssessorGlobal = {};
 let activityData = [];
+let assessoresDados = {};  // mapa nome → dados financeiros da planilha
 
 function fmtPat(v){
   if(!v || v<=0) return "—";
@@ -5709,29 +5815,42 @@ function fmtPat(v){
 }
 
 async function init(){
-  const [hist, clientes, suge] = await Promise.all([
+  const [hist, clientes, suge, assFinanc] = await Promise.all([
     fetch("/api/historico").then(r=>r.json()).catch(()=>({})),
     fetch("/api/clientes").then(r=>r.json()).catch(()=>[]),
     fetch("/api/sugestoes").then(r=>r.json()).catch(()=>({historico:[]})),
+    fetch("/api/assessores_dados").then(r=>r.json()).catch(()=>({assessores:[]})),
   ]);
   historico = hist;
   clientesData = Array.isArray(clientes) ? clientes : [];
   sugestoesHist = suge.historico||[];
   clientesData.forEach(c=>{ notas[c.assessor+"|"+c.nome] = {id:c.id, nota:c.nota_lider||""}; });
 
-  renderKPIs();
+  // Indexar dados financeiros por nome (busca aproximada)
+  (assFinanc.assessores||[]).forEach(function(a){
+    assessoresDados[a.nome] = a;
+    // Indexar também pelo primeiro nome + sobrenome para match parcial
+    const partes = a.nome.split(" ");
+    if(partes.length >= 2) assessoresDados[partes[0]+" "+partes[partes.length-1]] = a;
+  });
+
+  renderKPIs(assFinanc);
   renderRisco();
   renderAlertas();
   popularFiltroAssessor();
   renderRanking();
 }
 
-function renderKPIs(){
+function renderKPIs(assFinanc){
   const chaves = Object.keys(historico);
   const assessores = new Set(chaves.map(k=>historico[k].assessor||k.split("|")[0]));
   const totalRel = chaves.reduce((s,k)=>s+(historico[k].entradas&&historico[k].entradas.length||0),0);
 
-  const totalPat = clientesData.reduce((s,c)=>s+(c.patrimonio||0),0);
+  // Patrimônio: preferir soma da planilha quando disponível
+  const assArr = (assFinanc && assFinanc.assessores) || [];
+  const totalPatPlanilha = assArr.reduce((s,a)=>s+(a.patrimonio||0),0);
+  const totalPatClientes = clientesData.reduce((s,c)=>s+(c.patrimonio||0),0);
+  const totalPat = totalPatPlanilha > 0 ? totalPatPlanilha : totalPatClientes;
 
   let somaScore=0, cntScore=0;
   clientesData.forEach(c=>{
@@ -5939,6 +6058,17 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
     });
   }
 
+  // Função para buscar dados financeiros por nome (match aproximado)
+  function findFinanc(nome){
+    if(assessoresDados[nome]) return assessoresDados[nome];
+    // Tentar match por primeiro nome
+    const primeiro = nome.split(" ")[0].toLowerCase();
+    for(var k in assessoresDados){
+      if(k.toLowerCase().startsWith(primeiro)) return assessoresDados[k];
+    }
+    return null;
+  }
+
   let html = "";
   ranking.forEach(function(a,i){
     const pos = i+1;
@@ -5949,6 +6079,17 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
     const statusBadge = criticos>0
       ? '<span class="rbadge" style="background:#2A1010;color:#FF6B6B">🔴 '+criticos+' critico(s)</span>'
       : '<span class="rbadge" style="background:#0A2018;color:#5DCAA5">Saudavel</span>';
+
+    // Dados financeiros da planilha
+    const fin = findFinanc(a.nome);
+    const patrimFin = fin ? fin.patrimonio : 0;
+    const receitaFin = fin ? fin.receita_total : 0;
+    const okrMensal  = fin ? fin.okr_mensal : 0;
+    const pctOKR     = fin ? fin.pct_realizado_okr : 0;
+    const roaAnual   = fin ? fin.roa_anual : 0;
+    const okrColor   = pctOKR >= 100 ? "#5DCAA5" : pctOKR >= 70 ? "#FFD966" : "#FF6B6B";
+    const okrBarW    = Math.min(pctOKR, 100);
+    const fmtRec = function(v){ return v > 0 ? "R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}) : "—"; };
 
     // Métricas de performance
     const mesAtual = new Date().toISOString().slice(0,7);
@@ -5961,10 +6102,24 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
     const clientesComRentOk = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].rent12_pct_cdi>=80;}).length;
     const pctRent = a.clientes.length>0 ? Math.round(clientesComRentOk/a.clientes.length*100) : 0;
 
+    const finBlock = fin ? (
+      '<div style="display:flex;gap:16px;align-items:center;padding:4px 0 6px;flex-wrap:wrap">'
+      +'<span style="font-size:12px;color:#C9A96E;font-weight:700">'+fmtPat(patrimFin)+'</span>'
+      +'<span style="font-size:11px;color:#8A9A8A">|</span>'
+      +'<span style="font-size:11px;color:#B0B8B0">Rec: <b style="color:#5DCAA5">'+fmtRec(receitaFin)+'</b></span>'
+      +'<span style="font-size:11px;color:#8A9A8A">|</span>'
+      +'<span style="font-size:11px;color:#B0B8B0">OKR: '+fmtRec(okrMensal)+'</span>'
+      +'<span style="font-size:11px;color:#8A9A8A">|</span>'
+      +'<span style="font-size:11px;color:#B0B8B0">ROA: <b style="color:'+okrColor+'">'+roaAnual.toFixed(2)+'%a.a.</b></span>'
+      +'</div>'
+      +'<div class="rank-bar-row" style="margin-bottom:4px"><span class="lbl" style="min-width:68px">OKR '+Math.round(pctOKR)+'%</span><div class="rank-bar-bg" style="flex:1"><div class="rank-bar-fill" style="width:'+okrBarW+'%;background:'+okrColor+'"></div></div></div>'
+    ) : "";
+
     html += '<div class="rank-item" id="rank-'+i+'" onclick="toggleAssessor('+i+')">'
       +'<div class="rank-pos '+posClass+'">#'+pos+'</div>'
       +'<div style="flex:1">'
       +'<div class="rank-nome">'+a.nome+'</div>'
+      +finBlock
       +'<div class="rank-meta" style="margin-top:2px">'+a.clientes.length+' cliente(s) · '+a.totalRel+' relatorio(s) · '+emAjuste+' em ajuste ativo</div>'
       +'</div>'
       +'<div class="rank-bars">'
@@ -5977,6 +6132,7 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
       +'</div>'
       +'<div class="detalhe-assessor" id="detalhe-'+i+'">'
       +'<div class="metricas-assessor">'
+      +(fin?('<div class="met-item"><div class="met-n" style="color:'+okrColor+'">'+Math.round(pctOKR)+'%</div><div class="met-l">OKR realizado</div><div class="meta-bar '+(pctOKR>=100?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'):"")
       +'<div class="met-item"><div class="met-n">'+analisesMes+'</div><div class="met-l">Analises este mes</div><div class="meta-bar '+(analisesMes>=3?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
       +'<div class="met-item"><div class="met-n">'+pptxGerados+'</div><div class="met-l">PPTX gerados</div><div class="meta-bar '+(pptxGerados>=1?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
       +'<div class="met-item"><div class="met-n">'+pctScore+'%</div><div class="met-l">Clientes score >= 4</div><div class="meta-bar '+(pctScore>=60?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
