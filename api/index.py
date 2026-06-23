@@ -235,6 +235,8 @@ _HP_CALLS_FILE  = "/tmp/brauna_hp_calls.json"
 _HP_GESTORES_FILE   = "/tmp/brauna_hp_gestores.json"
 _HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
 _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
+_ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
+_CLIENTS_FILE         = "/tmp/brauna_clients.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -1432,6 +1434,13 @@ function sair(){
   window.location.replace("/");
 }
 
+// Registra acesso do assessor
+(function(){
+  const nome = localStorage.getItem("brauna_nome") || "Assessor";
+  fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({role:"assessor",nome,acao:"acesso",detalhe:"Abriu a página do Assessor"})});
+})();
+
 const MODELOS={conservadora:{pos_fixado:70,inflacao:16,pre_fixado:7,acoes:0,fiis:0,multimercado:3,internacional:4,alternativos:0,criptomoedas:0},moderada:{pos_fixado:44,inflacao:23,pre_fixado:10,acoes:5,fiis:1.5,multimercado:6,internacional:9,alternativos:1,criptomoedas:0.5},arrojada:{pos_fixado:28,inflacao:28,pre_fixado:12,acoes:8,fiis:2.5,multimercado:9.5,internacional:10.25,alternativos:1,criptomoedas:0.75},agressiva:{pos_fixado:13,inflacao:31,pre_fixado:13,acoes:14,fiis:3.5,multimercado:10.5,internacional:13,alternativos:1,criptomoedas:1}};
 const LABELS={pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
 
@@ -2127,32 +2136,52 @@ function renderAnaliseHP(xp){
   document.getElementById("hp-perfil-badge").textContent = "Perfil detectado: " + (xp.perfil_detectado || "—");
 
   // Alertas relevantes
+  // Badge "carteira salva"
+  const hpHeader = document.getElementById("hp-header");
+  if(xp.carteira_salva && hpHeader){
+    const salvo = document.createElement("span");
+    salvo.style.cssText = "font-size:10px;background:#0A2018;color:#5DCAA5;border:1px solid #1A4A2A;padding:3px 10px;border-radius:10px;display:inline-flex;align-items:center;gap:4px";
+    salvo.innerHTML = "💾 Carteira registrada";
+    hpHeader.prepend(salvo);
+  }
+
   const alertasDiv = document.getElementById("hp-alertas");
-  const alertas = xp.alertas_relevantes || [];
+  const alertas    = xp.alertas_relevantes || [];
+  const nMercado   = (xp.alertas_mercado || []).length;
+
   if(alertas.length){
-    const ACOR   = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
-    const AICON  = {info:"ℹ️", atencao:"⚠️", urgente:"🚨"};
-    const ORIG   = {hp_manual:"HP", knowledge_base:"📚 Base", auto:"🤖 Auto"};
+    const ACOR  = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
+    const AICON = {info:"ℹ️", atencao:"⚠️", urgente:"🚨"};
+    const ORIG  = {hp_manual:"HP", knowledge_base:"📚 Base", auto:"🤖 Auto", mercado:"📰 Mercado"};
+    const OBKG  = {hp_manual:"#1A1A08", knowledge_base:"#0A200A", auto:"#0A0A1A", mercado:"#0A1A28"};
+    const OCOR  = {hp_manual:"#888", knowledge_base:"#5DCAA5", auto:"#7777DD", mercado:"#5BA8D4"};
+
     const urgentes = alertas.filter(a=>a.tipo==="urgente");
-    const outros   = alertas.filter(a=>a.tipo!=="urgente");
     const bordaCor = urgentes.length ? "#FF6B6B" : "#D4B483";
+
     alertasDiv.innerHTML = `
       <div style="border:2px solid ${bordaCor};border-radius:10px;overflow:hidden;margin-bottom:14px">
         <div style="background:${bordaCor}22;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-          <span style="font-size:13px;font-weight:700;color:${bordaCor}">${urgentes.length ? "🚨" : "⚠️"} ${alertas.length} ponto${alertas.length>1?"s":""} para discutir com o cliente</span>
-          <div style="display:flex;gap:6px">
+          <span style="font-size:13px;font-weight:700;color:${bordaCor}">
+            ${urgentes.length ? "🚨" : "⚠️"} ${alertas.length} ponto${alertas.length>1?"s":""} para atenção
+          </span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
             ${urgentes.length ? `<span style="font-size:10px;background:#FF6B6B22;color:#FF6B6B;border:1px solid #FF6B6B44;padding:2px 8px;border-radius:10px">${urgentes.length} urgente${urgentes.length>1?"s":""}</span>` : ""}
-            ${outros.length   ? `<span style="font-size:10px;background:#D4B48322;color:#D4B483;border:1px solid #D4B48344;padding:2px 8px;border-radius:10px">${outros.length} atenção</span>` : ""}
+            ${nMercado ? `<span style="font-size:10px;background:#0A1A2822;color:#5BA8D4;border:1px solid #5BA8D444;padding:2px 8px;border-radius:10px">📰 ${nMercado} do mercado</span>` : ""}
           </div>
         </div>
         <div style="padding:8px 14px 10px">
           ${alertas.map(a=>{
-            const cor    = ACOR[a.tipo]||"#888";
-            const orig   = ORIG[a.origem_tipo]||a.origem||"";
-            return `<div style="border-left:3px solid ${cor};background:#060F0B;border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
+            const cor   = ACOR[a.tipo] || "#888";
+            const ot    = a.origem_tipo || "auto";
+            const orig  = a.origem || ORIG[ot] || "";
+            const obkg  = OBKG[ot] || "#1A1A08";
+            const ocor  = OCOR[ot] || "#888";
+            const isMercado = ot === "mercado";
+            return `<div style="border-left:3px solid ${cor};background:${isMercado?"#060F18":"#060F0B"};border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
                 <span style="font-size:12px;font-weight:700;color:${cor}">${AICON[a.tipo]||"🔔"} ${a.produto||a.classe||""}</span>
-                ${orig ? `<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${orig}</span>` : ""}
+                ${orig ? `<span style="font-size:10px;background:${obkg};color:${ocor};padding:2px 7px;border-radius:10px;border:1px solid ${ocor}33">${orig}</span>` : ""}
                 <span style="font-size:10px;color:#2A5A3A;margin-left:auto">${a.data||""}</span>
               </div>
               <p style="font-size:11px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
@@ -2161,7 +2190,7 @@ function renderAnaliseHP(xp){
         </div>
       </div>`;
   } else {
-    alertasDiv.innerHTML = "";
+    alertasDiv.innerHTML = `<div style="font-size:11px;color:#1E4A30;padding:8px 0;display:flex;align-items:center;gap:6px">✅ Nenhum alerta identificado para esta carteira.</div>`;
   }
 
   // Desvios
@@ -2319,6 +2348,11 @@ async function analisar(){
 
     renderizar(analiseData);
     if(analiseData._xp) renderAnaliseHP(analiseData._xp);
+
+    // Log de atividade
+    const _nomeLog = localStorage.getItem("brauna_nome") || document.getElementById("assessor")?.value || "Assessor";
+    fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({role:"assessor",nome:_nomeLog,acao:"análise",detalhe:`Analisou carteira de ${analiseData.nome||"cliente"} — perfil ${analiseData.perfil||""}`})});
 
     // Salva snapshot da carteira para comparativo futuro
     if(_clienteIdentificado?.conta && analiseData._xp){
@@ -2843,21 +2877,48 @@ async function gerarApresentacao(){
   st.textContent = "Claude está escrevendo a narrativa personalizada...";
 
   const xp = analiseData._xp || {};
+
+  // Monta checklist de modelo de servir (formato esperado pelo PPTX)
+  const checklistServir = {};
+  if(analiseData.checklist_servir){
+    analiseData.checklist_servir.forEach(p => {
+      checklistServir[p.id || p.pilar] = {
+        feito: p.status === "feito" || p.status === "ok",
+        nome: p.nome || p.pilar || p.id,
+        critico: p.critico || false,
+      };
+    });
+  }
+
+  // Cross-sell: mapeia IDs para nomes (o PPTX compara por nome)
+  const crossAtivosNomes   = CROSS_AREAS.filter(a=>crossSell[a.id]).map(a=>a.nome);
+  const crossFaltandoNomes = CROSS_AREAS.filter(a=>!crossSell[a.id]).map(a=>a.nome);
+
   const payload = {
-    nome_cliente:       analiseData.nome || "Cliente",
-    conta:              xp.conta || "",
-    assessor:           analiseData.assessor || "",
-    perfil:             analiseData.perfil || "moderada",
-    data_ref:           analiseData.data_ref || new Date().toLocaleDateString("pt-BR"),
-    patrimonio:         analiseData.patrimonio || xp.patrimonio || 0,
-    rent:               analiseData.rent || xp.rent || {},
-    composicao:         analiseData.composicao || xp.comp || {},
-    desvios:            xp.desvios || analiseData.desvios || [],
-    acoes:              xp.acoes || [],
-    fiis:               xp.fiis || [],
-    sugestoes_produtos: xp.sugestoes_produtos || [],
-    cenario_macro:      xp.cenario_macro || {},
-    alertas_relevantes: xp.alertas_relevantes || [],
+    nome_cliente:        analiseData.nome || "Cliente",
+    conta:               xp.conta || "",
+    assessor:            analiseData.assessor || document.getElementById("assessor")?.value || "",
+    perfil:              analiseData.perfil || "moderada",
+    data_ref:            analiseData.data_ref || new Date().toLocaleDateString("pt-BR"),
+    patrimonio:          analiseData.patrimonio || xp.patrimonio || 0,
+    rent:                analiseData.rent || xp.rent || {},
+    composicao:          analiseData.composicao || xp.comp || {},
+    desvios:             xp.desvios || analiseData.desvios || [],
+    acoes:               xp.acoes || [],
+    fiis:                xp.fiis || [],
+    sugestoes_produtos:  xp.sugestoes_produtos || [],
+    cenario_macro:       xp.cenario_macro || {},
+    alertas_relevantes:  xp.alertas_relevantes || analiseData.alertas || [],
+    // Modelo de Servir
+    score_servir:        analiseData.score_servir || 0,
+    checklist:           checklistServir,
+    pendentes_criticos:  analiseData.pendentes_criticos || 0,
+    // Cross-sell
+    cross_ativos:        crossAtivosNomes,
+    cross_ativos_nomes:  crossAtivosNomes,
+    cross_faltando:      crossFaltandoNomes,
+    // Objetivo e perfil detalhado
+    objetivo:            analiseData.objetivo || "",
   };
 
   try{
@@ -3332,6 +3393,87 @@ def okrs_endpoint():
         save_okrs(request.get_json())
         return jsonify({"ok":True})
     return jsonify(load_okrs())
+
+@app.route("/api/admin/activity", methods=["GET","POST"])
+def admin_activity():
+    """Registra e retorna atividade de assessores e líderes."""
+    if request.method == "POST":
+        data = request.get_json() or {}
+        log = _load(_ADMIN_ACTIVITY_FILE, [])
+        entry = {
+            "ts":     datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "role":   data.get("role",""),
+            "nome":   data.get("nome",""),
+            "acao":   data.get("acao","acesso"),
+            "detalhe":data.get("detalhe",""),
+        }
+        log.insert(0, entry)
+        if len(log) > 500: log = log[:500]
+        _save(_ADMIN_ACTIVITY_FILE, log)
+        return jsonify({"ok": True})
+    return jsonify(_load(_ADMIN_ACTIVITY_FILE, []))
+
+@app.route("/api/admin/dashboard", methods=["GET"])
+def admin_dashboard():
+    """Agrega todas as informações do sistema para o painel admin."""
+    activity = _load(_ADMIN_ACTIVITY_FILE, [])
+
+    # Resumo por role/nome
+    assessores = {}
+    lideres    = {}
+    for ev in activity:
+        nome = ev.get("nome","") or "Anônimo"
+        if ev.get("role") == "assessor":
+            if nome not in assessores:
+                assessores[nome] = {"nome": nome, "acoes": [], "ultimo": ev.get("ts","")}
+            assessores[nome]["acoes"].append({"acao": ev.get("acao",""), "detalhe": ev.get("detalhe",""), "ts": ev.get("ts","")})
+        elif ev.get("role") in ("lider","líder"):
+            if nome not in lideres:
+                lideres[nome] = {"nome": nome, "acoes": [], "ultimo": ev.get("ts","")}
+            lideres[nome]["acoes"].append({"acao": ev.get("acao",""), "detalhe": ev.get("detalhe",""), "ts": ev.get("ts","")})
+
+    # Head — agregar tudo
+    cenario    = _load(_HP_CENARIO_FILE, {})
+    produtos   = _load(_HP_PROD_FILE, {})
+    calls      = _load(_HP_CALLS_FILE, [])
+    knowledge  = _load(_HP_KNOW_FILE, [])
+    gestoras2  = _load(_HP_GESTORAS2_FILE, {})
+    estruturadas = _load(_HP_ESTRUTURADAS_FILE, [])
+    alertas    = _load(_HP_ALERTS_FILE, [])
+    portfolios = _load(_HP_PORT_FILE, {})
+    clientes   = _load(_CLIENTS_FILE, {})
+
+    total_produtos = sum(len(v) for v in produtos.values() if isinstance(v, list)) if isinstance(produtos, dict) else 0
+
+    return jsonify({
+        "assessores":     list(assessores.values()),
+        "lideres":        list(lideres.values()),
+        "_raw_activity":  activity[:200],
+        "head": {
+            "cenario": {
+                "referencia":    cenario.get("referencia",""),
+                "global_chars":  len(cenario.get("global","")),
+                "brasil_chars":  len(cenario.get("brasil","")),
+                "pos_chars":     len(cenario.get("posicionamento","")),
+                "global":        cenario.get("global","")[:300],
+                "brasil":        cenario.get("brasil","")[:300],
+                "posicionamento":cenario.get("posicionamento","")[:300],
+            },
+            "knowledge":    knowledge,
+            "calls":        [c for c in calls if c.get("ativo") is not False],
+            "estruturadas": estruturadas,
+            "alertas":      alertas,
+            "gestoras2":    list(gestoras2.values()),
+            "portfolios_ref": portfolios.get("referencia",""),
+            "total_produtos": total_produtos,
+            "total_docs_base": len(knowledge),
+            "total_calls":    len([c for c in calls if c.get("ativo") is not False]),
+            "total_estruturadas": len(estruturadas),
+            "total_alertas":  len(alertas),
+            "clientes":       list(clientes.values()),
+            "total_clientes": len(clientes),
+        }
+    })
 
 @app.route("/api/admin/mensagem", methods=["GET","POST"])
 def mensagem_endpoint():
@@ -4027,6 +4169,89 @@ def analyze_xp():
         if ticker_ok or perfil_ok:
             calls_relevantes.append(call)
 
+    # ── Salva carteira do cliente no Redis ────────────────────────────────────
+    conta_key = (dados.get("conta") or dados.get("assessor") or "sem_conta").strip().replace(" ","_")
+    clientes = _load(_CLIENTS_FILE, {})
+    clientes[conta_key] = {
+        "conta":       dados.get("conta",""),
+        "assessor":    dados.get("assessor","") or assessor,
+        "patrimonio":  dados.get("patrimonio", 0),
+        "perfil":      label_perfil,
+        "composicao":  comp,
+        "acoes":       dados.get("acoes",[])[:30],
+        "fiis":        dados.get("fiis",[])[:20],
+        "data_ref":    dados.get("data_ref",""),
+        "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+    }
+    _save(_CLIENTS_FILE, clientes)
+
+    # ── Notícias online para os principais tickers ────────────────────────────
+    alertas_mercado = []
+    try:
+        import requests as _req, xml.etree.ElementTree as ET, json as _json
+        todos_ativos = dados.get("acoes",[]) + dados.get("fiis",[])
+        top_tickers = [
+            a.get("ticker","") for a in
+            sorted(todos_ativos, key=lambda x: x.get("perc_carteira", x.get("perc", 0)), reverse=True)
+            if a.get("ticker")
+        ][:5]
+
+        noticias_por_ticker = {}
+        for tk in top_tickers:
+            try:
+                url = f"https://news.google.com/rss/search?q={tk}+bolsa&hl=pt-BR&gl=BR&ceid=BR:pt"
+                r = _req.get(url, timeout=3, headers={"User-Agent": "Mozilla/5.0"})
+                root = ET.fromstring(r.content)
+                titulos = [item.findtext("title","") for item in root.findall(".//item")[:3]]
+                titulos = [t for t in titulos if t]
+                if titulos:
+                    noticias_por_ticker[tk] = titulos
+            except Exception:
+                pass
+
+        if noticias_por_ticker:
+            noticias_txt = "\n".join(
+                f"{tk}: " + " | ".join(ts) for tk, ts in noticias_por_ticker.items()
+            )
+            _ai = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY",""))
+            resp_ai = _ai.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=700,
+                messages=[{"role":"user","content":
+                    f"Você é um assistente de assessor de investimentos. Analise estas notícias recentes "
+                    f"sobre ativos na carteira de um cliente (perfil {label_perfil}, "
+                    f"patrimônio R$ {dados.get('patrimonio',0):,.0f}).\n\n"
+                    f"Notícias:\n{noticias_txt}\n\n"
+                    f"Para cada ativo com notícia relevante (risco, oportunidade, evento corporativo, "
+                    f"resultado, dividendo, split, rebaixamento), gere um alerta ACIONÁVEL para o assessor. "
+                    f"Ignore notícias sem impacto prático. "
+                    f"Responda APENAS com JSON array (sem markdown):\n"
+                    f'[{{"ticker":"X","tipo":"urgente|atencao|info","mensagem":"Texto acionável para o assessor (max 160 chars)","fonte":"nome da notícia em 1 frase"}}]'
+                }]
+            )
+            raw = resp_ai.content[0].text.strip()
+            if raw.startswith("```"): raw = raw.split("```")[1].lstrip("json").strip()
+            parsed = _json.loads(raw)
+            for an in parsed:
+                if not isinstance(an, dict) or not an.get("ticker"): continue
+                alertas_mercado.append({
+                    "id":       f"news_{an['ticker']}_{datetime.now().strftime('%H%M%S')}",
+                    "produto":  an["ticker"],
+                    "classe":   "",
+                    "tipo":     an.get("tipo","atencao"),
+                    "mensagem": an.get("mensagem",""),
+                    "origem":   f"📰 {an.get('fonte','Notícias do mercado')}",
+                    "origem_tipo": "mercado",
+                    "data":     datetime.now().strftime("%d/%m/%Y"),
+                })
+    except Exception as _e:
+        app.logger.warning(f"News fetch warning: {_e}")
+
+    # Mescla: alertas internos primeiro, depois mercado
+    alertas_final = alertas_unicos + alertas_mercado
+    _ord2 = {"urgente": 0, "atencao": 1, "info": 2}
+    alertas_final.sort(key=lambda a: _ord2.get(a.get("tipo","info"), 2))
+
     resultado = {
         "conta":       dados["conta"],
         "assessor":    dados["assessor"] or assessor,
@@ -4041,15 +4266,17 @@ def analyze_xp():
         "acoes":       dados["acoes"],
         "fiis":        dados["fiis"],
         "sugestoes_produtos": sugestoes_prods,
-        "cenario_macro":  {
+        "cenario_macro": {
             "global":        cenario.get("global",""),
             "brasil":        cenario.get("brasil",""),
             "posicionamento":cenario.get("posicionamento",""),
             "vieses":        cenario.get("vieses",{}),
             "referencia":    cenario.get("referencia",""),
         },
-        "alertas_relevantes": alertas_unicos,
+        "alertas_relevantes": alertas_final,
+        "alertas_mercado":    alertas_mercado,
         "calls_relevantes":   calls_relevantes,
+        "carteira_salva":     True,
         "analisado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
     return jsonify(resultado)
@@ -4140,9 +4367,15 @@ def gerar_pptx():
         return jsonify({"error": "Dados não enviados"}), 400
 
     try:
-        hp_cenario = _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
-        macro_bcb  = buscar_macro_bcb()
-        docs_pub   = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
+        hp_cenario   = _load(_HP_CENARIO_FILE, HP_CENARIO_DEFAULT)
+        macro_bcb    = buscar_macro_bcb()
+        docs_pub     = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
+        calls_hp     = [c for c in _load(_HP_CALLS_FILE, []) if c.get("ativo") is not False]
+        estruturadas = _load(_HP_ESTRUTURADAS_FILE, [])
+        produtos_hp  = _load(_HP_PROD_FILE, {})
+        perfil_cli   = body.get("perfil", "moderada").lower()
+
+        # Cenário macro completo do Head
         body["cenario_macro"] = {
             "global":         hp_cenario.get("global",""),
             "brasil":         hp_cenario.get("brasil",""),
@@ -4153,6 +4386,33 @@ def gerar_pptx():
             "ipca_12m":       macro_bcb.get("ipca_12m"),
             "fontes":         [{"nome": d.get("nome",""), "tipo": d.get("tipo",""), "fonte": d.get("fonte","")} for d in docs_pub],
         }
+
+        # Calls de ações do Head (se o frontend não enviou nenhum)
+        if not body.get("calls"):
+            body["calls"] = calls_hp[:8]
+
+        # Operações estruturadas
+        if not body.get("estruturadas"):
+            body["estruturadas"] = estruturadas[:6]
+
+        # Produtos do Head filtrados pelo perfil do cliente
+        # (usa o que veio do frontend; complementa se vazio)
+        if not body.get("sugestoes_produtos"):
+            ORDEM_PERFIL = ["super_conservadora","conservadora","moderada","agressiva","super_agressiva"]
+            idx = ORDEM_PERFIL.index(perfil_cli) if perfil_cli in ORDEM_PERFIL else 2
+            sugs = []
+            for cls, lista in produtos_hp.items():
+                if not isinstance(lista, list): continue
+                for p in lista:
+                    perfis_prod = p.get("perfis") or []
+                    if not perfis_prod:
+                        sugs.append(p)
+                    else:
+                        perfis_norm = [x.lower().replace(" ","_") for x in perfis_prod]
+                        if any(ORDEM_PERFIL.index(pf) <= idx for pf in perfis_norm if pf in ORDEM_PERFIL):
+                            sugs.append(p)
+            body["sugestoes_produtos"] = sugs[:8]
+
         rent = body.get("rent", {})
         port_rent = rent.get("portfolio", {}) if isinstance(rent, dict) else {}
         cdi_rent  = rent.get("cdi", {}) if isinstance(rent, dict) else {}
@@ -5213,6 +5473,9 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 (function(){
   const role = localStorage.getItem("brauna_role");
   if(role !== "lider" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+  const nome = localStorage.getItem("brauna_nome") || "Líder";
+  fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({role:"lider",nome,acao:"acesso",detalhe:"Abriu a página do Líder"})});
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
 
@@ -5452,57 +5715,107 @@ HTML_ADMIN = r"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Braúna — Administração</title>
+<title>Braúna — Admin</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0A0E0A;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#0D120D;border-bottom:1px solid #1A2A1A;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-header h1{font-size:17px;color:#5DCAA5;font-weight:700}
-header p{font-size:11px;color:#2A5A3A;margin-top:2px}
+body{background:#060D08;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#071209;border-bottom:2px solid #1A3A1A;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header h1{font-size:16px;color:#5DCAA5;font-weight:700;letter-spacing:.5px}
+header p{font-size:10px;color:#2A5A3A;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1A2A1A;color:#4A7055;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
-.nav a:hover,.nav button:hover{border-color:#5DCAA5;color:#5DCAA5}
+.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1A2A1A;color:#4A7055;text-decoration:none;transition:all .2s}
+.nav a:hover{border-color:#5DCAA5;color:#5DCAA5}
 .nav a.active{background:#5DCAA5;color:#000;border-color:#5DCAA5;font-weight:700}
-.container{max-width:1100px;margin:0 auto;padding:24px 20px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:#0D140D;border:1px solid #1A2A1A;border-radius:12px;padding:20px;margin-bottom:16px}
-.card-title{font-size:11px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.container{max-width:1280px;margin:0 auto;padding:24px 20px}
+
+/* Tabs principais */
+.main-tabs{display:flex;gap:0;border-bottom:2px solid #1A3A1A;margin-bottom:24px}
+.main-tab{padding:12px 24px;font-size:13px;font-weight:600;color:#3A6A48;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;font-family:inherit;transition:all .2s;margin-bottom:-2px}
+.main-tab:hover{color:#5DCAA5}
+.main-tab.active{color:#5DCAA5;border-bottom-color:#5DCAA5}
+.main-panel{display:none}.main-panel.active{display:block}
+
+/* Cards */
+.card{background:#0A1A0C;border:1px solid #1A3A1A;border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 label{font-size:11px;color:#4A7055;display:block;margin-bottom:5px}
-input[type=text],textarea,select{width:100%;background:#080E08;border:1px solid #1A2A1A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
+input[type=text],textarea,select{width:100%;background:#060E08;border:1px solid #1A2A1A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
 input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .btn{display:inline-flex;align-items:center;gap:6px;background:#5DCAA5;color:#000;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
-.btn:hover{opacity:.85}
-.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn:hover{opacity:.85}.btn:disabled{opacity:.35;cursor:not-allowed}
 .btn-out{background:transparent;color:#5DCAA5;border:1px solid #5DCAA5}
 .btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
 .btn-ghost{background:transparent;border:1px solid #1A2A1A;color:#3A6A48;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-ghost:hover{border-color:#5DCAA5;color:#5DCAA5}
-/* Upload área */
-.upload-area{border:1.5px dashed #1A2A1A;border-radius:10px;padding:22px;text-align:center;cursor:pointer;position:relative;background:#080E08;transition:all .2s}
+
+/* KPI chips */
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.kpi{background:#0D1C10;border:1px solid #1A3A1A;border-radius:10px;padding:14px 18px;min-width:130px;flex:1}
+.kpi-val{font-size:28px;font-weight:900;line-height:1}
+.kpi-lbl{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* Tabela de atividade */
+.act-table{width:100%;border-collapse:collapse;font-size:12px}
+.act-table th{text-align:left;padding:8px 10px;font-size:10px;color:#2A5A3A;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #1A3A1A;font-weight:700}
+.act-table td{padding:9px 10px;border-bottom:1px solid #0D1A0E;vertical-align:top}
+.act-table tr:hover td{background:#0C180E}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700}
+.badge-assessor{background:#0D2A1D;color:#5DCAA5;border:1px solid #1A4A2A}
+.badge-lider{background:#0D1030;color:#8B9FE8;border:1px solid #1A2050}
+.badge-head{background:#2A1A08;color:#C9A96E;border:1px solid #4A3010}
+.badge-ok{background:#0A2018;color:#5DCAA5}
+.badge-warn{background:#2A1808;color:#C9A96E}
+
+/* Assessor cards */
+.user-card{background:#0A1A0C;border:1px solid #1A3A1A;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
+.user-card:hover{border-color:#2A5A3A}
+.user-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:700;color:#F0F0F0}
+.user-meta{font-size:10px;color:#3A6A48;margin-top:2px}
+.user-log{margin-top:8px;display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto}
+.log-row{font-size:10px;color:#4A7055;display:flex;gap:8px;align-items:flex-start}
+.log-ts{color:#1E4A30;flex-shrink:0;min-width:90px}
+
+/* Head info cards */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.info-card{background:#0A1A0C;border:1px solid #1A3A1A;border-radius:10px;padding:14px}
+.info-card-title{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px}
+.info-card-body{font-size:12px;color:#CCC;line-height:1.6}
+
+/* Doc list */
+.doc-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #0D1A0E;font-size:12px}
+.doc-row:last-child{border-bottom:none}
+.doc-icon{font-size:14px;flex-shrink:0}
+.doc-name{flex:1;color:#C9A96E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-meta{font-size:10px;color:#2A5A3A;flex-shrink:0}
+
+/* Config tab */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.upload-area{border:1.5px dashed #1A2A1A;border-radius:10px;padding:22px;text-align:center;cursor:pointer;position:relative;background:#060E08;transition:all .2s}
 .upload-area:hover{border-color:#5DCAA5;background:#050D05}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .ui{pointer-events:none}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
 .upload-area p{font-size:12px;color:#3A6A48}
 .upload-area .fname{color:#5DCAA5;font-weight:600;font-size:12px;margin-top:4px;min-height:18px}
-/* Barra de ferramentas da aba */
-.tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#070C07;border:1px dashed #1A2A1A;border-radius:8px;margin-bottom:12px}
+.tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#060C08;border:1px dashed #1A2A1A;border-radius:8px;margin-bottom:12px}
 .tab-toolbar .lbl{font-size:11px;color:#3A4A3A;flex:1;min-width:120px}
 .btn-file-wrap{position:relative;overflow:hidden;display:inline-flex}
 .btn-file-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-/* PDF preview dentro da aba */
-.pdf-preview{background:#070C07;border:1px solid #5DCAA5;border-radius:8px;padding:12px;margin-bottom:12px;display:none}
+.pdf-preview{background:#060C08;border:1px solid #5DCAA5;border-radius:8px;padding:12px;margin-bottom:12px;display:none}
 .pdf-preview .pdf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .pdf-preview .pdf-title{font-size:11px;color:#5DCAA5;font-weight:700}
-.pdf-preview textarea{height:140px;font-size:11px;font-family:monospace;color:#9A9;background:#050A05;resize:vertical}
+.pdf-preview textarea{height:140px;font-size:11px;font-family:monospace;color:#9A9;background:#040A04;resize:vertical}
 .pdf-preview .pdf-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-/* Sugestão items */
 .sg-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #1A2A1A;background:#080E08;color:#4A7055;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #1A2A1A;background:#060E08;color:#4A7055;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
 .sg-tab.active{background:#5DCAA5;color:#000;border-color:#5DCAA5;font-weight:700}
 .sg-panel{display:none}.sg-panel.active{display:block}
-.sg-item{background:#080E08;border:1px solid #1A2A1A;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
+.sg-item{background:#060E08;border:1px solid #1A2A1A;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .sg-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#2A3A2A;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
 .sg-del:hover{color:#FF6B6B;background:#1A0505}
@@ -5511,20 +5824,18 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 .sg-mini label{font-size:10px;color:#3A6A48;margin-bottom:3px}
 .perfis-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 .perfis-row label{display:flex;align-items:center;gap:4px;font-size:11px;color:#777;cursor:pointer;margin-bottom:0}
-/* Histórico */
-.hist-item{background:#080E08;border:1px solid #1A2A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:default;transition:border .2s}
+.hist-item{background:#060E08;border:1px solid #1A2A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
 .hist-item.ativa{border-color:#5DCAA5}
 .tag-ativa{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:#0A2018;color:#5DCAA5}
-/* Info box */
-.info-box{background:#080E08;border-radius:8px;padding:12px 14px;font-size:12px;color:#4A7055;line-height:1.6;border:1px solid #1A2A1A}
+.info-box{background:#060E08;border-radius:8px;padding:12px 14px;font-size:12px;color:#4A7055;line-height:1.6;border:1px solid #1A2A1A}
 .info-box b{color:#5DCAA5}
 .status-ok{color:#5DCAA5}.status-err{color:#FF6B6B}
-@media(max-width:640px){.grid-2,.sg-grid-2,.sg-grid-3{grid-template-columns:1fr}.tab-toolbar{flex-direction:column;align-items:flex-start}}
+@media(max-width:640px){.grid-2,.sg-grid-2,.sg-grid-3{grid-template-columns:1fr}.kpi{min-width:100px}}
 </style>
 </head>
 <body>
 <header>
-  <div><h1>⚙️ BRAÚNA — ADMINISTRAÇÃO</h1><p>Documentos estratégicos · Sugestões de alocação · Comunicados</p></div>
+  <div><h1>⚙️ BRAÚNA — ADMINISTRAÇÃO</h1><p>Painel de controle · Atividade da equipe · Informações do sistema</p></div>
   <nav class="nav">
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider">👥 Líder</a>
@@ -5535,12 +5846,143 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
 <div class="container">
 
+<!-- Tabs principais -->
+<div class="main-tabs">
+  <button class="main-tab active" onclick="switchTab('assessores',this)">📊 Assessores</button>
+  <button class="main-tab"        onclick="switchTab('lideres',this)">👥 Líderes</button>
+  <button class="main-tab"        onclick="switchTab('head',this)">🏛️ Head — Informações</button>
+  <button class="main-tab"        onclick="switchTab('config',this)">⚙️ Configurações</button>
+</div>
+
+<!-- ═══════ TAB: ASSESSORES ═══════ -->
+<div class="main-panel active" id="tab-assessores">
+  <div class="kpi-row" id="kpi-assessores">
+    <div class="kpi"><div class="kpi-val" id="kpi-ativos" style="color:#5DCAA5">—</div><div class="kpi-lbl">Assessores Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-analises" style="color:#C9A96E">—</div><div class="kpi-lbl">Análises Realizadas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-clientes" style="color:#8B9FE8">—</div><div class="kpi-lbl">Clientes Analisados</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-ultimo-acesso" style="color:#5DCAA5;font-size:14px">—</div><div class="kpi-lbl">Último Acesso</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:#5DCAA5">👤 Assessores — Atividade por Usuário</div>
+    <div id="lista-assessores"><div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Carregando...</div></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="card-title" style="color:#5DCAA5;margin-bottom:0">📋 Log de Atividade — Assessores</div>
+      <button class="btn-ghost" onclick="carregarDashboard()">↻ Atualizar</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="act-table" id="log-assessores">
+        <thead><tr><th>Hora</th><th>Assessor</th><th>Ação</th><th>Detalhe</th></tr></thead>
+        <tbody id="log-assessores-body"><tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB: LÍDERES ═══════ -->
+<div class="main-panel" id="tab-lideres">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val" id="kpi-lider-ativos" style="color:#8B9FE8">—</div><div class="kpi-lbl">Líderes Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-lider-acoes" style="color:#C9A96E">—</div><div class="kpi-lbl">Ações Realizadas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-lider-ultimo" style="color:#8B9FE8;font-size:14px">—</div><div class="kpi-lbl">Último Acesso</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:#8B9FE8">👥 Líderes — Atividade por Usuário</div>
+    <div id="lista-lideres"><div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Carregando...</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:#8B9FE8;margin-bottom:12px">📋 Log de Atividade — Líderes</div>
+    <div style="overflow-x:auto">
+      <table class="act-table">
+        <thead><tr><th>Hora</th><th>Líder</th><th>Ação</th><th>Detalhe</th></tr></thead>
+        <tbody id="log-lideres-body"><tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB: HEAD ═══════ -->
+<div class="main-panel" id="tab-head">
+
+  <!-- KPIs rápidos -->
+  <div class="kpi-row" id="kpi-head-row">
+    <div class="kpi"><div class="kpi-val" id="kpi-docs" style="color:#C9A96E">—</div><div class="kpi-lbl">Docs na Base</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-calls" style="color:#5DCAA5">—</div><div class="kpi-lbl">Calls Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-estr" style="color:#8B9FE8">—</div><div class="kpi-lbl">Op. Estruturadas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-prod" style="color:#C9A96E">—</div><div class="kpi-lbl">Produtos Destaque</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-alertas" style="color:#FF6B6B">—</div><div class="kpi-lbl">Alertas Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-gestoras" style="color:#5DCAA5">—</div><div class="kpi-lbl">Gestoras Cadastradas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-clientes" style="color:#8B9FE8">—</div><div class="kpi-lbl">Clientes Registrados</div></div>
+  </div>
+
+  <!-- Cenário Macro -->
+  <div class="card" style="border-color:#2A3A20">
+    <div class="card-title" style="color:#C9A96E">🌐 Cenário Macro Atual</div>
+    <div id="head-cenario"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+  </div>
+
+  <!-- Grid: Docs + Calls -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <!-- Base de Conhecimento -->
+    <div class="card" style="border-color:#2A2A18">
+      <div class="card-title" style="color:#C9A96E">📚 Base de Conhecimento</div>
+      <div id="head-docs"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    </div>
+
+    <!-- Calls de Ações -->
+    <div class="card" style="border-color:#1A2E3A">
+      <div class="card-title" style="color:#5DCAA5">📈 Calls de Ações</div>
+      <div id="head-calls"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    </div>
+
+  </div>
+
+  <!-- Grid: Estruturadas + Gestoras -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <!-- Operações Estruturadas -->
+    <div class="card" style="border-color:#2A1A10">
+      <div class="card-title" style="color:#C9A96E">💼 Operações Estruturadas</div>
+      <div id="head-estruturadas"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    </div>
+
+    <!-- Alocações de Referência -->
+    <div class="card" style="border-color:#1A3A1A">
+      <div class="card-title" style="color:#5DCAA5">📐 Alocações de Referência — Gestoras</div>
+      <div id="head-gestoras"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    </div>
+
+  </div>
+
+  <!-- Alertas -->
+  <div class="card" style="border-color:#2A1A08">
+    <div class="card-title" style="color:#FF6B6B">🚨 Alertas Ativos</div>
+    <div id="head-alertas"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+  </div>
+
+  <!-- Clientes Registrados -->
+  <div class="card" style="border-color:#1A2A3A">
+    <div class="card-title" style="color:#8B9FE8">👤 Carteiras de Clientes Registradas</div>
+    <div id="head-clientes"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+  </div>
+
+</div>
+
+<!-- ═══════ TAB: CONFIGURAÇÕES ═══════ -->
+<div class="main-panel" id="tab-config">
+
 <!-- Linha 1: Carta + Comunicado -->
 <div class="grid-2" style="margin-bottom:16px">
 
   <!-- Carta da Gestão -->
   <div class="card" style="margin-bottom:0">
-    <div class="card-title">📄 Carta da Gestão — Upload Mensal</div>
+    <div class="card-title" style="color:#5DCAA5">📄 Carta da Gestão — Upload Mensal</div>
     <p style="font-size:11px;color:#2A5A3A;margin-bottom:12px;line-height:1.5">Suba o PDF da carta mensal (Levante, BTG, XP Research…). O sistema extrai os insights e usa em todas as análises de carteira dos assessores.</p>
     <div class="upload-area" id="drop-carta">
       <input type="file" id="pdf-carta" accept=".pdf" onchange="onCartaSelect()">
@@ -5562,7 +6004,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
   <!-- Comunicado -->
   <div class="card" style="margin-bottom:0">
-    <div class="card-title">📢 Comunicado para Assessores</div>
+    <div class="card-title" style="color:#5DCAA5">📢 Comunicado para Assessores</div>
     <div style="margin-bottom:10px">
       <label>Estratégia do mês (visível na tela do assessor)</label>
       <textarea id="txt-estrategia" rows="3" placeholder="Ex: Foco em IPCA+ este mês. Clientes conservadores devem aumentar exposição em inflação..."></textarea>
@@ -5582,8 +6024,8 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
 <!-- Sugestões de Alocação -->
 <div class="card">
-  <div class="card-title">💡 Sugestões de Alocação para Assessores</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Monte as sugestões por categoria. Em cada aba você pode subir um PDF (relatório de casa de análise) ou uma planilha, ou preencher manualmente. Ao publicar, ficam disponíveis para todos os assessores filtradas pelo perfil do cliente.</p>
+  <div class="card-title" style="color:#5DCAA5">💡 Sugestões de Alocação para Assessores</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Monte as sugestões por categoria. Ao publicar, ficam disponíveis para todos os assessores filtradas pelo perfil do cliente.</p>
 
   <div style="margin-bottom:14px">
     <label>Título da publicação</label>
@@ -5758,8 +6200,6 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
   <div class="card-title">📋 Histórico de Publicações</div>
   <div id="sg-historico"><p style="color:#1E4A30;font-size:12px;font-style:italic">Carregando...</p></div>
 </div>
-
-</div><!-- /container -->
 
 <script>
 // Admin sem autenticação — seta role para permitir navegar em todas as páginas
@@ -6182,6 +6622,193 @@ function baixarModelo(tipo){
 init();
 carregarHistorico();
 </script>
+
+</div><!-- /tab-config -->
+
+</div><!-- /container -->
+
+<script>
+// ─── Tab switching (main tabs) ────────────────────────────────────────────────
+function switchTab(name, btn){
+  document.querySelectorAll(".main-panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".main-tab").forEach(b=>b.classList.remove("active"));
+  const panel = document.getElementById("tab-"+name);
+  if(panel) panel.classList.add("active");
+  if(btn)   btn.classList.add("active");
+  if(name==="assessores"||name==="lideres"||name==="head") carregarDashboard();
+}
+
+// ─── Dashboard data ───────────────────────────────────────────────────────────
+let _dashData = null;
+
+async function carregarDashboard(){
+  try{
+    const r = await fetch("/api/admin/dashboard");
+    _dashData = await r.json();
+    renderAssessores(_dashData.assessores||[]);
+    renderLideres(_dashData.lideres||[]);
+    renderHead(_dashData.head||{});
+  } catch(e){ console.warn("Dashboard error", e); }
+}
+
+// ─── Assessores ───────────────────────────────────────────────────────────────
+function renderAssessores(assessores){
+  const totalAnalises = assessores.reduce((s,a)=>s+(a.acoes||[]).filter(x=>x.acao==="análise").length,0);
+  const clientes = new Set();
+  assessores.forEach(a=>(a.acoes||[]).filter(x=>x.acao==="análise").forEach(x=>{
+    const m = (x.detalhe||"").match(/Analisou carteira de (.+?) —/);
+    if(m) clientes.add(m[1]);
+  }));
+  const ultimo = assessores.length ? (assessores[0].ultimo||"—") : "—";
+  document.getElementById("kpi-ativos").textContent    = assessores.length;
+  document.getElementById("kpi-analises").textContent  = totalAnalises;
+  document.getElementById("kpi-clientes").textContent  = clientes.size;
+  document.getElementById("kpi-ultimo-acesso").textContent = ultimo;
+
+  // Cards
+  const lista = document.getElementById("lista-assessores");
+  if(!assessores.length){
+    lista.innerHTML = '<div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Nenhum assessor registrado ainda.</div>';
+  } else {
+    const colors = ["#5DCAA5","#8B9FE8","#C9A96E","#FF8B6B","#A0D8A0"];
+    lista.innerHTML = assessores.map((a,i)=>{
+      const analises = (a.acoes||[]).filter(x=>x.acao==="análise");
+      const logHtml  = (a.acoes||[]).slice(0,5).map(x=>
+        `<div class="log-row"><span class="log-ts">${x.ts||""}</span><span>${x.acao}: ${x.detalhe||""}</span></div>`
+      ).join("");
+      return `<div class="user-card">
+        <div class="user-avatar" style="background:${colors[i%colors.length]}20;color:${colors[i%colors.length]}">${(a.nome||"?")[0].toUpperCase()}</div>
+        <div class="user-info">
+          <div class="user-name">${a.nome||"Desconhecido"}</div>
+          <div class="user-meta">Último acesso: ${a.ultimo||"—"} · ${(a.acoes||[]).length} ações · ${analises.length} análises</div>
+          <div class="user-log">${logHtml||'<div class="log-row"><span style="color:#1E4A30">Sem atividade registrada</span></div>'}</div>
+        </div>
+        <span class="badge badge-assessor">Assessor</span>
+      </div>`;
+    }).join("");
+  }
+
+  // Log table
+  const activity = _dashData?._raw_activity || [];
+  const rows = activity.filter(e=>e.role==="assessor").slice(0,50);
+  document.getElementById("log-assessores-body").innerHTML = rows.length
+    ? rows.map(e=>`<tr><td style="color:#2A5A3A">${e.ts||""}</td><td style="color:#F0F0F0;font-weight:600">${e.nome||""}</td><td><span class="badge badge-${e.acao==="análise"?"warn":"ok"}">${e.acao||""}</span></td><td style="color:#888">${e.detalhe||""}</td></tr>`).join("")
+    : `<tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Sem atividade registrada.</td></tr>`;
+}
+
+// ─── Líderes ──────────────────────────────────────────────────────────────────
+function renderLideres(lideres){
+  const totalAcoes = lideres.reduce((s,l)=>s+(l.acoes||[]).length,0);
+  const ultimo = lideres.length ? (lideres[0].ultimo||"—") : "—";
+  document.getElementById("kpi-lider-ativos").textContent = lideres.length;
+  document.getElementById("kpi-lider-acoes").textContent  = totalAcoes;
+  document.getElementById("kpi-lider-ultimo").textContent = ultimo;
+
+  const lista = document.getElementById("lista-lideres");
+  if(!lideres.length){
+    lista.innerHTML = '<div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Nenhum líder registrado ainda.</div>';
+  } else {
+    lista.innerHTML = lideres.map(l=>{
+      const logHtml = (l.acoes||[]).slice(0,5).map(x=>
+        `<div class="log-row"><span class="log-ts">${x.ts||""}</span><span>${x.acao}: ${x.detalhe||""}</span></div>`
+      ).join("");
+      return `<div class="user-card">
+        <div class="user-avatar" style="background:#8B9FE820;color:#8B9FE8">${(l.nome||"?")[0].toUpperCase()}</div>
+        <div class="user-info">
+          <div class="user-name">${l.nome||"Desconhecido"}</div>
+          <div class="user-meta">Último acesso: ${l.ultimo||"—"} · ${(l.acoes||[]).length} ações</div>
+          <div class="user-log">${logHtml||'<div class="log-row"><span style="color:#1E4A30">Sem atividade</span></div>'}</div>
+        </div>
+        <span class="badge badge-lider">Líder</span>
+      </div>`;
+    }).join("");
+  }
+
+  const activity = _dashData?._raw_activity || [];
+  const rows = activity.filter(e=>e.role==="lider"||e.role==="líder").slice(0,50);
+  document.getElementById("log-lideres-body").innerHTML = rows.length
+    ? rows.map(e=>`<tr><td style="color:#2A5A3A">${e.ts||""}</td><td style="color:#F0F0F0;font-weight:600">${e.nome||""}</td><td><span class="badge badge-lider">${e.acao||""}</span></td><td style="color:#888">${e.detalhe||""}</td></tr>`).join("")
+    : `<tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Sem atividade registrada.</td></tr>`;
+}
+
+// ─── Head ─────────────────────────────────────────────────────────────────────
+function renderHead(h){
+  document.getElementById("kpi-docs").textContent    = h.total_docs_base   ?? "—";
+  document.getElementById("kpi-calls").textContent   = h.total_calls        ?? "—";
+  document.getElementById("kpi-estr").textContent    = h.total_estruturadas ?? "—";
+  document.getElementById("kpi-prod").textContent    = h.total_produtos     ?? "—";
+  document.getElementById("kpi-alertas").textContent = (h.alertas||[]).length;
+  document.getElementById("kpi-gestoras").textContent= (h.gestoras2||[]).length;
+  document.getElementById("kpi-clientes").textContent= h.total_clientes ?? "—";
+
+  // Cenário
+  const c = h.cenario || {};
+  const cenRef = c.referencia ? `<div style="font-size:10px;color:#3A6A48;margin-bottom:8px">📅 Referência: <b style="color:#C9A96E">${c.referencia}</b></div>` : "";
+  const cenHtml = c.global || c.brasil || c.posicionamento
+    ? `${cenRef}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div><div style="font-size:10px;color:#3A6A48;margin-bottom:4px;font-weight:700">🌐 GLOBAL</div><div style="font-size:11px;color:#CCC;line-height:1.6">${(c.global||"").substring(0,200)}${c.global_chars>200?"…":""}</div></div>
+        <div><div style="font-size:10px;color:#3A6A48;margin-bottom:4px;font-weight:700">🇧🇷 BRASIL</div><div style="font-size:11px;color:#CCC;line-height:1.6">${(c.brasil||"").substring(0,200)}${c.brasil_chars>200?"…":""}</div></div>
+        <div><div style="font-size:10px;color:#3A6A48;margin-bottom:4px;font-weight:700">🎯 POSICIONAMENTO</div><div style="font-size:11px;color:#CCC;line-height:1.6">${(c.posicionamento||"").substring(0,200)}${c.pos_chars>200?"…":""}</div></div>
+      </div>`
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic">Nenhum cenário publicado ainda.</div>`;
+  document.getElementById("head-cenario").innerHTML = cenHtml;
+
+  // Base de Conhecimento
+  const docs = h.knowledge || [];
+  document.getElementById("head-docs").innerHTML = docs.length
+    ? docs.map(d=>`<div class="doc-row"><span class="doc-icon">📄</span><span class="doc-name" title="${d.nome||""}">${d.nome||"Documento"}</span><span class="doc-meta">${d.data||""}</span></div>`).join("")
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhum documento na base.</div>`;
+
+  // Calls
+  const calls = h.calls || [];
+  document.getElementById("head-calls").innerHTML = calls.length
+    ? calls.map(c=>`<div class="doc-row"><span class="doc-icon">📈</span><span class="doc-name">${c.ativo||c.nome||"—"} <span style="font-size:10px;color:#888">${c.acao||""}</span></span><span class="doc-meta">${c.data||""}</span></div>`).join("")
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma call ativa.</div>`;
+
+  // Estruturadas
+  const estr = h.estruturadas || [];
+  document.getElementById("head-estruturadas").innerHTML = estr.length
+    ? estr.map(e=>`<div class="doc-row"><span class="doc-icon">💼</span><span class="doc-name">${e.ativo||"—"} <span style="font-size:10px;color:#888">${e.tipo||""}</span></span><span class="doc-meta" style="color:#C9A96E">${e.retorno||""}</span></div>`).join("")
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma operação cadastrada.</div>`;
+
+  // Gestoras
+  const gest = h.gestoras2 || [];
+  document.getElementById("head-gestoras").innerHTML = gest.length
+    ? gest.map(g=>`<div class="doc-row"><span class="doc-icon">🏦</span><span class="doc-name">${g.nome||"—"}</span><span class="doc-meta">${g.referencia||""}</span></div>`).join("")
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma gestora cadastrada.</div>`;
+
+  // Alertas
+  const alertas = h.alertas || [];
+  document.getElementById("head-alertas").innerHTML = alertas.length
+    ? alertas.map(a=>`<div class="doc-row"><span class="doc-icon">🚨</span><span class="doc-name">${a.titulo||a.texto||"Alerta"}</span><span class="doc-meta">${a.data||""}</span></div>`).join("")
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhum alerta ativo.</div>`;
+
+  // Clientes registrados
+  const clientes = h.clientes || [];
+  const fmtPat = v => v >= 1e6 ? `R$ ${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `R$ ${(v/1e3).toFixed(0)}k` : `R$ ${v}`;
+  document.getElementById("head-clientes").innerHTML = clientes.length
+    ? `<div style="overflow-x:auto"><table class="act-table">
+        <thead><tr><th>Conta</th><th>Assessor</th><th>Perfil</th><th>Patrimônio</th><th>Principais ativos</th><th>Atualizado</th></tr></thead>
+        <tbody>${clientes.map(c=>{
+          const ativos = [...(c.acoes||[]).slice(0,3).map(a=>a.ticker), ...(c.fiis||[]).slice(0,2).map(f=>f.ticker)].filter(Boolean).join(", ");
+          return `<tr>
+            <td style="color:#C9A96E;font-weight:600">${c.conta||"—"}</td>
+            <td style="color:#AAA">${c.assessor||"—"}</td>
+            <td><span class="badge badge-assessor">${c.perfil||"—"}</span></td>
+            <td style="color:#5DCAA5;font-weight:700">${fmtPat(c.patrimonio||0)}</td>
+            <td style="color:#888;font-size:11px">${ativos||"—"}</td>
+            <td style="color:#2A5A3A;font-size:10px">${c.atualizado_em||"—"}</td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table></div>`
+    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma carteira registrada ainda.</div>`;
+}
+
+// ─── Load on start ────────────────────────────────────────────────────────────
+carregarDashboard();
+</script>
+
 </body></html>"""
 
 # ═══════════════════════════════════════════════════════════════════════════════
