@@ -232,7 +232,9 @@ _HP_PROD_FILE   = "/tmp/brauna_hp_produtos.json"
 _HP_ALERTS_FILE = "/tmp/brauna_hp_alertas.json"
 _HP_KNOW_FILE   = "/tmp/brauna_hp_knowledge.json"
 _HP_CALLS_FILE  = "/tmp/brauna_hp_calls.json"
-_HP_GESTORES_FILE = "/tmp/brauna_hp_gestores.json"
+_HP_GESTORES_FILE   = "/tmp/brauna_hp_gestores.json"
+_HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
+_HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -3548,6 +3550,62 @@ def hp_calls():
     _save(_HP_CALLS_FILE, calls)
     return jsonify({"ok": True, "call": novo})
 
+@app.route("/api/hp/gestoras2", methods=["GET","POST"])
+def hp_gestoras2():
+    """Armazena carteiras de gestoras externas com os 5 perfis. Estrutura: {gestora_id: {nome, referencia, perfis:{perfil:{classe:%}}}}"""
+    if request.method == "GET":
+        return jsonify(_load(_HP_GESTORAS2_FILE, {}))
+    data = request.get_json()
+    if data.get("_delete"):
+        gestoras = _load(_HP_GESTORAS2_FILE, {})
+        gid = data.get("id","")
+        gestoras.pop(gid, None)
+        _save(_HP_GESTORAS2_FILE, gestoras)
+        return jsonify({"ok": True})
+    CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"]
+    PERFIS  = ["super_conservadora","conservadora","moderada","agressiva","super_agressiva"]
+    gestoras = _load(_HP_GESTORAS2_FILE, {})
+    if len(gestoras) >= 5 and data.get("id","") not in gestoras:
+        return jsonify({"ok": False, "error": "Máximo de 5 gestoras atingido."}), 400
+    gid = data.get("id") or data.get("nome","gestora").lower().replace(" ","_")[:20]
+    perfis_data = {}
+    for p in PERFIS:
+        alocacao = {}
+        for c in CLASSES:
+            v = data.get("perfis",{}).get(p,{}).get(c, 0)
+            alocacao[c] = round(float(v or 0), 1)
+        perfis_data[p] = alocacao
+    gestoras[gid] = {"id": gid, "nome": data.get("nome","").strip(), "referencia": data.get("referencia","").strip(), "perfis": perfis_data}
+    _save(_HP_GESTORAS2_FILE, gestoras)
+    return jsonify({"ok": True, "id": gid})
+
+@app.route("/api/hp/estruturadas", methods=["GET","POST"])
+def hp_estruturadas():
+    """Operações estruturadas cadastradas pelo Head."""
+    if request.method == "GET":
+        return jsonify(_load(_HP_ESTRUTURADAS_FILE, []))
+    data = request.get_json()
+    if data.get("_delete"):
+        ops = _load(_HP_ESTRUTURADAS_FILE, [])
+        ops = [o for o in ops if o.get("id") != data.get("id")]
+        _save(_HP_ESTRUTURADAS_FILE, ops)
+        return jsonify({"ok": True})
+    nova = {
+        "id": str(uuid.uuid4())[:8],
+        "tipo": data.get("tipo","").strip(),
+        "ativo": data.get("ativo","").strip(),
+        "emissor": data.get("emissor","").strip(),
+        "vencimento": data.get("vencimento","").strip(),
+        "retorno": data.get("retorno","").strip(),
+        "perfil_minimo": data.get("perfil_minimo","moderada"),
+        "observacao": data.get("observacao","").strip(),
+        "data": datetime.now().strftime("%d/%m/%Y"),
+    }
+    ops = _load(_HP_ESTRUTURADAS_FILE, [])
+    ops.insert(0, nova)
+    _save(_HP_ESTRUTURADAS_FILE, ops)
+    return jsonify({"ok": True, "op": nova})
+
 @app.route("/api/hp/gestores", methods=["GET","POST"])
 def hp_gestores():
     if request.method == "GET":
@@ -6234,54 +6292,9 @@ textarea{resize:vertical}
 <!-- ── Status da publicação ── -->
 <div id="status-pub" class="info-box" style="margin-bottom:18px;display:none"></div>
 
-<!-- ══ 0. UPLOAD RÁPIDO DE PDF ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#3A3A20">
-  <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
-      <span style="font-size:11px;color:#2A5A3A">Material de trabalho, produtos, carteiras recomendadas e ativos → <b style="color:#D4B483">Base de Conhecimento</b></span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
-    </div>
-  </div>
-
-  <!-- Zona de seleção / lista -->
-  <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
-    style="border:2px dashed #2A4A2A;border-radius:10px;padding:30px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
-    onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
-    <div style="font-size:28px;margin-bottom:8px">📂</div>
-    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
-    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Produtos, carteiras recomendadas, material sobre ativos</div>
-  </div>
-
-  <!-- Lista de arquivos selecionados -->
-  <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
-    <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
-      Arquivos selecionados — <span id="pdf-rapido-contador">0</span>
-    </div>
-    <div id="pdf-rapido-lista"></div>
-
-    <!-- Botão de upload -->
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1A2A1A;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">
-        📤 Subir para a Memória
-      </button>
-      <button class="btn-ghost" onclick="document.getElementById('pdf-rapido').click()" style="font-size:11px;padding:6px 14px">
-        + Adicionar mais
-      </button>
-      <span id="rapido-upload-st" style="font-size:11px;color:#5DCAA5;margin-left:auto"></span>
-    </div>
-  </div>
-</div>
-
 <!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>🌐</span> Cenário Macro</div>
-
-  <!-- Upload de carta de gestora -->
   <div style="background:#060C08;border:1px solid #1A2E1A;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
     <span style="font-size:12px;color:#5DCAA5;font-weight:700">📩 Carta de Gestora</span>
     <span style="font-size:11px;color:#2A5A3A;flex:1">Suba a carta mensal — a IA extrai e preenche Global, Brasil e Posicionamento automaticamente</span>
@@ -6289,223 +6302,101 @@ textarea{resize:vertical}
     <button class="btn btn-sm" onclick="document.getElementById('carta-input').click()" style="white-space:nowrap">📂 Selecionar carta (PDF)</button>
     <span id="carta-st" style="font-size:11px;min-width:120px"></span>
   </div>
-
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
-    Ou edite manualmente os campos abaixo. Este cenário embasa as sugestões e scripts dos assessores.
-  </p>
-
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Ou edite manualmente os campos abaixo. Este cenário embasa as sugestões e scripts dos assessores.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-    <div>
-      <label>🌍 Cenário Global</label>
-      <textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..."></textarea>
-    </div>
-    <div>
-      <label>🇧🇷 Cenário Brasil</label>
-      <textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..."></textarea>
-    </div>
-    <div>
-      <label>📌 Posicionamento da Gestora</label>
-      <textarea id="cenario-pos" rows="5" placeholder="O que está sendo reduzido / aumentado..."></textarea>
-    </div>
+    <div><label>🌍 Cenário Global</label><textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..."></textarea></div>
+    <div><label>🇧🇷 Cenário Brasil</label><textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..."></textarea></div>
+    <div><label>📌 Posicionamento da Gestora</label><textarea id="cenario-pos" rows="5" placeholder="O que está sendo reduzido / aumentado..."></textarea></div>
   </div>
+  <div><label>Fonte / Referência do cenário</label><input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px"></div>
+</div>
 
-  <div>
-    <label>Fonte / Referência do cenário</label>
-    <input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px">
+<!-- ══ 2. UPLOAD RÁPIDO ═══════════════════════════════════════════════════════ -->
+<div class="card" style="border-color:#3A3A20">
+  <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
+      <span style="font-size:11px;color:#2A5A3A">Carteiras recomendadas, produtos e material sobre ativos → <b style="color:#D4B483">Base de Conhecimento</b></span>
+    </div>
+    <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
+  </div>
+  <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
+    style="border:2px dashed #2A4A2A;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
+    onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
+    <div style="font-size:26px;margin-bottom:8px">📂</div>
+    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
+    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Carteiras recomendadas Levante / XP, relatórios, material sobre ativos</div>
+  </div>
+  <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
+    <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Arquivos selecionados — <span id="pdf-rapido-contador">0</span></div>
+    <div id="pdf-rapido-lista"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1A2A1A;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">📤 Subir para a Memória</button>
+      <button class="btn-ghost" onclick="document.getElementById('pdf-rapido').click()" style="font-size:11px;padding:6px 14px">+ Adicionar mais</button>
+      <span id="rapido-upload-st" style="font-size:11px;color:#5DCAA5;margin-left:auto"></span>
+    </div>
   </div>
 </div>
 
-<!-- ══ 2. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#2A2A18">
-  <div class="card-title"><span>📚</span> Base de Conhecimento — Cartas de Gestores</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
-    Repositório de <b style="color:#D4B483">cartas mensais de gestoras</b>. Cada carta fica salva e pode ser aplicada ao <b style="color:#D4B483">Cenário Macro</b> com um clique, ou consultada pelos assessores.
+<!-- ══ 3. ALOCAÇÕES DE REFERÊNCIA ════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-title"><span>📐</span> Alocações de Referência — Carteiras por Gestora</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">
+    Cadastre até <b style="color:#D4B483">5 gestoras</b> com as 5 categorias de perfil cada. Os % são usados como benchmark nas análises e sempre citados com a fonte.
   </p>
 
-  <!-- Upload zone + metadados -->
-  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
-    <!-- Drop zone -->
-    <div>
-      <label>PDF do material</label>
-      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
-        <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
-        <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <p style="font-size:12px;color:#3A6A48">Arraste ou clique — múltiplos PDFs</p>
-        <p style="font-size:10px;color:#1E4A30;margin-top:4px">.pdf · vários de uma vez</p>
-        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
-      </div>
-      <div style="margin-top:8px;text-align:center">
-        <span id="know-st" style="font-size:11px"></span>
-      </div>
-    </div>
-    <!-- Metadados -->
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div>
-        <label>Nome do documento</label>
-        <input type="text" id="know-nome" placeholder="ex: Carta Levante Junho 2026">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <label>Tipo</label>
-          <select id="know-tipo" style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
-            <option value="carta">Carta de Gestora</option>
-            <option value="research">Nota de Research</option>
-            <option value="cenario">Cenário Macro</option>
-            <option value="relatorio">Relatório Mensal</option>
-            <option value="outro">Outro</option>
-          </select>
-        </div>
-        <div>
-          <label>Fonte / Gestora</label>
-          <input type="text" id="know-fonte" placeholder="ex: Levante Asset">
-        </div>
-      </div>
-      <div>
-        <label style="margin-bottom:6px">Classes relacionadas</label>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="know-classes-btns">
-          <button type="button" class="know-cls-btn" data-cls="pos_fixado">Pós Fixado</button>
-          <button type="button" class="know-cls-btn" data-cls="inflacao">Inflação</button>
-          <button type="button" class="know-cls-btn" data-cls="pre_fixado">Pré Fixado</button>
-          <button type="button" class="know-cls-btn" data-cls="acoes">Ações</button>
-          <button type="button" class="know-cls-btn" data-cls="fiis">FIIs</button>
-          <button type="button" class="know-cls-btn" data-cls="multimercado">Multimercado</button>
-          <button type="button" class="know-cls-btn" data-cls="internacional">Internacional</button>
-          <button type="button" class="know-cls-btn" data-cls="alternativos">Alternativos</button>
-          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#2A2A18;color:#D4B483;border-color:#D4B483">Geral</button>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
-        <button class="btn" id="know-btn-upload" onclick="knowSalvar()" disabled>⬆️ Adicionar à Base</button>
-        <span id="know-save-st" style="font-size:12px"></span>
-      </div>
-    </div>
+  <!-- Abas de gestoras (dinâmicas) -->
+  <div style="display:flex;gap:0;margin-bottom:0;border-bottom:1px solid #1A2A1A;flex-wrap:wrap" id="gest2-tabs"></div>
+
+  <!-- Painel: lista de gestoras / form -->
+  <div id="gest2-painel" style="margin-top:16px"></div>
+
+  <!-- Botão adicionar gestora -->
+  <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap" id="gest2-add-area">
+    <button class="btn btn-sm" onclick="gest2MostrarForm()" id="btn-gest2-add">➕ Adicionar Gestora</button>
+    <span style="font-size:11px;color:#2A5A3A" id="gest2-count-label"></span>
   </div>
 
-  <!-- Lista de documentos -->
-  <div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
-      <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+  <!-- Formulário oculto para adicionar/editar gestora -->
+  <div id="gest2-form" style="display:none;margin-top:16px;background:#060C10;border:1px solid #1A2E3A;border-radius:10px;padding:18px">
+    <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:14px" id="gest2-form-titulo">➕ Nova Gestora</div>
+    <input type="hidden" id="gest2-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div><label>Nome da Gestora</label><input type="text" id="gest2-nome" placeholder="ex: Levante Asset"></div>
+      <div><label>Referência / Mês</label><input type="text" id="gest2-ref" placeholder="ex: Junho 2026"></div>
     </div>
-    <div id="know-lista">
-      <div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda. Suba o primeiro PDF acima.</div>
+    <!-- 5 perfis com alocações -->
+    <div id="gest2-perfis-tabs" style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">
+      <button type="button" class="gest2-ptab active" data-p="super_conservadora" onclick="gest2SwitchPerfil('super_conservadora',this)">Super Conserv.</button>
+      <button type="button" class="gest2-ptab" data-p="conservadora" onclick="gest2SwitchPerfil('conservadora',this)">Conservadora</button>
+      <button type="button" class="gest2-ptab" data-p="moderada" onclick="gest2SwitchPerfil('moderada',this)">Moderada</button>
+      <button type="button" class="gest2-ptab" data-p="agressiva" onclick="gest2SwitchPerfil('agressiva',this)">Agressiva</button>
+      <button type="button" class="gest2-ptab" data-p="super_agressiva" onclick="gest2SwitchPerfil('super_agressiva',this)">Super Agressiva</button>
+    </div>
+    <div id="gest2-aloc-panel" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+      <div><label style="color:#4A7055">Pós Fixado %</label><input type="number" id="g2aloc-pos_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Inflação %</label><input type="number" id="g2aloc-inflacao" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Pré Fixado %</label><input type="number" id="g2aloc-pre_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Ações %</label><input type="number" id="g2aloc-acoes" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">FIIs %</label><input type="number" id="g2aloc-fiis" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Multimercado %</label><input type="number" id="g2aloc-multimercado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Internacional %</label><input type="number" id="g2aloc-internacional" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Alternativos %</label><input type="number" id="g2aloc-alternativos" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#4A7055">Criptomoedas %</label><input type="number" id="g2aloc-criptomoedas" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn" onclick="gest2Salvar()">💾 Salvar Gestora</button>
+      <span style="font-size:12px;color:#4A7055">Total: <b id="g2-total">0</b>%</span>
+      <span id="gest2-st" style="font-size:12px"></span>
+      <button class="btn-ghost" onclick="document.getElementById('gest2-form').style.display='none'" style="margin-left:auto;font-size:11px">✕ Fechar</button>
     </div>
   </div>
 </div>
-
 <style>
-.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #2A2A18;background:#0A0A0A;color:#4A7055;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
-.know-cls-btn.sel{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
-.know-doc-card{background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
-.know-doc-card:hover{border-color:#2A2A18}
-.know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
+.gest2-ptab{padding:5px 12px;border-radius:6px;border:1px solid #1A2E3A;background:#060C10;color:#4A7055;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.gest2-ptab.active{background:#1A2E3A;color:#8BcFEF;border-color:#8BcFEF;font-weight:700}
 </style>
-
-<!-- ══ 4. ALOCAÇÕES DE REFERÊNCIA (Portfólios + Gestores) ═══════════════════ -->
-<div class="card">
-  <div class="card-title"><span>📐</span> Alocações de Referência</div>
-  <!-- Abas internas -->
-  <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid #1A2A1A">
-    <button id="tab-porto-btn" onclick="switchAlocTab('porto')" style="font-size:12px;padding:8px 16px;border:none;border-bottom:2px solid #D4B483;background:none;color:#D4B483;font-weight:700;cursor:pointer">📐 Portfólio Braúna</button>
-    <button id="tab-gest-btn" onclick="switchAlocTab('gest')" style="font-size:12px;padding:8px 16px;border:none;border-bottom:2px solid transparent;background:none;color:#4A7055;cursor:pointer">🏦 Carteiras de Gestores</button>
-  </div>
-
-  <!-- Aba: Portfólio Modelo -->
-  <div id="tab-porto-panel">
-    <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:12px">Benchmark interno por classe/indexador para cada perfil. O agente compara a carteira real do cliente e aponta os gaps.</p>
-    <div class="ref-row">
-      <div><label>Fonte / Referência</label><input type="text" id="porto-ref" value="Levante Asset — Junho 2026"></div>
-      <span class="ref-badge" id="porto-badge">Levante Asset — Junho 2026</span>
-    </div>
-    <div style="overflow-x:auto">
-      <table class="porto-table" id="porto-table">
-        <thead>
-          <tr>
-            <th class="classe">Classe / Indexador</th>
-            <th>Super Conserv.</th><th>Conservadora</th><th>Moderada</th><th>Arrojada</th><th>Agressiva</th>
-            <th style="color:#4A7055;font-size:9px">Viés Macro</th>
-          </tr>
-        </thead>
-        <tbody id="porto-body"></tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td class="classe-label" style="color:#D4B483">TOTAL</td>
-            <td><span id="tot-super_conservadora" class="total-val">—</span></td>
-            <td><span id="tot-conservadora" class="total-val">—</span></td>
-            <td><span id="tot-moderada" class="total-val">—</span></td>
-            <td><span id="tot-arrojada" class="total-val">—</span></td>
-            <td><span id="tot-agressiva" class="total-val">—</span></td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </div>
-
-  <!-- Aba: Carteiras de Gestores -->
-  <div id="tab-gest-panel" style="display:none">
-    <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">Cadastre até <b style="color:#8BcFEF">5 carteiras de referência</b> de gestoras externas. Usadas nas análises e sempre citadas como fonte.</p>
-    <div style="background:#060C10;border:1px solid #1A2E3A;border-radius:10px;padding:16px;margin-bottom:16px">
-      <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:12px">➕ Adicionar / Atualizar Carteira</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-        <div><label>Nome da Carteira</label><input type="text" id="gest-nome" placeholder="ex: Carteira Moderada Levante"></div>
-        <div><label>Gestora / Fonte</label><input type="text" id="gest-gestora" placeholder="ex: Levante Asset"></div>
-        <div><label>Referência / Data</label><input type="text" id="gest-ref" placeholder="ex: Junho 2026"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div><label>Perfil alvo</label>
-          <select id="gest-perfil" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
-            <option value="super_conservadora">Super Conservadora</option>
-            <option value="conservadora">Conservadora</option>
-            <option value="moderada" selected>Moderada</option>
-            <option value="arrojada">Arrojada</option>
-            <option value="agressiva">Agressiva</option>
-            <option value="geral">Geral (todas)</option>
-          </select>
-        </div>
-        <div><label>Observação</label><input type="text" id="gest-obs" placeholder="ex: viés conservador com RF longa"></div>
-      </div>
-      <div style="font-size:11px;color:#8BcFEF;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Alocação % por Classe</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-        <div><label style="color:#4A7055">Pós Fixado</label><input type="number" id="galoc-pos_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Inflação</label><input type="number" id="galoc-inflacao" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Pré Fixado</label><input type="number" id="galoc-pre_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Ações</label><input type="number" id="galoc-acoes" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">FIIs</label><input type="number" id="galoc-fiis" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Multimercado</label><input type="number" id="galoc-multimercado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Internacional</label><input type="number" id="galoc-internacional" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Alternativos</label><input type="number" id="galoc-alternativos" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-        <div><label style="color:#4A7055">Criptomoedas</label><input type="number" id="galoc-criptomoedas" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <button class="btn" onclick="salvarGestora()">💾 Salvar Carteira</button>
-        <span id="gest-total-label" style="font-size:12px;color:#4A7055">Total: <b id="gest-total">0</b>%</span>
-        <span id="gest-save-st" style="font-size:12px"></span>
-      </div>
-    </div>
-    <div id="gest-lista-wrap">
-      <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Carteiras Salvas (<span id="gest-count">0</span>/5)</div>
-      <div id="gest-lista"><div style="color:#1E3A4A;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div></div>
-      <div id="gest-comparativo" style="display:none;margin-top:14px">
-        <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚖️ Comparativo entre Carteiras</div>
-        <div style="overflow-x:auto"><table id="gest-table" style="width:100%;border-collapse:collapse;font-size:11px"></table></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function switchAlocTab(tab){
-  document.getElementById("tab-porto-panel").style.display = tab==="porto"?"":"none";
-  document.getElementById("tab-gest-panel").style.display  = tab==="gest" ?"":"none";
-  document.getElementById("tab-porto-btn").style.borderBottomColor = tab==="porto"?"#D4B483":"transparent";
-  document.getElementById("tab-porto-btn").style.color = tab==="porto"?"#D4B483":"#4A7055";
-  document.getElementById("tab-porto-btn").style.fontWeight = tab==="porto"?"700":"400";
-  document.getElementById("tab-gest-btn").style.borderBottomColor = tab==="gest"?"#8BcFEF":"transparent";
-  document.getElementById("tab-gest-btn").style.color = tab==="gest"?"#8BcFEF":"#4A7055";
-  document.getElementById("tab-gest-btn").style.fontWeight = tab==="gest"?"700":"400";
-}
-</script>
 
 <!-- ══ 3. PRODUTOS EM DESTAQUE ════════════════════════════════════════════════ -->
 <div class="card">
@@ -6590,7 +6481,7 @@ function switchAlocTab(tab){
   </div>
 </div>
 
-<!-- ══ 4. CALLS DE AÇÕES ══════════════════════════════════════════════════════ -->
+<!-- ══ 5. CALLS DE AÇÕES + OPERAÇÕES ESTRUTURADAS ════════════════════════════ -->
 <div class="card" style="border-color:#1A2E3A">
   <div class="card-title"><span>📈</span> Calls de Ações</div>
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
@@ -6688,7 +6579,146 @@ function switchAlocTab(tab){
   <div id="calls-feed" style="display:flex;flex-direction:column;gap:8px">
     <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando calls...</div>
   </div>
+
+  <!-- ── Operações Estruturadas ─────────────────────────────────────────────── -->
+  <div style="margin-top:24px;border-top:1px solid #1A2E3A;padding-top:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;cursor:pointer" onclick="toggleEstruturadas()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:14px;font-weight:700;color:#C9A96E">💼 Operações Estruturadas</span>
+        <span style="font-size:11px;color:#2A5A3A">COE, Termo, Opção e outras oportunidades manuais</span>
+      </div>
+      <span id="icon-estr" style="color:#4A7055;font-size:14px">▼</span>
+    </div>
+
+    <div id="painel-estruturadas">
+      <!-- Formulário novo -->
+      <div style="background:#060C08;border:1px solid #2A1A10;border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:12px;color:#C9A96E;font-weight:700;margin-bottom:12px">➕ Nova Operação</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tipo</label>
+            <select id="estr-tipo" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+              <option>COE</option><option>Termo</option><option>Opção de Compra</option><option>Opção de Venda</option>
+              <option>Debenture Incentivada</option><option>CRI</option><option>CRA</option><option>Outro</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Ativo / Ativo Base</label>
+            <input id="estr-ativo" type="text" placeholder="ex: PETR4, IPCA+6,5%" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Emissor / Banco</label>
+            <input id="estr-emissor" type="text" placeholder="ex: BTG Pactual" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Vencimento</label>
+            <input id="estr-venc" type="text" placeholder="ex: Jan/2028" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Retorno Esperado</label>
+            <input id="estr-retorno" type="text" placeholder="ex: IPCA+7% ou 120% CDI" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Perfil Mínimo</label>
+            <select id="estr-perfil" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+              <option value="super_conservadora">Super Conservadora</option>
+              <option value="conservadora">Conservadora</option>
+              <option value="moderada" selected>Moderada</option>
+              <option value="agressiva">Agressiva</option>
+              <option value="super_agressiva">Super Agressiva</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Aplicação Mínima</label>
+            <input id="estr-minimo" type="text" placeholder="ex: R$ 1.000" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Observação / Tese</label>
+          <textarea id="estr-obs" rows="2" placeholder="Descreva a oportunidade, riscos e diferenciais..." style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn" onclick="adicionarEstruturada()" style="background:#C9A96E;color:#071E17;border-color:#C9A96E;font-weight:700">💼 Adicionar Operação</button>
+          <span id="estr-st" style="font-size:11px"></span>
+        </div>
+      </div>
+
+      <!-- Lista -->
+      <div style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Operações Ativas</div>
+      <div id="estr-lista"><div style="color:#2A2A18;font-size:11px;text-align:center;padding:16px">Carregando...</div></div>
+    </div>
+  </div>
 </div>
+
+<!-- ══ 6. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
+<div class="card" style="border-color:#2A2A18">
+  <div class="card-title"><span>📚</span> Base de Conhecimento — Cartas de Gestores</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
+    Repositório de <b style="color:#D4B483">cartas mensais de gestoras</b>. Cada carta fica salva e pode ser consultada pelos assessores.
+  </p>
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
+    <div>
+      <label>PDF da carta</label>
+      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+        <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
+        <div style="font-size:28px;margin-bottom:8px">📄</div>
+        <p style="font-size:12px;color:#3A6A48">Arraste ou clique — múltiplos PDFs</p>
+        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
+      </div>
+      <div style="margin-top:8px;text-align:center"><span id="know-st" style="font-size:11px"></span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label>Nome do documento</label><input type="text" id="know-nome" placeholder="ex: Carta Levante Junho 2026"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label>Tipo</label>
+          <select id="know-tipo" style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
+            <option value="carta">Carta de Gestora</option>
+            <option value="research">Nota de Research</option>
+            <option value="cenario">Cenário Macro</option>
+            <option value="relatorio">Relatório Mensal</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div><label>Fonte / Gestora</label><input type="text" id="know-fonte" placeholder="ex: Levante Asset"></div>
+      </div>
+      <div>
+        <label style="margin-bottom:6px">Classes relacionadas</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="know-classes-btns">
+          <button type="button" class="know-cls-btn" data-cls="pos_fixado">Pós Fixado</button>
+          <button type="button" class="know-cls-btn" data-cls="inflacao">Inflação</button>
+          <button type="button" class="know-cls-btn" data-cls="pre_fixado">Pré Fixado</button>
+          <button type="button" class="know-cls-btn" data-cls="acoes">Ações</button>
+          <button type="button" class="know-cls-btn" data-cls="fiis">FIIs</button>
+          <button type="button" class="know-cls-btn" data-cls="multimercado">Multimercado</button>
+          <button type="button" class="know-cls-btn" data-cls="internacional">Internacional</button>
+          <button type="button" class="know-cls-btn" data-cls="alternativos">Alternativos</button>
+          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#2A2A18;color:#D4B483;border-color:#D4B483">Geral</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <button class="btn" id="know-btn-upload" onclick="knowSalvar()" disabled>⬆️ Adicionar à Base</button>
+        <span id="know-save-st" style="font-size:12px"></span>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
+      <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+    </div>
+    <div id="know-lista"><div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda.</div></div>
+  </div>
+</div>
+
+<style>
+.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #2A2A18;background:#0A0A0A;color:#4A7055;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.know-cls-btn.sel{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
+.know-doc-card{background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.know-doc-card:hover{border-color:#2A2A18}
+.know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
+</style>
 
 <!-- ══ PUBLICAR ══════════════════════════════════════════════════════════════ -->
 <div class="publish-bar">
@@ -7484,6 +7514,262 @@ async function deletarCall(id){
   carregarCalls();
 }
 
+// ── Operações Estruturadas ────────────────────────────────────────────────────
+function toggleEstruturadas(){
+  const p = document.getElementById("painel-estruturadas");
+  const i = document.getElementById("icon-estr");
+  const aberto = p.style.display !== "none";
+  p.style.display = aberto ? "none" : "";
+  i.textContent = aberto ? "▶" : "▼";
+}
+
+async function adicionarEstruturada(){
+  const st = document.getElementById("estr-st");
+  const payload = {
+    tipo:         document.getElementById("estr-tipo").value,
+    ativo:        document.getElementById("estr-ativo").value.trim(),
+    emissor:      document.getElementById("estr-emissor").value.trim(),
+    vencimento:   document.getElementById("estr-venc").value.trim(),
+    retorno:      document.getElementById("estr-retorno").value.trim(),
+    perfil_minimo:document.getElementById("estr-perfil").value,
+    observacao:   document.getElementById("estr-obs").value.trim(),
+    minimo:       document.getElementById("estr-minimo").value.trim(),
+  };
+  if(!payload.ativo){ st.innerHTML=`<span class="status-err">Informe o ativo/produto.</span>`; return; }
+  st.innerHTML = `<span style="color:#4A7055">Salvando...</span>`;
+  try{
+    const r = await fetch("/api/hp/estruturadas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
+    const d = await r.json();
+    if(d.ok){
+      st.innerHTML = `<span class="status-ok">✓ Operação adicionada.</span>`;
+      ["estr-ativo","estr-emissor","estr-venc","estr-retorno","estr-obs","estr-minimo"].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.value="";
+      });
+      carregarEstruturadas();
+    } else { st.innerHTML=`<span class="status-err">Erro: ${d.error||"desconhecido"}</span>`; }
+  } catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
+  setTimeout(()=>st.textContent="", 5000);
+}
+
+async function carregarEstruturadas(){
+  const lista = document.getElementById("estr-lista");
+  if(!lista) return;
+  try{
+    const r = await fetch("/api/hp/estruturadas");
+    const ops = await r.json();
+    if(!ops.length){
+      lista.innerHTML=`<div style="color:#2A2A18;font-size:11px;text-align:center;padding:16px">Nenhuma operação cadastrada ainda.</div>`;
+      return;
+    }
+    const PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",agressiva:"Agressiva",super_agressiva:"Super Agressiva"};
+    lista.innerHTML = ops.map(op=>`
+      <div style="background:#080C06;border:1px solid #2A1A10;border-left:3px solid #C9A96E;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;background:#C9A96E22;color:#C9A96E;padding:2px 8px;border-radius:8px">${op.tipo}</span>
+            <span style="font-size:14px;font-weight:700;color:#F0F0F0">${op.ativo}</span>
+            ${op.emissor ? `<span style="font-size:11px;color:#888">${op.emissor}</span>` : ""}
+            <span style="font-size:10px;color:#1E4A30;margin-left:auto">${op.data||""}</span>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:4px">
+            ${op.vencimento ? `<span style="color:#888">Venc: <b style="color:#DDD">${op.vencimento}</b></span>` : ""}
+            ${op.retorno ? `<span style="color:#888">Retorno: <b style="color:#5DCAA5">${op.retorno}</b></span>` : ""}
+            ${op.perfil_minimo ? `<span style="color:#888">Mínimo: <b style="color:#C9A96E">${PERFIL_LABEL[op.perfil_minimo]||op.perfil_minimo}</b></span>` : ""}
+            ${op.minimo ? `<span style="color:#888">Apl. mín: <b style="color:#DDD">${op.minimo}</b></span>` : ""}
+          </div>
+          ${op.observacao ? `<p style="font-size:11px;color:#888;margin:0;line-height:1.5;font-style:italic">"${op.observacao}"</p>` : ""}
+        </div>
+        <button onclick="deletarEstruturada('${op.id}')" title="Remover" style="background:none;border:none;color:#2A2A18;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#2A2A18'">✕</button>
+      </div>`).join("");
+  } catch(e){ lista.innerHTML=`<div style="color:#FF6B6B;font-size:11px;padding:12px">Erro ao carregar operações.</div>`; }
+}
+
+async function deletarEstruturada(id){
+  await fetch("/api/hp/estruturadas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({id, _delete:true})});
+  carregarEstruturadas();
+}
+
+// ── Alocações de Referência — Gestoras 2 ─────────────────────────────────────
+let _gest2_data = {};
+let _gest2_perfil_ativo = "super_conservadora";
+let _gest2_perfis_temp  = {};
+
+const G2_CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"];
+const G2_PERFIS  = ["super_conservadora","conservadora","moderada","agressiva","super_agressiva"];
+const G2_PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",agressiva:"Agressiva",super_agressiva:"Super Agressiva"};
+
+async function carregarGest2(){
+  try{
+    const r = await fetch("/api/hp/gestoras2");
+    _gest2_data = await r.json();
+    renderGest2Tabs();
+    renderGest2Painel();
+    atualizarGest2Count();
+  } catch(e){}
+}
+
+function atualizarGest2Count(){
+  const n = Object.keys(_gest2_data).length;
+  const el = document.getElementById("gest2-count-label");
+  if(el) el.textContent = `${n}/5 gestoras cadastradas`;
+  const btnAdd = document.getElementById("btn-gest2-add");
+  if(btnAdd) btnAdd.style.display = n >= 5 ? "none" : "";
+}
+
+function renderGest2Tabs(){
+  const tabs = document.getElementById("gest2-tabs");
+  if(!tabs) return;
+  const gestoras = Object.values(_gest2_data);
+  tabs.innerHTML = gestoras.map(g=>`
+    <button onclick="gest2ShowGestora('${g.id}')" style="font-size:12px;padding:8px 14px;border:none;border-bottom:2px solid transparent;background:none;color:#4A7055;cursor:pointer;transition:all .15s" id="gest2tab-${g.id}">
+      🏦 ${g.nome||g.id}
+    </button>`).join("") + (gestoras.length ? "" : `<span style="font-size:11px;color:#1E3A2A;padding:8px 14px">Nenhuma gestora ainda.</span>`);
+}
+
+let _gest2_ativa = null;
+function gest2ShowGestora(gid){
+  _gest2_ativa = gid;
+  const g = _gest2_data[gid];
+  // highlight tab
+  document.querySelectorAll("[id^='gest2tab-']").forEach(b=>{
+    b.style.borderBottomColor = "transparent";
+    b.style.color = "#4A7055";
+    b.style.fontWeight = "400";
+  });
+  const tab = document.getElementById("gest2tab-"+gid);
+  if(tab){ tab.style.borderBottomColor="#D4B483"; tab.style.color="#D4B483"; tab.style.fontWeight="700"; }
+
+  const painel = document.getElementById("gest2-painel");
+  if(!g){ painel.innerHTML=""; return; }
+
+  const CLASSE_LABEL = {pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
+  painel.innerHTML = `
+    <div style="overflow-x:auto;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <span style="font-size:14px;font-weight:700;color:#D4B483">${g.nome}</span>
+          ${g.referencia ? `<span style="font-size:11px;color:#3A6A48;margin-left:10px">${g.referencia}</span>` : ""}
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" onclick="gest2EditarGestora('${gid}')" style="font-size:11px">✏️ Editar</button>
+          <button class="btn-ghost" onclick="gest2DeletarGestora('${gid}')" style="font-size:11px;color:#FF6B6B">✕ Remover</button>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="background:#060F0B">
+            <th style="padding:8px;text-align:left;color:#3A6A48;border-bottom:1px solid #1A2A1A">Classe</th>
+            ${G2_PERFIS.map(p=>`<th style="padding:8px;text-align:center;color:#3A6A48;border-bottom:1px solid #1A2A1A">${G2_PERFIL_LABEL[p]}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${G2_CLASSES.map(c=>{
+            const vals = G2_PERFIS.map(p=>g.perfis?.[p]?.[c]||0);
+            const allZero = vals.every(v=>v===0);
+            return `<tr style="border-bottom:1px solid #0A1A0A${allZero?";opacity:.4":""}">
+              <td style="padding:7px 8px;color:#4A7055;font-weight:600">${CLASSE_LABEL[c]||c}</td>
+              ${G2_PERFIS.map(p=>{
+                const v = g.perfis?.[p]?.[c]||0;
+                return `<td style="padding:7px 8px;text-align:center;color:${v>0?"#F0F0F0":"#1E3A2A"};font-weight:${v>0?"700":"400"}">${v>0?v+"%":"—"}</td>`;
+              }).join("")}
+            </tr>`;
+          }).join("")}
+        </tbody>
+        <tfoot>
+          <tr style="border-top:2px solid #1A2A1A;background:#060F0B">
+            <td style="padding:8px;color:#D4B483;font-weight:700">TOTAL</td>
+            ${G2_PERFIS.map(p=>{
+              const soma = G2_CLASSES.reduce((s,c)=>s+(g.perfis?.[p]?.[c]||0),0);
+              const ok = Math.abs(soma-100)<0.1;
+              return `<td style="padding:8px;text-align:center;font-weight:700;color:${ok?"#5DCAA5":"#FF6B6B"}">${soma.toFixed(1)}%</td>`;
+            }).join("")}
+          </tr>
+        </tfoot>
+      </table>
+    </div>`;
+}
+
+function renderGest2Painel(){
+  const gestoras = Object.values(_gest2_data);
+  if(!gestoras.length){
+    document.getElementById("gest2-painel").innerHTML = `<div style="color:#1E3A2A;font-size:11px;text-align:center;padding:20px">Adicione a primeira gestora clicando em ➕ Adicionar Gestora.</div>`;
+    return;
+  }
+  if(!_gest2_ativa && gestoras.length) gest2ShowGestora(gestoras[0].id);
+}
+
+function gest2MostrarForm(g){
+  const form = document.getElementById("gest2-form");
+  form.style.display = "";
+  document.getElementById("gest2-form-titulo").textContent = g ? "✏️ Editar Gestora" : "➕ Nova Gestora";
+  document.getElementById("gest2-id").value    = g ? g.id    : "";
+  document.getElementById("gest2-nome").value  = g ? g.nome  : "";
+  document.getElementById("gest2-ref").value   = g ? g.referencia : "";
+  _gest2_perfis_temp = g ? JSON.parse(JSON.stringify(g.perfis || {})) : {};
+  _gest2_perfil_ativo = "super_conservadora";
+  gest2SwitchPerfil("super_conservadora", document.querySelector(".gest2-ptab"));
+}
+
+function gest2EditarGestora(gid){
+  gest2MostrarForm(_gest2_data[gid]);
+}
+
+async function gest2DeletarGestora(gid){
+  if(!confirm("Remover esta gestora?")) return;
+  await fetch("/api/hp/gestoras2", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({_delete:true, id:gid})});
+  _gest2_ativa = null;
+  carregarGest2();
+}
+
+function gest2SwitchPerfil(p, btn){
+  // salvar valores do perfil anterior
+  const prev = _gest2_perfil_ativo;
+  const prevData = {};
+  G2_CLASSES.forEach(c=>{ const el=document.getElementById("g2aloc-"+c); if(el) prevData[c]=parseFloat(el.value)||0; });
+  _gest2_perfis_temp[prev] = prevData;
+  // trocar aba
+  document.querySelectorAll(".gest2-ptab").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  _gest2_perfil_ativo = p;
+  // carregar valores do novo perfil
+  const perfData = _gest2_perfis_temp[p] || {};
+  G2_CLASSES.forEach(c=>{ const el=document.getElementById("g2aloc-"+c); if(el) el.value = perfData[c]||0; });
+  g2Total();
+}
+
+function g2Total(){
+  let s=0;
+  G2_CLASSES.forEach(c=>{ const el=document.getElementById("g2aloc-"+c); if(el) s+=parseFloat(el.value)||0; });
+  const el=document.getElementById("g2-total");
+  if(el){ el.textContent=s.toFixed(1); el.style.color=Math.abs(s-100)<0.1?"#5DCAA5":"#FF6B6B"; }
+}
+
+async function gest2Salvar(){
+  const st = document.getElementById("gest2-st");
+  // save current tab values
+  const cur = {}; G2_CLASSES.forEach(c=>{ const el=document.getElementById("g2aloc-"+c); if(el) cur[c]=parseFloat(el.value)||0; });
+  _gest2_perfis_temp[_gest2_perfil_ativo] = cur;
+  const payload = {
+    id:         document.getElementById("gest2-id").value || undefined,
+    nome:       document.getElementById("gest2-nome").value.trim(),
+    referencia: document.getElementById("gest2-ref").value.trim(),
+    perfis:     _gest2_perfis_temp,
+  };
+  if(!payload.nome){ st.innerHTML=`<span class="status-err">Informe o nome.</span>`; return; }
+  st.innerHTML=`<span style="color:#4A7055">Salvando...</span>`;
+  try{
+    const r = await fetch("/api/hp/gestoras2", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
+    const d = await r.json();
+    if(d.ok){
+      st.innerHTML=`<span class="status-ok">✓ Salvo.</span>`;
+      document.getElementById("gest2-form").style.display="none";
+      _gest2_ativa = d.id;
+      carregarGest2();
+    } else { st.innerHTML=`<span class="status-err">Erro: ${d.error||"desconhecido"}</span>`; }
+  } catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
+  setTimeout(()=>st.textContent="",5000);
+}
+
 // ── Salvar só produtos ────────────────────────────────────────────────────────
 async function salvarProdutos(){
   const btn = document.getElementById("btn-salvar-prod");
@@ -7749,6 +8035,8 @@ async function init(){
   carregarAlertas();
   carregarCalls();
   carregarGestores();
+  carregarEstruturadas();
+  carregarGest2();
 }
 
 // ── Carteiras de Gestores ─────────────────────────────────────────────────────
