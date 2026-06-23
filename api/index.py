@@ -7112,23 +7112,18 @@ async function knowSalvar(){
 
   if(ok > 0){
     st.innerHTML = `<span class="status-ok">✓ ${ok} arquivo${ok>1?"s":""} adicionado${ok>1?"s":""} à base${erros.length ? ` · ${erros.length} erro(s)` : ""}</span>`;
-    // reset form
     _knowFiles = []; _knowFile = null;
     document.getElementById("know-pdf").value = "";
     document.getElementById("know-fname").textContent = "";
     document.getElementById("know-nome").value = "";
     document.getElementById("know-fonte").value = "";
     document.getElementById("know-st").textContent = "";
-      document.querySelectorAll(".know-cls-btn.sel").forEach(b=>b.classList.remove("sel"));
-      btn.disabled = true;
-      carregarKnowledge();
-      setTimeout(()=>st.textContent="", 5000);
-    } else {
-      st.innerHTML = `<span class="status-err">Erro: ${d.error}</span>`;
-      btn.disabled = false;
-    }
-  } catch(e){
-    st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`;
+    document.querySelectorAll(".know-cls-btn.sel").forEach(b=>b.classList.remove("sel"));
+    btn.disabled = true;
+    carregarKnowledge();
+    setTimeout(()=>st.textContent="", 5000);
+  } else {
+    st.innerHTML = `<span class="status-err">${erros.length} erro(s) ao enviar.</span>`;
     btn.disabled = false;
   }
 }
