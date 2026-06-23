@@ -405,7 +405,7 @@ def s_cenario_global(prs, d):
     items   = list(vieses.items())
     n       = max(len(items), 1)
     vw      = (SW - Cm(1.4)) / n - Cm(0.18)
-    vcard_h = SH - vieses_y - Cm(0.75)
+    vcard_h = min(SH - vieses_y - Cm(0.85), Cm(4.8))   # altura máxima fixa
     VBG     = {"positivo": RGBColor(0x0A, 0x35, 0x22),
                "neutro":   RGBColor(0x2A, 0x22, 0x08),
                "negativo": RGBColor(0x35, 0x0A, 0x0A)}
@@ -419,8 +419,13 @@ def s_cenario_global(prs, d):
         add_text(sl, CLS_LABEL.get(cls, cls), vx + Cm(0.2),
                  vieses_y + Cm(0.32), vw - Cm(0.4), Cm(0.65),
                  size=9, bold=True, color=C_WHITE, align=PP_ALIGN.CENTER)
-        add_text(sl, VIC.get(v, "→"), vx + Cm(0.2), vieses_y + Cm(1.05),
+        add_text(sl, VIC.get(v, "→"), vx + Cm(0.2), vieses_y + Cm(1.1),
                  vw - Cm(0.4), Cm(0.6), size=9, bold=True, color=cor,
+                 align=PP_ALIGN.CENTER)
+        # Ícone de sentimento centrado no card
+        ic_map = {"positivo": "▲", "neutro": "→", "negativo": "▼"}
+        add_text(sl, ic_map.get(v, ""), vx + Cm(0.2), vieses_y + Cm(1.9),
+                 vw - Cm(0.4), Cm(1.5), size=28, bold=True, color=cor,
                  align=PP_ALIGN.CENTER)
 
 # ── SLIDE 4: CENÁRIO BRASIL & HP ─────────────────────────────────────────────
@@ -644,7 +649,8 @@ def s_composicao(prs, d):
     comp = d.get("composicao", {})
     pat  = d.get("patrimonio", 0)
 
-    cats_com_valor = [(c, comp.get(c, 0)) for c in CATS if comp.get(c, 0) > 0]
+    cats_com_valor = sorted([(c, comp.get(c, 0)) for c in CATS if comp.get(c, 0) > 0],
+                            key=lambda x: -x[1])
     if not cats_com_valor:
         add_text(sl, "Sem dados de composição disponíveis.", MARGIN, Cm(5), SW - Cm(1.4), Cm(1.5),
                  size=14, color=C_LGRAY, align=PP_ALIGN.CENTER)
@@ -719,6 +725,14 @@ def s_vs_modelo(prs, d):
 
     comp   = d.get("composicao", {})
     modelo = d.get("modelo_hp", {})
+
+    # Reconstrói modelo a partir dos desvios se não veio direto
+    if not modelo:
+        for dev in d.get("desvios", []):
+            cls_key = dev.get("cls", "")
+            alvo    = dev.get("alvo", 0)
+            if cls_key and alvo:
+                modelo[cls_key] = alvo
 
     cats_visiveis = [c for c in CATS if comp.get(c, 0) > 0 or modelo.get(c, 0) > 0]
 
@@ -978,7 +992,7 @@ def s_rv(prs, d):
             fundo = C_CARD if k % 2 == 0 else C_CARD3
             add_rect(sl, cx, ry, col_w, row_h, fundo)
             ticker = a.get("ticker", "")
-            perc   = a.get("perc_carteira", a.get("perc", 0))
+            perc   = a.get("perc_carteira", a.get("perc", a.get("pct", 0)))
             nome_a = a.get("nome", "")
             add_text(sl, ticker, cx + Cm(0.2), ry + Cm(0.1), col_w * 0.35, Cm(0.55),
                      size=10, bold=True, color=cor)
@@ -1014,16 +1028,45 @@ def s_modelo_servir(prs, d):
 
     checklist = d.get("checklist", {})
     score     = d.get("score_servir", 0)
-    total     = 6
 
-    PILARES = [
-        ("open_investments",         "Open Investments",       "CRÍTICA", "🔗"),
-        ("financial_planning",       "Financial Planning",     "CRÍTICA", "🎯"),
-        ("ordem_enviada",            "Ordem Enviada",          "ALTA",    "📋"),
-        ("conta_acessada",           "Conta Acessada",         "ALTA",    "📱"),
-        ("xperformance",             "X-Performance",          "MÉDIA",   "📊"),
-        ("atividade_relacionamento", "Atividade Relac.",       "ALTA",    "🤝"),
-    ]
+    # Mapeamento de ícones por palavra-chave na chave do pilar
+    def _pilar_icone(pid):
+        p = pid.lower()
+        if "open" in p:       return "🔗"
+        if "financ" in p:     return "🎯"
+        if "ordem" in p:      return "📋"
+        if "conta" in p:      return "📱"
+        if "xperf" in p or "performance" in p: return "📊"
+        if "ativid" in p or "relac" in p:      return "🤝"
+        if "contato" in p:    return "📞"
+        if "sucess" in p:     return "🏛️"
+        if "declar" in p or " ir" in p:        return "📑"
+        if "monitor" in p:    return "👁️"
+        return "📋"
+
+    # Constrói PILARES dinamicamente do checklist
+    PILARES = []
+    if checklist:
+        for pid, info in checklist.items():
+            if isinstance(info, dict):
+                nome    = info.get("nome", pid.replace("_", " ").title())
+                critico = info.get("critico", False)
+                imp     = "CRÍTICA" if critico else "ALTA"
+            else:
+                nome    = pid.replace("_", " ").title()
+                imp     = "ALTA"
+            PILARES.append((pid, nome, imp, _pilar_icone(pid)))
+    else:
+        PILARES = [
+            ("open_investments",         "Open Investments",      "CRÍTICA", "🔗"),
+            ("financial_planning",       "Financial Planning",    "CRÍTICA", "🎯"),
+            ("ordem_enviada",            "Ordem Enviada",         "ALTA",    "📋"),
+            ("conta_acessada",           "Conta Acessada",        "ALTA",    "📱"),
+            ("xperformance",             "X-Performance",         "MÉDIA",   "📊"),
+            ("atividade_relacionamento", "Atividade Relac.",      "ALTA",    "🤝"),
+        ]
+
+    total   = len(PILARES) or 6
     IMP_COR = {"CRÍTICA": C_RED, "ALTA": C_AMBER, "MÉDIA": C_LGRAY}
 
     # Score bar
@@ -1043,7 +1086,9 @@ def s_modelo_servir(prs, d):
         col = i % n_cols; row = i // n_cols
         cx  = MARGIN + col * (col_w + Cm(0.25))
         ry  = Cm(5.3) + row * (row_h + Cm(0.2))
-        feito     = bool(checklist.get(pid))
+        _chk_val  = checklist.get(pid, False)
+        feito     = (_chk_val.get("feito", False) if isinstance(_chk_val, dict)
+                     else bool(_chk_val))
         cor_borda = C_GREEN if feito else IMP_COR.get(imp, C_GRAY)
         add_rect(sl, cx, ry, col_w, row_h, C_CARD, cor_borda, 0.5)
         if feito:
@@ -1056,8 +1101,12 @@ def s_modelo_servir(prs, d):
         add_text(sl, status_txt, cx + Cm(0.3), ry + Cm(1.7), col_w - Cm(0.6), Cm(0.5),
                  size=9, bold=feito, color=C_GREEN if feito else C_RED)
 
-    pendentes = [nome for pid, nome, imp, icone in PILARES if not checklist.get(pid)]
-    criticos  = [nome for pid, nome, imp, icone in PILARES if not checklist.get(pid) and imp == "CRÍTICA"]
+    def _feito(pid):
+        v = checklist.get(pid, False)
+        return v.get("feito", False) if isinstance(v, dict) else bool(v)
+
+    pendentes = [nome for pid, nome, imp, icone in PILARES if not _feito(pid)]
+    criticos  = [nome for pid, nome, imp, icone in PILARES if not _feito(pid) and imp == "CRÍTICA"]
     if score == 6:
         narrativa_ms = ("Excelente! Todos os 6 pilares concluídos. Engajamento máximo — menor risco "
                         "de ruptura e maior potencial de cross sell.")
@@ -1108,23 +1157,44 @@ def s_sugestoes(prs, d):
                  Cm(1.8), Cm(0.48), size=8, bold=True,
                  color=C_RED if gap < 0 else C_GREEN, align=PP_ALIGN.RIGHT)
         add_text(sl, p.get("nome", "—"), cx + Cm(0.3), top_y + Cm(1.05),
-                 cw - Cm(0.6), Cm(1.5), size=12, bold=True, color=C_WHITE, wrap=True)
-        add_rect(sl, cx + Cm(0.3), top_y + Cm(2.7), cw - Cm(0.6), Cm(0.04), C_GRAY)
-        if p.get("taxa"):
-            add_text(sl, p["taxa"], cx + Cm(0.3), top_y + Cm(2.85),
-                     cw - Cm(0.6), Cm(0.65), size=13, bold=True, color=C_GREEN)
+                 cw - Cm(0.6), Cm(1.6), size=13, bold=True, color=C_WHITE, wrap=True)
+
+        # Linha divisória
+        add_rect(sl, cx + Cm(0.3), top_y + Cm(2.85), cw - Cm(0.6), Cm(0.04), C_GRAY)
+
+        # Taxa (fallback: gap como texto)
+        taxa = p.get("taxa", "")
+        if taxa:
+            add_text(sl, taxa, cx + Cm(0.3), top_y + Cm(3.05),
+                     cw - Cm(0.6), Cm(0.7), size=14, bold=True, color=C_GREEN)
+        else:
+            gap_txt = f"Gap a fechar: {gap:+.1f}%"
+            add_text(sl, gap_txt, cx + Cm(0.3), top_y + Cm(3.05),
+                     cw - Cm(0.6), Cm(0.7), size=11, bold=True, color=C_AMBER)
+
+        # Emissor e vencimento
+        detalhes = []
         if p.get("emissor"):
-            add_text(sl, p["emissor"], cx + Cm(0.3), top_y + Cm(3.6),
-                     cw - Cm(0.6), Cm(0.5), size=9, color=C_LGRAY)
+            detalhes.append(p["emissor"])
         if p.get("vencimento"):
-            add_text(sl, f"Venc: {p['vencimento']}", cx + Cm(0.3), top_y + Cm(4.2),
-                     cw - Cm(0.6), Cm(0.5), size=8.5, color=C_GRAY)
-        add_rect(sl, cx + Cm(0.3), top_y + Cm(4.8), cw - Cm(0.6), Cm(0.04), C_GRAY)
-        if p.get("motivo"):
-            add_text(sl, p["motivo"], cx + Cm(0.3), top_y + Cm(4.95),
-                     cw - Cm(0.6), Cm(2.8), size=8.5, color=C_LGRAY, wrap=True)
+            detalhes.append(f"Venc: {p['vencimento']}")
+        if detalhes:
+            add_text(sl, "  ·  ".join(detalhes), cx + Cm(0.3), top_y + Cm(3.85),
+                     cw - Cm(0.6), Cm(0.55), size=9, color=C_LGRAY)
+
+        # Linha divisória e motivo
+        add_rect(sl, cx + Cm(0.3), top_y + Cm(4.55), cw - Cm(0.6), Cm(0.04), C_GRAY)
+        motivo = p.get("motivo") or f"Recomendado para adequar exposição à classe {s.get('label_classe', CLS_LABEL.get(cls, cls))}."
+        add_text(sl, motivo, cx + Cm(0.3), top_y + Cm(4.72),
+                 cw - Cm(0.6), Cm(2.6), size=8.5, color=C_LGRAY, wrap=True)
+
+        # Rodapé do card
         if p.get("indicado_por"):
             add_text(sl, f"Indicado: {p['indicado_por']}", cx + Cm(0.3),
+                     top_y + card_h - Cm(0.85), cw - Cm(0.6), Cm(0.6),
+                     size=7.5, color=C_GRAY, italic=True)
+        else:
+            add_text(sl, "Indicado: Head de Produtos", cx + Cm(0.3),
                      top_y + card_h - Cm(0.85), cw - Cm(0.6), Cm(0.6),
                      size=7.5, color=C_GRAY, italic=True)
 

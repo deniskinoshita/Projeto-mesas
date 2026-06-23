@@ -509,11 +509,9 @@ def extrair_xperformance(pdf_bytes):
         if not rent: rent = rent2
         if not patrimonio: patrimonio = pat2
 
-    # Ativos individuais de RV e FIIs
+    # ── Ativos individuais de RV e FIIs ─────────────────────────────────────────
     acoes = []
     fiis_list = []
-
-    # Seção RV: linhas com ticker (4 letras + dígito) e valor
     rv_section = False
     fii_section = False
     for linha in texto.splitlines():
@@ -522,9 +520,7 @@ def extrair_xperformance(pdf_bytes):
         if re.search(r"Alternativo|Pre.Fixado|Infla|Caixa|Proventos", linha, re.I) and (rv_section or fii_section):
             rv_section = False; fii_section = False; continue
 
-        # Ticker: 3-6 letras + dígito(s) = ação/BDR
         ticker_m = re.match(r"^([A-Z]{3,5}[0-9]{1,2})\s+R\$?\s*([-\d\.,]+)\s+([\d]+)\s+([\d,]+)%", linha.strip())
-        # Alternativo mais permissivo
         if not ticker_m:
             ticker_m = re.match(r"^([A-Z]{3,5}[0-9]{1,2})\s+([-R\$\s\d\.,]+?)\s+(\d+)\s+([\d,]+)%", linha.strip())
 
@@ -538,23 +534,141 @@ def extrair_xperformance(pdf_bytes):
             except: qtd = 0
             try: perc = float(ticker_m.group(4).replace(",","."))
             except: perc = 0.0
-
             item = {"ticker": ticker, "saldo": saldo, "qtd": qtd, "perc": perc}
             if fii_section or re.match(r".*11$", ticker):
                 fiis_list.append(item)
             else:
                 acoes.append(item)
 
+    # ── Ativos individuais de Renda Fixa ─────────────────────────────────────────
+    # Formato na seção "POSIÇÃO DETALHADA":
+    #   Cabeçalho de seção: "P?s Fixado R$ 346.922,61 - 5,72% ..."  (sem parênteses)
+    #   Ativo multilinhas:   nome na linha N, "R$ saldo qtd perc% ..." na linha N+1
+    #   Ativo inline (CRA/CRI): "CRA ... R$ 35.728,16 48 0,59% ..." tudo em uma linha
+
+    RF_SECAO_MAP = [
+        (r"^[Pp].s\s*[Ff]ix",      "pos_fixado"),
+        (r"^[Ii]nfla..[ao]",       "inflacao"),
+        (r"^[Pp]r.\s*[Ff]ix",      "pre_fixado"),
+        (r"^[Mm]ulti.?[Mm]ercado", "multimercado"),
+        (r"^[Ii]nternacion",       "internacional"),
+        (r"^[Aa]lternativ",        "alternativos"),
+    ]
+    # Seção de cabeçalho: nome da classe + R$ total logo na mesma linha
+    RF_HEADER_PAT = re.compile(
+        r"^([A-Za-z\?\s\-]+?)\s+R\$\s+[\d\.,]+"
+    )
+    # Linha de dados de ativo: começa com R$ e tem qtd + %
+    RF_DADOS_PAT = re.compile(
+        r"R\$\s*([-\d\.]+,\d{2})\s+([-\d\.]+)\s+([-\d,]+)%\s+([-\d,]+)%"
+    )
+    # Para encerrar a leitura RF
+    RF_FIM_PAT = re.compile(
+        r"Renda\s*Vari|Fundos\s*[Ll]istados|MOVIMENTA|ESTAT.STICA\s+HIST|"
+        r"HIST.RICO\s+POR\s+ESTRAT|Relat.rio\s+informativo|"
+        r"POSIÇÃO DETALHADA.*POSIÇÃO", re.I
+    )
+    # Ruídos que aparecem depois do nome do fundo
+    RF_RUIDO_PAT = re.compile(r"^(RL|RF\s*CP|CP\s*RL|RF|CP|Incentivado.*Investimento.*)$", re.I)
+
+    def _brl(s):
+        try: return float(s.replace(".","").replace(",","."))
+        except: return 0.0
+
+    rf_ativos    = []
+    rf_cls       = None    # classe atual
+    rf_nome_buf  = None    # nome em buffer (linha anterior)
+    em_detalhe   = False   # True quando dentro de "POSIÇÃO DETALHADA"
+
+    for linha in texto.splitlines():
+        l = linha.strip()
+        if not l:
+            continue
+
+        # Entra na seção de posição detalhada
+        if re.search(r"POSI..O\s+DETALHADA", l, re.I):
+            em_detalhe = True
+            continue
+
+        if not em_detalhe:
+            continue
+
+        # Encerra ao chegar em RV ou rodapé
+        if RF_FIM_PAT.search(l):
+            em_detalhe = False
+            rf_cls = None
+            rf_nome_buf = None
+            continue
+
+        # Detecta cabeçalho de seção RF: "P?s Fixado R$ 346.922,61 - 5,72% ..."
+        nova_cls = None
+        for pat, cls in RF_SECAO_MAP:
+            if re.search(pat, l, re.I) and "R$" in l:
+                # Confirma que é cabeçalho (tem o total da seção, não ativo individual)
+                # Cabeçalhos têm " - " antes do %
+                if re.search(r"R\$.*-\s*\d+[,\.]\d+%", l):
+                    nova_cls = cls
+                    break
+        if nova_cls:
+            rf_cls = nova_cls
+            rf_nome_buf = None
+            continue
+
+        if rf_cls is None:
+            continue
+
+        # Linha de dados: "R$ 78.286,79 67759.84 1,29% 1,37% ..."
+        m = RF_DADOS_PAT.search(l)
+        if m:
+            saldo    = _brl(m.group(1))
+            perc_str = m.group(3)
+            rent_mes_str = m.group(4)
+            try: perc     = float(perc_str.replace(",","."))
+            except: perc  = 0.0
+            try: rent_mes = float(rent_mes_str.replace(",","."))
+            except: rent_mes = None
+
+            # Tenta pegar rent_12m (5ª % na linha)
+            all_pcts = re.findall(r"([-\d,]+)%", l)
+            rent_12m = float(all_pcts[4].replace(",",".")) if len(all_pcts) >= 5 else None
+
+            # Nome: texto antes do R$ na mesma linha (CRA/CRI inline) ou buffer anterior
+            before_rs = l[:m.start()].strip()
+            before_rs = re.sub(r"\s+(RL|RF\s*CP|CP\s*RL|RF|CP)\s*$", "", before_rs).strip()
+            nome = (before_rs or rf_nome_buf or "").strip()
+
+            if nome and saldo > 0:
+                rf_ativos.append({
+                    "nome":     nome,
+                    "classe":   rf_cls,
+                    "saldo":    saldo,
+                    "perc":     perc,
+                    "rent_mes": rent_mes,
+                    "rent_12m": rent_12m,
+                })
+            rf_nome_buf = None
+            continue
+
+        # Linha de nome do ativo (sem R$): buffer para próxima linha de dados
+        if "R$" not in l:
+            # Ignora cabeçalhos de tabela e ruídos
+            if (not re.search(r"PRECIFICA|M.S\s+ATUAL|ANO\s+24|SALDO|QTD|%ALLOC|Estrat.gia\s+Saldo", l, re.I) and
+                    not re.match(r"^[\d\s\.\-\%\*\+]+$", l) and
+                    not RF_RUIDO_PAT.match(l) and
+                    len(l) > 5):
+                rf_nome_buf = l
+
     return {
-        "conta": conta,
-        "assessor": assessor,
-        "data_ref": data_ref,
+        "conta":     conta,
+        "assessor":  assessor,
+        "data_ref":  data_ref,
         "patrimonio": patrimonio,
-        "comp": comp,
-        "caixa": caixa_perc,
-        "rent": rent,
-        "acoes": acoes,
-        "fiis": fiis_list,
+        "comp":      comp,
+        "caixa":     caixa_perc,
+        "rent":      rent,
+        "acoes":     acoes,
+        "fiis":      fiis_list,
+        "rf_ativos": rf_ativos,
         "texto_completo": texto[:3000],
     }
 
@@ -4180,6 +4294,7 @@ def analyze_xp():
         "composicao":  comp,
         "acoes":       dados.get("acoes",[])[:30],
         "fiis":        dados.get("fiis",[])[:20],
+        "rf_ativos":   dados.get("rf_ativos",[])[:40],
         "data_ref":    dados.get("data_ref",""),
         "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
@@ -5346,11 +5461,51 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
 .card{background:#0F0F22;border:1px solid #1E1E3A;border-radius:12px;padding:20px;margin-bottom:16px}
 .card h2{font-size:11px;color:#8B9FE8;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px}
-/* Stats */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.stat{background:#0A0A1A;border-radius:8px;padding:10px 12px;text-align:center;border:1px solid #1E1E3A}
-.stat .n{font-size:22px;font-weight:700;color:#8B9FE8}
-.stat .l{font-size:10px;color:#3A6A48;margin-top:2px}
+/* KPIs 6 colunas */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.kpi{background:#0A0A1A;border-radius:10px;padding:12px 14px;text-align:center;border:1px solid #1E1E3A;transition:border-color .2s}
+.kpi:hover{border-color:#8B9FE8}
+.kpi .n{font-size:22px;font-weight:700;color:#8B9FE8}
+.kpi .n.red{color:#FF6B6B}
+.kpi .n.green{color:#5DCAA5}
+.kpi .n.gold{color:#C9A96E}
+.kpi .l{font-size:10px;color:#3A6A48;margin-top:3px}
+/* Filtros */
+.filtros-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:#0A0A1A;border:1px solid #1E1E3A;border-radius:10px}
+.filtros-bar label{font-size:11px;color:#3A6A48;margin-right:4px}
+.filtros-bar select{background:#0D0D22;border:1px solid #2A2A4A;color:#C0C0D0;font-size:11px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer}
+.filtros-bar select:focus{border-color:#8B9FE8}
+.btn-limpar{font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #2A2A4A;color:#4A7055;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
+.btn-limpar:hover{border-color:#FF6B6B;color:#FF6B6B}
+/* Card risco */
+.card-risco{background:#140A0A;border:1px solid #3A1A1A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card-risco h2{font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.risco-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;background:#1A0A0A;border:1px solid #2A1010;margin-bottom:8px;flex-wrap:wrap}
+.risco-nome{font-size:13px;font-weight:700;color:#F0F0F0;flex:1;min-width:120px}
+.risco-assessor{font-size:11px;color:#3A6A48}
+.risco-pat{font-size:11px;color:#8B9FE8}
+.risco-motivo{font-size:11px;color:#FFD966;padding:2px 8px;background:#1A1500;border-radius:6px;border:1px solid #2A2000}
+.btn-ver{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #3A1010;color:#FF6B6B;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
+.btn-ver:hover{background:#2A1010;border-color:#FF6B6B}
+.risco-ok{padding:12px 16px;color:#5DCAA5;font-size:13px;background:#0A2018;border-radius:8px;border:1px solid #0A3020}
+/* Card alertas */
+.card-alertas{background:#0D0A14;border:1px solid #2A1E3A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card-alertas h2{font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.alerta-acordeao{border:1px solid #2A2A4A;border-radius:8px;margin-bottom:6px;overflow:hidden}
+.alerta-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#0A0A1A;transition:background .2s}
+.alerta-header:hover{background:#0D0D22}
+.alerta-header-nome{font-size:13px;font-weight:700;color:#F0F0F0;flex:1}
+.alerta-count{font-size:11px;color:#C9A96E;padding:2px 8px;background:#1A1200;border-radius:8px}
+.alerta-body{display:none;padding:10px 14px;background:#080814}
+.alerta-body.aberto{display:block}
+.alerta-linha{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1A1A2E;flex-wrap:wrap}
+.alerta-linha:last-child{border-bottom:none}
+.alerta-ticker{font-size:12px;font-weight:700;color:#8B9FE8;min-width:60px}
+.alerta-titulo{font-size:12px;color:#D0D0E0;flex:1}
+.alerta-tipo{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
+.alerta-compra{background:#0A2018;color:#5DCAA5;border:1px solid #0A3020}
+.alerta-venda{background:#2A1010;color:#FF6B6B;border:1px solid #3A1010}
+.alerta-atencao{background:#1A1500;color:#FFD966;border:1px solid #2A2000}
 /* Ranking assessores */
 .rank-item{
   display:flex;align-items:center;gap:14px;
@@ -5365,9 +5520,9 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .rank-pos.top3{color:#5DCAA5}
 .rank-nome{font-size:14px;font-weight:700;color:#F0F0F0;flex:1}
 .rank-meta{font-size:11px;color:#3A6A48}
-.rank-bars{flex:2;display:flex;flex-direction:column;gap:4px}
+.rank-bars{flex:2;display:flex;flex-direction:column;gap:5px}
 .rank-bar-row{display:flex;align-items:center;gap:8px;font-size:11px}
-.rank-bar-row .lbl{width:80px;color:#3A6A48;text-align:right;flex-shrink:0}
+.rank-bar-row .lbl{width:90px;color:#3A6A48;text-align:right;flex-shrink:0}
 .rank-bar-bg{flex:1;height:5px;background:#1A1A2E;border-radius:3px;overflow:hidden}
 .rank-bar-fill{height:100%;border-radius:3px;transition:width .6s}
 .rank-badges{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
@@ -5376,6 +5531,14 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .detalhe-assessor{display:none;margin-bottom:8px;animation:fadeIn .2s}
 .detalhe-assessor.aberto{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+/* Métricas assessor */
+.metricas-assessor{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;margin-bottom:8px;background:#080814;border-radius:8px;border:1px solid #1A1A2E}
+.met-item{text-align:center;padding:8px}
+.met-n{font-size:18px;font-weight:700;color:#8B9FE8}
+.met-l{font-size:10px;color:#2A5A3A;margin-top:2px}
+.meta-bar{height:4px;border-radius:2px;margin-top:6px}
+.meta-ok{background:#5DCAA5}
+.meta-nok{background:#FF6B6B}
 /* Cards de cliente */
 .cliente-card{
   background:#080816;border:1px solid #1A1A30;border-radius:10px;
@@ -5429,7 +5592,8 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 /* Vazio */
 .vazio{text-align:center;color:#1E4A30;padding:40px;font-size:13px}
 .progress-anel{text-align:right}
-@media(max-width:760px){.stat-row{grid-template-columns:1fr 1fr}.rank-bars{display:none}}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.rank-bars{display:none}.metricas-assessor{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -5444,19 +5608,57 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   (function(){
     if(localStorage.getItem("brauna_role")==="admin"){
       const nav=document.getElementById("nav-lider");
-      nav.innerHTML=`<a href="/assessor">📊 Assessor</a><a href="/lider" class="active">👥 Líder</a><a href="/head-produtos">🏛️ Head</a><a href="/admin">⚙️ Admin</a>`;
+      nav.innerHTML='<a href="/assessor">📊 Assessor</a><a href="/lider" class="active">👥 Líder</a><a href="/head-produtos">🏛️ Head</a><a href="/admin">⚙️ Admin</a>';
     }
   })();
   </script>
 </header>
 <div class="container">
 
-<!-- Estatísticas rápidas -->
-<div class="stat-row" id="stats">
-  <div class="stat"><div class="n" id="st-assessores">—</div><div class="l">Assessores ativos</div></div>
-  <div class="stat"><div class="n" id="st-total">—</div><div class="l">Clientes acompanhados</div></div>
-  <div class="stat"><div class="n" id="st-relatorios">—</div><div class="l">Relatórios subidos</div></div>
-  <div class="stat"><div class="n" id="st-ajustando" style="color:#5DCAA5">—</div><div class="l">Clientes em ajuste</div></div>
+<!-- KPIs 6 itens -->
+<div class="kpi-row" id="kpi-row">
+  <div class="kpi"><div class="n gold" id="kpi-patrimonio">—</div><div class="l">Total Patrimônio</div></div>
+  <div class="kpi"><div class="n" id="kpi-assessores">—</div><div class="l">Assessores Ativos</div></div>
+  <div class="kpi"><div class="n" id="kpi-clientes">—</div><div class="l">Clientes</div></div>
+  <div class="kpi"><div class="n" id="kpi-relatorios">—</div><div class="l">Relatórios</div></div>
+  <div class="kpi"><div class="n red" id="kpi-risco">—</div><div class="l">Clientes em Risco</div></div>
+  <div class="kpi"><div class="n green" id="kpi-score">—</div><div class="l">Score Médio Servir</div></div>
+</div>
+
+<!-- Clientes em Risco -->
+<div class="card-risco" id="sec-risco">
+  <h2>🚨 Clientes em Risco</h2>
+  <div id="risco-container"><p class="vazio">Carregando...</p></div>
+</div>
+
+<!-- Alertas de Mercado -->
+<div class="card-alertas" id="sec-alertas" style="display:none">
+  <h2>📡 Alertas de Mercado</h2>
+  <div id="alertas-container"></div>
+</div>
+
+<!-- Filtros -->
+<div class="filtros-bar">
+  <label>Assessor</label>
+  <select id="filtro-assessor" onchange="aplicarFiltros()">
+    <option value="">Todos</option>
+  </select>
+  <label>Perfil</label>
+  <select id="filtro-perfil" onchange="aplicarFiltros()">
+    <option value="">Todos</option>
+    <option value="conservadora">Conservadora</option>
+    <option value="moderada">Moderada</option>
+    <option value="arrojada">Arrojada</option>
+    <option value="agressiva">Agressiva</option>
+  </select>
+  <label>Status</label>
+  <select id="filtro-status" onchange="aplicarFiltros()">
+    <option value="">Todos</option>
+    <option value="saudavel">Saudável</option>
+    <option value="atencao">Atenção</option>
+    <option value="critico">Crítico</option>
+  </select>
+  <button class="btn-limpar" onclick="limparFiltros()">Limpar filtros</button>
 </div>
 
 <!-- Ranking assessores -->
@@ -5473,15 +5675,15 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 (function(){
   const role = localStorage.getItem("brauna_role");
   if(role !== "lider" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
-  const nome = localStorage.getItem("brauna_nome") || "Líder";
+  const nome = localStorage.getItem("brauna_nome") || "Lider";
   fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({role:"lider",nome,acao:"acesso",detalhe:"Abriu a página do Líder"})});
+    body:JSON.stringify({role:"lider",nome,acao:"acesso",detalhe:"Abriu a pagina do Lider"})});
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
 
 const LABEL_COMP = {
-  pos_fixado:"Pós Fixado", inflacao:"Inflação", pre_fixado:"Pré Fixado",
-  acoes:"Ações", fiis:"FIIs", multimercado:"Multimercado",
+  pos_fixado:"Pos Fixado", inflacao:"Inflacao", pre_fixado:"Pre Fixado",
+  acoes:"Acoes", fiis:"FIIs", multimercado:"Multimercado",
   internacional:"Internacional", alternativos:"Alternativos", criptomoedas:"Criptomoedas"
 };
 
@@ -5493,10 +5695,18 @@ const MODELOS = {
 };
 
 let historico = {};
-let abertos = new Set();
-let notas = {}; // id → nota
-
+let clientesData = [];
+let notas = {};
 let sugestoesHist = [];
+let porAssessorGlobal = {};
+let activityData = [];
+
+function fmtPat(v){
+  if(!v || v<=0) return "—";
+  if(v>=1e9) return "R$ " + (v/1e9).toFixed(1) + "B";
+  if(v>=1e6) return "R$ " + (v/1e6).toFixed(1) + "M";
+  return "R$ " + Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0});
+}
 
 async function init(){
   const [hist, clientes, suge] = await Promise.all([
@@ -5505,79 +5715,275 @@ async function init(){
     fetch("/api/sugestoes").then(r=>r.json()).catch(()=>({historico:[]})),
   ]);
   historico = hist;
+  clientesData = Array.isArray(clientes) ? clientes : [];
   sugestoesHist = suge.historico||[];
-  clientes.forEach(c=>{ notas[`${c.assessor}|${c.nome}`] = {id:c.id, nota:c.nota_lider||""}; });
-  renderStats();
+  clientesData.forEach(c=>{ notas[c.assessor+"|"+c.nome] = {id:c.id, nota:c.nota_lider||""}; });
+
+  renderKPIs();
+  renderRisco();
+  renderAlertas();
+  popularFiltroAssessor();
   renderRanking();
 }
 
-function renderStats(){
+function renderKPIs(){
   const chaves = Object.keys(historico);
-  const assessores = new Set(chaves.map(k=>k.split("|")[0]));
-  const totalRel = chaves.reduce((s,k)=>s+(historico[k].entradas?.length||0),0);
-  const emAjuste = chaves.filter(k=>{
-    const ent = historico[k].entradas||[];
-    return ent.length >= 2;
+  const assessores = new Set(chaves.map(k=>historico[k].assessor||k.split("|")[0]));
+  const totalRel = chaves.reduce((s,k)=>s+(historico[k].entradas&&historico[k].entradas.length||0),0);
+
+  const totalPat = clientesData.reduce((s,c)=>s+(c.patrimonio||0),0);
+
+  let somaScore=0, cntScore=0;
+  clientesData.forEach(c=>{
+    const hist = historico[c.assessor+"|"+c.nome]||historico[Object.keys(historico).find(k=>k.includes(c.nome))||""]||null;
+    const ult = hist && hist.entradas && hist.entradas[0];
+    if(ult && ult.score_servir>0){ somaScore+=ult.score_servir; cntScore++; }
+  });
+
+  const emRisco = clientesData.filter(c=>{
+    const hist = historico[c.assessor+"|"+c.nome]||null;
+    const ult = hist && hist.entradas && hist.entradas[0];
+    return ult && (ult.rent12_pct_cdi < 70 || ult.status === "critico");
   }).length;
-  document.getElementById("st-assessores").textContent  = assessores.size;
-  document.getElementById("st-total").textContent       = chaves.length;
-  document.getElementById("st-relatorios").textContent  = totalRel;
-  document.getElementById("st-ajustando").textContent   = emAjuste;
+
+  document.getElementById("kpi-patrimonio").textContent = fmtPat(totalPat);
+  document.getElementById("kpi-assessores").textContent = assessores.size;
+  document.getElementById("kpi-clientes").textContent   = clientesData.length;
+  document.getElementById("kpi-relatorios").textContent = totalRel;
+  document.getElementById("kpi-risco").textContent      = emRisco;
+  document.getElementById("kpi-score").textContent      = cntScore>0 ? (somaScore/cntScore).toFixed(1) : "—";
+}
+
+function clientesEmRisco(filtroAssessor, filtroPerfil, filtroStatus){
+  return clientesData.filter(c=>{
+    if(filtroAssessor && c.assessor !== filtroAssessor) return false;
+    if(filtroPerfil && c.perfil !== filtroPerfil) return false;
+    const hist = historico[c.assessor+"|"+c.nome]||null;
+    const ult = hist && hist.entradas && hist.entradas[0];
+    if(!ult) return false;
+    const isRisco = ult.rent12_pct_cdi < 70 || ult.status === "critico";
+    if(filtroStatus==="critico" && ult.status!=="critico") return false;
+    if(filtroStatus==="saudavel" || filtroStatus==="atencao") return false;
+    return isRisco;
+  });
+}
+
+function renderRisco(filtroAssessor, filtroPerfil, filtroStatus){
+  const riscos = clientesEmRisco(filtroAssessor||"", filtroPerfil||"", filtroStatus||"");
+  const cont = document.getElementById("risco-container");
+  if(!riscos.length){
+    cont.innerHTML = '<div class="risco-ok">Nenhum alerta critico com os filtros atuais</div>';
+    return;
+  }
+  cont.innerHTML = riscos.map(c=>{
+    const hist = historico[c.assessor+"|"+c.nome]||null;
+    const ult = hist && hist.entradas && hist.entradas[0];
+    const motivos = [];
+    if(ult && ult.status==="critico") motivos.push("Status critico");
+    if(ult && ult.rent12_pct_cdi < 70) motivos.push("Rent. 12M abaixo de 70% CDI (" + (ult.rent12_pct_cdi||0) + "%)");
+    const motivoStr = motivos.join(" · ")||"Desvio detectado";
+    const chaveHist = Object.keys(historico).find(k=>k.startsWith(c.assessor+"|"+c.nome)||k.endsWith("|"+c.nome));
+    const assessorIdx = rankingOrder ? rankingOrder.findIndex(a=>a.nome===c.assessor) : -1;
+    return '<div class="risco-item">'
+      +'<div class="risco-nome">'+c.nome+'</div>'
+      +'<span class="risco-assessor">'+c.assessor+'</span>'
+      +'<span class="risco-pat">'+fmtPat(c.patrimonio)+'</span>'
+      +'<span class="risco-motivo">'+motivoStr+'</span>'
+      +'<button class="btn-ver" onclick="verDetalhesCliente(\''+c.assessor+'\',\''+c.nome+'\')">Ver detalhes</button>'
+      +'</div>';
+  }).join("");
+}
+
+function verDetalhesCliente(assessor, nome){
+  // Encontra o assessor no ranking e abre o card dele
+  const idx = rankingOrder ? rankingOrder.findIndex(a=>a.nome===assessor) : -1;
+  if(idx>=0){
+    const detalhe = document.getElementById("detalhe-"+idx);
+    if(detalhe && !detalhe.classList.contains("aberto")) toggleAssessor(idx);
+    setTimeout(function(){
+      const cards = document.querySelectorAll(".cliente-card");
+      for(var i=0;i<cards.length;i++){
+        if(cards[i].getAttribute("data-nome")===nome){
+          cards[i].scrollIntoView({behavior:"smooth",block:"center"});
+          cards[i].style.borderColor="#FF6B6B";
+          setTimeout(function(){ cards[i].style.borderColor=""; }, 3000);
+          break;
+        }
+      }
+    }, 300);
+  }
+}
+
+function renderAlertas(){
+  const porAssessor = {};
+  clientesData.forEach(c=>{
+    if(!c.alertas || !c.alertas.length) return;
+    if(!porAssessor[c.assessor]) porAssessor[c.assessor] = [];
+    c.alertas.forEach(function(al){
+      porAssessor[c.assessor].push({ticker:al.ticker||"—", titulo:al.titulo||al.title||"Alerta", tipo:(al.tipo||al.type||"atencao").toLowerCase(), assessor:c.assessor});
+    });
+  });
+  const assessoresComAlertas = Object.keys(porAssessor);
+  if(!assessoresComAlertas.length){
+    document.getElementById("sec-alertas").style.display = "none";
+    return;
+  }
+  document.getElementById("sec-alertas").style.display = "block";
+  let html = "";
+  assessoresComAlertas.forEach(function(aN, idx){
+    const als = porAssessor[aN];
+    html += '<div class="alerta-acordeao">'
+      +'<div class="alerta-header" onclick="toggleAlerta('+idx+')">'
+      +'<span class="alerta-header-nome">'+aN+'</span>'
+      +'<span class="alerta-count">'+als.length+' alerta(s)</span>'
+      +'<span style="font-size:16px;color:#2A2A4A;transition:transform .2s" id="achev-'+idx+'">▾</span>'
+      +'</div>'
+      +'<div class="alerta-body" id="abody-'+idx+'">';
+    als.forEach(function(al){
+      const tipoCls = al.tipo.includes("compra")?"alerta-compra":al.tipo.includes("venda")?"alerta-venda":"alerta-atencao";
+      html += '<div class="alerta-linha">'
+        +'<span class="alerta-ticker">'+al.ticker+'</span>'
+        +'<span class="alerta-titulo">'+al.titulo+'</span>'
+        +'<span class="alerta-tipo '+tipoCls+'">'+al.tipo+'</span>'
+        +'</div>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById("alertas-container").innerHTML = html;
+}
+
+function toggleAlerta(i){
+  const body = document.getElementById("abody-"+i);
+  const chev = document.getElementById("achev-"+i);
+  const aberto = body.classList.toggle("aberto");
+  chev.style.transform = aberto?"rotate(180deg)":"";
+}
+
+function popularFiltroAssessor(){
+  const assessores = [...new Set(clientesData.map(c=>c.assessor).filter(Boolean))].sort();
+  const sel = document.getElementById("filtro-assessor");
+  assessores.forEach(function(a){
+    const op = document.createElement("option");
+    op.value = a; op.textContent = a;
+    sel.appendChild(op);
+  });
+}
+
+function limparFiltros(){
+  document.getElementById("filtro-assessor").value="";
+  document.getElementById("filtro-perfil").value="";
+  document.getElementById("filtro-status").value="";
+  aplicarFiltros();
+}
+
+function aplicarFiltros(){
+  const fa = document.getElementById("filtro-assessor").value;
+  const fp = document.getElementById("filtro-perfil").value;
+  const fs = document.getElementById("filtro-status").value;
+  renderRisco(fa, fp, fs);
+  renderRankingFiltrado(fa, fp, fs);
+}
+
+let rankingOrder = null;
+
+function buildPorAssessor(filtroAssessor, filtroPerfil, filtroStatus){
+  const porAssessor = {};
+  Object.entries(historico).forEach(function(entry){
+    const key = entry[0]; const reg = entry[1];
+    const assessor = reg.assessor || key.split("|")[0];
+    const perfil = reg.perfil || "";
+    const ult = reg.entradas && reg.entradas[0];
+    const status = ult && ult.status || "saudavel";
+    if(filtroAssessor && assessor !== filtroAssessor) return;
+    if(filtroPerfil && perfil && perfil !== filtroPerfil) return;
+    if(filtroStatus){
+      const stMap = {saudavel:"saudavel",atencao:"atencao",critico:"critico"};
+      const stNorm = status==="critico"?"critico":status==="atencao"?"atencao":"saudavel";
+      if(filtroStatus !== stNorm) return;
+    }
+    if(!porAssessor[assessor]) porAssessor[assessor] = {nome:assessor, clientes:[], totalRel:0};
+    porAssessor[assessor].clientes.push(Object.assign({key:key},reg));
+    porAssessor[assessor].totalRel += (reg.entradas&&reg.entradas.length||0);
+  });
+  return porAssessor;
 }
 
 function renderRanking(){
+  renderRankingFiltrado("","","");
+}
+
+function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
   const container = document.getElementById("ranking-container");
   if(!Object.keys(historico).length){
-    container.innerHTML = '<p class="vazio">Nenhum assessor usou o sistema ainda. Os relatórios aparecerão aqui após a primeira análise.</p>';
+    container.innerHTML = '<p class="vazio">Nenhum assessor usou o sistema ainda. Os relatorios aparecerao aqui apos a primeira analise.</p>';
     return;
   }
 
-  // Agrupar por assessor
-  const porAssessor = {};
-  Object.entries(historico).forEach(([key, reg])=>{
-    const assessor = reg.assessor || key.split("|")[0];
-    if(!porAssessor[assessor]) porAssessor[assessor] = {nome:assessor, clientes:[], totalRel:0};
-    porAssessor[assessor].clientes.push({key, ...reg});
-    porAssessor[assessor].totalRel += (reg.entradas?.length||0);
-  });
+  const porAssessor = buildPorAssessor(filtroAssessor||"", filtroPerfil||"", filtroStatus||"");
+  if(!Object.keys(porAssessor).length){
+    container.innerHTML = '<p class="vazio">Nenhum resultado para os filtros selecionados.</p>';
+    return;
+  }
 
-  // Ordenar por total de relatórios
-  const ranking = Object.values(porAssessor).sort((a,b)=>b.totalRel-a.totalRel);
-  const maxRel = ranking[0]?.totalRel || 1;
+  const ranking = Object.values(porAssessor).sort(function(a,b){return b.totalRel-a.totalRel;});
+  rankingOrder = ranking;
+  const maxRel = ranking[0].totalRel || 1;
+
+  // Contar PPTXs por assessor a partir de activity (se disponível)
+  const pptxPorAssessor = {};
+  if(activityData && activityData.length){
+    activityData.forEach(function(ev){
+      if(ev.acao==="pptx_gerado" && ev.nome){
+        pptxPorAssessor[ev.nome] = (pptxPorAssessor[ev.nome]||0)+1;
+      }
+    });
+  }
 
   let html = "";
-  ranking.forEach((a,i)=>{
+  ranking.forEach(function(a,i){
     const pos = i+1;
     const posClass = pos===1?"top1":pos===2?"top2":pos===3?"top3":"";
     const pctBar = Math.round(a.totalRel/maxRel*100);
-    const emAjuste = a.clientes.filter(c=>(c.entradas?.length||0)>=2).length;
-    const criticos = a.clientes.filter(c=>c.entradas?.[0]?.status==="critico").length;
+    const emAjuste = a.clientes.filter(function(c){return (c.entradas&&c.entradas.length||0)>=2;}).length;
+    const criticos = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].status==="critico";}).length;
     const statusBadge = criticos>0
-      ? `<span class="rbadge" style="background:#2A1010;color:#FF6B6B">🔴 ${criticos} crítico(s)</span>`
-      : `<span class="rbadge" style="background:#0A2018;color:#5DCAA5">✓ Saudável</span>`;
+      ? '<span class="rbadge" style="background:#2A1010;color:#FF6B6B">🔴 '+criticos+' critico(s)</span>'
+      : '<span class="rbadge" style="background:#0A2018;color:#5DCAA5">Saudavel</span>';
 
-    html += `
-<div class="rank-item" id="rank-${i}" onclick="toggleAssessor(${i})">
-  <div class="rank-pos ${posClass}">#${pos}</div>
-  <div style="flex:1">
-    <div class="rank-nome">${a.nome}</div>
-    <div class="rank-meta" style="margin-top:2px">${a.clientes.length} cliente(s) · ${a.totalRel} relatório(s) · ${emAjuste} em ajuste ativo</div>
-  </div>
-  <div class="rank-bars">
-    <div class="rank-bar-row">
-      <span class="lbl">Relatórios</span>
-      <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pctBar}%;background:#8B9FE8"></div></div>
-    </div>
-    <div class="rank-bar-row">
-      <span class="lbl">Em ajuste</span>
-      <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${a.clientes.length>0?Math.round(emAjuste/a.clientes.length*100):0}%;background:#5DCAA5"></div></div>
-    </div>
-  </div>
-  <div class="rank-badges">${statusBadge}<span style="font-size:18px;color:#2A2A4A;transition:transform .2s" id="chevron-${i}">▾</span></div>
-</div>
-<div class="detalhe-assessor" id="detalhe-${i}">
-  ${renderClientesAssessor(a.clientes, a.nome)}
-</div>`;
+    // Métricas de performance
+    const mesAtual = new Date().toISOString().slice(0,7);
+    const analisesMes = a.clientes.reduce(function(s,c){
+      return s + (c.entradas||[]).filter(function(e){return e.data&&e.data.startsWith(mesAtual);}).length;
+    },0);
+    const pptxGerados = pptxPorAssessor[a.nome]||0;
+    const clientesComScoreAlto = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].score_servir>=4;}).length;
+    const pctScore = a.clientes.length>0 ? Math.round(clientesComScoreAlto/a.clientes.length*100) : 0;
+    const clientesComRentOk = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].rent12_pct_cdi>=80;}).length;
+    const pctRent = a.clientes.length>0 ? Math.round(clientesComRentOk/a.clientes.length*100) : 0;
+
+    html += '<div class="rank-item" id="rank-'+i+'" onclick="toggleAssessor('+i+')">'
+      +'<div class="rank-pos '+posClass+'">#'+pos+'</div>'
+      +'<div style="flex:1">'
+      +'<div class="rank-nome">'+a.nome+'</div>'
+      +'<div class="rank-meta" style="margin-top:2px">'+a.clientes.length+' cliente(s) · '+a.totalRel+' relatorio(s) · '+emAjuste+' em ajuste ativo</div>'
+      +'</div>'
+      +'<div class="rank-bars">'
+      +'<div class="rank-bar-row"><span class="lbl">Relatorios</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctBar+'%;background:#8B9FE8"></div></div></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Em ajuste</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+(a.clientes.length>0?Math.round(emAjuste/a.clientes.length*100):0)+'%;background:#5DCAA5"></div></div></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Score >=4</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctScore+'%;background:'+(pctScore>=60?"#5DCAA5":"#FF6B6B")+'"></div></div><span style="font-size:10px;color:#3A6A48;margin-left:4px">'+pctScore+'%</span></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Rent >=80%</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctRent+'%;background:'+(pctRent>=60?"#5DCAA5":"#FFD966")+'"></div></div><span style="font-size:10px;color:#3A6A48;margin-left:4px">'+pctRent+'%</span></div>'
+      +'</div>'
+      +'<div class="rank-badges">'+statusBadge+'<span style="font-size:18px;color:#2A2A4A;transition:transform .2s" id="chevron-'+i+'">▾</span></div>'
+      +'</div>'
+      +'<div class="detalhe-assessor" id="detalhe-'+i+'">'
+      +'<div class="metricas-assessor">'
+      +'<div class="met-item"><div class="met-n">'+analisesMes+'</div><div class="met-l">Analises este mes</div><div class="meta-bar '+(analisesMes>=3?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
+      +'<div class="met-item"><div class="met-n">'+pptxGerados+'</div><div class="met-l">PPTX gerados</div><div class="meta-bar '+(pptxGerados>=1?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
+      +'<div class="met-item"><div class="met-n">'+pctScore+'%</div><div class="met-l">Clientes score >= 4</div><div class="meta-bar '+(pctScore>=60?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
+      +'<div class="met-item"><div class="met-n">'+pctRent+'%</div><div class="met-l">Clientes rent >= 80% CDI</div><div class="meta-bar '+(pctRent>=60?"meta-ok":"meta-nok")+'" style="width:100%"></div></div>'
+      +'</div>'
+      +renderClientesAssessor(a.clientes, a.nome)
+      +'</div>';
   });
 
   container.innerHTML = html;
@@ -5593,118 +5999,111 @@ function toggleAssessor(i){
 }
 
 function renderClientesAssessor(clientes, assessorNome){
-  // Ordena: mais recente primeiro
-  const sorted = [...clientes].sort((a,b)=>{
-    const da = a.entradas?.[0]?.data||"";
-    const db = b.entradas?.[0]?.data||"";
+  const sorted = clientes.slice().sort(function(a,b){
+    const da = a.entradas&&a.entradas[0]&&a.entradas[0].data||"";
+    const db = b.entradas&&b.entradas[0]&&b.entradas[0].data||"";
     return db.localeCompare(da);
   });
 
-  return `<div style="padding:8px 0 4px">` + sorted.map(c=>{
+  return '<div style="padding:8px 0 4px">' + sorted.map(function(c){
     const entradas = c.entradas||[];
     const ultima   = entradas[0];
-    const statusCls = ultima?.status==="critico"?"c-critico":ultima?.status==="atencao"?"c-atencao":"c-ok";
-    const statusTxt = ultima?.status==="critico"?"🔴 Crítico":ultima?.status==="atencao"?"🟡 Atenção":"🟢 Saudável";
-    const fmt = v=>v>0?"R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}):"—";
-    const notaKey = `${assessorNome}|${c.nome}`;
+    const statusCls = ultima&&ultima.status==="critico"?"c-critico":ultima&&ultima.status==="atencao"?"c-atencao":"c-ok";
+    const statusTxt = ultima&&ultima.status==="critico"?"🔴 Critico":ultima&&ultima.status==="atencao"?"🟡 Atencao":"🟢 Saudavel";
+    const fmt = function(v){return v>0?"R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}):"—";};
+    const notaKey = assessorNome+"|"+c.nome;
     const notaObj = notas[notaKey]||{};
     const notaVal = (notaObj.nota||"").replace(/"/g,"&quot;");
     const clienteId = notaObj.id||"";
 
-    // Monta timeline
     let timelineHtml = '<div class="timeline">';
-    entradas.forEach((e,idx)=>{
+    entradas.forEach(function(e,idx){
       const isFirst = idx===0;
       const dotCls  = e.status==="critico"?"critico":e.status==="atencao"?"atencao":"ok";
       const prev    = entradas[idx+1];
 
-      // Deltas vs análise anterior
       let deltaHtml = "";
       if(prev && e.composicao && prev.composicao){
         const modelo = MODELOS[c.perfil]||MODELOS.conservadora;
         const deltas = [];
-        Object.entries(e.composicao).forEach(([k,v])=>{
+        Object.keys(e.composicao).forEach(function(k){
+          const v = e.composicao[k];
           const vPrev = prev.composicao[k]||0;
           const diff  = v - vPrev;
-          if(Math.abs(diff) < 0.5) return; // ignora mudanças menores que 0.5%
+          if(Math.abs(diff) < 0.5) return;
           const meta  = modelo[k]||0;
           const distNow  = Math.abs(v - meta);
           const distPrev = Math.abs(vPrev - meta);
-          const approx   = distNow < distPrev; // se aproximou do modelo
+          const approx   = distNow < distPrev;
           const sinal    = diff>0?"▲":"▼";
           const cls      = diff>0 ? (approx?"delta-up-ok":"delta-up-bad") : (approx?"delta-dn-ok":"delta-dn-bad");
-          deltas.push(`<span class="delta-item ${cls}">${sinal} ${LABEL_COMP[k]||k} ${diff>0?"+":""}${diff.toFixed(1)}%</span>`);
+          deltas.push('<span class="delta-item '+cls+'">'+sinal+' '+(LABEL_COMP[k]||k)+' '+(diff>0?"+":"")+diff.toFixed(1)+'%</span>');
         });
         if(deltas.length){
-          deltaHtml = `<div style="margin-top:4px;font-size:10px;color:#2A5A3A">Variação vs análise anterior:</div><div class="delta-row">${deltas.join("")}</div>`;
+          deltaHtml = '<div style="margin-top:4px;font-size:10px;color:#2A5A3A">Variacao vs analise anterior:</div><div class="delta-row">'+deltas.join("")+'</div>';
         } else {
-          deltaHtml = `<div style="font-size:10px;color:#2A2A4A;margin-top:4px">Sem variações significativas vs análise anterior</div>`;
+          deltaHtml = '<div style="font-size:10px;color:#2A2A4A;margin-top:4px">Sem variacoes significativas vs analise anterior</div>';
         }
 
-        // Verificar adesão às sugestões
         if(sugestoesHist.length && deltas.length){
-          const rfSugs = sugestoesHist[0]?.rf||[];
-          const MAPA_IDX = {IPCA:"inflacao",CDI:"pos_fixado",SELIC:"pos_fixado","Pré-fixado":"pre_fixado"};
-          let aderiuRF=false, contrariouRF=false;
-          rfSugs.forEach(s=>{
-            if(!s.perfis?.includes(c.perfil)) return;
+          const rfSugs = sugestoesHist[0]&&sugestoesHist[0].rf||[];
+          const MAPA_IDX = {IPCA:"inflacao",CDI:"pos_fixado",SELIC:"pos_fixado","Pre-fixado":"pre_fixado"};
+          let aderiuRF=false;
+          rfSugs.forEach(function(s){
+            if(!s.perfis||!s.perfis.includes(c.perfil)) return;
             const k = MAPA_IDX[s.indexador];
             if(!k) return;
-            const diff = (e.composicao[k]||0)-(prev.composicao[k]||0);
-            if(s.acao==="alocar"  && diff>0.5) aderiuRF=true;
-            if(s.acao==="substituir" && s.de && diff>0.5) aderiuRF=true;
+            const diff2 = (e.composicao[k]||0)-(prev.composicao[k]||0);
+            if(s.acao==="alocar"  && diff2>0.5) aderiuRF=true;
+            if(s.acao==="substituir" && s.de && diff2>0.5) aderiuRF=true;
           });
           if(aderiuRF){
-            deltaHtml += `<div style="margin-top:6px;font-size:11px;color:#5DCAA5;padding:5px 10px;background:#0A2018;border-radius:6px;border:1px solid #0A3020">✓ Adesão à sugestão de Renda Fixa detectada nesta análise</div>`;
+            deltaHtml += '<div style="margin-top:6px;font-size:11px;color:#5DCAA5;padding:5px 10px;background:#0A2018;border-radius:6px;border:1px solid #0A3020">Adesao a sugestao de Renda Fixa detectada nesta analise</div>';
           }
         }
       }
 
       const rentTxt = e.rent12_pct_cdi>0
-        ? `<span style="color:${e.rent12_pct_cdi<70?"#FF6B6B":"#5DCAA5"}">${e.rent12_pct_cdi}%</span> do CDI`
+        ? '<span style="color:'+(e.rent12_pct_cdi<70?"#FF6B6B":"#5DCAA5")+'">'+e.rent12_pct_cdi+'%</span> do CDI'
         : "—";
 
-      timelineHtml += `
-        <div class="tl-entry">
-          <div class="tl-dot ${dotCls}${isFirst?" first":""}"></div>
-          <div class="tl-content">
-            <div class="tl-data">
-              <b>${e.data} ${e.hora||""}</b>
-              <span class="c-badge ${statusCls}">${statusTxt}</span>
-              ${isFirst?'<span style="font-size:10px;color:#8B9FE8;font-weight:700">← MAIS RECENTE</span>':""}
-            </div>
-            <div class="tl-metrics">
-              <div class="tl-m">Patrimônio <span>${fmt(e.patrimonio)}</span></div>
-              <div class="tl-m">Modelo de Servir <span>${e.score_servir}/6</span></div>
-              <div class="tl-m">Cross Sell <span>${e.cross_ativos}/5</span></div>
-              <div class="tl-m">Rentab. CDI <span>${rentTxt}</span></div>
-            </div>
-            ${deltaHtml}
-          </div>
-        </div>`;
+      timelineHtml += '<div class="tl-entry">'
+        +'<div class="tl-dot '+dotCls+(isFirst?" first":"")+'"></div>'
+        +'<div class="tl-content">'
+        +'<div class="tl-data"><b>'+e.data+' '+(e.hora||"")+'</b>'
+        +'<span class="c-badge '+statusCls+'">'+statusTxt+'</span>'
+        +(isFirst?'<span style="font-size:10px;color:#8B9FE8;font-weight:700">MAIS RECENTE</span>':"")
+        +'</div>'
+        +'<div class="tl-metrics">'
+        +'<div class="tl-m">Patrimonio <span>'+fmt(e.patrimonio)+'</span></div>'
+        +'<div class="tl-m">Modelo Servir <span>'+e.score_servir+'/6</span></div>'
+        +'<div class="tl-m">Cross Sell <span>'+e.cross_ativos+'/5</span></div>'
+        +'<div class="tl-m">Rentab. CDI <span>'+rentTxt+'</span></div>'
+        +'</div>'
+        +deltaHtml
+        +'</div></div>';
     });
     timelineHtml += "</div>";
 
-    return `
-<div class="cliente-card">
-  <div class="cliente-header">
-    <div class="cliente-nome">${c.nome}</div>
-    <div class="cliente-perfil">${c.perfil||"—"}</div>
-    ${c.objetivo?`<div class="cliente-objetivo">🎯 ${c.objetivo}</div>`:""}
-    <span class="c-badge ${statusCls}" style="margin-left:auto">${statusTxt}</span>
-    <span style="font-size:11px;color:#3A6A48">${entradas.length} análise(s)</span>
-  </div>
-  ${timelineHtml}
-  <input class="nota-input" value="${notaVal}"
-    placeholder="Orientação do líder para este assessor sobre este cliente..."
-    onchange="salvarNota('${clienteId}',this.value)">
-</div>`;
+    return '<div class="cliente-card" data-nome="'+c.nome+'">'
+      +'<div class="cliente-header">'
+      +'<div class="cliente-nome">'+c.nome+'</div>'
+      +'<div class="cliente-perfil">'+(c.perfil||"—")+'</div>'
+      +(c.objetivo?'<div class="cliente-objetivo">'+c.objetivo+'</div>':"")
+      +'<span class="c-badge '+statusCls+'" style="margin-left:auto">'+statusTxt+'</span>'
+      +'<span style="font-size:11px;color:#3A6A48">'+entradas.length+' analise(s)</span>'
+      +'</div>'
+      +timelineHtml
+      +'<input class="nota-input" value="'+notaVal+'"'
+      +' placeholder="Orientacao do lider para este assessor sobre este cliente..."'
+      +' onchange="salvarNota(\''+clienteId+'\',this.value)">'
+      +'</div>';
   }).join("") + "</div>";
 }
 
 async function salvarNota(id,nota){
   if(!id) return;
-  await fetch("/api/clientes/"+id+"/nota",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nota})});
+  await fetch("/api/clientes/"+id+"/nota",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nota:nota})});
 }
 
 init();
