@@ -5670,6 +5670,28 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 /* Vazio */
 .vazio{text-align:center;color:#1E4A30;padding:40px;font-size:13px}
 .progress-anel{text-align:right}
+/* Tabela Resumo Financeiro */
+.tabela-resumo{width:100%;border-collapse:collapse;font-size:12px;min-width:780px}
+.tabela-resumo th{background:#0A1A0A;color:#5DCAA5;font-weight:700;padding:9px 10px;text-align:right;border-bottom:2px solid #1A3A1A;white-space:nowrap}
+.tabela-resumo th:first-child{text-align:left}
+.tabela-resumo td{padding:8px 10px;border-bottom:1px solid #0F1F0F;text-align:right;color:#C0C8C0;vertical-align:middle}
+.tabela-resumo td:first-child{text-align:left;color:#E0E8E0;font-weight:600;max-width:180px}
+.tabela-resumo tr:hover td{background:#0A1A0A}
+.tabela-resumo tr.tr-total td{background:#071E17;color:#C9A96E;font-weight:700;border-top:2px solid #1A3A1A}
+.okr-bar-mini{height:5px;border-radius:3px;margin-top:3px;background:#1A2A1A}
+.okr-bar-mini-fill{height:100%;border-radius:3px;transition:width .4s}
+.pct-okr-chip{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700}
+/* Botões resumo */
+.btn-resumo{display:inline-block;padding:7px 16px;border:1px solid #2A3A2A;border-radius:8px;background:#0A1A0A;color:#5DCAA5;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-resumo:hover{border-color:#5DCAA5;color:#fff}
+.btn-gold{background:#1A1200;color:#C9A96E;border-color:#3A2A00}
+.btn-gold:hover{border-color:#C9A96E;color:#fff}
+.btn-danger{color:#FF6B6B;border-color:#3A1010;background:#1A0808}
+.btn-danger:hover{border-color:#FF6B6B}
+/* Form modal */
+.flabel{display:block;font-size:11px;color:#4A7055;margin-bottom:4px;margin-top:2px}
+.finput{width:100%;background:#071E17;border:1px solid #1A3A1A;border-radius:7px;padding:8px 10px;color:#E0E8E0;font-size:13px;outline:none;box-sizing:border-box}
+.finput:focus{border-color:#C9A96E}
 @media(max-width:900px){.kpi-row{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.rank-bars{display:none}.metricas-assessor{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -5739,6 +5761,87 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   <button class="btn-limpar" onclick="limparFiltros()">Limpar filtros</button>
 </div>
 
+<!-- Resumo Financeiro Assessores -->
+<div class="card" id="sec-resumo-financeiro">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <div>
+      <h2 style="margin:0 0 2px">📊 Resumo Financeiro dos Assessores</h2>
+      <span id="resumo-atualizado" style="font-size:11px;color:#2A5A3A"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <label style="font-size:12px;color:#4A7055;cursor:pointer">
+        <input type="file" id="input-planilha-resumo" accept=".xlsx" style="display:none" onchange="importarPlanilha(this)">
+        <span class="btn-resumo" onclick="document.getElementById('input-planilha-resumo').click()">📥 Importar Excel</span>
+      </label>
+      <button class="btn-resumo btn-gold" onclick="abrirModalNovoAssessor()">+ Adicionar manualmente</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="tabela-resumo" id="tabela-resumo">
+      <thead>
+        <tr>
+          <th>Assessor</th>
+          <th>Patrimônio</th>
+          <th>Receita/mês</th>
+          <th>OKR mensal</th>
+          <th>% OKR</th>
+          <th>RF %</th>
+          <th>RV %</th>
+          <th>FII %</th>
+          <th>Intl %</th>
+          <th>ROA anual</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-resumo">
+        <tr><td colspan="11" style="text-align:center;color:#1E4A30;padding:24px">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="resumo-total-row" style="display:flex;gap:24px;flex-wrap:wrap;padding:10px 4px 0;border-top:1px solid #1A2A1A;margin-top:10px"></div>
+</div>
+
+<!-- Modal edição/adição de assessor -->
+<div id="modal-assessor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#0D1A0F;border:1px solid #1A3A1A;border-radius:14px;padding:28px 32px;width:min(700px,96vw);max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 id="modal-titulo" style="margin:0;color:#C9A96E">Assessor</h3>
+      <button onclick="fecharModal()" style="background:none;border:none;color:#4A7055;font-size:22px;cursor:pointer">✕</button>
+    </div>
+    <input type="hidden" id="modal-idx">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="grid-column:1/-1"><label class="flabel">Nome do Assessor</label><input id="f-nome" class="finput" placeholder="Nome completo"></div>
+      <div><label class="flabel">Patrimônio (R$)</label><input id="f-patrimonio" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">Receita Total/mês (R$)</label><input id="f-receita" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">OKR Mensal (R$)</label><input id="f-okr-mensal" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">OKR Anual (R$)</label><input id="f-okr-anual" class="finput" type="number" placeholder="0"></div>
+      <div style="grid-column:1/-1"><div style="font-size:12px;color:#C9A96E;font-weight:700;margin:8px 0 4px;border-bottom:1px solid #1A3A1A;padding-bottom:4px">Por Classe — Saldo (R$) e % na carteira</div></div>
+      <div><label class="flabel">RF — Saldo (R$)</label><input id="f-rf-saldo" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">RF — % carteira</label><input id="f-rf-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
+      <div><label class="flabel">RF — Receita/mês (R$)</label><input id="f-rf-receita" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">RF — Vol. mensal (R$)</label><input id="f-rf-vol" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">RV — Saldo (R$)</label><input id="f-rv-saldo" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">RV — % carteira</label><input id="f-rv-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
+      <div><label class="flabel">RV — Receita/mês (R$)</label><input id="f-rv-receita" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">RV — Vol. mensal (R$)</label><input id="f-rv-vol" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">FII — Saldo (R$)</label><input id="f-fii-saldo" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">FII — % carteira</label><input id="f-fii-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
+      <div><label class="flabel">FII — Receita/mês (R$)</label><input id="f-fii-receita" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">FII — Vol. mensal (R$)</label><input id="f-fii-vol" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">Internacional — Saldo (R$)</label><input id="f-intl-saldo" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">Internacional — %</label><input id="f-intl-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
+      <div><label class="flabel">Internacional — Receita (R$)</label><input id="f-intl-receita" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">Internacional — Vol. mensal</label><input id="f-intl-vol" class="finput" type="number" placeholder="0"></div>
+      <div><label class="flabel">Estruturadas — % máx elegível</label><input id="f-estr-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
+      <div><label class="flabel">Estruturadas — Receita (R$)</label><input id="f-estr-receita" class="finput" type="number" placeholder="0"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+      <button onclick="fecharModal()" style="padding:9px 20px;border:1px solid #2A3A2A;border-radius:8px;background:none;color:#4A7055;cursor:pointer">Cancelar</button>
+      <button onclick="salvarAssessor()" style="padding:9px 24px;border:none;border-radius:8px;background:#C9A96E;color:#071E17;font-weight:700;cursor:pointer">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Ranking assessores -->
 <div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
@@ -5765,26 +5868,165 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
 
+// ─── Resumo Financeiro ────────────────────────────────────────────────────────
+let dadosFinanceiros = {assessores:[], atualizado_em:""};
+
+function fmtR(v){ return v>0 ? "R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}) : "—"; }
+function fmtPct(v){ return v>0 ? v.toFixed(1)+"%" : "—"; }
+
+function renderResumoFinanceiro(){
+  const lista = dadosFinanceiros.assessores||[];
+  document.getElementById("resumo-atualizado").textContent =
+    dadosFinanceiros.atualizado_em ? "Atualizado em "+dadosFinanceiros.atualizado_em+" · "+dadosFinanceiros.fonte : "";
+  const tbody = document.getElementById("tbody-resumo");
+  if(!lista.length){
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#1E4A30;padding:24px">Nenhum dado importado ainda. Use "Importar Excel" ou "Adicionar manualmente".</td></tr>';
+    return;
+  }
+  let totalPat=0, totalRec=0, totalOKR=0;
+  tbody.innerHTML = lista.map(function(a,i){
+    const pctOKR = a.pct_realizado_okr||0;
+    const okrColor = pctOKR>=100?"#5DCAA5":pctOKR>=70?"#FFD966":"#FF6B6B";
+    const barW = Math.min(pctOKR,100);
+    totalPat += a.patrimonio||0; totalRec += a.receita_total||0; totalOKR += a.okr_mensal||0;
+    return '<tr>'
+      +'<td>'+a.nome+'</td>'
+      +'<td>'+fmtR(a.patrimonio)+'</td>'
+      +'<td style="color:#5DCAA5;font-weight:700">'+fmtR(a.receita_total)+'</td>'
+      +'<td>'+fmtR(a.okr_mensal)+'</td>'
+      +'<td><span class="pct-okr-chip" style="background:'+(pctOKR>=100?"#0A2018":pctOKR>=70?"#1A1500":"#2A1010")+';color:'+okrColor+'">'+Math.round(pctOKR)+'%</span><div class="okr-bar-mini"><div class="okr-bar-mini-fill" style="width:'+barW+'%;background:'+okrColor+'"></div></div></td>'
+      +'<td>'+fmtPct(a.rf&&a.rf.pct)+'</td>'
+      +'<td>'+fmtPct(a.rv&&a.rv.pct)+'</td>'
+      +'<td>'+fmtPct(a.fii&&a.fii.pct)+'</td>'
+      +'<td>'+fmtPct(a.internacional&&a.internacional.pct)+'</td>'
+      +'<td>'+((a.roa_anual||0).toFixed(2))+'%</td>'
+      +'<td style="white-space:nowrap">'
+        +'<button class="btn-resumo" style="padding:3px 10px;font-size:11px;margin-right:4px" onclick="editarAssessor('+i+')">✏️</button>'
+        +'<button class="btn-resumo btn-danger" style="padding:3px 10px;font-size:11px" onclick="excluirAssessor('+i+')">🗑️</button>'
+      +'</td>'
+      +'</tr>';
+  }).join("")
+  + '<tr class="tr-total">'
+    +'<td>TOTAL ('+lista.length+' assessores)</td>'
+    +'<td>'+fmtR(totalPat)+'</td>'
+    +'<td>'+fmtR(totalRec)+'</td>'
+    +'<td>'+fmtR(totalOKR)+'</td>'
+    +'<td><span class="pct-okr-chip" style="background:#0A1A0A;color:#C9A96E">'+Math.round(totalOKR>0?totalRec/totalOKR*100:0)+'%</span></td>'
+    +'<td colspan="5"></td><td></td></tr>';
+}
+
 function importarPlanilha(input){
   const file = input.files[0];
   if(!file) return;
   const formData = new FormData();
   formData.append("planilha", file);
-  const btn = document.querySelector("[onclick=\"document.getElementById('input-planilha').click()\"]");
-  if(btn) btn.textContent = "Importando...";
+  const btns = document.querySelectorAll(".btn-resumo");
   fetch("/api/importar_assessores_xlsx", {method:"POST", body:formData})
     .then(r=>r.json())
     .then(function(res){
       if(res.ok){
-        if(btn) btn.textContent = "✅ "+res.total+" importados";
-        setTimeout(function(){ window.location.reload(); }, 1500);
-      } else {
-        if(btn) btn.textContent = "❌ Erro";
-        alert(res.erro||"Erro ao importar planilha");
-      }
-    }).catch(function(){ if(btn) btn.textContent = "❌ Erro"; });
+        fetch("/api/assessores_dados").then(r=>r.json()).then(function(d){
+          dadosFinanceiros = d;
+          renderResumoFinanceiro();
+          // Atualizar ranking também
+          renderRanking();
+          alert("✅ "+res.total+" assessores importados com sucesso!");
+        });
+      } else { alert("❌ Erro: "+(res.erro||"falha ao importar")); }
+    }).catch(function(){ alert("❌ Erro de conexão"); });
   input.value = "";
 }
+
+function abrirModalNovoAssessor(){
+  document.getElementById("modal-titulo").textContent = "Novo Assessor";
+  document.getElementById("modal-idx").value = "";
+  ["nome","patrimonio","receita","okr-mensal","okr-anual",
+   "rf-saldo","rf-pct","rf-receita","rf-vol",
+   "rv-saldo","rv-pct","rv-receita","rv-vol",
+   "fii-saldo","fii-pct","fii-receita","fii-vol",
+   "intl-saldo","intl-pct","intl-receita","intl-vol",
+   "estr-pct","estr-receita"].forEach(function(id){ document.getElementById("f-"+id).value=""; });
+  document.getElementById("modal-assessor").style.display="flex";
+}
+
+function editarAssessor(i){
+  const a = dadosFinanceiros.assessores[i];
+  if(!a) return;
+  document.getElementById("modal-titulo").textContent = "Editar: "+a.nome;
+  document.getElementById("modal-idx").value = i;
+  document.getElementById("f-nome").value         = a.nome||"";
+  document.getElementById("f-patrimonio").value   = a.patrimonio||0;
+  document.getElementById("f-receita").value      = a.receita_total||0;
+  document.getElementById("f-okr-mensal").value   = a.okr_mensal||0;
+  document.getElementById("f-okr-anual").value    = a.okr_anual||0;
+  document.getElementById("f-rf-saldo").value     = a.rf&&a.rf.saldo||0;
+  document.getElementById("f-rf-pct").value       = a.rf&&a.rf.pct||0;
+  document.getElementById("f-rf-receita").value   = a.rf&&a.rf.receita||0;
+  document.getElementById("f-rf-vol").value       = a.rf&&a.rf.volume_mes||0;
+  document.getElementById("f-rv-saldo").value     = a.rv&&a.rv.saldo||0;
+  document.getElementById("f-rv-pct").value       = a.rv&&a.rv.pct||0;
+  document.getElementById("f-rv-receita").value   = a.rv&&a.rv.receita||0;
+  document.getElementById("f-rv-vol").value       = a.rv&&a.rv.volume_mes||0;
+  document.getElementById("f-fii-saldo").value    = a.fii&&a.fii.saldo||0;
+  document.getElementById("f-fii-pct").value      = a.fii&&a.fii.pct||0;
+  document.getElementById("f-fii-receita").value  = a.fii&&a.fii.receita||0;
+  document.getElementById("f-fii-vol").value      = a.fii&&a.fii.volume_mes||0;
+  document.getElementById("f-intl-saldo").value   = a.internacional&&a.internacional.saldo||0;
+  document.getElementById("f-intl-pct").value     = a.internacional&&a.internacional.pct||0;
+  document.getElementById("f-intl-receita").value = a.internacional&&a.internacional.receita||0;
+  document.getElementById("f-intl-vol").value     = a.internacional&&a.internacional.volume_mes||0;
+  document.getElementById("f-estr-pct").value     = a.estruturadas&&a.estruturadas.pct_max||0;
+  document.getElementById("f-estr-receita").value = a.estruturadas&&a.estruturadas.receita||0;
+  document.getElementById("modal-assessor").style.display="flex";
+}
+
+function fecharModal(){ document.getElementById("modal-assessor").style.display="none"; }
+
+function g(id){ return parseFloat(document.getElementById("f-"+id).value)||0; }
+
+function salvarAssessor(){
+  const nome = document.getElementById("f-nome").value.trim();
+  if(!nome){ alert("Informe o nome do assessor"); return; }
+  const receita = g("receita");
+  const okr     = g("okr-mensal");
+  const novo = {
+    nome, patrimonio:g("patrimonio"), receita_total:receita, okr_mensal:okr,
+    okr_anual:g("okr-anual"), roa_anual: receita>0&&g("patrimonio")>0 ? round2(receita/g("patrimonio")*12*100) : 0,
+    pct_realizado_okr: okr>0 ? round2(receita/okr*100) : 0,
+    rf:   {saldo:g("rf-saldo"),   pct:g("rf-pct"),   receita:g("rf-receita"),   volume_mes:g("rf-vol")},
+    rv:   {saldo:g("rv-saldo"),   pct:g("rv-pct"),   receita:g("rv-receita"),   volume_mes:g("rv-vol")},
+    fii:  {saldo:g("fii-saldo"),  pct:g("fii-pct"),  receita:g("fii-receita"),  volume_mes:g("fii-vol")},
+    internacional: {saldo:g("intl-saldo"), pct:g("intl-pct"), receita:g("intl-receita"), volume_mes:g("intl-vol")},
+    estruturadas: {pct_max:g("estr-pct"), receita:g("estr-receita")},
+  };
+  const idx = document.getElementById("modal-idx").value;
+  if(idx !== ""){
+    dadosFinanceiros.assessores[parseInt(idx)] = novo;
+  } else {
+    dadosFinanceiros.assessores.push(novo);
+  }
+  dadosFinanceiros.atualizado_em = new Date().toLocaleDateString("pt-BR")+" "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  dadosFinanceiros.fonte = "manual";
+  salvarDadosFinanceiros();
+  fecharModal();
+}
+
+function excluirAssessor(i){
+  const a = dadosFinanceiros.assessores[i];
+  if(!a || !confirm("Excluir "+a.nome+"?")) return;
+  dadosFinanceiros.assessores.splice(i,1);
+  salvarDadosFinanceiros();
+}
+
+function salvarDadosFinanceiros(){
+  fetch("/api/assessores_dados",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(dadosFinanceiros)})
+    .then(r=>r.json())
+    .then(function(){ renderResumoFinanceiro(); renderRanking(); })
+    .catch(function(){ alert("Erro ao salvar"); });
+}
+
+function round2(v){ return Math.round(v*100)/100; }
 
 const LABEL_COMP = {
   pos_fixado:"Pos Fixado", inflacao:"Inflacao", pre_fixado:"Pre Fixado",
@@ -5827,6 +6069,7 @@ async function init(){
   clientesData.forEach(c=>{ notas[c.assessor+"|"+c.nome] = {id:c.id, nota:c.nota_lider||""}; });
 
   // Indexar dados financeiros por nome (busca aproximada)
+  dadosFinanceiros = assFinanc;
   (assFinanc.assessores||[]).forEach(function(a){
     assessoresDados[a.nome] = a;
     // Indexar também pelo primeiro nome + sobrenome para match parcial
@@ -5838,6 +6081,7 @@ async function init(){
   renderRisco();
   renderAlertas();
   popularFiltroAssessor();
+  renderResumoFinanceiro();
   renderRanking();
 }
 
