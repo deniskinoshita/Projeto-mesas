@@ -1,0 +1,69 @@
+{
+  "perfil_utilizado": "Moderado (Levante Asset Junho 2026)",
+  "data_analise": "19/06/2026 15:12",
+  "classes": {
+    "pos_fixado": {
+      "label": "Pos Fixado (CDI)",
+      "atual": 56.81,
+      "modelo": 44,
+      "desvio": 12.81,
+      "status": "Fora do perfil"
+    },
+    "inflacao": {
+      "label": "Inflacao (IPCA)",
+      "atual": 23.16,
+      "modelo": 23,
+      "desvio": 0.16,
+      "status": "Adequado"
+    },
+    "pre_fixado": {
+      "label": "Pre Fixado",
+      "atual": 2.45,
+      "modelo": 10,
+      "desvio": -7.55,
+      "status": "Fora do perfil"
+    },
+    "acoes": {
+      "label": "Acoes / RV Brasil",
+      "atual": 9.39,
+      "modelo": 5,
+      "desvio": 4.39,
+      "status": "Atencao"
+    },
+    "fiis": {
+      "label": "FIIs / Fundos Listados",
+      "atual": 4.51,
+      "modelo": 1.5,
+      "desvio": 3.01,
+      "status": "Atencao"
+    },
+    "multimercado": {
+      "label": "Multimercado",
+      "atual": 0.0,
+      "modelo": 6,
+      "desvio": -6.0,
+      "status": "Fora do perfil"
+    },
+    "alternativos": {
+      "label": "Alternativos",
+      "atual": 2.18,
+      "modelo": 1,
+      "desvio": 1.18,
+      "status": "Adequado"
+    },
+    "internacional": {
+      "label": "Internacional",
+      "atual": 0.0,
+      "modelo": 9,
+      "desvio": -9.0,
+      "status": "Fora do perfil"
+    },
+    "criptomoedas": {
+      "label": "Criptomoedas",
+      "atual": 0.0,
+      "modelo": 0.5,
+      "desvio": -0.5,
+      "status": "Adequado"
+    }
+  }
+}

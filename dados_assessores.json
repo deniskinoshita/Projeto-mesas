@@ -1,0 +1,626 @@
+[
+  {
+    "nome": "Alex Alves dos Santos",
+    "patrimonio": 16600000,
+    "rf": {
+      "saldo": 5832796.63,
+      "pct": 35.14,
+      "receita": 1888.38,
+      "volume_mes": 472095.37
+    },
+    "rv": {
+      "saldo": 6803550.86,
+      "pct": 40.99,
+      "receita": 4434.39,
+      "volume_mes": 886878.58
+    },
+    "estruturadas": {
+      "pct_max": 5.65,
+      "volume": 84791.07,
+      "receita": 1059.89
+    },
+    "fii": {
+      "saldo": 957854.55,
+      "pct": 5.77,
+      "receita": 497.38,
+      "volume_mes": 49737.51
+    },
+    "internacional": {
+      "saldo": 1149531.53,
+      "pct": 6.92,
+      "receita": 2063.43,
+      "volume_mes": 137562.25
+    },
+    "receita_total": 9943.47,
+    "roa_anual": 0.7188,
+    "okr_mensal": 14666.67,
+    "okr_anual": 176000,
+    "okr_semestre": 88000,
+    "pct_falta_meta": 47.5
+  },
+  {
+    "nome": "Andre Guilherme Leite Figueiredo",
+    "patrimonio": 34700000,
+    "rf": {
+      "saldo": 19461382.01,
+      "pct": 56.08,
+      "receita": 6300.67,
+      "volume_mes": 1575166.92
+    },
+    "rv": {
+      "saldo": 1613411.22,
+      "pct": 4.65,
+      "receita": 1051.58,
+      "volume_mes": 210316.62
+    },
+    "estruturadas": {
+      "pct_max": 1.34,
+      "volume": 20107.57,
+      "receita": 251.34
+    },
+    "fii": {
+      "saldo": 2465108.77,
+      "pct": 7.1,
+      "receita": 1280.03,
+      "volume_mes": 128003.13
+    },
+    "internacional": {
+      "saldo": 101123.24,
+      "pct": 0.29,
+      "receita": 181.52,
+      "volume_mes": 12101.23
+    },
+    "receita_total": 9065.15,
+    "roa_anual": 0.3135,
+    "okr_mensal": 8666.67,
+    "okr_anual": 104000,
+    "okr_semestre": 52000,
+    "pct_falta_meta": -4.4
+  },
+  {
+    "nome": "Bruno Seiji Ito",
+    "patrimonio": 6600000,
+    "rf": {
+      "saldo": 2643130.49,
+      "pct": 40.05,
+      "receita": 855.72,
+      "volume_mes": 213929.91
+    },
+    "rv": {
+      "saldo": 831756.45,
+      "pct": 12.6,
+      "receita": 542.12,
+      "volume_mes": 108423.82
+    },
+    "estruturadas": {
+      "pct_max": 0.69,
+      "volume": 10365.99,
+      "receita": 129.57
+    },
+    "fii": {
+      "saldo": 392850.01,
+      "pct": 5.95,
+      "receita": 203.99,
+      "volume_mes": 20399.11
+    },
+    "internacional": {
+      "saldo": 477091.51,
+      "pct": 7.23,
+      "receita": 856.39,
+      "volume_mes": 57092.63
+    },
+    "receita_total": 2587.79,
+    "roa_anual": 0.4705,
+    "okr_mensal": 3333.33,
+    "okr_anual": 40000,
+    "okr_semestre": 20000,
+    "pct_falta_meta": 28.81
+  },
+  {
+    "nome": "Carlos Fernando Victor Bolivar Moreira Neto",
+    "patrimonio": 22900000,
+    "rf": {
+      "saldo": 7236122.1,
+      "pct": 31.6,
+      "receita": 2342.71,
+      "volume_mes": 585677.84
+    },
+    "rv": {
+      "saldo": 861308.99,
+      "pct": 3.76,
+      "receita": 561.38,
+      "volume_mes": 112276.15
+    },
+    "estruturadas": {
+      "pct_max": 0.72,
+      "volume": 10734.29,
+      "receita": 134.18
+    },
+    "fii": {
+      "saldo": 2646713.75,
+      "pct": 11.56,
+      "receita": 1374.33,
+      "volume_mes": 137433.15
+    },
+    "internacional": {
+      "saldo": 190518.38,
+      "pct": 0.83,
+      "receita": 341.98,
+      "volume_mes": 22798.97
+    },
+    "receita_total": 4754.59,
+    "roa_anual": 0.2491,
+    "okr_mensal": 6020.17,
+    "okr_anual": 72242,
+    "okr_semestre": 36121,
+    "pct_falta_meta": 26.62
+  },
+  {
+    "nome": "Carolina Custodio Siqueira",
+    "patrimonio": 19600000,
+    "rf": {
+      "saldo": 7883260.03,
+      "pct": 40.22,
+      "receita": 2552.22,
+      "volume_mes": 638055.94
+    },
+    "rv": {
+      "saldo": 1761749.57,
+      "pct": 8.99,
+      "receita": 1148.27,
+      "volume_mes": 229653.31
+    },
+    "estruturadas": {
+      "pct_max": 1.46,
+      "volume": 21956.27,
+      "receita": 274.45
+    },
+    "fii": {
+      "saldo": 1844822.69,
+      "pct": 9.41,
+      "receita": 957.94,
+      "volume_mes": 95794.18
+    },
+    "internacional": {
+      "saldo": 834061.11,
+      "pct": 4.26,
+      "receita": 1497.16,
+      "volume_mes": 99810.51
+    },
+    "receita_total": 6430.04,
+    "roa_anual": 0.3937,
+    "okr_mensal": 4583.33,
+    "okr_anual": 55000,
+    "okr_semestre": 27500,
+    "pct_falta_meta": -28.72
+  },
+  {
+    "nome": "Denis Albertino dos Santos Kinoshita",
+    "patrimonio": 26400000,
+    "rf": {
+      "saldo": 4824370.2,
+      "pct": 18.27,
+      "receita": 1561.9,
+      "volume_mes": 390475.27
+    },
+    "rv": {
+      "saldo": 7891674.91,
+      "pct": 29.89,
+      "receita": 5143.61,
+      "volume_mes": 1028721.26
+    },
+    "estruturadas": {
+      "pct_max": 6.56,
+      "volume": 98352.11,
+      "receita": 1229.4
+    },
+    "fii": {
+      "saldo": 885729.34,
+      "pct": 3.36,
+      "receita": 459.92,
+      "volume_mes": 45992.34
+    },
+    "internacional": {
+      "saldo": 44548.49,
+      "pct": 0.17,
+      "receita": 79.97,
+      "volume_mes": 5331.03
+    },
+    "receita_total": 8474.8,
+    "roa_anual": 0.3852,
+    "okr_mensal": 9333.33,
+    "okr_anual": 112000,
+    "okr_semestre": 56000,
+    "pct_falta_meta": 10.13
+  },
+  {
+    "nome": "Felipe Fraga",
+    "patrimonio": 42900000,
+    "rf": {
+      "saldo": 17036711.07,
+      "pct": 39.71,
+      "receita": 5515.67,
+      "volume_mes": 1378918.71
+    },
+    "rv": {
+      "saldo": 6156977.3,
+      "pct": 14.35,
+      "receita": 4012.97,
+      "volume_mes": 802594.32
+    },
+    "estruturadas": {
+      "pct_max": 5.12,
+      "volume": 76732.97,
+      "receita": 959.16
+    },
+    "fii": {
+      "saldo": 8191381.49,
+      "pct": 19.09,
+      "receita": 4253.45,
+      "volume_mes": 425345.33
+    },
+    "internacional": {
+      "saldo": 2026971.35,
+      "pct": 4.72,
+      "receita": 3638.46,
+      "volume_mes": 242563.81
+    },
+    "receita_total": 18379.72,
+    "roa_anual": 0.5141,
+    "okr_mensal": 9189.86,
+    "okr_anual": 110278.31,
+    "okr_semestre": 55139.16,
+    "pct_falta_meta": -50.0
+  },
+  {
+    "nome": "Felipe Santos Nishio",
+    "patrimonio": 179200000,
+    "rf": {
+      "saldo": 54888387.59,
+      "pct": 30.63,
+      "receita": 17770.24,
+      "volume_mes": 4442560.79
+    },
+    "rv": {
+      "saldo": 40410594.4,
+      "pct": 22.55,
+      "receita": 26338.67,
+      "volume_mes": 5267733.18
+    },
+    "estruturadas": {
+      "pct_max": 33.58,
+      "volume": 503627.82,
+      "receita": 6295.35
+    },
+    "fii": {
+      "saldo": 2225617.17,
+      "pct": 1.24,
+      "receita": 1155.67,
+      "volume_mes": 115567.3
+    },
+    "internacional": {
+      "saldo": 2098246.14,
+      "pct": 1.17,
+      "receita": 3766.4,
+      "volume_mes": 251093.12
+    },
+    "receita_total": 55326.33,
+    "roa_anual": 0.3705,
+    "okr_mensal": 30140.67,
+    "okr_anual": 361688,
+    "okr_semestre": 180844,
+    "pct_falta_meta": -45.52
+  },
+  {
+    "nome": "Giuseppe Hilario Neto",
+    "patrimonio": 21600000,
+    "rf": {
+      "saldo": 6541875.09,
+      "pct": 30.29,
+      "receita": 2117.95,
+      "volume_mes": 529486.82
+    },
+    "rv": {
+      "saldo": 1229614.8,
+      "pct": 5.69,
+      "receita": 801.43,
+      "volume_mes": 160286.75
+    },
+    "estruturadas": {
+      "pct_max": 1.02,
+      "volume": 15324.4,
+      "receita": 191.56
+    },
+    "fii": {
+      "saldo": 931124.01,
+      "pct": 4.31,
+      "receita": 483.5,
+      "volume_mes": 48349.51
+    },
+    "internacional": {
+      "saldo": 609920.5,
+      "pct": 2.82,
+      "receita": 1094.82,
+      "volume_mes": 72988.03
+    },
+    "receita_total": 4689.25,
+    "roa_anual": 0.2605,
+    "okr_mensal": 2500,
+    "okr_anual": 30000,
+    "okr_semestre": 15000,
+    "pct_falta_meta": -46.69
+  },
+  {
+    "nome": "Lucas Landroni Cozzi",
+    "patrimonio": 75400000,
+    "rf": {
+      "saldo": 29956280.85,
+      "pct": 39.73,
+      "receita": 9698.42,
+      "volume_mes": 2424603.9
+    },
+    "rv": {
+      "saldo": 11949668.67,
+      "pct": 15.85,
+      "receita": 7788.51,
+      "volume_mes": 1557702.06
+    },
+    "estruturadas": {
+      "pct_max": 9.93,
+      "volume": 148925.94,
+      "receita": 1861.57
+    },
+    "fii": {
+      "saldo": 2525162.58,
+      "pct": 3.35,
+      "receita": 1311.21,
+      "volume_mes": 131121.48
+    },
+    "internacional": {
+      "saldo": 1154799.22,
+      "pct": 1.53,
+      "receita": 2072.89,
+      "volume_mes": 138192.63
+    },
+    "receita_total": 22732.6,
+    "roa_anual": 0.3618,
+    "okr_mensal": 7397.17,
+    "okr_anual": 88766,
+    "okr_semestre": 44383,
+    "pct_falta_meta": -67.46
+  },
+  {
+    "nome": "Marcelo Ramos Dias",
+    "patrimonio": 111000000,
+    "rf": {
+      "saldo": 22865841.68,
+      "pct": 20.6,
+      "receita": 7402.87,
+      "volume_mes": 1850717.36
+    },
+    "rv": {
+      "saldo": 8900345.57,
+      "pct": 8.02,
+      "receita": 5801.03,
+      "volume_mes": 1160206.78
+    },
+    "estruturadas": {
+      "pct_max": 7.39,
+      "volume": 110922.93,
+      "receita": 1386.54
+    },
+    "fii": {
+      "saldo": 6445509.62,
+      "pct": 5.81,
+      "receita": 3346.89,
+      "volume_mes": 334689.26
+    },
+    "internacional": {
+      "saldo": 1102044.93,
+      "pct": 0.99,
+      "receita": 1978.19,
+      "volume_mes": 131879.62
+    },
+    "receita_total": 19915.53,
+    "roa_anual": 0.2153,
+    "okr_mensal": 12500,
+    "okr_anual": 150000,
+    "okr_semestre": 75000,
+    "pct_falta_meta": -37.23
+  },
+  {
+    "nome": "Matheus Escoza Milani",
+    "patrimonio": 18500000,
+    "rf": {
+      "saldo": 1258114.15,
+      "pct": 6.8,
+      "receita": 407.32,
+      "volume_mes": 101829.35
+    },
+    "rv": {
+      "saldo": 76579.77,
+      "pct": 0.41,
+      "receita": 49.91,
+      "volume_mes": 9982.58
+    },
+    "estruturadas": {
+      "pct_max": 0.06,
+      "volume": 954.4,
+      "receita": 11.93
+    },
+    "fii": {
+      "saldo": 13862.72,
+      "pct": 0.07,
+      "receita": 7.2,
+      "volume_mes": 719.84
+    },
+    "internacional": {
+      "saldo": 195166.83,
+      "pct": 1.05,
+      "receita": 350.33,
+      "volume_mes": 23355.24
+    },
+    "receita_total": 826.69,
+    "roa_anual": 0.0536,
+    "okr_mensal": 4166.67,
+    "okr_anual": 0,
+    "okr_semestre": 25000,
+    "pct_falta_meta": 404.02
+  },
+  {
+    "nome": "Michael Ademilson Santos da Silva",
+    "patrimonio": 65500000,
+    "rf": {
+      "saldo": 23964673.61,
+      "pct": 36.59,
+      "receita": 7758.62,
+      "volume_mes": 1939654.71
+    },
+    "rv": {
+      "saldo": 9854203.48,
+      "pct": 15.04,
+      "receita": 6422.74,
+      "volume_mes": 1284547.17
+    },
+    "estruturadas": {
+      "pct_max": 8.19,
+      "volume": 122810.64,
+      "receita": 1535.13
+    },
+    "fii": {
+      "saldo": 4018015.08,
+      "pct": 6.13,
+      "receita": 2086.39,
+      "volume_mes": 208639.28
+    },
+    "internacional": {
+      "saldo": 1141400.21,
+      "pct": 1.74,
+      "receita": 2048.84,
+      "volume_mes": 136589.19
+    },
+    "receita_total": 19851.72,
+    "roa_anual": 0.3637,
+    "okr_mensal": 16666.67,
+    "okr_anual": 200000,
+    "okr_semestre": 100000,
+    "pct_falta_meta": -16.04
+  },
+  {
+    "nome": "Paulo Roberto Negreiros Sobrinho",
+    "patrimonio": 45600000,
+    "rf": {
+      "saldo": 35351842.03,
+      "pct": 77.53,
+      "receita": 11445.24,
+      "volume_mes": 2861310.27
+    },
+    "rv": {
+      "saldo": 912979.46,
+      "pct": 2.0,
+      "receita": 595.06,
+      "volume_mes": 119011.67
+    },
+    "estruturadas": {
+      "pct_max": 0.76,
+      "volume": 11378.25,
+      "receita": 142.23
+    },
+    "fii": {
+      "saldo": 0,
+      "pct": 0,
+      "receita": 0,
+      "volume_mes": 0
+    },
+    "internacional": {
+      "saldo": 0,
+      "pct": 0,
+      "receita": 0,
+      "volume_mes": 0
+    },
+    "receita_total": 12182.53,
+    "roa_anual": 0.3206,
+    "okr_mensal": 8333.33,
+    "okr_anual": 100000,
+    "okr_semestre": 50000,
+    "pct_falta_meta": -31.6
+  },
+  {
+    "nome": "Tatiane Cristina da Silva Cecchetti",
+    "patrimonio": 44100000,
+    "rf": {
+      "saldo": 13888164.3,
+      "pct": 31.49,
+      "receita": 4496.33,
+      "volume_mes": 1124081.37
+    },
+    "rv": {
+      "saldo": 3258978.08,
+      "pct": 7.39,
+      "receita": 2124.12,
+      "volume_mes": 424824.91
+    },
+    "estruturadas": {
+      "pct_max": 2.71,
+      "volume": 40615.88,
+      "receita": 507.7
+    },
+    "fii": {
+      "saldo": 370179.76,
+      "pct": 0.84,
+      "receita": 192.22,
+      "volume_mes": 19221.94
+    },
+    "internacional": {
+      "saldo": 196909.55,
+      "pct": 0.45,
+      "receita": 353.46,
+      "volume_mes": 23563.79
+    },
+    "receita_total": 7673.82,
+    "roa_anual": 0.2088,
+    "okr_mensal": 11666.67,
+    "okr_anual": 140000,
+    "okr_semestre": 70000,
+    "pct_falta_meta": 52.03
+  },
+  {
+    "nome": "Thiago Brunelli Borba",
+    "patrimonio": 6200000,
+    "rf": {
+      "saldo": 857619.48,
+      "pct": 13.83,
+      "receita": 277.66,
+      "volume_mes": 69414.07
+    },
+    "rv": {
+      "saldo": 68393.83,
+      "pct": 1.1,
+      "receita": 44.58,
+      "volume_mes": 8915.49
+    },
+    "estruturadas": {
+      "pct_max": 0.06,
+      "volume": 852.38,
+      "receita": 10.65
+    },
+    "fii": {
+      "saldo": 879575.37,
+      "pct": 14.19,
+      "receita": 456.73,
+      "volume_mes": 45672.79
+    },
+    "internacional": {
+      "saldo": 15200.8,
+      "pct": 0.25,
+      "receita": 27.29,
+      "volume_mes": 1819.05
+    },
+    "receita_total": 816.9,
+    "roa_anual": 0.1581,
+    "okr_mensal": 0,
+    "okr_anual": 0,
+    "okr_semestre": 0,
+    "pct_falta_meta": -100
+  }
+]

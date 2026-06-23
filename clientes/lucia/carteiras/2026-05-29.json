@@ -1,0 +1,44 @@
+{
+  "cliente": "Lucia",
+  "conta_xp": "327592",
+  "data_referencia": "2026-05-29",
+  "patrimonio_total": 255261.68,
+  "caixa_pct": 0.00,
+  "composicao": {
+    "pos_fixado": 77.79,
+    "inflacao": 0.00,
+    "pre_fixado": 0.00,
+    "acoes": 0.00,
+    "fiis": 0.00,
+    "multimercado": 0.00,
+    "internacional": 0.00,
+    "alternativos": 22.21,
+    "criptomoedas": 0.00
+  },
+  "detalhamento_xp": {
+    "Pós Fixado": {
+      "pct": 77.79,
+      "valor": 198569.84,
+      "ativos": [
+        {"nome": "Trend Investback FIC FIRF Simples RL", "pct": 74.27, "valor": 189573.16},
+        {"nome": "Tesouro Selic 2031", "pct": 2.16, "valor": 5524.85},
+        {"nome": "RAM Cash FIF", "pct": 1.36, "valor": 3471.83}
+      ]
+    },
+    "Alternativo": {
+      "pct": 22.21,
+      "valor": 56691.84,
+      "ativos": [
+        {"nome": "Vinci Impacto e Retorno - Trend PE III FIC FIRF Simples RL", "pct": 16.89, "valor": 43104.72},
+        {"nome": "Vinci Impacto e Retorno Advisory FIP Multiestratégia IS", "pct": 5.32, "valor": 13587.12}
+      ]
+    }
+  },
+  "rentabilidade": {
+    "portfolio": {"mes": 0.91, "ano": 4.35, "12m": 1.63, "24m": 15.16},
+    "cdi": {"mes": 1.07, "ano": 5.66, "12m": 14.76, "24m": 28.28},
+    "pct_cdi": {"mes": 84.39, "ano": 76.87, "12m": 11.08, "24m": 53.59}
+  },
+  "fonte": "XPerformance - 327592 - Ref.29.05.pdf",
+  "aviso": "Caixa = 0%. Alternativo mapeado de 'Alternativo' XP para 'alternativos' do modelo."
+}
