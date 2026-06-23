@@ -6307,11 +6307,14 @@ textarea{resize:vertical}
   </div>
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Ou edite manualmente os campos abaixo. Este cenário embasa as sugestões e scripts dos assessores.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-    <div><label>🌍 Cenário Global</label><textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..."></textarea></div>
-    <div><label>🇧🇷 Cenário Brasil</label><textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..."></textarea></div>
-    <div><label>📌 Posicionamento da Gestora</label><textarea id="cenario-pos" rows="5" placeholder="O que está sendo reduzido / aumentado..."></textarea></div>
+    <div><label>🌍 Cenário Global</label><textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..." oninput="autosaveCenario()"></textarea></div>
+    <div><label>🇧🇷 Cenário Brasil</label><textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..." oninput="autosaveCenario()"></textarea></div>
+    <div><label>📌 Posicionamento da Gestora</label><textarea id="cenario-pos" rows="5" placeholder="O que está sendo reduzido / aumentado..." oninput="autosaveCenario()"></textarea></div>
   </div>
-  <div><label>Fonte / Referência do cenário</label><input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px"></div>
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div><label>Fonte / Referência do cenário</label><input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px" oninput="autosaveCenario()"></div>
+    <span id="cenario-autosave-st" style="font-size:10px;color:#2A5A3A;margin-top:18px"></span>
+  </div>
 </div>
 
 <!-- ══ 2. UPLOAD RÁPIDO ═══════════════════════════════════════════════════════ -->
@@ -6760,6 +6763,27 @@ function marcarPendente(){
   // scroll suave até a publish-bar para chamar atenção
   if(bar) bar.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
+// ── Auto-save Cenário Macro ───────────────────────────────────────────────────
+let _cenarioTimer = null;
+function autosaveCenario(){
+  clearTimeout(_cenarioTimer);
+  const st = document.getElementById("cenario-autosave-st");
+  if(st) st.textContent = "✏️ digitando...";
+  _cenarioTimer = setTimeout(async ()=>{
+    const payload = {
+      global:        document.getElementById("cenario-global").value,
+      brasil:        document.getElementById("cenario-brasil").value,
+      posicionamento:document.getElementById("cenario-pos").value,
+      referencia:    document.getElementById("cenario-ref").value,
+    };
+    try{
+      await fetch("/api/hp/cenario", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
+      if(st){ st.textContent = "✓ salvo automaticamente"; setTimeout(()=>{ if(st) st.textContent=""; }, 3000); }
+      marcarPendente();
+    } catch(e){ if(st) st.textContent = ""; }
+  }, 1500);
+}
+
 function limparPendente(){
   const bar   = document.getElementById("publish-bar");
   const badge = document.getElementById("pub-pendente-badge");
