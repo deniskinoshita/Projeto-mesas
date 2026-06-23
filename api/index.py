@@ -3607,7 +3607,10 @@ def hp_knowledge_upload():
         if len(texto) < 50:
             return jsonify({"error": "PDF sem texto extraível"}), 400
     except Exception as e:
-        return jsonify({"error": f"Falha ao ler PDF: {str(e)}"}), 400
+        msg = str(e)
+        if "Root" in msg or "EOF" in msg or "not a PDF" in msg.lower():
+            msg = "PDF inválido ou protegido por senha. Tente exportar novamente como PDF."
+        return jsonify({"error": msg}), 400
 
     docs = _load(_HP_KNOW_FILE, [])
     doc = {
@@ -7512,6 +7515,13 @@ function renderListaRapido(){
 
 async function uploadRapidoUm(i){
   const item = _arquivosRapido[i];
+  // Verificar tamanho antes de enviar (limite Vercel: ~4MB)
+  if(item.file.size > 4 * 1024 * 1024){
+    item.status = "erro";
+    item.erro = `Arquivo muito grande (${(item.file.size/1024/1024).toFixed(1)} MB). Limite: 4 MB.`;
+    renderListaRapido();
+    return;
+  }
   item.status = "processando";
   renderListaRapido();
   try{
@@ -7522,11 +7532,15 @@ async function uploadRapidoUm(i){
     fd.append("classes", "geral");
     fd.append("fonte", "");
     const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
-    const d = await r.json();
+    // Tratar resposta não-JSON (ex: HTML de erro do Vercel)
+    const texto = await r.text();
+    let d;
+    try { d = JSON.parse(texto); }
+    catch(_){ item.status="erro"; item.erro = r.status===413 ? "Arquivo muito grande para o servidor." : `Erro ${r.status}: resposta inesperada do servidor.`; renderListaRapido(); return; }
     if(d.ok){
       item.status = "ok"; item.texto = d.texto||""; item.chars = d.chars||0; item.doc_id = d.id||"";
-      carregarKnowledge(); // atualiza lista da base
-    } else { item.status="erro"; item.erro = d.error||"falha"; }
+      carregarKnowledge();
+    } else { item.status="erro"; item.erro = d.error||"falha no servidor"; }
   } catch(e){ item.status="erro"; item.erro = e.message; }
   renderListaRapido();
 }
