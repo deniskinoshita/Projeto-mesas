@@ -6165,16 +6165,46 @@ textarea{resize:vertical}
 <div id="status-pub" class="info-box" style="margin-bottom:18px;display:none"></div>
 
 <!-- ══ 0. UPLOAD RÁPIDO DE PDF ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#3A3A20;padding:14px 20px">
+<div class="card" style="border-color:#3A3A20">
   <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
-  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <span style="font-size:12px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">⚡ Upload Rápido</span>
-    <button class="btn btn-sm" onclick="document.getElementById('pdf-rapido').click()">📎 Selecionar PDFs (até 5)</button>
-    <span id="pdf-rapido-contador" style="font-size:11px;color:#4A7055"></span>
-    <button class="btn btn-sm" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="display:none">⚡ Salvar todos</button>
-    <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
+      <span style="font-size:11px;color:#2A5A3A">Suba cartas de gestoras direto para a memória do sistema</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
+    </div>
   </div>
-  <div id="pdf-rapido-itens" style="margin-top:10px"></div>
+
+  <!-- Zona de seleção / lista -->
+  <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
+    style="border:2px dashed #2A4A2A;border-radius:10px;padding:30px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
+    onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
+    <div style="font-size:28px;margin-bottom:8px">📂</div>
+    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
+    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos por vez · Cartas de gestoras, relatórios, análises</div>
+  </div>
+
+  <!-- Lista de arquivos selecionados -->
+  <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
+    <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+      Arquivos selecionados — <span id="pdf-rapido-contador">0</span>
+    </div>
+    <div id="pdf-rapido-lista"></div>
+
+    <!-- Botão de upload -->
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1A2A1A;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">
+        📤 Subir para a Memória
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('pdf-rapido').click()" style="font-size:11px;padding:6px 14px">
+        + Adicionar mais
+      </button>
+      <span id="rapido-upload-st" style="font-size:11px;color:#5DCAA5;margin-left:auto"></span>
+    </div>
+  </div>
 </div>
 
 <!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
@@ -7434,36 +7464,55 @@ function uploadRapidoSelecionar(input){
   const files = Array.from(input.files);
   if(!files.length) return;
   const MAX = 5;
-  if(files.length > MAX){ alert(`Selecione no máximo ${MAX} arquivos por vez.`); input.value=""; return; }
-  _arquivosRapido = files.map(f => ({file: f, status: "pendente", texto: "", chars: 0}));
+  // Merge novos arquivos com existentes (sem duplicar por nome)
+  const novos = files.filter(f => !_arquivosRapido.some(a => a.file.name === f.name));
+  const total = _arquivosRapido.length + novos.length;
+  if(total > MAX){ alert(`Máximo de ${MAX} arquivos. Você já tem ${_arquivosRapido.length}.`); input.value=""; return; }
+  novos.forEach(f => _arquivosRapido.push({file: f, status: "pendente", texto: "", chars: 0}));
   renderListaRapido();
-  document.getElementById("pdf-rapido-contador").textContent =
-    `${files.length} arquivo${files.length>1?"s":""} selecionado${files.length>1?"s":""}`;
-  document.getElementById("btn-extrair-todos").style.display = "";
+  // Mostra seção de lista, esconde zona vazia
+  document.getElementById("rapido-zona-vazia").style.display = "none";
+  document.getElementById("pdf-rapido-itens").style.display = "";
   document.getElementById("btn-limpar-rapido").style.display = "";
+  document.getElementById("pdf-rapido-contador").textContent =
+    `${_arquivosRapido.length} arquivo${_arquivosRapido.length>1?"s":""}`;
+  input.value = ""; // permite re-selecionar mesmos arquivos
 }
 
 function renderListaRapido(){
-  const el = document.getElementById("pdf-rapido-itens");
+  const el = document.getElementById("pdf-rapido-lista");
   el.innerHTML = _arquivosRapido.map((item, i) => {
     const cor = item.status==="ok" ? "#5DCAA5" : item.status==="erro" ? "#FF6B6B" : item.status==="processando" ? "#D4B483" : "#4A7055";
     const icone = item.status==="ok" ? "✅" : item.status==="erro" ? "❌" : item.status==="processando" ? "⏳" : "📄";
-    const info = item.status==="ok" ? `${item.chars} caracteres` : item.status==="erro" ? item.erro : `${(item.file.size/1024).toFixed(0)} KB`;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0A140A;border:1px solid #1A2A1A;border-radius:8px;margin-bottom:6px;gap:10px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
-        <span style="font-size:18px">${icone}</span>
-        <div style="min-width:0">
-          <div style="font-size:12px;color:#D4B483;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
-          <div style="font-size:10px;color:${cor};margin-top:2px">${info}</div>
-        </div>
+    const tamanho = `${(item.file.size/1024).toFixed(0)} KB`;
+    const statusTxt = item.status==="ok" ? `Salvo · ${item.chars} caracteres` : item.status==="erro" ? `Erro: ${item.erro}` : item.status==="processando" ? "Enviando..." : `Aguardando upload · ${tamanho}`;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0A140A;border:1px solid ${item.status==='ok'?'#1A3A1A':'#1A2A1A'};border-radius:8px;margin-bottom:6px">
+      <span style="font-size:20px;flex-shrink:0">${icone}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;color:#D4B483;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
+        <div style="font-size:10px;color:${cor};margin-top:3px">${statusTxt}</div>
       </div>
-      ${item.status==="ok" ? `<div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-sm" onclick="rapidoUsarCenario(${i})" style="font-size:10px;padding:4px 10px">🌐 Cenário</button>
-        <button class="btn btn-sm btn-out" onclick="rapidoUsarBase(${i})" style="font-size:10px;padding:4px 10px">📚 Base</button>
-        <button class="btn-ghost" onclick="rapidoCopiar(${i})" style="font-size:10px;padding:4px 8px">📋</button>
-      </div>` : item.status==="pendente" ? `<button class="btn-ghost" onclick="uploadRapidoUm(${i})" style="font-size:10px;padding:4px 10px">⚡ Extrair</button>` : ""}
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        ${item.status==="ok" ? `
+          <button class="btn btn-sm" onclick="rapidoUsarCenario(${i})" style="font-size:10px;padding:4px 10px" title="Preencher Cenário Macro">🌐 Cenário</button>
+          <button class="btn-ghost" onclick="rapidoCopiar(${i})" style="font-size:10px;padding:4px 8px" title="Copiar texto">📋</button>` : ""}
+        <button class="btn-ghost" onclick="_arquivosRapido.splice(${i},1);if(!_arquivosRapido.length){fecharRapido();}else{renderListaRapido();document.getElementById('pdf-rapido-contador').textContent=_arquivosRapido.length+' arquivo'+(_arquivosRapido.length>1?'s':'');}" style="font-size:11px;padding:4px 8px;color:#FF6B6B" title="Remover">✕</button>
+      </div>
     </div>`;
   }).join("");
+
+  // Atualiza botão principal
+  const btn = document.getElementById("btn-extrair-todos");
+  const pendentes = _arquivosRapido.filter(a=>a.status==="pendente").length;
+  const todos_ok = _arquivosRapido.every(a=>a.status==="ok");
+  btn.textContent = todos_ok ? "✅ Todos enviados" : `📤 Subir para a Memória${pendentes>0?" ("+pendentes+")":""}`;
+  btn.disabled = todos_ok || pendentes===0;
+  btn.style.opacity = (todos_ok || pendentes===0) ? ".5" : "1";
+
+  // Status geral
+  const st = document.getElementById("rapido-upload-st");
+  const ok = _arquivosRapido.filter(a=>a.status==="ok").length;
+  if(ok>0) st.textContent = `${ok} de ${_arquivosRapido.length} salvo${ok>1?"s":""}`;
 }
 
 async function uploadRapidoUm(i){
@@ -7521,10 +7570,12 @@ async function uploadRapido(){ await uploadRapidoTodos(); }
 
 function fecharRapido(){
   _arquivosRapido = [];
-  document.getElementById("pdf-rapido-itens").innerHTML = "";
-  document.getElementById("pdf-rapido-contador").textContent = "";
-  document.getElementById("btn-extrair-todos").style.display = "none";
+  document.getElementById("pdf-rapido-lista").innerHTML = "";
+  document.getElementById("pdf-rapido-contador").textContent = "0";
+  document.getElementById("pdf-rapido-itens").style.display = "none";
+  document.getElementById("rapido-zona-vazia").style.display = "";
   document.getElementById("btn-limpar-rapido").style.display = "none";
+  document.getElementById("rapido-upload-st").textContent = "";
   document.getElementById("pdf-rapido").value = "";
 }
 
