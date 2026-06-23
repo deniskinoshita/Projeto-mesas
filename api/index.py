@@ -7845,7 +7845,12 @@ async function salvarProdutos(){
 async function publicar(){
   const btn = document.getElementById("btn-pub");
   const st  = document.getElementById("pub-st");
-  btn.disabled = true; btn.textContent = "Publicando..."; st.textContent = "";
+  btn.disabled = true;
+  st.innerHTML = `<span style="color:#D4B483">⏳ Publicando — aguarde alguns segundos...</span>`;
+
+  // Anima o botão com pontos enquanto espera
+  let dots = 0;
+  const anim = setInterval(()=>{ dots=(dots+1)%4; btn.textContent = "Publicando" + ".".repeat(dots+1); }, 600);
 
   const payload = {
     portfolios: coletarPortfolios(),
@@ -7857,14 +7862,14 @@ async function publicar(){
     const r = await fetch("/api/hp/publicar", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
     const d = await r.json();
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ Publicado em ${d.publicado_em} — dados disponíveis para todos os assessores</span>`;
+      st.innerHTML = `<span class="status-ok">✓ Publicado em ${d.publicado_em} — visível para todos os assessores</span>`;
       const bar = document.getElementById("status-pub");
       if(bar){ bar.style.display = "block"; bar.innerHTML = `<b>✓ Última publicação:</b> ${d.publicado_em} — Portfólios modelo, cenário macro e produtos atualizados.`; }
       limparPendente();
     } else { st.innerHTML = `<span class="status-err">Erro ao publicar.</span>`; }
-  } catch(e){ st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`; }
-  finally{ btn.disabled=false; btn.textContent="📤 Publicar agora"; }
-  setTimeout(()=>st.textContent="", 6000);
+  } catch(e){ st.innerHTML = `<span class="status-err">Erro de conexão. Tente novamente.</span>`; }
+  finally{ clearInterval(anim); btn.disabled=false; btn.textContent="📤 Publicar agora"; }
+  setTimeout(()=>st.textContent="", 8000);
 }
 
 // ── Upload Rápido ─────────────────────────────────────────────────────────────
