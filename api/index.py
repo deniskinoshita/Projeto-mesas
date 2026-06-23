@@ -6254,9 +6254,12 @@ textarea{resize:vertical}
 .info-box{background:#060F0B;border-radius:8px;padding:12px 14px;font-size:12px;color:#3A6A48;line-height:1.6;border:1px solid #2A2A18}
 .info-box b{color:#D4B483}
 /* Publish bar */
-.publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:border-color .3s,background .3s}
+.publish-bar.pendente{border-color:#FF4444 !important;background:#1A0808 !important;animation:piscar-pub 1.2s ease-in-out infinite}
+@keyframes piscar-pub{0%,100%{border-color:#FF4444;box-shadow:0 0 0 0 #FF444400}50%{border-color:#FF8888;box-shadow:0 0 16px 4px #FF444455}}
 .publish-bar .pub-info{flex:1}
-.publish-bar .pub-info h3{font-size:14px;color:#D4B483;font-weight:700}
+.publish-bar .pub-info h3{font-size:14px;color:#D4B483;font-weight:700;transition:color .3s}
+.publish-bar.pendente .pub-info h3{color:#FF6B6B}
 .publish-bar .pub-info p{font-size:11px;color:#4A7055;margin-top:3px}
 /* Referência */
 .ref-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
@@ -6721,13 +6724,14 @@ textarea{resize:vertical}
 </style>
 
 <!-- ══ PUBLICAR ══════════════════════════════════════════════════════════════ -->
-<div class="publish-bar">
+<div class="publish-bar" id="publish-bar">
   <div class="pub-info">
-    <h3>📤 Publicar para os Assessores</h3>
-    <p>Ao publicar, os portfólios modelo, cenário macro e produtos em destaque ficam disponíveis para todos os assessores e agentes.</p>
+    <h3 id="pub-titulo">📤 Publicar para os Assessores</h3>
+    <p id="pub-desc">Ao publicar, o cenário macro, alocações, produtos e calls ficam disponíveis para todos os assessores.</p>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <button class="btn" id="btn-pub" onclick="publicar()">📤 Publicar agora</button>
+    <span id="pub-pendente-badge" style="display:none;font-size:11px;font-weight:700;color:#FF6B6B;background:#2A0808;border:1px solid #FF444455;border-radius:8px;padding:3px 10px;animation:piscar-pub 1.2s ease-in-out infinite">⚠️ Alterações não publicadas</span>
+    <button class="btn" id="btn-pub" onclick="publicar()" style="background:#C9A96E;color:#071E17;border-color:#C9A96E;font-weight:700">📤 Publicar agora</button>
     <span id="pub-st" style="font-size:12px"></span>
   </div>
 </div>
@@ -6744,6 +6748,27 @@ textarea{resize:vertical}
   }
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+
+// ── Publicar pendente ─────────────────────────────────────────────────────────
+function marcarPendente(){
+  const bar   = document.getElementById("publish-bar");
+  const badge = document.getElementById("pub-pendente-badge");
+  const titulo= document.getElementById("pub-titulo");
+  if(bar)   bar.classList.add("pendente");
+  if(badge) badge.style.display = "";
+  if(titulo) titulo.textContent = "🔴 Publicar para os Assessores";
+  // scroll suave até a publish-bar para chamar atenção
+  if(bar) bar.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+function limparPendente(){
+  const bar   = document.getElementById("publish-bar");
+  const badge = document.getElementById("pub-pendente-badge");
+  const titulo= document.getElementById("pub-titulo");
+  if(bar)   bar.classList.remove("pendente");
+  if(badge) badge.style.display = "none";
+  if(titulo) titulo.textContent = "✅ Publicar para os Assessores";
+  setTimeout(()=>{ if(titulo) titulo.textContent="📤 Publicar para os Assessores"; }, 4000);
+}
 
 // ── Estado ────────────────────────────────────────────────────────────────────
 let _portfolios = null;
@@ -7221,7 +7246,7 @@ async function knowSalvar(){
   }
 
   if(ok > 0){
-    st.innerHTML = `<span class="status-ok">✓ ${ok} arquivo${ok>1?"s":""} adicionado${ok>1?"s":""} à base${erros.length ? ` · ${erros.length} erro(s)` : ""}</span>`;
+    st.innerHTML = `<span class="status-ok">✓ ${ok} arquivo${ok>1?"s":""} adicionado${ok>1?"s":""} à base${erros.length ? ` · ${erros.length} erro(s)` : ""}</span>`; marcarPendente();
     _knowFiles = []; _knowFile = null;
     document.getElementById("know-pdf").value = "";
     document.getElementById("know-fname").textContent = "";
@@ -7300,7 +7325,7 @@ async function knowAplicarCenario(id){
       if(d.brasil) document.getElementById("cenario-brasil").value = d.brasil;
       if(d.posicionamento) document.getElementById("cenario-pos").value = d.posicionamento;
       if(d.fonte) document.getElementById("cenario-ref").value = d.fonte;
-      st.innerHTML = `<span class="status-ok">✓ Cenário preenchido — revise e publique</span>`;
+      st.innerHTML = `<span class="status-ok">✓ Cenário preenchido — revise e publique</span>`; marcarPendente();
       // Scroll até o cenário
       document.querySelector('[id="cenario-global"]')?.scrollIntoView({behavior:"smooth", block:"center"});
       setTimeout(()=>st.textContent="", 6000);
@@ -7352,7 +7377,7 @@ async function registrarAlerta(){
     const r = await fetch("/api/hp/alertas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({produto, classe, tipo, mensagem, origem:"Head de Produtos", assessor_destino})});
     const d = await r.json();
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ Alerta registrado${assessor_destino?" para "+assessor_destino:""}</span>`;
+      st.innerHTML = `<span class="status-ok">✓ Alerta registrado${assessor_destino?" para "+assessor_destino:""}</span>`; marcarPendente();
       document.getElementById("alert-produto").value = "";
       document.getElementById("alert-msg").value = "";
       document.getElementById("alert-tipo").value = "info";
@@ -7457,7 +7482,7 @@ async function adicionarCall(){
     });
     const d = await r.json();
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ Call ${ticker} adicionado</span>`;
+      st.innerHTML = `<span class="status-ok">✓ Call ${ticker} adicionado</span>`; marcarPendente();
       ["call-ticker","call-nome","call-entrada","call-alvo","call-stop","call-prazo","call-tese","call-fonte"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
       ["arrojada","agressiva","moderada","conservadora"].forEach(p=>{ const el=document.getElementById("call-perf-"+p); if(el) el.checked=false; });
       document.getElementById("call-upside-display").textContent="—";
@@ -7541,7 +7566,7 @@ async function adicionarEstruturada(){
     const r = await fetch("/api/hp/estruturadas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
     const d = await r.json();
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ Operação adicionada.</span>`;
+      st.innerHTML = `<span class="status-ok">✓ Operação adicionada.</span>`; marcarPendente();
       ["estr-ativo","estr-emissor","estr-venc","estr-retorno","estr-obs","estr-minimo"].forEach(id=>{
         const el=document.getElementById(id); if(el) el.value="";
       });
@@ -7761,7 +7786,7 @@ async function gest2Salvar(){
     const r = await fetch("/api/hp/gestoras2", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
     const d = await r.json();
     if(d.ok){
-      st.innerHTML=`<span class="status-ok">✓ Salvo.</span>`;
+      st.innerHTML=`<span class="status-ok">✓ Salvo.</span>`; marcarPendente();
       document.getElementById("gest2-form").style.display="none";
       _gest2_ativa = d.id;
       carregarGest2();
@@ -7785,7 +7810,7 @@ async function salvarProdutos(){
     });
     const d = await r.json();
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ ${d.total} produto(s) salvos · indicado por <strong>${d.indicado_por}</strong> em ${d.indicado_em}</span>`;
+      st.innerHTML = `<span class="status-ok">✓ ${d.total} produto(s) salvos · indicado por <strong>${d.indicado_por}</strong> em ${d.indicado_em}</span>`; marcarPendente();
     } else { st.innerHTML = `<span class="status-err">Erro ao salvar.</span>`; }
   } catch(e){ st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`; }
   finally{ btn.disabled=false; btn.textContent="💾 Salvar produtos"; }
@@ -7810,8 +7835,8 @@ async function publicar(){
     if(d.ok){
       st.innerHTML = `<span class="status-ok">✓ Publicado em ${d.publicado_em} — dados disponíveis para todos os assessores</span>`;
       const bar = document.getElementById("status-pub");
-      bar.style.display = "block";
-      bar.innerHTML = `<b>✓ Última publicação:</b> ${d.publicado_em} — Portfólios modelo, cenário macro e produtos atualizados.`;
+      if(bar){ bar.style.display = "block"; bar.innerHTML = `<b>✓ Última publicação:</b> ${d.publicado_em} — Portfólios modelo, cenário macro e produtos atualizados.`; }
+      limparPendente();
     } else { st.innerHTML = `<span class="status-err">Erro ao publicar.</span>`; }
   } catch(e){ st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`; }
   finally{ btn.disabled=false; btn.textContent="📤 Publicar agora"; }
@@ -7951,6 +7976,8 @@ async function uploadRapidoTodos(){
     if(_arquivosRapido[i].status === "pendente") await uploadRapidoUm(i);
   }
   btn.disabled = false;
+  const algumOk = _arquivosRapido.some(a=>a.status==="ok");
+  if(algumOk) marcarPendente();
 }
 
 function rapidoUsarCenario(i){
@@ -8159,7 +8186,7 @@ async function salvarGestora(){
       observacao: document.getElementById("gest-obs").value.trim(), alocacao,
     })});
     const d = await r.json();
-    if(d.ok){ st.innerHTML='<span class="status-ok">✓ Salvo!</span>'; carregarGestores(); }
+    if(d.ok){ st.innerHTML='<span class="status-ok">✓ Salvo!</span>'; marcarPendente(); carregarGestores(); }
     else { st.innerHTML=`<span class="status-err">${d.error}</span>`; }
   }catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
   setTimeout(()=>st.textContent="",3000);
