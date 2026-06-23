@@ -3637,6 +3637,73 @@ def hp_knowledge_delete():
     _save(_HP_KNOW_FILE, docs)
     return jsonify({"ok": True})
 
+@app.route("/api/hp/carta-upload", methods=["POST"])
+def hp_carta_upload():
+    """Recebe PDF de carta de gestora, extrai texto e gera cenário macro via Claude. Não salva na base de conhecimento."""
+    pdf_file = request.files.get("pdf")
+    if not pdf_file:
+        return jsonify({"error": "PDF não enviado"}), 400
+    try:
+        import pdfplumber, io
+        raw = pdf_file.read()
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            texto = "\n".join(p.extract_text() or "" for p in pdf.pages)
+        texto = texto.strip()
+        if len(texto) < 50:
+            return jsonify({"error": "PDF sem texto extraível (pode ser PDF de imagem ou protegido)"}), 400
+    except Exception as e:
+        msg = str(e)
+        if "Root" in msg or "EOF" in msg or "not a pdf" in msg.lower():
+            msg = "PDF inválido ou protegido por senha. Exporte novamente como PDF."
+        return jsonify({"error": msg}), 400
+
+    fonte = request.form.get("nome", pdf_file.filename or "Carta da Gestora").replace(".pdf","").strip()
+    api_key = os.environ.get("ANTHROPIC_API_KEY","")
+    resultado = {"ok": True, "fonte": fonte, "chars": len(texto), "ia": False,
+                 "global": "", "brasil": "", "posicionamento": ""}
+
+    if api_key and len(texto) > 100:
+        try:
+            import anthropic as _anthropic, re as _re
+            client = _anthropic.Anthropic(api_key=api_key)
+            prompt = f"""Você é analista de investimentos. Leia a carta da gestora abaixo e extraia 3 resumos objetivos em português, cada um com no máximo 3 frases:
+
+1. CENÁRIO GLOBAL: principais pontos sobre economia mundial, Fed, inflação global, bolsas internacionais, geopolítica
+2. CENÁRIO BRASIL: principais pontos sobre economia brasileira, Selic/COPOM, IPCA, Ibovespa, fiscal, câmbio
+3. POSICIONAMENTO: o que a gestora está fazendo/recomendando (aumentando, reduzindo, neutro) por classe de ativo
+
+Responda SOMENTE no formato JSON:
+{{"global": "...", "brasil": "...", "posicionamento": "..."}}
+
+CARTA:
+{texto[:6000]}"""
+            msg = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=600,
+                                         messages=[{"role":"user","content": prompt}])
+            raw = msg.content[0].text.strip()
+            m = _re.search(r'\{.*\}', raw, _re.DOTALL)
+            if m:
+                parsed = json.loads(m.group())
+                resultado.update({
+                    "global": parsed.get("global","")[:1200],
+                    "brasil": parsed.get("brasil","")[:1200],
+                    "posicionamento": parsed.get("posicionamento","")[:1200],
+                    "ia": True,
+                })
+        except Exception:
+            pass  # fallback: retorna sem cenário extraído
+
+    if not resultado["global"]:
+        # Fallback: divide texto em terços
+        linhas = [l for l in texto.split("\n") if l.strip()]
+        n = max(len(linhas)//3, 1)
+        resultado.update({
+            "global": " ".join(linhas[:n])[:800],
+            "brasil": " ".join(linhas[n:2*n])[:800],
+            "posicionamento": " ".join(linhas[2*n:])[:800],
+        })
+
+    return jsonify(resultado)
+
 @app.route("/api/hp/knowledge/apply", methods=["POST"])
 def hp_knowledge_apply():
     """Extrai trechos do documento e aplica ao cenário macro ou retorna para o frontend usar."""
@@ -6174,7 +6241,7 @@ textarea{resize:vertical}
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
-      <span style="font-size:11px;color:#2A5A3A">Suba cartas de gestoras direto para a memória do sistema</span>
+      <span style="font-size:11px;color:#2A5A3A">Cartas de gestoras → extrai e preenche o <b style="color:#D4B483">Cenário Macro</b> automaticamente</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
@@ -6186,8 +6253,8 @@ textarea{resize:vertical}
     style="border:2px dashed #2A4A2A;border-radius:10px;padding:30px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
     onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
     <div style="font-size:28px;margin-bottom:8px">📂</div>
-    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
-    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos por vez · Cartas de gestoras, relatórios, análises</div>
+    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar cartas de gestoras (PDF)</div>
+    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · A IA extrai Global, Brasil e Posicionamento automaticamente</div>
   </div>
 
   <!-- Lista de arquivos selecionados -->
@@ -7492,8 +7559,7 @@ function renderListaRapido(){
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         ${item.status==="ok" ? `
-          <button class="btn btn-sm" onclick="rapidoUsarCenario(${i})" style="font-size:10px;padding:4px 10px" title="Preencher Cenário Macro">🌐 Cenário</button>
-          <button class="btn-ghost" onclick="rapidoCopiar(${i})" style="font-size:10px;padding:4px 8px" title="Copiar texto">📋</button>` : ""}
+          <button class="btn btn-sm" onclick="rapidoAplicarCenario(${i})" style="font-size:10px;padding:4px 10px" title="Reaplicar ao Cenário Macro">↺ Reaplicar</button>` : ""}
         <button class="btn-ghost" onclick="_arquivosRapido.splice(${i},1);if(!_arquivosRapido.length){fecharRapido();}else{renderListaRapido();document.getElementById('pdf-rapido-contador').textContent=_arquivosRapido.length+' arquivo'+(_arquivosRapido.length>1?'s':'');}" style="font-size:11px;padding:4px 8px;color:#FF6B6B" title="Remover">✕</button>
       </div>
     </div>`;
@@ -7515,7 +7581,6 @@ function renderListaRapido(){
 
 async function uploadRapidoUm(i){
   const item = _arquivosRapido[i];
-  // Verificar tamanho antes de enviar (limite Vercel: ~4MB)
   if(item.file.size > 4 * 1024 * 1024){
     item.status = "erro";
     item.erro = `Arquivo muito grande (${(item.file.size/1024/1024).toFixed(1)} MB). Limite: 4 MB.`;
@@ -7528,21 +7593,41 @@ async function uploadRapidoUm(i){
     const fd = new FormData();
     fd.append("pdf", item.file);
     fd.append("nome", item.file.name.replace(/\.pdf$/i,""));
-    fd.append("tipo", "carta");
-    fd.append("classes", "geral");
-    fd.append("fonte", "");
-    const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
-    // Tratar resposta não-JSON (ex: HTML de erro do Vercel)
-    const texto = await r.text();
+    const r = await fetch("/api/hp/carta-upload", {method:"POST", body:fd});
+    const txt = await r.text();
     let d;
-    try { d = JSON.parse(texto); }
-    catch(_){ item.status="erro"; item.erro = r.status===413 ? "Arquivo muito grande para o servidor." : `Erro ${r.status}: resposta inesperada do servidor.`; renderListaRapido(); return; }
+    try { d = JSON.parse(txt); }
+    catch(_){ item.status="erro"; item.erro = r.status===413?"Arquivo muito grande.": `Erro ${r.status} do servidor.`; renderListaRapido(); return; }
     if(d.ok){
-      item.status = "ok"; item.texto = d.texto||""; item.chars = d.chars||0; item.doc_id = d.id||"";
-      carregarKnowledge();
+      item.status = "ok";
+      item.chars  = d.chars||0;
+      item.cenario = {global: d.global||"", brasil: d.brasil||"", posicionamento: d.posicionamento||"", referencia: d.fonte||""};
+      // Aplica automaticamente ao Cenário Macro
+      rapidoAplicarCenario(i);
     } else { item.status="erro"; item.erro = d.error||"falha no servidor"; }
   } catch(e){ item.status="erro"; item.erro = e.message; }
   renderListaRapido();
+}
+
+function rapidoAplicarCenario(i){
+  const c = _arquivosRapido[i].cenario;
+  if(!c) return;
+  // Preenche os campos do Cenário Macro na página
+  const g = document.getElementById("cenario-global");
+  const b = document.getElementById("cenario-brasil");
+  const p = document.getElementById("cenario-posicionamento");
+  const r = document.getElementById("cenario-referencia");
+  if(g && c.global) g.value = c.global;
+  if(b && c.brasil) b.value = c.brasil;
+  if(p && c.posicionamento) p.value = c.posicionamento;
+  if(r && c.referencia) r.value = c.referencia;
+  // Salva automaticamente
+  fetch("/api/hp/cenario", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({global: c.global, brasil: c.brasil, posicionamento: c.posicionamento, referencia: c.referencia})
+  });
+  document.getElementById("cenario-global")?.scrollIntoView({behavior:"smooth", block:"center"});
 }
 
 async function uploadRapidoTodos(){
