@@ -6291,122 +6291,111 @@ textarea{resize:vertical}
 .know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 </style>
 
-<!-- ══ 3. CARTEIRAS DE GESTORES ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#1A2E3A">
-  <div class="card-title"><span>🏦</span> Carteiras de Gestores — Base de Referência</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">
-    Cadastre até <b style="color:#8BcFEF">5 carteiras de referência</b> de gestoras (Levante, BTG, XP Research, etc.). Serão usadas nas análises e sempre citadas como fonte.
-  </p>
-
-  <!-- Formulário adicionar carteira -->
-  <div style="background:#060C10;border:1px solid #1A2E3A;border-radius:10px;padding:16px;margin-bottom:16px">
-    <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:12px">➕ Adicionar / Atualizar Carteira</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-      <div>
-        <label>Nome da Carteira</label>
-        <input type="text" id="gest-nome" placeholder="ex: Carteira Moderada Levante">
-      </div>
-      <div>
-        <label>Gestora / Fonte</label>
-        <input type="text" id="gest-gestora" placeholder="ex: Levante Asset">
-      </div>
-      <div>
-        <label>Referência / Data</label>
-        <input type="text" id="gest-ref" placeholder="ex: Junho 2026">
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div>
-        <label>Perfil alvo</label>
-        <select id="gest-perfil" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
-          <option value="super_conservadora">Super Conservadora</option>
-          <option value="conservadora">Conservadora</option>
-          <option value="moderada" selected>Moderada</option>
-          <option value="arrojada">Arrojada</option>
-          <option value="agressiva">Agressiva</option>
-          <option value="geral">Geral (todas)</option>
-        </select>
-      </div>
-      <div>
-        <label>Observação</label>
-        <input type="text" id="gest-obs" placeholder="ex: Carteira conservadora com viés para renda fixa">
-      </div>
-    </div>
-    <!-- Alocação por classe -->
-    <div style="font-size:11px;color:#8BcFEF;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Alocação % por Classe</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px" id="gest-aloc-grid">
-      <div><label style="color:#4A7055">Pós Fixado</label><input type="number" id="galoc-pos_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Inflação</label><input type="number" id="galoc-inflacao" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Pré Fixado</label><input type="number" id="galoc-pre_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Ações</label><input type="number" id="galoc-acoes" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">FIIs</label><input type="number" id="galoc-fiis" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Multimercado</label><input type="number" id="galoc-multimercado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Internacional</label><input type="number" id="galoc-internacional" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Alternativos</label><input type="number" id="galoc-alternativos" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-      <div><label style="color:#4A7055">Criptomoedas</label><input type="number" id="galoc-criptomoedas" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <button class="btn" onclick="salvarGestora()">💾 Salvar Carteira</button>
-      <span id="gest-total-label" style="font-size:12px;color:#4A7055">Total: <b id="gest-total">0</b>%</span>
-      <span id="gest-save-st" style="font-size:12px"></span>
-    </div>
-  </div>
-
-  <!-- Comparativo das carteiras salvas -->
-  <div id="gest-lista-wrap">
-    <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Carteiras Salvas (<span id="gest-count">0</span>/5)</div>
-    <div id="gest-lista"><div style="color:#1E3A4A;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div></div>
-    <!-- Tabela comparativa -->
-    <div id="gest-comparativo" style="display:none;margin-top:14px">
-      <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚖️ Comparativo entre Carteiras</div>
-      <div style="overflow-x:auto"><table id="gest-table" style="width:100%;border-collapse:collapse;font-size:11px"></table></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 4. PORTFÓLIOS MODELO ══════════════════════════════════════════════════ -->
+<!-- ══ 4. ALOCAÇÕES DE REFERÊNCIA (Portfólios + Gestores) ═══════════════════ -->
 <div class="card">
-  <div class="card-title"><span>📐</span> Portfólios Modelo por Indexador</div>
-  <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:14px">
-    Define o benchmark de alocação por classe/indexador para cada perfil. O agente compara a carteira real do cliente contra estes percentuais e aponta os gaps.
-  </p>
-
-  <div class="ref-row">
-    <div>
-      <label>Fonte / Referência</label>
-      <input type="text" id="porto-ref" value="Levante Asset — Junho 2026">
-    </div>
-    <span class="ref-badge" id="porto-badge">Levante Asset — Junho 2026</span>
+  <div class="card-title"><span>📐</span> Alocações de Referência</div>
+  <!-- Abas internas -->
+  <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid #1A2A1A">
+    <button id="tab-porto-btn" onclick="switchAlocTab('porto')" style="font-size:12px;padding:8px 16px;border:none;border-bottom:2px solid #D4B483;background:none;color:#D4B483;font-weight:700;cursor:pointer">📐 Portfólio Braúna</button>
+    <button id="tab-gest-btn" onclick="switchAlocTab('gest')" style="font-size:12px;padding:8px 16px;border:none;border-bottom:2px solid transparent;background:none;color:#4A7055;cursor:pointer">🏦 Carteiras de Gestores</button>
   </div>
 
-  <div style="overflow-x:auto">
-    <table class="porto-table" id="porto-table">
-      <thead>
-        <tr>
-          <th class="classe">Classe / Indexador</th>
-          <th>Super Conserv.</th>
-          <th>Conservadora</th>
-          <th>Moderada</th>
-          <th>Arrojada</th>
-          <th>Agressiva</th>
-          <th style="color:#4A7055;font-size:9px">Viés Macro</th>
-        </tr>
-      </thead>
-      <tbody id="porto-body"></tbody>
-      <tfoot>
-        <tr class="total-row">
-          <td class="classe-label" style="color:#D4B483">TOTAL</td>
-          <td><span id="tot-super_conservadora" class="total-val">—</span></td>
-          <td><span id="tot-conservadora" class="total-val">—</span></td>
-          <td><span id="tot-moderada" class="total-val">—</span></td>
-          <td><span id="tot-arrojada" class="total-val">—</span></td>
-          <td><span id="tot-agressiva" class="total-val">—</span></td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
+  <!-- Aba: Portfólio Modelo -->
+  <div id="tab-porto-panel">
+    <p style="font-size:11px;color:#2A5A3A;line-height:1.5;margin-bottom:12px">Benchmark interno por classe/indexador para cada perfil. O agente compara a carteira real do cliente e aponta os gaps.</p>
+    <div class="ref-row">
+      <div><label>Fonte / Referência</label><input type="text" id="porto-ref" value="Levante Asset — Junho 2026"></div>
+      <span class="ref-badge" id="porto-badge">Levante Asset — Junho 2026</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="porto-table" id="porto-table">
+        <thead>
+          <tr>
+            <th class="classe">Classe / Indexador</th>
+            <th>Super Conserv.</th><th>Conservadora</th><th>Moderada</th><th>Arrojada</th><th>Agressiva</th>
+            <th style="color:#4A7055;font-size:9px">Viés Macro</th>
+          </tr>
+        </thead>
+        <tbody id="porto-body"></tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td class="classe-label" style="color:#D4B483">TOTAL</td>
+            <td><span id="tot-super_conservadora" class="total-val">—</span></td>
+            <td><span id="tot-conservadora" class="total-val">—</span></td>
+            <td><span id="tot-moderada" class="total-val">—</span></td>
+            <td><span id="tot-arrojada" class="total-val">—</span></td>
+            <td><span id="tot-agressiva" class="total-val">—</span></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Aba: Carteiras de Gestores -->
+  <div id="tab-gest-panel" style="display:none">
+    <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">Cadastre até <b style="color:#8BcFEF">5 carteiras de referência</b> de gestoras externas. Usadas nas análises e sempre citadas como fonte.</p>
+    <div style="background:#060C10;border:1px solid #1A2E3A;border-radius:10px;padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:12px">➕ Adicionar / Atualizar Carteira</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div><label>Nome da Carteira</label><input type="text" id="gest-nome" placeholder="ex: Carteira Moderada Levante"></div>
+        <div><label>Gestora / Fonte</label><input type="text" id="gest-gestora" placeholder="ex: Levante Asset"></div>
+        <div><label>Referência / Data</label><input type="text" id="gest-ref" placeholder="ex: Junho 2026"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div><label>Perfil alvo</label>
+          <select id="gest-perfil" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
+            <option value="super_conservadora">Super Conservadora</option>
+            <option value="conservadora">Conservadora</option>
+            <option value="moderada" selected>Moderada</option>
+            <option value="arrojada">Arrojada</option>
+            <option value="agressiva">Agressiva</option>
+            <option value="geral">Geral (todas)</option>
+          </select>
+        </div>
+        <div><label>Observação</label><input type="text" id="gest-obs" placeholder="ex: viés conservador com RF longa"></div>
+      </div>
+      <div style="font-size:11px;color:#8BcFEF;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Alocação % por Classe</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+        <div><label style="color:#4A7055">Pós Fixado</label><input type="number" id="galoc-pos_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Inflação</label><input type="number" id="galoc-inflacao" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Pré Fixado</label><input type="number" id="galoc-pre_fixado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Ações</label><input type="number" id="galoc-acoes" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">FIIs</label><input type="number" id="galoc-fiis" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Multimercado</label><input type="number" id="galoc-multimercado" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Internacional</label><input type="number" id="galoc-internacional" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Alternativos</label><input type="number" id="galoc-alternativos" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+        <div><label style="color:#4A7055">Criptomoedas</label><input type="number" id="galoc-criptomoedas" min="0" max="100" step="0.5" value="0" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none" oninput="atualizarTotalGest()"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <button class="btn" onclick="salvarGestora()">💾 Salvar Carteira</button>
+        <span id="gest-total-label" style="font-size:12px;color:#4A7055">Total: <b id="gest-total">0</b>%</span>
+        <span id="gest-save-st" style="font-size:12px"></span>
+      </div>
+    </div>
+    <div id="gest-lista-wrap">
+      <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Carteiras Salvas (<span id="gest-count">0</span>/5)</div>
+      <div id="gest-lista"><div style="color:#1E3A4A;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div></div>
+      <div id="gest-comparativo" style="display:none;margin-top:14px">
+        <div style="font-size:11px;color:#8BcFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚖️ Comparativo entre Carteiras</div>
+        <div style="overflow-x:auto"><table id="gest-table" style="width:100%;border-collapse:collapse;font-size:11px"></table></div>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+function switchAlocTab(tab){
+  document.getElementById("tab-porto-panel").style.display = tab==="porto"?"":"none";
+  document.getElementById("tab-gest-panel").style.display  = tab==="gest" ?"":"none";
+  document.getElementById("tab-porto-btn").style.borderBottomColor = tab==="porto"?"#D4B483":"transparent";
+  document.getElementById("tab-porto-btn").style.color = tab==="porto"?"#D4B483":"#4A7055";
+  document.getElementById("tab-porto-btn").style.fontWeight = tab==="porto"?"700":"400";
+  document.getElementById("tab-gest-btn").style.borderBottomColor = tab==="gest"?"#8BcFEF":"transparent";
+  document.getElementById("tab-gest-btn").style.color = tab==="gest"?"#8BcFEF":"#4A7055";
+  document.getElementById("tab-gest-btn").style.fontWeight = tab==="gest"?"700":"400";
+}
+</script>
 
 <!-- ══ 3. PRODUTOS EM DESTAQUE ════════════════════════════════════════════════ -->
 <div class="card">
@@ -6439,6 +6428,55 @@ textarea{resize:vertical}
     <button class="btn" id="btn-salvar-prod" onclick="salvarProdutos()">💾 Salvar produtos</button>
     <span style="font-size:11px;color:#2A5A3A">Salva apenas os produtos em destaque. Use "Publicar" no final para enviar tudo de uma vez.</span>
     <span id="prod-save-st" style="font-size:12px;margin-left:auto"></span>
+  </div>
+
+  <!-- Alertas de produtos inline -->
+  <div style="margin-top:16px;padding-top:16px;border-top:1px solid #1A1A28">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+      <span style="font-size:11px;color:#B08FCF;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🔔 Alertas de Produtos</span>
+      <span style="font-size:10px;color:#4A7055">▾ expandir</span>
+    </div>
+    <div style="display:none">
+      <div style="background:#060F0B;border:1px solid #2A1A30;border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+          <div><label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Produto / Ticker</label>
+            <input id="alert-produto" type="text" placeholder="ex: NTN-B 2035, VALE3" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none"></div>
+          <div><label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Classe</label>
+            <select id="alert-classe" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+              <option value="">— Selecionar —</option>
+              <option value="pos_fixado">Pós Fixado</option><option value="inflacao">Inflação</option>
+              <option value="pre_fixado">Pré Fixado</option><option value="acoes">Ações</option>
+              <option value="fiis">FIIs</option><option value="multimercado">Multimercado</option>
+              <option value="internacional">Internacional</option><option value="alternativos">Alternativos</option>
+            </select></div>
+          <div><label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tipo</label>
+            <select id="alert-tipo" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+              <option value="info">ℹ️ Informativo</option>
+              <option value="atencao">⚠️ Atenção</option>
+              <option value="urgente">🚨 Urgente</option>
+            </select></div>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Direcionar para assessor (opcional)</label>
+          <input id="alert-assessor" type="text" placeholder="Deixe em branco para todos" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Mensagem</label>
+          <textarea id="alert-msg" rows="3" placeholder="ex: COPOM elevou Selic +50bps. Revisar alocação em pré-fixado." style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:10px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn" onclick="registrarAlerta()">🔔 Registrar alerta</button>
+          <span id="alert-st" style="font-size:11px"></span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#3A6A48;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        <span>Histórico de alertas</span>
+        <button onclick="carregarAlertas()" class="btn-ghost">↻ Atualizar</button>
+      </div>
+      <div id="alertas-feed" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+        <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando alertas...</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -6539,68 +6577,6 @@ textarea{resize:vertical}
   </div>
   <div id="calls-feed" style="display:flex;flex-direction:column;gap:8px">
     <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando calls...</div>
-  </div>
-</div>
-
-<!-- ══ 5. MONITORAMENTO DE PRODUTOS ══════════════════════════════════════════ -->
-<div class="card" style="border-color:#2A1A30">
-  <div class="card-title"><span>🔔</span> Monitoramento & Alertas de Produtos</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">
-    Registre atualizações de mercado sobre os produtos indicados. Cada alerta fica vinculado ao produto e aparece no painel do Head de Produtos. Assessores verão um aviso quando o produto do cliente sofrer uma atualização relevante.
-  </p>
-
-  <!-- Formulário novo alerta -->
-  <div style="background:#060F0B;border:1px solid #2A1A30;border-radius:10px;padding:16px;margin-bottom:16px">
-    <div style="font-size:12px;color:#B08FCF;font-weight:700;margin-bottom:12px">➕ Registrar atualização de mercado</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-      <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Produto / Ticker</label>
-        <input id="alert-produto" type="text" placeholder="ex: NTN-B 2035, VALE3, MXRF11" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
-      </div>
-      <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Classe</label>
-        <select id="alert-classe" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
-          <option value="">— Selecionar —</option>
-          <option value="pos_fixado">Pós Fixado</option>
-          <option value="inflacao">Inflação</option>
-          <option value="pre_fixado">Pré Fixado</option>
-          <option value="acoes">Ações</option>
-          <option value="fiis">FIIs</option>
-          <option value="multimercado">Multimercado</option>
-          <option value="internacional">Internacional</option>
-          <option value="alternativos">Alternativos</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tipo de alerta</label>
-        <select id="alert-tipo" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
-          <option value="info">ℹ️ Informativo</option>
-          <option value="atencao">⚠️ Atenção</option>
-          <option value="urgente">🚨 Urgente — revisar carteiras</option>
-        </select>
-      </div>
-    </div>
-    <div style="margin-bottom:10px">
-      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Direcionar para assessor (opcional)</label>
-      <input id="alert-assessor" type="text" placeholder="Deixe em branco para todos · ex: lucas" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
-    </div>
-    <div style="margin-bottom:10px">
-      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Mensagem / Atualização</label>
-      <textarea id="alert-msg" rows="3" placeholder="ex: COPOM elevou Selic +50bps. Revisar alocação em pré-fixado acima de 2 anos. Clientes arrojados e agressivos devem reduzir duration." style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:10px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <button class="btn" onclick="registrarAlerta()">🔔 Registrar alerta</button>
-      <span id="alert-st" style="font-size:11px"></span>
-    </div>
-  </div>
-
-  <!-- Feed de alertas -->
-  <div style="font-size:11px;color:#3A6A48;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-    <span>Histórico de alertas registrados</span>
-    <button onclick="carregarAlertas()" class="btn-ghost">↻ Atualizar</button>
-  </div>
-  <div id="alertas-feed" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
-    <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando alertas...</div>
   </div>
 </div>
 
