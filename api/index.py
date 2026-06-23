@@ -7900,9 +7900,9 @@ function renderListaRapido(){
 
 async function uploadRapidoUm(i){
   const item = _arquivosRapido[i];
-  if(item.file.size > 4 * 1024 * 1024){
+  if(item.file.size > 4.3 * 1024 * 1024){
     item.status = "erro";
-    item.erro = `Arquivo muito grande (${(item.file.size/1024/1024).toFixed(1)} MB). Limite: 4 MB.`;
+    item.erro = `Arquivo muito grande (${(item.file.size/1024/1024).toFixed(1)} MB). Limite: 4,3 MB.`;
     renderListaRapido();
     return;
   }
@@ -7940,7 +7940,7 @@ async function uploadCartaCenario(input){
   input.value = "";
   const st = document.getElementById("carta-st");
   st.innerHTML = `<span style="color:#D4B483">⏳ Processando carta...</span>`;
-  if(file.size > 4*1024*1024){ st.innerHTML=`<span style="color:#FF6B6B">Arquivo muito grande (máx 4 MB)</span>`; return; }
+  if(file.size > 4.3*1024*1024){ st.innerHTML=`<span style="color:#FF6B6B">Arquivo muito grande (máx 4,3 MB)</span>`; return; }
   try{
     const fd = new FormData();
     fd.append("pdf", file);
