@@ -6254,7 +6254,7 @@ textarea{resize:vertical}
 .info-box{background:#060F0B;border-radius:8px;padding:12px 14px;font-size:12px;color:#3A6A48;line-height:1.6;border:1px solid #2A2A18}
 .info-box b{color:#D4B483}
 /* Publish bar */
-.publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:border-color .3s,background .3s}
+.publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:border-color .3s,background .3s;position:relative;overflow:hidden}
 .publish-bar.pendente{border-color:#FF4444 !important;background:#1A0808 !important;animation:piscar-pub 1.2s ease-in-out infinite}
 @keyframes piscar-pub{0%,100%{border-color:#FF4444;box-shadow:0 0 0 0 #FF444400}50%{border-color:#FF8888;box-shadow:0 0 16px 4px #FF444455}}
 .publish-bar .pub-info{flex:1}
@@ -6728,6 +6728,10 @@ textarea{resize:vertical}
 
 <!-- ══ PUBLICAR ══════════════════════════════════════════════════════════════ -->
 <div class="publish-bar" id="publish-bar">
+  <!-- Barra de progresso (oculta por padrão) -->
+  <div id="pub-progress-wrap" style="display:none;position:absolute;bottom:0;left:0;right:0;height:4px;border-radius:0 0 12px 12px;overflow:hidden;background:#1A0A0A">
+    <div id="pub-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#FF4444,#FF8C42,#FFD700);border-radius:0 0 12px 12px;transition:width .4s ease;box-shadow:0 0 8px #FF444488"></div>
+  </div>
   <div class="pub-info">
     <h3 id="pub-titulo">📤 Publicar para os Assessores</h3>
     <p id="pub-desc">Ao publicar, o cenário macro, alocações, produtos e calls ficam disponíveis para todos os assessores.</p>
@@ -7842,15 +7846,45 @@ async function salvarProdutos(){
 }
 
 // ── Publicar ──────────────────────────────────────────────────────────────────
+function _pubProgress(pct, cor){
+  const wrap = document.getElementById("pub-progress-wrap");
+  const bar  = document.getElementById("pub-progress-bar");
+  if(!wrap || !bar) return;
+  wrap.style.display = "";
+  bar.style.width = pct + "%";
+  if(cor) bar.style.background = cor;
+}
+function _pubProgressHide(){
+  const wrap = document.getElementById("pub-progress-wrap");
+  const bar  = document.getElementById("pub-progress-bar");
+  if(wrap && bar){
+    bar.style.width = "100%";
+    bar.style.background = "linear-gradient(90deg,#5DCAA5,#C9A96E)";
+    setTimeout(()=>{ if(wrap) wrap.style.display="none"; bar.style.width="0%"; }, 800);
+  }
+}
+
 async function publicar(){
   const btn = document.getElementById("btn-pub");
   const st  = document.getElementById("pub-st");
   btn.disabled = true;
-  st.innerHTML = `<span style="color:#D4B483">⏳ Publicando — aguarde alguns segundos...</span>`;
+  st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Publicando...</span>`;
 
-  // Anima o botão com pontos enquanto espera
-  let dots = 0;
-  const anim = setInterval(()=>{ dots=(dots+1)%4; btn.textContent = "Publicando" + ".".repeat(dots+1); }, 600);
+  // Progresso simulado: avança até 85% enquanto aguarda resposta do servidor
+  // Timing baseado no cold start típico do Vercel (~6-8s)
+  _pubProgress(5);
+  const etapas = [
+    {pct:15, delay:400,  label:"Preparando dados..."},
+    {pct:30, delay:1000, label:"Enviando cenário macro..."},
+    {pct:50, delay:2000, label:"Salvando portfólios..."},
+    {pct:65, delay:3500, label:"Salvando produtos..."},
+    {pct:78, delay:5000, label:"Aguardando servidor..."},
+    {pct:85, delay:7000, label:"Quase pronto..."},
+  ];
+  const timers = etapas.map(e => setTimeout(()=>{
+    _pubProgress(e.pct);
+    st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ ${e.label}</span>`;
+  }, e.delay));
 
   const payload = {
     portfolios: coletarPortfolios(),
@@ -7861,14 +7895,27 @@ async function publicar(){
   try{
     const r = await fetch("/api/hp/publicar", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
     const d = await r.json();
+    timers.forEach(t=>clearTimeout(t));
     if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ Publicado em ${d.publicado_em} — visível para todos os assessores</span>`;
+      _pubProgress(100, "linear-gradient(90deg,#5DCAA5,#C9A96E)");
+      st.innerHTML = `<span class="status-ok">✓ Publicado em ${d.publicado_em}</span>`;
       const bar = document.getElementById("status-pub");
-      if(bar){ bar.style.display = "block"; bar.innerHTML = `<b>✓ Última publicação:</b> ${d.publicado_em} — Portfólios modelo, cenário macro e produtos atualizados.`; }
+      if(bar){ bar.style.display="block"; bar.innerHTML=`<b>✓ Última publicação:</b> ${d.publicado_em}`; }
       limparPendente();
-    } else { st.innerHTML = `<span class="status-err">Erro ao publicar.</span>`; }
-  } catch(e){ st.innerHTML = `<span class="status-err">Erro de conexão. Tente novamente.</span>`; }
-  finally{ clearInterval(anim); btn.disabled=false; btn.textContent="📤 Publicar agora"; }
+      setTimeout(()=>_pubProgressHide(), 600);
+    } else {
+      timers.forEach(t=>clearTimeout(t));
+      _pubProgress(100, "#FF4444");
+      st.innerHTML = `<span class="status-err">Erro ao publicar.</span>`;
+      setTimeout(()=>_pubProgressHide(), 1000);
+    }
+  } catch(e){
+    timers.forEach(t=>clearTimeout(t));
+    _pubProgress(100, "#FF4444");
+    st.innerHTML = `<span class="status-err">Erro de conexão. Tente novamente.</span>`;
+    setTimeout(()=>_pubProgressHide(), 1000);
+  }
+  finally{ btn.disabled=false; btn.textContent="📤 Publicar agora"; }
   setTimeout(()=>st.textContent="", 8000);
 }
 
