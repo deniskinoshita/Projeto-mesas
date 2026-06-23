@@ -6241,7 +6241,7 @@ textarea{resize:vertical}
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
-      <span style="font-size:11px;color:#2A5A3A">Cartas de gestoras → extrai e preenche o <b style="color:#D4B483">Cenário Macro</b> automaticamente</span>
+      <span style="font-size:11px;color:#2A5A3A">Material de trabalho, produtos, carteiras recomendadas e ativos → <b style="color:#D4B483">Base de Conhecimento</b></span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
@@ -6253,8 +6253,8 @@ textarea{resize:vertical}
     style="border:2px dashed #2A4A2A;border-radius:10px;padding:30px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
     onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
     <div style="font-size:28px;margin-bottom:8px">📂</div>
-    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar cartas de gestoras (PDF)</div>
-    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · A IA extrai Global, Brasil e Posicionamento automaticamente</div>
+    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
+    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Produtos, carteiras recomendadas, material sobre ativos</div>
   </div>
 
   <!-- Lista de arquivos selecionados -->
@@ -6280,8 +6280,18 @@ textarea{resize:vertical}
 <!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>🌐</span> Cenário Macro</div>
+
+  <!-- Upload de carta de gestora -->
+  <div style="background:#060C08;border:1px solid #1A2E1A;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#5DCAA5;font-weight:700">📩 Carta de Gestora</span>
+    <span style="font-size:11px;color:#2A5A3A;flex:1">Suba a carta mensal — a IA extrai e preenche Global, Brasil e Posicionamento automaticamente</span>
+    <input type="file" id="carta-input" accept=".pdf" style="display:none" onchange="uploadCartaCenario(this)">
+    <button class="btn btn-sm" onclick="document.getElementById('carta-input').click()" style="white-space:nowrap">📂 Selecionar carta (PDF)</button>
+    <span id="carta-st" style="font-size:11px;min-width:120px"></span>
+  </div>
+
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
-    Este cenário é usado pelo agente para embasar as sugestões e scripts dos assessores. Atualize mensalmente com base na carta da gestora.
+    Ou edite manualmente os campos abaixo. Este cenário embasa as sugestões e scripts dos assessores.
   </p>
 
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
@@ -6307,9 +6317,9 @@ textarea{resize:vertical}
 
 <!-- ══ 2. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A2A18">
-  <div class="card-title"><span>📚</span> Base de Conhecimento — Central de Materiais HP</div>
+  <div class="card-title"><span>📚</span> Base de Conhecimento — Cartas de Gestores</div>
   <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
-    Suba cartas de gestoras, relatórios e notas de research. Cada documento fica salvo na base e pode ser aplicado com um clique ao <b style="color:#D4B483">Cenário Macro</b> ou publicado para os assessores consultarem.
+    Repositório de <b style="color:#D4B483">cartas mensais de gestoras</b>. Cada carta fica salva e pode ser aplicada ao <b style="color:#D4B483">Cenário Macro</b> com um clique, ou consultada pelos assessores.
   </p>
 
   <!-- Upload zone + metadados -->
@@ -7558,8 +7568,6 @@ function renderListaRapido(){
         <div style="font-size:10px;color:${cor};margin-top:3px">${statusTxt}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        ${item.status==="ok" ? `
-          <button class="btn btn-sm" onclick="rapidoAplicarCenario(${i})" style="font-size:10px;padding:4px 10px" title="Reaplicar ao Cenário Macro">↺ Reaplicar</button>` : ""}
         <button class="btn-ghost" onclick="_arquivosRapido.splice(${i},1);if(!_arquivosRapido.length){fecharRapido();}else{renderListaRapido();document.getElementById('pdf-rapido-contador').textContent=_arquivosRapido.length+' arquivo'+(_arquivosRapido.length>1?'s':'');}" style="font-size:11px;padding:4px 8px;color:#FF6B6B" title="Remover">✕</button>
       </div>
     </div>`;
@@ -7593,39 +7601,59 @@ async function uploadRapidoUm(i){
     const fd = new FormData();
     fd.append("pdf", item.file);
     fd.append("nome", item.file.name.replace(/\.pdf$/i,""));
-    const r = await fetch("/api/hp/carta-upload", {method:"POST", body:fd});
+    fd.append("tipo", "outro");
+    fd.append("classes", "geral");
+    fd.append("fonte", "");
+    const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
     const txt = await r.text();
     let d;
     try { d = JSON.parse(txt); }
     catch(_){ item.status="erro"; item.erro = r.status===413?"Arquivo muito grande.": `Erro ${r.status} do servidor.`; renderListaRapido(); return; }
     if(d.ok){
-      item.status = "ok";
-      item.chars  = d.chars||0;
-      item.cenario = {global: d.global||"", brasil: d.brasil||"", posicionamento: d.posicionamento||"", referencia: d.fonte||""};
-      // Aplica automaticamente ao Cenário Macro
-      rapidoAplicarCenario(i);
+      item.status = "ok"; item.chars = d.chars||0; item.doc_id = d.id||"";
+      carregarKnowledge();
     } else { item.status="erro"; item.erro = d.error||"falha no servidor"; }
   } catch(e){ item.status="erro"; item.erro = e.message; }
   renderListaRapido();
 }
 
 function rapidoAplicarCenario(i){
-  const c = _arquivosRapido[i].cenario;
+  const c = _arquivosRapido[i]?.cenario;
   if(!c) return;
-  // Preenche os campos do Cenário Macro na página
-  const g = document.getElementById("cenario-global");
-  const b = document.getElementById("cenario-brasil");
-  const p = document.getElementById("cenario-posicionamento");
-  const r = document.getElementById("cenario-referencia");
-  if(g && c.global) g.value = c.global;
-  if(b && c.brasil) b.value = c.brasil;
-  if(p && c.posicionamento) p.value = c.posicionamento;
-  if(r && c.referencia) r.value = c.referencia;
-  // Salva automaticamente
-  fetch("/api/hp/cenario", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({global: c.global, brasil: c.brasil, posicionamento: c.posicionamento, referencia: c.referencia})
+  aplicarCenarioNaPagina(c);
+}
+
+async function uploadCartaCenario(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = "";
+  const st = document.getElementById("carta-st");
+  st.innerHTML = `<span style="color:#D4B483">⏳ Processando carta...</span>`;
+  if(file.size > 4*1024*1024){ st.innerHTML=`<span style="color:#FF6B6B">Arquivo muito grande (máx 4 MB)</span>`; return; }
+  try{
+    const fd = new FormData();
+    fd.append("pdf", file);
+    fd.append("nome", file.name.replace(/\.pdf$/i,""));
+    const r = await fetch("/api/hp/carta-upload", {method:"POST", body:fd});
+    const txt = await r.text();
+    let d;
+    try{ d = JSON.parse(txt); } catch(_){ st.innerHTML=`<span style="color:#FF6B6B">Erro ${r.status} do servidor</span>`; return; }
+    if(d.ok){
+      aplicarCenarioNaPagina({global:d.global, brasil:d.brasil, posicionamento:d.posicionamento, referencia:d.fonte});
+      st.innerHTML = `<span style="color:#5DCAA5">✅ Cenário atualizado${d.ia?" (IA)":""}</span>`;
+      setTimeout(()=>st.textContent="", 5000);
+    } else { st.innerHTML=`<span style="color:#FF6B6B">${d.error}</span>`; }
+  } catch(e){ st.innerHTML=`<span style="color:#FF6B6B">${e.message}</span>`; }
+}
+
+function aplicarCenarioNaPagina(c){
+  if(!c) return;
+  if(c.global)         { const el=document.getElementById("cenario-global");        if(el) el.value=c.global; }
+  if(c.brasil)         { const el=document.getElementById("cenario-brasil");        if(el) el.value=c.brasil; }
+  if(c.posicionamento) { const el=document.getElementById("cenario-pos");           if(el) el.value=c.posicionamento; }
+  if(c.referencia)     { const el=document.getElementById("cenario-ref");           if(el) el.value=c.referencia; }
+  fetch("/api/hp/cenario", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({global:c.global||"", brasil:c.brasil||"", posicionamento:c.posicionamento||"", referencia:c.referencia||""})
   });
   document.getElementById("cenario-global")?.scrollIntoView({behavior:"smooth", block:"center"});
 }
