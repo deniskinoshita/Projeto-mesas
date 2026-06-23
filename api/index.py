@@ -3227,9 +3227,7 @@ async function baixarPpt(){
     try{
       const hRes = await fetch("/api/historico");
       const hData = await hRes.json();
-      const nomeKey = (analiseData.nome||"").toLowerCase().replace(/\s+/g,"_");
-      const assessorKey = (analiseData.assessor||"").toLowerCase().replace(/\s+/g,"_");
-      const fkey = `${assessorKey}__${nomeKey}`;
+      const fkey = ((analiseData.assessor||"")+("|")+(analiseData.nome||"")).toLowerCase().trim();
       const entradas = (hData[fkey]||{}).entradas||[];
       if(entradas.length>=2 && patrimonioAtual < entradas[1].patrimonio){
         patrimonioCaindo = true;
@@ -6063,10 +6061,13 @@ async function init(){
     fetch("/api/sugestoes").then(r=>r.json()).catch(()=>({historico:[]})),
     fetch("/api/assessores_dados").then(r=>r.json()).catch(()=>({assessores:[]})),
   ]);
-  historico = hist;
+  // Normalizar historico para lowercase (backend salva chaves em lowercase)
+  const histRaw = hist||{};
+  historico = {};
+  Object.keys(histRaw).forEach(function(k){ historico[k.toLowerCase()] = histRaw[k]; });
   clientesData = Array.isArray(clientes) ? clientes : [];
   sugestoesHist = suge.historico||[];
-  clientesData.forEach(c=>{ notas[c.assessor+"|"+c.nome] = {id:c.id, nota:c.nota_lider||""}; });
+  clientesData.forEach(c=>{ notas[(c.assessor+"|"+c.nome).toLowerCase()] = {id:c.id, nota:c.nota_lider||""}; });
 
   // Indexar dados financeiros por nome (busca aproximada)
   dadosFinanceiros = assFinanc;
@@ -6087,7 +6088,10 @@ async function init(){
 
 function renderKPIs(assFinanc){
   const chaves = Object.keys(historico);
-  const assessores = new Set(chaves.map(k=>historico[k].assessor||k.split("|")[0]));
+  // Assessores: combina histórico + planilha financeira
+  const fromHist  = new Set(chaves.map(k=>historico[k].assessor||k.split("|")[0]));
+  const fromPlanilha2 = new Set((assFinanc&&assFinanc.assessores||[]).map(a=>a.nome));
+  const assessores = new Set([...fromHist,...fromPlanilha2]);
   const totalRel = chaves.reduce((s,k)=>s+(historico[k].entradas&&historico[k].entradas.length||0),0);
 
   // Patrimônio: preferir soma da planilha quando disponível
@@ -6098,13 +6102,13 @@ function renderKPIs(assFinanc){
 
   let somaScore=0, cntScore=0;
   clientesData.forEach(c=>{
-    const hist = historico[c.assessor+"|"+c.nome]||historico[Object.keys(historico).find(k=>k.includes(c.nome))||""]||null;
+    const hist = historico[(c.assessor+"|"+c.nome).toLowerCase()]||historico[Object.keys(historico).find(k=>k.includes(c.nome.toLowerCase()))||""]||null;
     const ult = hist && hist.entradas && hist.entradas[0];
     if(ult && ult.score_servir>0){ somaScore+=ult.score_servir; cntScore++; }
   });
 
   const emRisco = clientesData.filter(c=>{
-    const hist = historico[c.assessor+"|"+c.nome]||null;
+    const hist = historico[(c.assessor+"|"+c.nome).toLowerCase()]||null;
     const ult = hist && hist.entradas && hist.entradas[0];
     return ult && (ult.rent12_pct_cdi < 70 || ult.status === "critico");
   }).length;
@@ -6121,7 +6125,7 @@ function clientesEmRisco(filtroAssessor, filtroPerfil, filtroStatus){
   return clientesData.filter(c=>{
     if(filtroAssessor && c.assessor !== filtroAssessor) return false;
     if(filtroPerfil && c.perfil !== filtroPerfil) return false;
-    const hist = historico[c.assessor+"|"+c.nome]||null;
+    const hist = historico[(c.assessor+"|"+c.nome).toLowerCase()]||null;
     const ult = hist && hist.entradas && hist.entradas[0];
     if(!ult) return false;
     const isRisco = ult.rent12_pct_cdi < 70 || ult.status === "critico";
@@ -6139,7 +6143,7 @@ function renderRisco(filtroAssessor, filtroPerfil, filtroStatus){
     return;
   }
   cont.innerHTML = riscos.map(c=>{
-    const hist = historico[c.assessor+"|"+c.nome]||null;
+    const hist = historico[(c.assessor+"|"+c.nome).toLowerCase()]||null;
     const ult = hist && hist.entradas && hist.entradas[0];
     const motivos = [];
     if(ult && ult.status==="critico") motivos.push("Status critico");
@@ -6223,7 +6227,10 @@ function toggleAlerta(i){
 }
 
 function popularFiltroAssessor(){
-  const assessores = [...new Set(clientesData.map(c=>c.assessor).filter(Boolean))].sort();
+  // Combina assessores de clientes + da planilha financeira
+  const fromClientes = clientesData.map(c=>c.assessor).filter(Boolean);
+  const fromPlanilha = (dadosFinanceiros.assessores||[]).map(a=>a.nome).filter(Boolean);
+  const assessores = [...new Set([...fromClientes,...fromPlanilha])].sort();
   const sel = document.getElementById("filtro-assessor");
   assessores.forEach(function(a){
     const op = document.createElement("option");
@@ -6277,14 +6284,19 @@ function renderRanking(){
 
 function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
   const container = document.getElementById("ranking-container");
-  if(!Object.keys(historico).length){
-    container.innerHTML = '<p class="vazio">Nenhum assessor usou o sistema ainda. Os relatorios aparecerao aqui apos a primeira analise.</p>';
-    return;
-  }
 
   const porAssessor = buildPorAssessor(filtroAssessor||"", filtroPerfil||"", filtroStatus||"");
+
+  // Incluir assessores da planilha que ainda não têm análises
+  if(!filtroStatus && !filtroPerfil){
+    (dadosFinanceiros.assessores||[]).forEach(function(a){
+      if(filtroAssessor && a.nome !== filtroAssessor) return;
+      if(!porAssessor[a.nome]) porAssessor[a.nome] = {nome:a.nome, clientes:[], totalRel:0};
+    });
+  }
+
   if(!Object.keys(porAssessor).length){
-    container.innerHTML = '<p class="vazio">Nenhum resultado para os filtros selecionados.</p>';
+    container.innerHTML = '<p class="vazio">Nenhum assessor encontrado. Importe a planilha financeira para ver o ranking.</p>';
     return;
   }
 
@@ -6411,7 +6423,7 @@ function renderClientesAssessor(clientes, assessorNome){
     const statusCls = ultima&&ultima.status==="critico"?"c-critico":ultima&&ultima.status==="atencao"?"c-atencao":"c-ok";
     const statusTxt = ultima&&ultima.status==="critico"?"🔴 Critico":ultima&&ultima.status==="atencao"?"🟡 Atencao":"🟢 Saudavel";
     const fmt = function(v){return v>0?"R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}):"—";};
-    const notaKey = assessorNome+"|"+c.nome;
+    const notaKey = (assessorNome+"|"+c.nome).toLowerCase();
     const notaObj = notas[notaKey]||{};
     const notaVal = (notaObj.nota||"").replace(/"/g,"&quot;");
     const clienteId = notaObj.id||"";
