@@ -4788,11 +4788,12 @@ CARTA:
 
 @app.route("/api/hp/knowledge/publicar", methods=["POST"])
 def hp_knowledge_publicar():
-    """Marca um documento como publicado (visível para assessores)."""
+    """Publica ou despublica um documento. Aceita {id, publicado: true/false} (default true)."""
     body   = request.get_json()
     doc_id = body.get("id")
-    update_know_meta(doc_id, publicado=True)   # atômico
-    return jsonify({"ok": True})
+    publicado = body.get("publicado", True)
+    update_know_meta(doc_id, publicado=bool(publicado))   # atômico
+    return jsonify({"ok": True, "publicado": bool(publicado)})
 
 @app.route("/api/analyze-xp", methods=["POST"])
 def analyze_xp():
