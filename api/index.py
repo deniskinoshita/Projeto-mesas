@@ -3710,9 +3710,18 @@ def sugestoes_endpoint():
         return jsonify({"ok": True, "id": nova["id"]})
     return jsonify(data)
 
-@app.route("/api/ficha", methods=["GET","POST"])
+@app.route("/api/ficha", methods=["GET","POST","DELETE"])
 def ficha_endpoint():
     fichas = load_fichas()
+    if request.method == "DELETE":
+        d = request.get_json() or {}
+        conta = d.get("conta","").strip()
+        removidas = []
+        for k in [f"conta:{conta}", conta]:
+            if k in fichas:
+                del fichas[k]; removidas.append(k)
+        save_fichas(fichas)
+        return jsonify({"ok": True, "removidas": removidas})
     if request.method == "POST":
         d = request.get_json()
         # Chave primária: código da conta (preferencial) ou assessor|nome
