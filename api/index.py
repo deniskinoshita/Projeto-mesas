@@ -3517,8 +3517,7 @@ async function baixarPpt(){
 # ── Rotas ─────────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def login_page():
-    from flask import redirect
-    return redirect("/admin")
+    return render_template_string(HTML_LOGIN)
 
 def _pilar_html_inicial(p):
     imp = p.get("importancia", "CRÍTICA")
@@ -7579,8 +7578,14 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 </div>
 
 <script>
-// Admin sem autenticação — seta role para permitir navegar em todas as páginas
-localStorage.setItem("brauna_role", "admin");
+// ── Auth ── Requer login como admin (senha) via página inicial
+(function(){
+  const _r = localStorage.getItem("brauna_role");
+  if(_r !== "admin"){
+    localStorage.removeItem("brauna_role");
+    window.location.replace("/");
+  }
+})();
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 const PERFIS     = ["conservadora","moderada","arrojada","agressiva"];
