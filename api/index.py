@@ -4772,16 +4772,21 @@ def gerar_apresentacao():
 
 @app.route("/api/gerar-pptx", methods=["POST"])
 def gerar_pptx():
-    """Gera PPTX de apresentação de reunião com identidade Braúna."""
+    """Gera PPTX de análise de carteira com identidade visual Braúna."""
     try:
         import sys, os
         _api_dir = os.path.dirname(os.path.abspath(__file__))
         if _api_dir not in sys.path:
             sys.path.insert(0, _api_dir)
-        from apresentacao_pptx import gerar_apresentacao_pptx as _gerar_pptx
+        from pptx_brauna import gerar_pptx_cliente as _gerar_novo
+        _usar_novo = True
     except Exception as e:
-        app.logger.error(f"Erro ao importar apresentacao_pptx: {e}")
-        return jsonify({"error": f"Erro ao carregar módulo PPTX: {e}"}), 500
+        app.logger.warning(f"pptx_brauna não disponível ({e}), usando módulo legado")
+        _usar_novo = False
+        try:
+            from apresentacao_pptx import gerar_apresentacao_pptx as _gerar_legado
+        except Exception as e2:
+            return jsonify({"error": f"Erro ao carregar módulo PPTX: {e2}"}), 500
 
     body = request.get_json()
     if not body:
@@ -4842,7 +4847,43 @@ def gerar_pptx():
         body["rent_12m"] = rent_12m
         body["pct_cdi"]  = round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0
 
-        pptx_bytes = _gerar_pptx(body)
+        if _usar_novo:
+            # Adapta o payload para o formato esperado pelo novo módulo
+            rent_raw  = body.get("rent", {})
+            port_rent = rent_raw.get("portfolio", {}) if isinstance(rent_raw, dict) else {}
+            cdi_rent  = rent_raw.get("cdi", {}) if isinstance(rent_raw, dict) else {}
+            rent_12m  = port_rent.get("12m", 0)
+            cdi_12m   = cdi_rent.get("12m", 0)
+            dados = {
+                "nome":         body.get("nome_cliente", "Cliente"),
+                "assessor":     body.get("assessor", ""),
+                "perfil":       body.get("perfil", "moderada"),
+                "data_ref":     body.get("data_ref", ""),
+                "patrimonio":   body.get("patrimonio", 0),
+                "rent": {
+                    "mes":      port_rent.get("mes", 0),
+                    "ano":      port_rent.get("ano", 0),
+                    "12m":      rent_12m,
+                    "24m":      port_rent.get("24m", 0),
+                    "cdi_pct":  round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0,
+                },
+                "composicao":    body.get("composicao", {}),
+                "modelo":        body.get("modelo", {}),
+                "desvios":       body.get("desvios", []),
+                "acoes":         body.get("acoes", []),
+                "fiis":          body.get("fiis", []),
+                "rf_ativos":     body.get("rf_ativos", []),
+                "checklist":     body.get("checklist", {}),
+                "cross_ativos":  body.get("cross_ativos", []),
+                "score_servir":  body.get("score_servir", 0),
+                "status":        body.get("status", ""),
+                "objetivo":      body.get("objetivo", ""),
+                "alertas":       body.get("alertas_relevantes", []),
+                "nota_lider":    body.get("nota_lider", ""),
+            }
+            pptx_bytes = _gerar_novo(dados)
+        else:
+            pptx_bytes = _gerar_legado(body)
     except Exception as e:
         import traceback
         app.logger.error(f"Erro ao gerar PPTX: {traceback.format_exc()}")
