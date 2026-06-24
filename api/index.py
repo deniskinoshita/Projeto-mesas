@@ -9005,11 +9005,14 @@ textarea{resize:vertical}
     </div>
   </div>
   <div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
-      <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+    <button class="btn btn-out" id="btn-toggle-base" onclick="toggleBaseLista()" style="width:100%;justify-content:center">📂 Gerenciar documentos da base</button>
+    <div id="know-base-wrap" style="display:none;margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
+        <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+      </div>
+      <div id="know-lista"><div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda.</div></div>
     </div>
-    <div id="know-lista"><div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda.</div></div>
   </div>
 </div>
 
@@ -9592,14 +9595,30 @@ async function knowSalvar(){
   }
 }
 
+let _baseDocs = [];
+let _baseAberta = false;
+
 async function carregarKnowledge(){
   try{
     const r = await fetch("/api/hp/knowledge");
-    const docs = await r.json();
+    _baseDocs = await r.json();
+    const n = _baseDocs.length;
+    const btn = document.getElementById("btn-toggle-base");
+    if(btn) btn.textContent = `📂 Gerenciar documentos da base${n ? ` (${n})` : ""}`;
     const ct = document.getElementById("know-count");
-    if(ct) ct.textContent = docs.length ? `${docs.length} documento${docs.length>1?"s":""}` : "";
-    renderKnowledge(docs);
+    if(ct) ct.textContent = n ? `${n} documento${n>1?"s":""}` : "";
+    // Só re-renderiza a lista se ela estiver aberta
+    if(_baseAberta) renderKnowledge(_baseDocs);
   } catch(e){ console.warn("knowledge:", e); }
+}
+
+function toggleBaseLista(){
+  _baseAberta = !_baseAberta;
+  const wrap = document.getElementById("know-base-wrap");
+  const btn  = document.getElementById("btn-toggle-base");
+  if(wrap) wrap.style.display = _baseAberta ? "block" : "none";
+  if(btn)  btn.classList.toggle("btn", _baseAberta);   // realça quando aberto
+  if(_baseAberta) renderKnowledge(_baseDocs);
 }
 
 function renderKnowledge(docs){
