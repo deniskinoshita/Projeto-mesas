@@ -239,6 +239,26 @@ _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
 _CLIENTS_FILE         = "/tmp/brauna_clients.json"
 _ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
 _NOTIF_FILE           = "/tmp/brauna_notificacoes.json"
+_SENHAS_PESSOAIS_FILE = "/tmp/brauna_senhas_pessoais.json"
+
+# ── Senha pessoal (2ª senha, criada no 1º acesso) ─────────────────────────────
+import hashlib as _hashlib, secrets as _secrets
+
+def _hash_senha(senha: str) -> str:
+    salt = _secrets.token_hex(16)
+    h = _hashlib.pbkdf2_hmac("sha256", senha.encode("utf-8"), bytes.fromhex(salt), 100000).hex()
+    return f"{salt}${h}"
+
+def _verifica_senha(senha: str, guardado: str) -> bool:
+    try:
+        salt, h = guardado.split("$", 1)
+        calc = _hashlib.pbkdf2_hmac("sha256", senha.encode("utf-8"), bytes.fromhex(salt), 100000).hex()
+        return _secrets.compare_digest(calc, h)
+    except Exception:
+        return False
+
+def load_senhas_pessoais():  return _load(_SENHAS_PESSOAIS_FILE, {})
+def save_senhas_pessoais(d): _save(_SENHAS_PESSOAIS_FILE, d)
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -3559,19 +3579,60 @@ def index():
 
 @app.route("/api/login", methods=["POST"])
 def login():
+    """Etapa 1: valida a credencial do papel (código do assessor ou senha do papel)
+    e informa se a senha pessoal (2ª senha) já foi criada para essa identidade."""
     d     = request.get_json()
     role  = d.get("role","")
-    senha = d.get("senha","").strip().upper()
+    senha = d.get("senha","").strip()
+
+    identity, nome, codigo = None, None, None
     if role == "assessor":
-        nome = ASSESSORES.get(senha)
-        if nome:
-            return jsonify({"ok": True, "role": "assessor", "nome": nome, "codigo": senha})
-        return jsonify({"ok": False, "msg": "Código de assessor inválido"}), 401
-    if role == "admin":
-        return jsonify({"ok": True, "role": "admin"})
-    if SENHAS.get(role) == d.get("senha",""):
-        return jsonify({"ok": True, "role": role})
-    return jsonify({"ok": False, "msg": "Senha incorreta"}), 401
+        cod = senha.upper()
+        nome = ASSESSORES.get(cod)
+        if not nome:
+            return jsonify({"ok": False, "msg": "Código de assessor inválido"}), 401
+        identity, codigo = f"assessor:{cod}", cod
+    elif role in ("lider", "head", "admin"):
+        if SENHAS.get(role) != senha:
+            return jsonify({"ok": False, "msg": "Senha do perfil incorreta"}), 401
+        identity, nome = role, role.capitalize()
+    else:
+        return jsonify({"ok": False, "msg": "Perfil inválido"}), 401
+
+    senhas = load_senhas_pessoais()
+    precisa_criar = identity not in senhas
+    return jsonify({
+        "ok": True, "etapa": "senha_pessoal",
+        "role": role, "nome": nome, "codigo": codigo,
+        "identity": identity, "precisa_criar": precisa_criar,
+    })
+
+@app.route("/api/login-pessoal", methods=["POST"])
+def login_pessoal():
+    """Etapa 2: cria (1º acesso) ou valida a senha pessoal individual."""
+    d        = request.get_json() or {}
+    identity = d.get("identity","").strip()
+    senha    = d.get("senha_pessoal","")
+    criar    = bool(d.get("criar"))
+    if not identity:
+        return jsonify({"ok": False, "msg": "Sessão inválida. Recomece o login."}), 400
+
+    senhas = load_senhas_pessoais()
+    if criar:
+        if identity in senhas:
+            return jsonify({"ok": False, "msg": "Senha já existe. Faça login normalmente."}), 400
+        if len(senha) < 4:
+            return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
+        senhas[identity] = _hash_senha(senha)
+        save_senhas_pessoais(senhas)
+        return jsonify({"ok": True, "criada": True})
+    # Validação
+    guardado = senhas.get(identity)
+    if not guardado:
+        return jsonify({"ok": False, "msg": "Senha pessoal não cadastrada.", "precisa_criar": True}), 400
+    if _verifica_senha(senha, guardado):
+        return jsonify({"ok": True})
+    return jsonify({"ok": False, "msg": "Senha pessoal incorreta."}), 401
 
 
 @app.route("/api/macro", methods=["GET"])
@@ -6003,8 +6064,28 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
     <input type="password" id="senha" class="senha-input" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')entrar()">
     <button class="toggle-pw" onclick="toggleSenha()" type="button">👁</button>
   </div>
-  <button class="btn-entrar" id="btn-entrar" onclick="entrar()">Entrar</button>
+  <button class="btn-entrar" id="btn-entrar" onclick="entrar()">Continuar</button>
   <div class="erro-msg" id="erro"></div>
+</div>
+
+<!-- Caixa de senha pessoal (2ª senha) -->
+<div class="senha-box" id="pessoal-box" style="display:none">
+  <div class="senha-label">
+    <span>🔐</span>
+    <span id="pessoal-titulo" style="color:var(--role-color)">Senha pessoal</span>
+  </div>
+  <div id="pessoal-aviso" style="font-size:11px;color:#888;margin-bottom:10px;line-height:1.5"></div>
+  <div class="senha-input-wrap">
+    <input type="password" id="senha-pessoal" class="senha-input" placeholder="Sua senha pessoal" onkeydown="if(event.key==='Enter')entrarPessoal()">
+    <button class="toggle-pw" onclick="togglePessoal('senha-pessoal')" type="button">👁</button>
+  </div>
+  <div class="senha-input-wrap" id="confirma-wrap" style="display:none;margin-top:10px">
+    <input type="password" id="senha-pessoal-confirma" class="senha-input" placeholder="Repita a senha pessoal" onkeydown="if(event.key==='Enter')entrarPessoal()">
+    <button class="toggle-pw" onclick="togglePessoal('senha-pessoal-confirma')" type="button">👁</button>
+  </div>
+  <button class="btn-entrar" id="btn-pessoal" onclick="entrarPessoal()">Entrar</button>
+  <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #333;color:#888;margin-top:8px">Voltar</button>
+  <div class="erro-msg" id="erro-pessoal"></div>
 </div>
 
 <div class="rodape">Braúna Investimentos · Uso interno · Acesso restrito</div>
@@ -6043,6 +6124,9 @@ function toggleSenha(){
   inp.type = inp.type === "password" ? "text" : "password";
 }
 
+let _sessaoPendente = null;   // {role, nome, codigo, identity}
+
+// Etapa 1: valida credencial do papel
 async function entrar(){
   if(!roleAtual) return;
   const senha = document.getElementById("senha").value;
@@ -6059,14 +6143,11 @@ async function entrar(){
       body: JSON.stringify({role: roleAtual, senha})
     });
     const d = await r.json();
-    if(d.ok){
-      localStorage.setItem("brauna_role", roleAtual);
-      localStorage.setItem("brauna_role_ts", Date.now());
-      if(d.nome)  localStorage.setItem("brauna_nome",   d.nome);
-      if(d.codigo) localStorage.setItem("brauna_codigo", d.codigo);
-      window.location.href = ROLES[roleAtual].dest;
+    if(d.ok && d.etapa === "senha_pessoal"){
+      _sessaoPendente = {role: d.role, nome: d.nome, codigo: d.codigo, identity: d.identity};
+      mostrarSenhaPessoal(d.precisa_criar);
     } else {
-      document.getElementById("erro").textContent = d.msg || "Código inválido. Tente novamente.";
+      document.getElementById("erro").textContent = d.msg || "Credencial inválida. Tente novamente.";
       document.getElementById("senha").value="";
       document.getElementById("senha").focus();
     }
@@ -6074,8 +6155,82 @@ async function entrar(){
     document.getElementById("erro").textContent = "Erro de conexão.";
   } finally {
     btn.disabled = false;
-    btn.textContent = "Entrar";
+    btn.textContent = "Continuar";
   }
+}
+
+function mostrarSenhaPessoal(precisaCriar){
+  document.getElementById("senha-box").style.display = "none";
+  document.querySelector(".roles").style.opacity = ".4";
+  document.querySelector(".roles").style.pointerEvents = "none";
+  const box = document.getElementById("pessoal-box");
+  box.style.display = "block";
+  box.dataset.criar = precisaCriar ? "1" : "0";
+  document.getElementById("confirma-wrap").style.display = precisaCriar ? "block" : "none";
+  document.getElementById("pessoal-titulo").textContent = precisaCriar ? "Crie sua senha pessoal" : "Senha pessoal";
+  document.getElementById("pessoal-aviso").innerHTML = precisaCriar
+    ? "🔒 Primeiro acesso: crie uma <b>senha pessoal só sua</b>. Você vai precisar dela toda vez para entrar — ninguém com seu código consegue acessar sem ela."
+    : "Digite sua senha pessoal para acessar.";
+  document.getElementById("btn-pessoal").textContent = precisaCriar ? "Criar e entrar" : "Entrar";
+  document.getElementById("senha-pessoal").value = "";
+  document.getElementById("senha-pessoal-confirma").value = "";
+  document.getElementById("erro-pessoal").textContent = "";
+  setTimeout(()=>document.getElementById("senha-pessoal").focus(), 50);
+}
+
+// Etapa 2: cria ou valida a senha pessoal
+async function entrarPessoal(){
+  if(!_sessaoPendente) return voltarLogin();
+  const criar = document.getElementById("pessoal-box").dataset.criar === "1";
+  const senha = document.getElementById("senha-pessoal").value;
+  const erro  = document.getElementById("erro-pessoal");
+  erro.textContent = "";
+  if(!senha){ erro.textContent = "Digite a senha pessoal."; return; }
+  if(criar){
+    if(senha.length < 4){ erro.textContent = "Mínimo de 4 caracteres."; return; }
+    if(senha !== document.getElementById("senha-pessoal-confirma").value){
+      erro.textContent = "As senhas não conferem."; return;
+    }
+  }
+  const btn = document.getElementById("btn-pessoal");
+  btn.disabled = true; btn.textContent = "Verificando...";
+  try{
+    const r = await fetch("/api/login-pessoal",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({identity: _sessaoPendente.identity, senha_pessoal: senha, criar})
+    });
+    const d = await r.json();
+    if(d.ok){
+      localStorage.setItem("brauna_role", _sessaoPendente.role);
+      localStorage.setItem("brauna_role_ts", Date.now());
+      if(_sessaoPendente.nome)   localStorage.setItem("brauna_nome",   _sessaoPendente.nome);
+      if(_sessaoPendente.codigo) localStorage.setItem("brauna_codigo", _sessaoPendente.codigo);
+      window.location.href = ROLES[_sessaoPendente.role].dest;
+    } else {
+      erro.textContent = d.msg || "Falha ao validar senha pessoal.";
+      document.getElementById("senha-pessoal").focus();
+    }
+  } catch(e){
+    erro.textContent = "Erro de conexão.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = criar ? "Criar e entrar" : "Entrar";
+  }
+}
+
+function togglePessoal(id){
+  const inp = document.getElementById(id);
+  inp.type = inp.type === "password" ? "text" : "password";
+}
+
+function voltarLogin(){
+  _sessaoPendente = null;
+  document.getElementById("pessoal-box").style.display = "none";
+  document.getElementById("senha-box").style.display = "block";
+  document.querySelector(".roles").style.opacity = "1";
+  document.querySelector(".roles").style.pointerEvents = "auto";
+  document.getElementById("senha").value = "";
+  document.getElementById("senha").focus();
 }
 
 // Seleciona automaticamente se já existe role salvo
