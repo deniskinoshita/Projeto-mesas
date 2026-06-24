@@ -260,6 +260,12 @@ def _verifica_senha(senha: str, guardado: str) -> bool:
 def load_senhas_pessoais():  return _load(_SENHAS_PESSOAIS_FILE, {})
 def save_senhas_pessoais(d): _save(_SENHAS_PESSOAIS_FILE, d)
 
+def _entry_hash(entry):
+    """Compat: entrada pode ser string (formato antigo) ou dict {hash, criada_em}."""
+    if isinstance(entry, dict):
+        return entry.get("hash", "")
+    return entry or ""
+
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
     "referencia": "Levante Asset — Junho 2026",
@@ -3607,6 +3613,25 @@ def login():
         "identity": identity, "precisa_criar": precisa_criar,
     })
 
+@app.route("/api/admin/senhas-status", methods=["POST"])
+def senhas_status():
+    """Lista status da senha pessoal de cada assessor/perfil (sem expor a senha).
+    Requer a senha de admin para autorizar."""
+    d = request.get_json() or {}
+    if SENHAS.get("admin") != d.get("admin_senha",""):
+        return jsonify({"ok": False, "msg": "Senha de admin incorreta"}), 401
+    senhas = load_senhas_pessoais()
+    def _info(entry):
+        return {"tem_senha": bool(entry),
+                "criada_em": entry.get("criada_em","") if isinstance(entry, dict) else ""}
+    assessores = []
+    for cod, nome in ASSESSORES.items():
+        info = _info(senhas.get(f"assessor:{cod}"))
+        assessores.append({"codigo": cod, "nome": nome, **info})
+    assessores.sort(key=lambda a: a["nome"])
+    papeis = [{"role": r, "label": r.capitalize(), **_info(senhas.get(r))} for r in ("lider","head","admin")]
+    return jsonify({"ok": True, "assessores": assessores, "papeis": papeis})
+
 @app.route("/api/admin/reset-senha-pessoal", methods=["POST"])
 def reset_senha_pessoal():
     """Admin reseta a senha pessoal de alguém (ex: esqueceu). A pessoa recria no próximo acesso.
@@ -3641,14 +3666,14 @@ def login_pessoal():
             return jsonify({"ok": False, "msg": "Senha já existe. Faça login normalmente."}), 400
         if len(senha) < 4:
             return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
-        senhas[identity] = _hash_senha(senha)
+        senhas[identity] = {"hash": _hash_senha(senha), "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M")}
         save_senhas_pessoais(senhas)
         return jsonify({"ok": True, "criada": True})
     # Validação
     guardado = senhas.get(identity)
     if not guardado:
         return jsonify({"ok": False, "msg": "Senha pessoal não cadastrada.", "precisa_criar": True}), 400
-    if _verifica_senha(senha, guardado):
+    if _verifica_senha(senha, _entry_hash(guardado)):
         return jsonify({"ok": True})
     return jsonify({"ok": False, "msg": "Senha pessoal incorreta."}), 401
 
@@ -7429,6 +7454,29 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
       </table>
     </div>
   </div>
+
+  <!-- ═══ Gestão de Acessos (senhas pessoais) ═══ -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px">
+      <div class="card-title" style="color:#C9A96E;margin-bottom:0">🔐 Gestão de Acessos — Senhas Pessoais</div>
+      <button class="btn-ghost" onclick="carregarSenhas()">↻ Carregar</button>
+    </div>
+    <p style="font-size:11px;color:#3A6A48;line-height:1.5;margin-bottom:12px">
+      Por segurança, a senha pessoal de cada um é guardada criptografada e <b>não pode ser vista por ninguém</b> — nem pelo admin.
+      Aqui você acompanha quem já criou a senha e pode <b>resetar</b> caso alguém esqueça (a pessoa cria uma nova no próximo acesso).
+    </p>
+    <div id="senhas-auth" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <input type="password" id="senhas-admin-pw" placeholder="Confirme a senha de admin" style="background:#060F0B;border:1px solid #2A2A18;border-radius:6px;padding:8px 10px;color:#F0F0F0;font-size:12px;outline:none;max-width:240px" onkeydown="if(event.key==='Enter')carregarSenhas()">
+      <button class="btn btn-sm" onclick="carregarSenhas()">Ver acessos</button>
+      <span id="senhas-st" style="font-size:11px"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="act-table" id="tabela-senhas" style="display:none">
+        <thead><tr><th>Assessor</th><th>Código</th><th>Status</th><th>Criada em</th><th></th></tr></thead>
+        <tbody id="senhas-body"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════ TAB: LÍDERES ═══════ -->
@@ -8204,6 +8252,61 @@ async function carregarDashboard(){
     renderLideres(_dashData.lideres||[]);
     renderHead(_dashData.head||{});
   } catch(e){ console.warn("Dashboard error", e); }
+}
+
+// ── Gestão de Acessos (senhas pessoais) ───────────────────────────────────────
+let _senhasAdminPw = "";
+async function carregarSenhas(){
+  const pw = document.getElementById("senhas-admin-pw").value || _senhasAdminPw;
+  const st = document.getElementById("senhas-st");
+  if(!pw){ st.innerHTML = '<span style="color:#FF6B6B">Digite a senha de admin.</span>'; return; }
+  st.innerHTML = '<span style="color:#D4B483">Carregando...</span>';
+  try{
+    const r = await fetch("/api/admin/senhas-status",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({admin_senha:pw})});
+    const d = await r.json();
+    if(!d.ok){ st.innerHTML = `<span style="color:#FF6B6B">${d.msg||"Falha"}</span>`; return; }
+    _senhasAdminPw = pw;
+    st.textContent = "";
+    renderSenhas(d.assessores||[], d.papeis||[]);
+  } catch(e){ st.innerHTML = '<span style="color:#FF6B6B">Erro de conexão.</span>'; }
+}
+
+function renderSenhas(assessores, papeis){
+  const tb = document.getElementById("senhas-body");
+  const chip = (tem)=> tem
+    ? '<span style="background:#0A2A18;color:#5DCAA5;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✓ Criada</span>'
+    : '<span style="background:#2A1A0A;color:#D4B483;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">⏳ Pendente</span>';
+  const linhas = [];
+  assessores.forEach(a=>{
+    linhas.push(`<tr>
+      <td style="text-align:left">${a.nome}</td>
+      <td style="font-family:monospace;color:#C9A96E">${a.codigo}</td>
+      <td>${chip(a.tem_senha)}</td>
+      <td style="color:#888;font-size:11px">${a.criada_em||"—"}</td>
+      <td>${a.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#5A2A2A;color:#FF8B8B" onclick="resetarSenha('${a.codigo}','${a.nome.replace(/'/g,"")}')">Resetar</button>` : ""}</td>
+    </tr>`);
+  });
+  papeis.forEach(p=>{
+    linhas.push(`<tr style="opacity:.85">
+      <td style="text-align:left">${p.label} <span style="font-size:10px;color:#3A6A48">(perfil)</span></td>
+      <td style="font-family:monospace;color:#8B9FE8">${p.role}</td>
+      <td>${chip(p.tem_senha)}</td>
+      <td style="color:#888;font-size:11px">${p.criada_em||"—"}</td>
+      <td>${p.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#5A2A2A;color:#FF8B8B" onclick="resetarSenha('${p.role}','${p.label}')">Resetar</button>` : ""}</td>
+    </tr>`);
+  });
+  tb.innerHTML = linhas.join("");
+  document.getElementById("tabela-senhas").style.display = "table";
+}
+
+async function resetarSenha(identity, nome){
+  if(!confirm(`Resetar a senha pessoal de ${nome}?\n\nEle(a) vai criar uma nova senha no próximo acesso. Você não verá a senha — só zera para permitir recriação.`)) return;
+  try{
+    const r = await fetch("/api/admin/reset-senha-pessoal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({admin_senha:_senhasAdminPw, identity})});
+    const d = await r.json();
+    if(d.ok){ carregarSenhas(); }
+    else alert(d.msg||"Falha ao resetar.");
+  } catch(e){ alert("Erro de conexão."); }
 }
 
 // ─── Assessores ───────────────────────────────────────────────────────────────
