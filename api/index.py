@@ -3426,13 +3426,27 @@ def xp_identificar():
         })
     conta = xp.get("conta", "").strip()
 
-    # Busca ficha salva para este código de conta
+    # Busca ficha salva: 1) por conta, 2) por qualquer ficha que tenha esta conta, 3) por assessor|nome
     fichas = load_fichas()
+    assessor_xp = xp.get("assessor", "").strip()
     ficha = fichas.get(f"conta:{conta}") or fichas.get(conta) or {}
+    # Fallback: buscar ficha do assessor que tenha esta conta registrada
+    if not ficha and assessor_xp and conta:
+        for v in fichas.values():
+            if isinstance(v, dict) and v.get("conta") == conta:
+                ficha = v
+                break
+    # Se encontrou por nome mas sem chave por conta, indexar para próxima vez
+    if ficha and conta and not fichas.get(f"conta:{conta}"):
+        ficha["conta"] = conta
+        fichas[f"conta:{conta}"] = ficha
+        save_fichas(fichas)
 
-    # Busca histórico de carteiras salvas
+    # Busca histórico de carteiras salvas (por conta)
     hist = load_hist()
-    historico_conta = hist.get(conta, [])
+    historico_conta = hist.get(conta) or []
+    if not isinstance(historico_conta, list):
+        historico_conta = historico_conta.get("entradas", [])
     ultima_carteira = historico_conta[-1] if historico_conta else None
 
     # Calcula comparativo vs. última carteira salva
@@ -4721,15 +4735,22 @@ def analyze():
 
     # Salva ficha do cliente (dados do formulário para pré-carregar na próxima vez)
     fichas = load_fichas()
-    fkey = f"{assessor}|{nome}".lower().strip()
-    ficha_salva = fichas.get(fkey, {})
-    fichas[fkey] = {
+    conta_xp  = xp_parsed.get("conta", "").strip()
+    fkey      = f"{assessor}|{nome}".lower().strip()
+    fkey_conta = f"conta:{conta_xp}" if conta_xp else None
+
+    ficha_nova = {
+        "conta": conta_xp,
         "nome": nome, "assessor": assessor, "perfil": perfil,
         "objetivo": objetivo,
         "checklist": checklist_input,
         "cross_ativos": list(cross_tem),
         "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
+    # Salva por ambas as chaves: nome+assessor E conta (se disponível)
+    fichas[fkey] = ficha_nova
+    if fkey_conta:
+        fichas[fkey_conta] = ficha_nova
     save_fichas(fichas)
 
     # Salva histórico de análises (até 4 por cliente)
