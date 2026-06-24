@@ -9011,6 +9011,8 @@ textarea{resize:vertical}
         <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
         <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
       </div>
+      <input type="text" id="know-busca" placeholder="🔍 Buscar documento pelo nome..." oninput="filtrarBase()"
+        style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:9px 12px;color:#F0F0F0;font-size:13px;outline:none;margin-bottom:12px">
       <div id="know-lista"><div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda.</div></div>
     </div>
   </div>
@@ -9618,14 +9620,38 @@ function toggleBaseLista(){
   const btn  = document.getElementById("btn-toggle-base");
   if(wrap) wrap.style.display = _baseAberta ? "block" : "none";
   if(btn)  btn.classList.toggle("btn", _baseAberta);   // realça quando aberto
-  if(_baseAberta) renderKnowledge(_baseDocs);
+  if(_baseAberta){
+    const busca = document.getElementById("know-busca");
+    if(busca) busca.value = "";
+    renderKnowledge(_baseDocs);
+    if(busca) setTimeout(()=>busca.focus(), 50);
+  }
+}
+
+function filtrarBase(){
+  const q = (document.getElementById("know-busca")?.value || "").toLowerCase().trim();
+  const ct = document.getElementById("know-count");
+  if(!q){
+    renderKnowledge(_baseDocs);
+    if(ct) ct.textContent = `${_baseDocs.length} documento${_baseDocs.length>1?"s":""}`;
+    return;
+  }
+  const filtrados = _baseDocs.filter(d =>
+    (d.nome||"").toLowerCase().includes(q) ||
+    (d.fonte||"").toLowerCase().includes(q) ||
+    (d.tickers||[]).some(t => t.toLowerCase().includes(q))
+  );
+  renderKnowledge(filtrados);
+  if(ct) ct.textContent = `${filtrados.length} de ${_baseDocs.length}`;
 }
 
 function renderKnowledge(docs){
   const el = document.getElementById("know-lista");
   if(!el) return;
   if(!docs.length){
-    el.innerHTML = `<div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda. Suba o primeiro PDF acima.</div>`;
+    const q = (document.getElementById("know-busca")?.value || "").trim();
+    const msg = q ? `Nenhum documento encontrado para "${q}".` : "Nenhum documento ainda. Suba o primeiro PDF acima.";
+    el.innerHTML = `<div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">${msg}</div>`;
     return;
   }
   el.innerHTML = docs.map(d=>{
