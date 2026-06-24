@@ -4425,6 +4425,33 @@ def hp_knowledge_texto():
         return jsonify({"error": "id obrigatório"}), 400
     return jsonify({"id": doc_id, "texto": load_know_text(doc_id)})
 
+@app.route("/api/hp/knowledge/upload-texto", methods=["POST"])
+def hp_knowledge_upload_texto():
+    """Adiciona um documento a partir do texto já extraído (JSON leve).
+    Útil para PDFs grandes que o edge rejeita por tamanho."""
+    body  = request.get_json() or {}
+    texto = (body.get("texto") or "").strip()
+    nome  = body.get("nome", "").strip()
+    if not texto or len(texto) < 50:
+        return jsonify({"error": "texto vazio ou muito curto"}), 400
+    doc_id = str(uuid.uuid4())[:8]
+    save_know_text(doc_id, texto)
+    meta = {
+        "id":        doc_id,
+        "nome":      nome or "Documento",
+        "tipo":      body.get("tipo", "research"),
+        "classes":   [c.strip() for c in (body.get("classes","") or "").split(",") if c.strip()],
+        "fonte":     body.get("fonte", ""),
+        "chars":     len(texto),
+        "preview":   texto[:300],
+        "tickers":   _extrair_tickers(texto),
+        "data":      datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "ts":        time.time(),
+        "publicado": False,
+    }
+    add_know_meta(meta)
+    return jsonify({"ok": True, "id": doc_id, "chars": len(texto)})
+
 @app.route("/api/hp/knowledge/reset", methods=["POST"])
 def hp_knowledge_reset():
     """Limpa TODA a base de conhecimento (índice antigo + metas + textos + órfãos).
