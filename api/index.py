@@ -238,6 +238,7 @@ _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
 _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
 _CLIENTS_FILE         = "/tmp/brauna_clients.json"
 _ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
+_NOTIF_FILE           = "/tmp/brauna_notificacoes.json"
 
 # ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
@@ -1193,9 +1194,26 @@ select option{background:#1A1A1A}
     <h1>BRAÚNA INVESTIMENTOS</h1>
     <p>Análise de Alocação por Indexador · Modelo Levante Asset</p>
   </div>
-  <nav style="display:flex;gap:8px" id="nav-assessor">
+  <nav style="display:flex;gap:8px;align-items:center" id="nav-assessor">
+    <!-- Sino de notificações -->
+    <div style="position:relative;cursor:pointer" id="notif-btn" onclick="toggleNotifPanel()" title="Alertas do Head de Produtos">
+      <span style="font-size:20px">🔔</span>
+      <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#E53935;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center"></span>
+    </div>
     <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#888'">Sair</button>
   </nav>
+
+  <!-- Painel de notificações flutuante -->
+  <div id="notif-panel" style="display:none;position:fixed;top:60px;right:16px;width:380px;max-height:70vh;overflow-y:auto;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;z-index:9999;box-shadow:0 8px 32px #000a">
+    <div style="padding:12px 16px;border-bottom:1px solid #2A2A2A;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#C9A96E;font-weight:700;font-size:14px">🔔 Alertas do Head de Produtos</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="marcarTodasLidas()" style="font-size:11px;color:#5DCAA5;background:none;border:none;cursor:pointer;padding:0">Marcar todas lidas</button>
+        <button onclick="toggleNotifPanel()" style="color:#666;background:none;border:none;cursor:pointer;font-size:18px;line-height:1">×</button>
+      </div>
+    </div>
+    <div id="notif-lista" style="padding:8px 0"></div>
+  </div>
   <script>
   (function(){
     const role = localStorage.getItem("brauna_role");
@@ -1555,6 +1573,95 @@ function sair(){
   fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({role:"assessor",nome,acao:"acesso",detalhe:"Abriu a página do Assessor"})});
 })();
+
+// ── Notificações do Head de Produtos ─────────────────────────────────────────
+let _notificacoes = [];
+let _notifPanelAberto = false;
+
+async function carregarNotificacoes(){
+  const nome = localStorage.getItem("brauna_nome") || "";
+  if(!nome) return;
+  try{
+    const data = await fetch("/api/minhas-notificacoes?assessor="+encodeURIComponent(nome)).then(r=>r.json());
+    _notificacoes = Array.isArray(data) ? data : [];
+    const naoLidas = _notificacoes.filter(n=>!n.lido).length;
+    const badge = document.getElementById("notif-badge");
+    if(badge){
+      badge.textContent = naoLidas > 9 ? "9+" : naoLidas;
+      badge.style.display = naoLidas > 0 ? "block" : "none";
+    }
+    renderNotifLista();
+  }catch(e){}
+}
+
+function renderNotifLista(){
+  const lista = document.getElementById("notif-lista");
+  if(!lista) return;
+  if(!_notificacoes.length){
+    lista.innerHTML = '<div style="padding:24px;text-align:center;color:#555;font-size:13px">Nenhum alerta no momento</div>';
+    return;
+  }
+  lista.innerHTML = _notificacoes.map(function(n){
+    const cor = n.tipo==="call" ? "#5DCAA5" : n.mensagem.includes("URGENTE") ? "#E53935" : "#F59E0B";
+    const icon = n.tipo==="call" ? "📈" : "⚠️";
+    const fundo = n.lido ? "#111" : "#1E1E1E";
+    const clientes = (n.clientes_afetados||[]).map(c=>`<span style="background:#1A3A2A;color:#5DCAA5;border-radius:4px;padding:1px 7px;font-size:11px;margin-right:4px">${c}</span>`).join("");
+    return `<div style="padding:12px 16px;border-bottom:1px solid #222;background:${fundo};cursor:pointer" onclick="marcarLida('${n.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1">
+          <div style="font-size:13px;color:${cor};font-weight:${n.lido?'400':'700'};margin-bottom:4px">${icon} ${n.mensagem}</div>
+          ${clientes ? `<div style="margin-top:5px">Clientes afetados: ${clientes}</div>` : ""}
+          <div style="font-size:11px;color:#555;margin-top:4px">${n.data}</div>
+        </div>
+        ${!n.lido ? `<div style="width:8px;height:8px;border-radius:50%;background:#E53935;flex-shrink:0;margin-top:4px"></div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleNotifPanel(){
+  _notifPanelAberto = !_notifPanelAberto;
+  const panel = document.getElementById("notif-panel");
+  if(panel) panel.style.display = _notifPanelAberto ? "block" : "none";
+}
+
+async function marcarLida(id){
+  const nome = localStorage.getItem("brauna_nome") || "";
+  await fetch("/api/minhas-notificacoes",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({assessor:nome, id})});
+  const n = _notificacoes.find(x=>x.id===id);
+  if(n) n.lido = true;
+  const naoLidas = _notificacoes.filter(x=>!x.lido).length;
+  const badge = document.getElementById("notif-badge");
+  if(badge){ badge.textContent = naoLidas>9?"9+":naoLidas; badge.style.display=naoLidas>0?"block":"none"; }
+  renderNotifLista();
+}
+
+async function marcarTodasLidas(){
+  const nome = localStorage.getItem("brauna_nome") || "";
+  await fetch("/api/minhas-notificacoes",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({assessor:nome, all:true})});
+  _notificacoes.forEach(n=>n.lido=true);
+  const badge = document.getElementById("notif-badge");
+  if(badge) badge.style.display="none";
+  renderNotifLista();
+}
+
+// Fechar painel ao clicar fora
+document.addEventListener("click", function(e){
+  if(_notifPanelAberto){
+    const panel = document.getElementById("notif-panel");
+    const btn   = document.getElementById("notif-btn");
+    if(panel && btn && !panel.contains(e.target) && !btn.contains(e.target)){
+      _notifPanelAberto = false;
+      panel.style.display = "none";
+    }
+  }
+});
+
+// Carrega notificações ao abrir a página e refresca a cada 5 min
+carregarNotificacoes();
+setInterval(carregarNotificacoes, 5*60*1000);
 
 const MODELOS={conservadora:{pos_fixado:70,inflacao:16,pre_fixado:7,acoes:0,fiis:0,multimercado:3,internacional:4,alternativos:0,criptomoedas:0},moderada:{pos_fixado:44,inflacao:23,pre_fixado:10,acoes:5,fiis:1.5,multimercado:6,internacional:9,alternativos:1,criptomoedas:0.5},arrojada:{pos_fixado:28,inflacao:28,pre_fixado:12,acoes:8,fiis:2.5,multimercado:9.5,internacional:10.25,alternativos:1,criptomoedas:0.75},agressiva:{pos_fixado:13,inflacao:31,pre_fixado:13,acoes:14,fiis:3.5,multimercado:10.5,internacional:13,alternativos:1,criptomoedas:1}};
 const LABELS={pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
@@ -3855,8 +3962,17 @@ def hp_alertas():
         "assessor_destino": data.get("assessor_destino", ""),  # "" = global, "lucas" = só Lucas
     }
     alertas.insert(0, novo)
-    alertas = alertas[:100]  # manter últimos 100
+    alertas = alertas[:100]
     _save(_HP_ALERTS_FILE, alertas)
+    # Dispara notificações individuais se o produto/ticker for identificável
+    produto = novo.get("produto","").strip()
+    if produto:
+        _disparar_notificacoes_ativo(
+            produto,
+            "alerta",
+            f"Head de Produtos [{novo['tipo'].upper()}] {produto}: {novo['mensagem'][:120]}",
+            novo["id"],
+        )
     return jsonify({"ok": True, "alerta": novo})
 
 @app.route("/api/hp/calls", methods=["GET","POST"])
@@ -3894,7 +4010,107 @@ def hp_calls():
     calls.insert(0, novo)
     calls = calls[:200]
     _save(_HP_CALLS_FILE, calls)
-    return jsonify({"ok": True, "call": novo})
+    # Dispara notificações para assessores com clientes que possuem o ativo
+    afetados = _disparar_notificacoes_ativo(
+        novo["ticker"],
+        "call",
+        f"Head de Produtos: {novo['direcao'].upper()} {novo['ticker']} — {(novo['tese'] or '')[:120] or 'Ver detalhes na área de Produtos'}",
+        novo["id"],
+    )
+    return jsonify({"ok": True, "call": novo, "assessores_notificados": list(afetados.keys())})
+
+def _disparar_notificacoes_ativo(ticker_ou_nome: str, tipo: str, mensagem: str, item_id: str):
+    """
+    Varre todas as fichas e cria notificações para assessores
+    cujos clientes possuem o ativo informado.
+    ticker_ou_nome: ticker (ex: 'BBAS3') ou nome parcial de RF (ex: 'Tesouro IPCA')
+    tipo: 'call' | 'alerta'
+    """
+    fichas = load_fichas()
+    notif  = _load(_NOTIF_FILE, {})
+    busca  = ticker_ou_nome.upper().strip()
+
+    por_assessor = {}  # assessor → [nome_cliente, ...]
+    vistos = set()     # evita duplicar por ter duas chaves para o mesmo cliente
+
+    for ficha in fichas.values():
+        if not isinstance(ficha, dict):
+            continue
+        cliente_id = ficha.get("conta") or (ficha.get("assessor","")+"_"+ficha.get("nome",""))
+        if cliente_id in vistos:
+            continue
+        assessor    = ficha.get("assessor","").strip()
+        nome_cli    = ficha.get("nome","").strip()
+        if not assessor or not nome_cli:
+            continue
+
+        # Verifica ações e FIIs (match por ticker exato)
+        encontrou = any(
+            a.get("ticker","").upper() == busca
+            for a in (ficha.get("acoes",[]) + ficha.get("fiis",[]))
+        )
+        # Verifica RF (match parcial no nome)
+        if not encontrou:
+            encontrou = any(
+                busca in a.get("nome","").upper()
+                for a in ficha.get("rf_ativos",[])
+            )
+
+        if encontrou:
+            vistos.add(cliente_id)
+            if assessor not in por_assessor:
+                por_assessor[assessor] = []
+            por_assessor[assessor].append(nome_cli)
+
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+    for assessor, clientes in por_assessor.items():
+        if assessor not in notif:
+            notif[assessor] = []
+        notif[assessor].insert(0, {
+            "id":               item_id,
+            "tipo":             tipo,           # 'call' | 'alerta'
+            "ticker":           ticker_ou_nome,
+            "mensagem":         mensagem,
+            "clientes_afetados": clientes,
+            "data":             agora,
+            "lido":             False,
+        })
+        notif[assessor] = notif[assessor][:50]  # últimas 50 por assessor
+
+    _save(_NOTIF_FILE, notif)
+    return por_assessor   # retorna para log/resposta
+
+@app.route("/api/minhas-notificacoes", methods=["GET","POST"])
+def minhas_notificacoes():
+    assessor = (request.args.get("assessor","") or "").strip().lower()
+    notif    = _load(_NOTIF_FILE, {})
+
+    if request.method == "POST":
+        # Marcar como lido: {"assessor":"...", "id":"...", "all":true}
+        d = request.get_json() or {}
+        ass = d.get("assessor","").strip()
+        if ass in notif:
+            if d.get("all"):
+                for n in notif[ass]:
+                    n["lido"] = True
+            else:
+                nid = d.get("id","")
+                for n in notif[ass]:
+                    if n["id"] == nid:
+                        n["lido"] = True
+            _save(_NOTIF_FILE, notif)
+        return jsonify({"ok": True})
+
+    # GET — retorna notificações do assessor (match case-insensitive)
+    for key in notif:
+        if key.lower() == assessor:
+            return jsonify(notif[key])
+    # Tenta match parcial (primeiro nome)
+    primeiro = assessor.split()[0] if assessor else ""
+    for key in notif:
+        if primeiro and key.lower().startswith(primeiro):
+            return jsonify(notif[key])
+    return jsonify([])
 
 @app.route("/api/hp/gestoras2", methods=["GET","POST"])
 def hp_gestoras2():
@@ -4745,6 +4961,10 @@ def analyze():
         "objetivo": objetivo,
         "checklist": checklist_input,
         "cross_ativos": list(cross_tem),
+        # Ativos da carteira (para matching de calls/alertas do Head)
+        "acoes":    [{"ticker": a.get("ticker",""), "nome": a.get("nome",""), "pct": a.get("pct", a.get("perc_carteira",0))} for a in xp_parsed.get("acoes",[])[:30]],
+        "fiis":     [{"ticker": a.get("ticker",""), "nome": a.get("nome",""), "pct": a.get("pct", a.get("perc_carteira",0))} for a in xp_parsed.get("fiis",[])[:20]],
+        "rf_ativos":[{"nome": a.get("nome",""), "classe": a.get("classe",""), "saldo": a.get("saldo",0)} for a in xp_parsed.get("rf_ativos",[])[:40]],
         "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
     }
     # Salva por ambas as chaves: nome+assessor E conta (se disponível)
