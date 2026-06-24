@@ -4376,7 +4376,7 @@ def hp_gestores():
 
 @app.route("/api/hp/knowledge", methods=["GET"])
 def hp_knowledge_list():
-    return jsonify(_load(_HP_KNOW_FILE, []))
+    return jsonify(load_know_index())
 
 @app.route("/api/hp/knowledge/upload", methods=["POST"])
 def hp_knowledge_upload():
