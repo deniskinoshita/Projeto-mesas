@@ -862,7 +862,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     elems.append(Paragraph("Análise de Alocação por Indexador — Modelo Levante Asset",s_sub))
     elems.append(HRFlowable(width="100%",thickness=1,color=DOURADO,spaceAfter=8))
 
-    perfil_pt={"conservadora":"Conservadora","moderada":"Moderada","arrojada":"Arrojada","agressiva":"Agressiva"}
+    perfil_pt={"super_conservadora":"Super Conservadora","conservadora":"Conservadora","moderada":"Moderada","arrojada":"Arrojada","agressiva":"Agressiva"}
     pat_fmt=f"R$ {patrimonio:,.2f}".replace(",","X").replace(".",",").replace("X",".")
     selic_txt=f"{macro['selic_meta']:.2f}%" if macro.get('selic_meta') else "—"
     ipca_txt=f"{macro['ipca_12m']:.2f}%" if macro.get('ipca_12m') else "—"
@@ -1255,7 +1255,8 @@ select option{background:#1A1A1A}
   </div>
   <div class="grid-3" style="margin-bottom:14px">
     <div><label>Perfil</label>
-      <select id="perfil" onchange="var _nm={conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();">
+      <select id="perfil" onchange="var _nm={super_conservadora:'SUPER CONSERVADORA',conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();">
+        <option value="super_conservadora">Super Conservadora</option>
         <option value="conservadora">Conservadora</option>
         <option value="moderada">Moderada</option>
         <option value="arrojada">Arrojada</option>
@@ -5404,8 +5405,8 @@ def gerar_ppt(dados):
     objetivo  = dados.get("objetivo", "")
     pat_caindo = dados.get("patrimonio_caindo", False)
 
-    PLABEL = {"conservadora": "Conservadora", "moderada": "Moderada",
-              "arrojada": "Arrojada", "agressiva": "Agressiva"}
+    PLABEL = {"super_conservadora": "Super Conservadora", "conservadora": "Conservadora",
+              "moderada": "Moderada", "arrojada": "Arrojada", "agressiva": "Agressiva"}
     fmt_brl = lambda v: f"R$ {int(v):,.0f}".replace(",", ".") if v else "—"
     data_hoje = datetime.now().strftime("%d/%m/%Y")
     mes_ano   = datetime.now().strftime("%B de %Y").capitalize()
@@ -6280,6 +6281,7 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   <label>Perfil</label>
   <select id="filtro-perfil" onchange="aplicarFiltros()">
     <option value="">Todos</option>
+    <option value="super_conservadora">Super Conservadora</option>
     <option value="conservadora">Conservadora</option>
     <option value="moderada">Moderada</option>
     <option value="arrojada">Arrojada</option>
