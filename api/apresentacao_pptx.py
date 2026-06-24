@@ -511,7 +511,11 @@ def s_patrimonio(prs, d, num=2):
     r_12m  = d.get("rentabilidade_12m", "—")
     r_24m  = d.get("rentabilidade_24m", "—")
     g_mes  = d.get("ganho_mes", 0)
-    pct_cdi = d.get("pct_cdi", {})
+    _pct_cdi_raw = d.get("pct_cdi", {})
+    if isinstance(_pct_cdi_raw, dict):
+        pct_cdi = _pct_cdi_raw
+    else:
+        pct_cdi = {"mes": "—", "12m": _pct_cdi_raw, "24m": "—"}
     cdi_mes = pct_cdi.get("mes", pct_cdi.get("pct_cdi_mes", "—"))
     cdi_12m = pct_cdi.get("12m", pct_cdi.get("pct_cdi_12m", "—"))
     cdi_24m = pct_cdi.get("24m", pct_cdi.get("pct_cdi_24m", "—"))
