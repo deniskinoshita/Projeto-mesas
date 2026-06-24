@@ -4452,6 +4452,34 @@ def hp_knowledge_upload_texto():
     add_know_meta(meta)
     return jsonify({"ok": True, "id": doc_id, "chars": len(texto)})
 
+@app.route("/api/hp/knowledge/debug", methods=["GET"])
+def hp_knowledge_debug():
+    """Diagnóstico do estado bruto do Redis para a base de conhecimento."""
+    kv = _kv_client()
+    out = {"kv_conectado": bool(kv)}
+    if kv:
+        try:
+            ids = kv.smembers(_KNOW_IDS_KEY) or []
+            out["smembers_count"] = len(ids)
+            out["smembers_sample"] = list(ids)[:5]
+            # conta chaves por scan
+            for label, padrao in [("meta_keys","brauna:hp_know_meta:*"), ("doc_keys","brauna:hp_know_doc:*")]:
+                cursor, total = 0, 0
+                for _ in range(100):  # teto de segurança
+                    res = kv.scan(cursor, match=padrao, count=500)
+                    cursor = res[0]; chaves = res[1]
+                    total += len(chaves)
+                    if str(cursor) == "0": break
+                out[label] = total
+            # testa mget de uma amostra
+            if ids:
+                sample_keys = [_know_meta_key(i) for i in list(ids)[:3]]
+                vals = kv.mget(*sample_keys)
+                out["mget_sample_nonempty"] = sum(1 for v in vals if v)
+        except Exception as e:
+            out["erro"] = str(e)
+    return jsonify(out)
+
 @app.route("/api/hp/knowledge/reset", methods=["POST"])
 def hp_knowledge_reset():
     """Limpa TODA a base de conhecimento (índice antigo + metas + textos + órfãos).
