@@ -1,4 +1,4 @@
-import io, re, json, os, uuid
+import io, re, json, os, uuid, time
 from datetime import datetime
 from flask import Flask, request, jsonify, send_file, render_template_string
 
@@ -331,16 +331,84 @@ def _know_doc_key(doc_id: str) -> str:
 def _know_doc_path(doc_id: str) -> str:
     return f"/tmp/brauna_hp_know_doc_{doc_id}.json"
 
+_KNOW_IDS_KEY = "brauna:hp_know_ids"   # SET com os ids dos documentos
+
+def _know_meta_key(doc_id: str) -> str:
+    return f"brauna:hp_know_meta:{doc_id}"
+
 def _extrair_tickers(texto: str):
     """Extrai tickers B3 (ex: PETR4, BBAS3, KNRI11) para busca rápida sem ler o texto todo."""
     achados = set(_re_kb.findall(r"\b[A-Z]{4}\d{1,2}\b", (texto or "").upper()))
     return sorted(achados)
 
 def load_know_index():
-    """Lista de metadados dos documentos (sem o texto completo)."""
+    """Metadados de todos os docs. Usa SET de ids + chave de meta por doc (atômico,
+    sem corrida de leitura-modificação-gravação). Cai p/ /tmp em dev local."""
+    kv = _kv_client()
+    if kv:
+        try:
+            ids = kv.smembers(_KNOW_IDS_KEY) or []
+            if not ids:
+                return []
+            keys = [_know_meta_key(i) for i in ids]
+            vals = kv.mget(*keys)
+            metas = []
+            for v in vals:
+                if not v:
+                    continue
+                m = json.loads(v) if isinstance(v, str) else v
+                if isinstance(m, dict):
+                    metas.append(m)
+            metas.sort(key=lambda m: m.get("ts", 0), reverse=True)
+            return metas
+        except Exception:
+            pass
     return _load(_HP_KNOW_FILE, [])
 
-def save_know_index(idx):
+def add_know_meta(meta: dict):
+    """Adiciona um documento ao índice de forma atômica (SET próprio + SADD)."""
+    kv = _kv_client()
+    if kv:
+        try:
+            kv.set(_know_meta_key(meta["id"]), json.dumps(meta, ensure_ascii=False))
+            kv.sadd(_KNOW_IDS_KEY, meta["id"])
+            return
+        except Exception:
+            pass
+    idx = _load(_HP_KNOW_FILE, [])
+    idx.insert(0, meta)
+    _save(_HP_KNOW_FILE, idx)
+
+def update_know_meta(doc_id: str, **changes):
+    """Atualiza campos do meta de um doc (ex: marcar publicado)."""
+    kv = _kv_client()
+    if kv:
+        try:
+            v = kv.get(_know_meta_key(doc_id))
+            if v is not None:
+                m = json.loads(v) if isinstance(v, str) else v
+                m.update(changes)
+                kv.set(_know_meta_key(doc_id), json.dumps(m, ensure_ascii=False))
+                return True
+        except Exception:
+            pass
+    idx = _load(_HP_KNOW_FILE, [])
+    for m in idx:
+        if m.get("id") == doc_id:
+            m.update(changes)
+    _save(_HP_KNOW_FILE, idx)
+    return True
+
+def delete_know_meta(doc_id: str):
+    kv = _kv_client()
+    if kv:
+        try:
+            kv.srem(_KNOW_IDS_KEY, doc_id)
+            kv.delete(_know_meta_key(doc_id))
+            return
+        except Exception:
+            pass
+    idx = [m for m in _load(_HP_KNOW_FILE, []) if m.get("id") != doc_id]
     _save(_HP_KNOW_FILE, idx)
 
 def load_know_text(doc_id: str) -> str:
@@ -4336,20 +4404,17 @@ def hp_knowledge_upload():
         "preview":   texto[:300],
         "tickers":   _extrair_tickers(texto),
         "data":      datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "ts":        time.time(),
         "publicado": False,
     }
-    idx = load_know_index()
-    idx.insert(0, meta)
-    save_know_index(idx)
+    add_know_meta(meta)   # atômico — sem corrida de índice
     return jsonify({"ok": True, "id": doc_id, "chars": len(texto), "texto": texto[:300], "doc": meta})
 
 @app.route("/api/hp/knowledge/delete", methods=["POST"])
 def hp_knowledge_delete():
     id_del = request.get_json().get("id")
-    idx = load_know_index()
-    idx = [d for d in idx if d.get("id") != id_del]
-    save_know_index(idx)
-    delete_know_text(id_del)   # remove também o registro do texto completo
+    delete_know_meta(id_del)   # remove do índice (atômico)
+    delete_know_text(id_del)   # remove o registro do texto completo
     return jsonify({"ok": True})
 
 @app.route("/api/hp/knowledge/texto", methods=["GET"])
@@ -4360,23 +4425,30 @@ def hp_knowledge_texto():
         return jsonify({"error": "id obrigatório"}), 400
     return jsonify({"id": doc_id, "texto": load_know_text(doc_id)})
 
-@app.route("/api/hp/knowledge/migrate", methods=["POST"])
-def hp_knowledge_migrate():
-    """Migra docs do formato antigo (texto embutido no índice) para registros próprios.
-    Idempotente: pode rodar várias vezes sem duplicar."""
-    idx = load_know_index()
-    migrados = 0
-    for d in idx:
-        if d.get("texto"):
-            save_know_text(d["id"], d["texto"])
-            if not d.get("preview"):
-                d["preview"] = d["texto"][:300]
-            if not d.get("tickers"):
-                d["tickers"] = _extrair_tickers(d["texto"])
-            del d["texto"]          # remove texto do índice (fica só no registro próprio)
-            migrados += 1
-    save_know_index(idx)
-    return jsonify({"ok": True, "migrados": migrados, "total_docs": len(idx)})
+@app.route("/api/hp/knowledge/reset", methods=["POST"])
+def hp_knowledge_reset():
+    """Limpa TODA a base de conhecimento (índice antigo + metas + textos + órfãos).
+    Protegido por token simples para evitar acionamento acidental."""
+    if (request.get_json() or {}).get("confirm") != "RESET_BASE_CONHECIMENTO":
+        return jsonify({"error": "confirmação inválida"}), 400
+    kv = _kv_client()
+    apagadas = 0
+    if kv:
+        try:
+            for padrao in ("brauna:hp_know_doc:*", "brauna:hp_know_meta:*"):
+                cursor = 0
+                while True:
+                    cursor, chaves = kv.scan(cursor, match=padrao, count=200)
+                    for c in chaves:
+                        kv.delete(c)
+                        apagadas += 1
+                    if str(cursor) == "0":
+                        break
+            kv.delete(_KNOW_IDS_KEY)
+            kv.delete("brauna:hp_knowledge")   # blob do formato antigo
+        except Exception as e:
+            return jsonify({"error": str(e), "apagadas": apagadas}), 500
+    return jsonify({"ok": True, "chaves_apagadas": apagadas})
 
 @app.route("/api/hp/carta-upload", methods=["POST"])
 def hp_carta_upload():
@@ -4519,11 +4591,7 @@ def hp_knowledge_publicar():
     """Marca um documento como publicado (visível para assessores)."""
     body   = request.get_json()
     doc_id = body.get("id")
-    docs   = _load(_HP_KNOW_FILE, [])
-    for d in docs:
-        if d.get("id") == doc_id:
-            d["publicado"] = True
-    _save(_HP_KNOW_FILE, docs)
+    update_know_meta(doc_id, publicado=True)   # atômico
     return jsonify({"ok": True})
 
 @app.route("/api/analyze-xp", methods=["POST"])
