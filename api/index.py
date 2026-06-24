@@ -321,6 +321,78 @@ def _save(path, data):
     except Exception:
         pass
 
+# ── Base de Conhecimento: armazenamento por-documento (escala p/ 200+ arquivos) ─
+# Índice leve (metadados) num registro; texto completo de cada doc num registro próprio.
+import re as _re_kb
+
+def _know_doc_key(doc_id: str) -> str:
+    return f"brauna:hp_know_doc:{doc_id}"
+
+def _know_doc_path(doc_id: str) -> str:
+    return f"/tmp/brauna_hp_know_doc_{doc_id}.json"
+
+def _extrair_tickers(texto: str):
+    """Extrai tickers B3 (ex: PETR4, BBAS3, KNRI11) para busca rápida sem ler o texto todo."""
+    achados = set(_re_kb.findall(r"\b[A-Z]{4}\d{1,2}\b", (texto or "").upper()))
+    return sorted(achados)
+
+def load_know_index():
+    """Lista de metadados dos documentos (sem o texto completo)."""
+    return _load(_HP_KNOW_FILE, [])
+
+def save_know_index(idx):
+    _save(_HP_KNOW_FILE, idx)
+
+def load_know_text(doc_id: str) -> str:
+    """Texto completo de um documento. Tenta registro próprio; cai p/ texto embutido (formato antigo)."""
+    kv = _kv_client()
+    if kv:
+        try:
+            val = kv.get(_know_doc_key(doc_id))
+            if val is not None:
+                d = json.loads(val) if isinstance(val, str) else val
+                return d.get("texto", "") if isinstance(d, dict) else (d or "")
+        except Exception:
+            pass
+    # Fallback /tmp
+    try:
+        with open(_know_doc_path(doc_id), encoding="utf-8") as f:
+            return json.load(f).get("texto", "")
+    except Exception:
+        pass
+    # Compatibilidade: texto ainda embutido no índice (docs antigos)
+    for d in load_know_index():
+        if d.get("id") == doc_id and d.get("texto"):
+            return d["texto"]
+    return ""
+
+def save_know_text(doc_id: str, texto: str):
+    payload = {"id": doc_id, "texto": texto}
+    kv = _kv_client()
+    if kv:
+        try:
+            kv.set(_know_doc_key(doc_id), json.dumps(payload, ensure_ascii=False))
+            return
+        except Exception:
+            pass
+    try:
+        with open(_know_doc_path(doc_id), "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+def delete_know_text(doc_id: str):
+    kv = _kv_client()
+    if kv:
+        try:
+            kv.delete(_know_doc_key(doc_id))
+        except Exception:
+            pass
+    try:
+        os.remove(_know_doc_path(doc_id))
+    except Exception:
+        pass
+
 def load_clientes():  return _load(_DATA_FILE, [])
 def save_clientes(d): _save(_DATA_FILE, d)
 
@@ -4238,9 +4310,8 @@ def hp_knowledge_upload():
         import pdfplumber, io
         raw = pdf_file.read()
         with pdfplumber.open(io.BytesIO(raw)) as pdf:
-            # Limita a 20 páginas para evitar timeout em PDFs grandes
-            paginas = pdf.pages[:20]
-            texto = "\n".join(p.extract_text() or "" for p in paginas)
+            # Lê TODAS as páginas — texto completo, sem corte
+            texto = "\n".join(p.extract_text() or "" for p in pdf.pages)
         texto = texto.strip()
         if len(texto) < 50:
             return jsonify({"error": "PDF sem texto extraível"}), 400
@@ -4250,30 +4321,62 @@ def hp_knowledge_upload():
             msg = "PDF inválido ou protegido por senha. Tente exportar novamente como PDF."
         return jsonify({"error": msg}), 400
 
-    docs = _load(_HP_KNOW_FILE, [])
-    doc = {
-        "id":       str(uuid.uuid4())[:8],
-        "nome":     nome or pdf_file.filename,
-        "tipo":     tipo,
-        "classes":  [c.strip() for c in classes.split(",") if c.strip()],
-        "fonte":    fonte,
-        "chars":    len(texto),
-        "texto":    texto[:12000],   # máx 12k chars para não explodir o JSON
-        "data":     datetime.now().strftime("%d/%m/%Y %H:%M"),
+    doc_id = str(uuid.uuid4())[:8]
+    # Texto completo vai para registro próprio (escala p/ centenas de docs)
+    save_know_text(doc_id, texto)
+
+    # Índice guarda só metadados + prévia curta + tickers p/ busca rápida
+    meta = {
+        "id":        doc_id,
+        "nome":      nome or pdf_file.filename,
+        "tipo":      tipo,
+        "classes":   [c.strip() for c in classes.split(",") if c.strip()],
+        "fonte":     fonte,
+        "chars":     len(texto),
+        "preview":   texto[:300],
+        "tickers":   _extrair_tickers(texto),
+        "data":      datetime.now().strftime("%d/%m/%Y %H:%M"),
         "publicado": False,
     }
-    docs.insert(0, doc)
-    docs = docs[:50]   # manter últimos 50 documentos
-    _save(_HP_KNOW_FILE, docs)
-    return jsonify({"ok": True, "id": doc["id"], "chars": len(texto), "texto": texto[:12000], "doc": doc})
+    idx = load_know_index()
+    idx.insert(0, meta)
+    save_know_index(idx)
+    return jsonify({"ok": True, "id": doc_id, "chars": len(texto), "texto": texto[:300], "doc": meta})
 
 @app.route("/api/hp/knowledge/delete", methods=["POST"])
 def hp_knowledge_delete():
     id_del = request.get_json().get("id")
-    docs = _load(_HP_KNOW_FILE, [])
-    docs = [d for d in docs if d.get("id") != id_del]
-    _save(_HP_KNOW_FILE, docs)
+    idx = load_know_index()
+    idx = [d for d in idx if d.get("id") != id_del]
+    save_know_index(idx)
+    delete_know_text(id_del)   # remove também o registro do texto completo
     return jsonify({"ok": True})
+
+@app.route("/api/hp/knowledge/texto", methods=["GET"])
+def hp_knowledge_texto():
+    """Retorna o texto completo de um documento (carregado sob demanda)."""
+    doc_id = request.args.get("id", "")
+    if not doc_id:
+        return jsonify({"error": "id obrigatório"}), 400
+    return jsonify({"id": doc_id, "texto": load_know_text(doc_id)})
+
+@app.route("/api/hp/knowledge/migrate", methods=["POST"])
+def hp_knowledge_migrate():
+    """Migra docs do formato antigo (texto embutido no índice) para registros próprios.
+    Idempotente: pode rodar várias vezes sem duplicar."""
+    idx = load_know_index()
+    migrados = 0
+    for d in idx:
+        if d.get("texto"):
+            save_know_text(d["id"], d["texto"])
+            if not d.get("preview"):
+                d["preview"] = d["texto"][:300]
+            if not d.get("tickers"):
+                d["tickers"] = _extrair_tickers(d["texto"])
+            del d["texto"]          # remove texto do índice (fica só no registro próprio)
+            migrados += 1
+    save_know_index(idx)
+    return jsonify({"ok": True, "migrados": migrados, "total_docs": len(idx)})
 
 @app.route("/api/hp/carta-upload", methods=["POST"])
 def hp_carta_upload():
@@ -4349,12 +4452,12 @@ def hp_knowledge_apply():
     doc_id = body.get("id")
     destino= body.get("destino", "cenario")   # cenario | alerta | produto
 
-    docs = _load(_HP_KNOW_FILE, [])
+    docs = load_know_index()
     doc  = next((d for d in docs if d.get("id") == doc_id), None)
     if not doc:
         return jsonify({"error": "Documento não encontrado"}), 404
 
-    texto = doc.get("texto", "")
+    texto = load_know_text(doc_id)
 
     if destino == "cenario":
         fonte = doc.get("fonte") or doc.get("nome","")
@@ -4502,7 +4605,7 @@ def analyze_xp():
         or a.get("assessor_destino","").lower().strip() == assessor_atual
         or assessor_atual in a.get("assessor_destino","").lower()
     ]
-    docs_publicados  = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
+    docs_publicados  = [d for d in load_know_index() if d.get("publicado")]
     tickers_carteira = [a["ticker"] for a in dados.get("acoes", [])] + \
                        [f["ticker"] for f in dados.get("fiis", [])]
     nomes_fundos     = [a.get("nome","") for a in dados.get("acoes", [])] + \
@@ -4518,14 +4621,21 @@ def analyze_xp():
             alertas_relevantes.append({**a, "origem_tipo": "hp_manual"})
 
     # 2. Varredura nos documentos publicados da Base de Conhecimento
-    #    Procura menções a tickers ou nomes de fundos da carteira
+    #    O índice já tem os tickers pré-extraídos — só lê o texto completo
+    #    dos documentos que realmente mencionam um ticker da carteira.
+    tickers_set = {tk.upper() for tk in tickers_carteira if tk and len(tk) >= 4}
     for doc in docs_publicados:
-        texto_doc = (doc.get("texto","") or "").upper()
-        for tk in tickers_carteira:
-            if tk and len(tk) >= 4 and tk.upper() in texto_doc:
-                # Extrai trecho ao redor da menção
-                idx = texto_doc.find(tk.upper())
-                trecho = doc.get("texto","")[max(0, idx-80):idx+200].replace("\n"," ").strip()
+        # Compat: docs antigos podem não ter 'tickers' no índice — assume match p/ checar
+        doc_tickers = set(doc.get("tickers") or [])
+        casa = tickers_set & doc_tickers if doc_tickers else tickers_set
+        if not casa and doc_tickers:
+            continue
+        texto_completo = load_know_text(doc["id"])
+        texto_doc = texto_completo.upper()
+        for tk in (casa or tickers_set):
+            if tk in texto_doc:
+                idx = texto_doc.find(tk)
+                trecho = texto_completo[max(0, idx-80):idx+200].replace("\n"," ").strip()
                 alertas_relevantes.append({
                     "id":       f"kb_{doc['id']}_{tk}",
                     "produto":  tk,
@@ -9125,11 +9235,13 @@ function knowVerTexto(id){
   const el = document.getElementById(`know-preview-${id}`);
   if(!el) return;
   if(el.style.display === "none"){
-    // busca o texto da lista em cache
-    fetch("/api/hp/knowledge").then(r=>r.json()).then(docs=>{
-      const doc = docs.find(d=>d.id===id);
-      if(doc){ el.textContent = doc.texto||"(sem texto)"; el.style.display = "block"; }
-    });
+    el.textContent = "Carregando...";
+    el.style.display = "block";
+    // Texto completo é carregado sob demanda (cada doc tem registro próprio)
+    fetch("/api/hp/knowledge/texto?id="+encodeURIComponent(id))
+      .then(r=>r.json())
+      .then(d=>{ el.textContent = d.texto || "(sem texto)"; })
+      .catch(()=>{ el.textContent = "(erro ao carregar texto)"; });
   } else { el.style.display = "none"; }
 }
 
