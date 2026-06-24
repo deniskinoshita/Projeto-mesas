@@ -3925,15 +3925,31 @@ def hp_produtos():
         return jsonify({"ok": True})
     return jsonify(_load(_HP_PROD_FILE, {}))
 
+@app.route("/api/ping", methods=["GET","POST"])
+def ping():
+    """Endpoint leve para aquecer o container antes de operações pesadas."""
+    return jsonify({"ok": True, "ts": datetime.now().isoformat()})
+
 @app.route("/api/hp/publicar", methods=["POST"])
 def hp_publicar():
     body = request.get_json()
     portfolios = body.get("portfolios")
     cenario    = body.get("cenario")
     produtos   = body.get("produtos")
-    if portfolios: _save(_HP_PORT_FILE, portfolios)
-    if cenario:    _save(_HP_CENARIO_FILE, cenario)
-    if produtos:   _save(_HP_PROD_FILE, produtos)
+    # Salva os 3 em paralelo para reduzir latência de rede com Redis
+    import threading
+    erros = []
+    def _s(path, data):
+        try:
+            _save(path, data)
+        except Exception as e:
+            erros.append(str(e))
+    threads = []
+    if portfolios: threads.append(threading.Thread(target=_s, args=(_HP_PORT_FILE, portfolios)))
+    if cenario:    threads.append(threading.Thread(target=_s, args=(_HP_CENARIO_FILE, cenario)))
+    if produtos:   threads.append(threading.Thread(target=_s, args=(_HP_PROD_FILE, produtos)))
+    for t in threads: t.start()
+    for t in threads: t.join(timeout=8)
     return jsonify({"ok": True, "publicado_em": datetime.now().strftime("%d/%m/%Y %H:%M")})
 
 @app.route("/api/hp/alertas", methods=["GET","POST","DELETE"])
@@ -9588,29 +9604,32 @@ async function publicar(){
   const btn = document.getElementById("btn-pub");
   const st  = document.getElementById("pub-st");
   btn.disabled = true;
-  st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Publicando...</span>`;
+  st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Conectando...</span>`;
 
-  // Progresso simulado: avança até 85% enquanto aguarda resposta do servidor
-  // Timing baseado no cold start típico do Vercel (~6-8s)
-  _pubProgress(5);
-  const etapas = [
-    {pct:15, delay:400,  label:"Preparando dados..."},
-    {pct:30, delay:1000, label:"Enviando cenário macro..."},
-    {pct:50, delay:2000, label:"Salvando portfólios..."},
-    {pct:65, delay:3500, label:"Salvando produtos..."},
-    {pct:78, delay:5000, label:"Aguardando servidor..."},
-    {pct:85, delay:7000, label:"Quase pronto..."},
-  ];
-  const timers = etapas.map(e => setTimeout(()=>{
-    _pubProgress(e.pct);
-    st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ ${e.label}</span>`;
-  }, e.delay));
+  // Passo 1: ping para aquecer o container antes do payload pesado
+  _pubProgress(8);
+  try { await fetch("/api/ping"); } catch(e) {}
+
+  _pubProgress(20);
+  st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Preparando dados...</span>`;
 
   const payload = {
     portfolios: coletarPortfolios(),
     cenario:    coletarCenario(),
     produtos:   coletarProdutos(),
   };
+
+  // Progresso simulado enquanto salva (container já aquecido: ~2-4s)
+  const etapas = [
+    {pct:40, delay:400,  label:"Enviando cenário macro..."},
+    {pct:60, delay:900,  label:"Salvando portfólios..."},
+    {pct:75, delay:1500, label:"Salvando produtos..."},
+    {pct:88, delay:2200, label:"Quase pronto..."},
+  ];
+  const timers = etapas.map(e => setTimeout(()=>{
+    _pubProgress(e.pct);
+    st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ ${e.label}</span>`;
+  }, e.delay));
 
   try{
     const r = await fetch("/api/hp/publicar", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
