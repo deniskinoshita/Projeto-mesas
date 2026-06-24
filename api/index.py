@@ -4455,8 +4455,28 @@ def hp_knowledge_upload_texto():
 @app.route("/api/hp/knowledge/debug", methods=["GET"])
 def hp_knowledge_debug():
     """Diagnóstico do estado bruto do Redis para a base de conhecimento."""
+    # Diagnóstico detalhado de por que o KV conecta ou não
+    diag = {
+        "tem_KV_REST_API_URL":   bool(os.environ.get("KV_REST_API_URL")),
+        "tem_KV_REST_API_TOKEN": bool(os.environ.get("KV_REST_API_TOKEN")),
+        "tem_UPSTASH_URL":       bool(os.environ.get("UPSTASH_REDIS_REST_URL")),
+        "tem_UPSTASH_TOKEN":     bool(os.environ.get("UPSTASH_REDIS_REST_TOKEN")),
+    }
+    try:
+        from upstash_redis import Redis as _R
+        diag["import_upstash"] = "ok"
+    except Exception as e:
+        diag["import_upstash"] = f"FALHOU: {e}"
+    try:
+        _kvtest = _kv_client()
+        if _kvtest:
+            _kvtest.set("brauna:diag_ping", "1")
+            diag["set_test"] = _kvtest.get("brauna:diag_ping")
+    except Exception as e:
+        diag["kv_runtime_erro"] = str(e)
+
     kv = _kv_client()
-    out = {"kv_conectado": bool(kv)}
+    out = {"kv_conectado": bool(kv), "diag": diag}
     if kv:
         try:
             ids = kv.smembers(_KNOW_IDS_KEY) or []
