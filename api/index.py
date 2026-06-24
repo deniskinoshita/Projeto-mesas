@@ -4238,7 +4238,9 @@ def hp_knowledge_upload():
         import pdfplumber, io
         raw = pdf_file.read()
         with pdfplumber.open(io.BytesIO(raw)) as pdf:
-            texto = "\n".join(p.extract_text() or "" for p in pdf.pages)
+            # Limita a 20 páginas para evitar timeout em PDFs grandes
+            paginas = pdf.pages[:20]
+            texto = "\n".join(p.extract_text() or "" for p in paginas)
         texto = texto.strip()
         if len(texto) < 50:
             return jsonify({"error": "PDF sem texto extraível"}), 400
@@ -9002,11 +9004,17 @@ async function knowSalvar(){
       fd.append("tipo",    tipo);
       fd.append("fonte",   fonte);
       fd.append("classes", classes);
-      const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd});
+      const ctrl = new AbortController();
+      const tmo  = setTimeout(()=>ctrl.abort(), 55000);
+      const r = await fetch("/api/hp/knowledge/upload", {method:"POST", body:fd, signal:ctrl.signal});
+      clearTimeout(tmo);
       const d = await r.json();
       if(d.ok) ok++;
-      else erros.push(f.name);
-    } catch(e){ erros.push(f.name); }
+      else erros.push(`${f.name}: ${d.error||"erro"}`);
+    } catch(e){
+      const msg = e.name === "AbortError" ? "timeout (PDF muito grande — tente um arquivo menor)" : e.message;
+      erros.push(`${f.name}: ${msg}`);
+    }
   }
 
   if(ok > 0){
