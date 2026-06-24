@@ -1276,17 +1276,18 @@ select option{background:#1A1A1A}
 
   <div style="margin-bottom:10px">
     <label>Relatório XPerformance (PDF) *</label>
-    <div class="upload-area" id="drop1" onclick="document.getElementById('pdf-xp').click()">
-      <input type="file" id="pdf-xp" accept=".pdf" style="display:none"
+    <div class="upload-area" id="drop1" onclick="document.getElementById('pdf-xp').click()" style="cursor:pointer">
+      <input type="file" id="pdf-xp" accept=".pdf"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
         onchange="onXpFileChange(this)">
       <div class="icon">📊</div>
-      <p>XPerformance — arraste ou clique para identificar o cliente</p>
+      <p id="upload-hint-text">XPerformance — arraste ou clique para identificar o cliente</p>
       <p class="fname" id="fname-xp"></p>
     </div>
   </div>
 
-  <!-- Status da identificação -->
-  <div id="box-cliente-identificado" style="margin-top:10px;background:#111;border:1px solid #1C4A34;border-radius:10px;padding:14px;display:none;transition:all .3s"></div>
+  <!-- Preview dos dados extraídos do PDF — aparece ANTES do botão avançar -->
+  <div id="box-preview-pdf" style="display:none;margin-top:14px;background:#0A1F18;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
 
   <!-- Botão para avançar — aparece após PDF carregado -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
@@ -1913,13 +1914,101 @@ async function identificarCliente(file){
       renderCrossForm();
     }
 
+    // ── Exibe preview dos dados extraídos ANTES do botão avançar
+    mostrarPreviewPDF(d);
+
     // ── Atualiza botão com dados do cliente
     mostrarBotaoProximaEtapa(d);
 
   }catch(e){
     console.error("Identificação falhou:", e);
+    const prev = document.getElementById("box-preview-pdf");
+    if(prev){ prev.style.display="block"; prev.innerHTML='<p style="color:#E8A87C;font-size:13px">⚠️ Não foi possível ler o PDF. Verifique se é um XPerformance válido.</p>'; }
     mostrarBotaoProximaEtapa(null);
   }
+}
+
+function mostrarPreviewPDF(d){
+  const box = document.getElementById("box-preview-pdf");
+  if(!box) return;
+
+  const comp = d.composicao_atual || {};
+  const semDados = !d.conta || d.conta === "-" || !d.patrimonio;
+  const semComp  = Object.values(comp).every(v => v === 0);
+
+  if(semDados || semComp){
+    box.style.display = "block";
+    box.innerHTML = '<p style="color:#E8A87C;font-weight:700;font-size:13px;margin-bottom:4px">⚠️ PDF sem carteira detectada</p><p style="color:#888;font-size:12px">Preencha os dados manualmente na Etapa 2.</p>';
+    return;
+  }
+
+  const pat = d.patrimonio || 0;
+  const fmtBrl = v => "R$ " + Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+  const fmtPct = v => (Number(v)||0).toFixed(1) + "%";
+
+  // Mapa de labels de classe
+  const CLS_LBL = {
+    pos_fixado:"Pós Fixado", inflacao:"Inflação", pre_fixado:"Pré Fixado",
+    acoes:"Ações / RV", fiis:"FIIs", multimercado:"Multimercado",
+    alternativos:"Alternativos", internacional:"Internacional", criptomoedas:"Cripto"
+  };
+  // Cores por classe
+  const CLS_COR = {
+    pos_fixado:"#3EB8A8", inflacao:"#C8A733", pre_fixado:"#5DCAA5",
+    acoes:"#E88038", fiis:"#9E8FE8", multimercado:"#5DAAD8",
+    alternativos:"#C0A878", internacional:"#5DDAA8", criptomoedas:"#FF8A65"
+  };
+
+  const rentMes = d.rentabilidade?.mes ?? d.rentabilidade_mes ?? null;
+  const rentAno = d.rentabilidade?.ano ?? d.rentabilidade_ano ?? null;
+  const rent12m = d.rentabilidade?.doze_meses ?? d.rentabilidade_12m ?? null;
+
+  // Monta barras de composição
+  const clsEntries = Object.entries(comp).filter(([,v])=>Number(v)>0.1).sort((a,b)=>b[1]-a[1]);
+  const barras = clsEntries.map(([k,v])=>{
+    const cor = CLS_COR[k] || "#C9A96E";
+    const lbl = CLS_LBL[k] || k;
+    return `<div style="margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span style="font-size:11px;color:#CCC">${lbl}</span>
+        <span style="font-size:11px;color:${cor};font-weight:700">${fmtPct(v)}</span>
+      </div>
+      <div style="height:6px;background:#1A2E28;border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(v,100)}%;background:${cor};border-radius:3px;transition:width .5s"></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Linha de rentabilidade
+  const rentRow = [
+    rentMes  != null ? `<span>Mês: <b style="color:#5DCAA5">${rentMes}%</b></span>` : "",
+    rentAno  != null ? `<span>Ano: <b style="color:#5DCAA5">${rentAno}%</b></span>` : "",
+    rent12m  != null ? `<span>12m: <b style="color:#5DCAA5">${rent12m}%</b></span>` : "",
+  ].filter(Boolean).join('<span style="color:#444;margin:0 8px">|</span>');
+
+  const assessorNome = d.assessor || "";
+  const tipoConta   = d.tipo_conta || "";
+
+  box.style.display = "block";
+  box.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="font-size:22px">📋</div>
+      <div>
+        <p style="font-size:14px;font-weight:700;color:#F0F0F0;margin:0">Carteira identificada — Conta ${d.conta} ${tipoConta ? '<span style="font-size:10px;background:#C8A733;color:#000;padding:2px 7px;border-radius:10px;margin-left:4px;font-weight:700">'+tipoConta+'</span>' : ""}</p>
+        <p style="font-size:11px;color:#888;margin:2px 0 0">${assessorNome ? "Assessor: " + assessorNome + "  ·  " : ""}${d.data_ref ? "Ref.: " + d.data_ref : ""}</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <p style="font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Patrimônio total</p>
+        <p style="font-size:20px;font-weight:700;color:#C8A733;margin:0">${fmtBrl(pat)}</p>
+        ${rentRow ? '<div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#AAA">' + rentRow + '</div>' : ""}
+      </div>
+      <div>
+        <p style="font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Composição atual</p>
+        ${barras}
+      </div>
+    </div>`;
 }
 
 function mostrarBotaoProximaEtapa(d){
