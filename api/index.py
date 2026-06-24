@@ -347,22 +347,35 @@ def load_know_index():
     kv = _kv_client()
     if kv:
         try:
-            ids = kv.smembers(_KNOW_IDS_KEY) or []
-            if not ids:
-                return []
-            keys = [_know_meta_key(i) for i in ids]
-            vals = kv.mget(*keys)
+            ids = list(kv.smembers(_KNOW_IDS_KEY) or [])
+        except Exception:
+            ids = None
+        if ids is not None:
             metas = []
-            for v in vals:
-                if not v:
-                    continue
-                m = json.loads(v) if isinstance(v, str) else v
-                if isinstance(m, dict):
-                    metas.append(m)
+            # Lê em lotes pequenos; falha de um item nunca zera a lista toda
+            for inicio in range(0, len(ids), 25):
+                lote = ids[inicio:inicio+25]
+                keys = [_know_meta_key(i) for i in lote]
+                try:
+                    vals = kv.mget(*keys)
+                except Exception:
+                    vals = []
+                    for k in keys:
+                        try:
+                            vals.append(kv.get(k))
+                        except Exception:
+                            vals.append(None)
+                for v in vals:
+                    if not v:
+                        continue
+                    try:
+                        m = json.loads(v) if isinstance(v, str) else v
+                        if isinstance(m, dict):
+                            metas.append(m)
+                    except Exception:
+                        continue
             metas.sort(key=lambda m: m.get("ts", 0), reverse=True)
             return metas
-        except Exception:
-            pass
     return _load(_HP_KNOW_FILE, [])
 
 def add_know_meta(meta: dict):
