@@ -3607,6 +3607,24 @@ def login():
         "identity": identity, "precisa_criar": precisa_criar,
     })
 
+@app.route("/api/admin/reset-senha-pessoal", methods=["POST"])
+def reset_senha_pessoal():
+    """Admin reseta a senha pessoal de alguém (ex: esqueceu). A pessoa recria no próximo acesso.
+    Requer a senha de admin no corpo para autorizar."""
+    d = request.get_json() or {}
+    if SENHAS.get("admin") != d.get("admin_senha",""):
+        return jsonify({"ok": False, "msg": "Não autorizado"}), 401
+    identity = d.get("identity","").strip()
+    # Aceita também só o código do assessor (monta o identity)
+    if identity and not identity.startswith(("assessor:","lider","head","admin")):
+        identity = f"assessor:{identity.upper()}"
+    senhas = load_senhas_pessoais()
+    if identity in senhas:
+        del senhas[identity]
+        save_senhas_pessoais(senhas)
+        return jsonify({"ok": True, "resetada": identity})
+    return jsonify({"ok": False, "msg": "Identidade sem senha cadastrada"}), 404
+
 @app.route("/api/login-pessoal", methods=["POST"])
 def login_pessoal():
     """Etapa 2: cria (1º acesso) ou valida a senha pessoal individual."""
