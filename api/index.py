@@ -1506,7 +1506,7 @@ select option{background:#1A1A1A}
 // Auth guard
 (function(){
   const role = localStorage.getItem("brauna_role");
-  if(role !== "assessor" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+  if(role !== "assessor" && role !== "admin"){ localStorage.removeItem("brauna_role"); window.location.replace("/"); return; }
 
   const ASSESSORES_LIST = [
     "Lucas Landroni Cozzi","Tatiane Cristina da Silva Cecchetti","Felipe Fraga",
@@ -4540,6 +4540,412 @@ def gerar_apresentacao():
     )
 
 
+def _buscar_cotacoes_brapi(tickers: list) -> dict:
+    """
+    Busca cotações em tempo real via Yahoo Finance (gratuito, sem auth).
+    Sufixo .SA adicionado automaticamente para ativos da B3.
+    Retorna dict {TICKER: {"preco": float, "variacao_dia": float, "nome": str, "volume": int}}
+    Cache em memória por 5 minutos.
+    """
+    import time, urllib.request, json as _json
+
+    if not tickers:
+        return {}
+
+    # Cache simples em memória (módulo-level)
+    _cache = _buscar_cotacoes_brapi.__dict__.setdefault("_cache", {})
+    _ts    = _buscar_cotacoes_brapi.__dict__.setdefault("_ts", {})
+    TTL    = 300  # 5 minutos
+
+    agora = time.time()
+    resultado = {}
+    a_buscar  = []
+
+    for tk in tickers:
+        tk = tk.upper().strip()
+        if tk in _cache and agora - _ts.get(tk, 0) < TTL:
+            resultado[tk] = _cache[tk]
+        else:
+            a_buscar.append(tk)
+
+    if not a_buscar:
+        return resultado
+
+    # Yahoo Finance: busca individual por ticker com sufixo .SA para B3
+    HEADERS = {
+        "User-Agent": "Mozilla/5.0 (compatible; Brauna-Mesas/1.0)",
+        "Accept":     "application/json",
+    }
+    for tk in a_buscar:
+        # ETFs internacionais e BDRs (sem sufixo necessário se já tiverem 34/11)
+        sufixo = ".SA"
+        yf_sym = tk + sufixo
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yf_sym}?range=1d&interval=1d"
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                raw = _json.loads(resp.read().decode("utf-8"))
+            meta = raw["chart"]["result"][0]["meta"]
+            prc  = meta.get("regularMarketPrice") or meta.get("chartPreviousClose")
+            prev = meta.get("previousClose") or meta.get("chartPreviousClose") or prc
+            var  = round((prc / prev - 1) * 100, 2) if prc and prev and prev != 0 else 0.0
+            nom  = meta.get("longName") or meta.get("shortName") or tk
+            vol  = meta.get("regularMarketVolume", 0)
+            if prc is not None:
+                info = {
+                    "preco":        round(float(prc), 2),
+                    "variacao_dia": var,
+                    "nome":         nom,
+                    "volume":       int(vol or 0),
+                }
+                resultado[tk] = info
+                _cache[tk]    = info
+                _ts[tk]       = agora
+        except Exception:
+            pass  # falha silenciosa — análise continua sem cotação
+
+    return resultado
+
+
+def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, assessor_metas=None):
+    """
+    Analisa o portfólio do cliente e retorna sugestões inteligentes por classe,
+    alertas de ações, carteira FII sugerida e trocas de produtos.
+    Usa cotações em tempo real via brapi.dev quando disponível.
+    """
+    import math
+
+    patrimonio   = float(body.get("patrimonio", 0) or 0)
+    perfil_cli   = (body.get("perfil") or "moderada").lower()
+    composicao   = body.get("composicao", {}) or {}
+    modelo_hp    = body.get("modelo_hp", {}) or {}
+    desvios      = body.get("desvios", []) or []
+    acoes_cli    = body.get("acoes", []) or []
+    fiis_cli     = body.get("fiis", []) or []
+    metas_a      = assessor_metas or {}
+    if isinstance(metas_a, dict):
+        pass
+    else:
+        metas_a = {}
+
+    LABELS_CLS = {
+        "pos_fixado":    "Pós Fixado",
+        "inflacao":      "Inflação",
+        "pre_fixado":    "Pré Fixado",
+        "acoes":         "Ações / RV",
+        "fiis":          "FIIs",
+        "multimercado":  "Multimercado",
+        "alternativos":  "Alternativos",
+        "internacional": "Internacional",
+        "criptomoedas":  "Criptomoedas",
+    }
+
+    # ── Mapeamento assessor_metas → classe ────────────────────────────────────
+    # assessor_metas pode ter: rv, fii, internacional, estruturadas, rf, pct_falta_meta
+    # Normaliza para dict {cls: pct_falta} onde positivo = está abaixo da meta
+    _asses_gap_por_cls = {}
+    if metas_a:
+        _rv_m = metas_a.get("rv", {}) or {}
+        _fii_m = metas_a.get("fii", {}) or {}
+        _intl_m = metas_a.get("internacional", {}) or {}
+        _rf_m = metas_a.get("rf", {}) or {}
+        # Estimativas de gap do assessor (pct = quanto já tem; quanto falta)
+        for _cls, _m in [("acoes", _rv_m), ("fiis", _fii_m), ("internacional", _intl_m),
+                          ("pos_fixado", _rf_m), ("pre_fixado", _rf_m), ("inflacao", _rf_m)]:
+            _pct = float(_m.get("pct", 0) or 0)
+            _meta = float(_m.get("meta", 0) or _m.get("meta_pct", 0) or 0)
+            if _meta > 0:
+                _asses_gap_por_cls[_cls] = max(0.0, _meta - _pct)
+            elif _pct < 50:
+                # Sem meta explícita: assume que assessor abaixo de 50% da meta → tem gap
+                _asses_gap_por_cls[_cls] = 50.0 - _pct
+
+    # ── PARTE A: Sugestões por classe ─────────────────────────────────────────
+    sugestoes_por_classe = []
+    for dev in desvios:
+        cls = dev.get("cls") or dev.get("classe", "")
+        if not cls:
+            continue
+        gap_pp = float(dev.get("desvio", dev.get("desvio_pp", 0)) or 0)
+        atual  = float(dev.get("atual", 0) or 0)
+        alvo   = float(dev.get("alvo", dev.get("modelo", 0)) or 0)
+        if gap_pp >= -0.5:
+            # Não subexposição relevante — pula
+            continue
+
+        gap_valor = patrimonio * abs(gap_pp) / 100.0
+
+        # Determinar prioridade
+        asses_tem_gap = _asses_gap_por_cls.get(cls, 0) > 10.0
+        pct_falta_meta = float(metas_a.get("pct_falta_meta", 0) or 0) if isinstance(metas_a, dict) else 0
+        if asses_tem_gap or pct_falta_meta > 20:
+            prioridade = "alta"
+            motivo = (
+                f"Assessor abaixo da meta em {LABELS_CLS.get(cls, cls)}; "
+                f"cliente {abs(gap_pp):.1f}pp abaixo do modelo"
+            )
+        elif abs(gap_pp) >= 3.0:
+            prioridade = "media"
+            motivo = f"Cliente {abs(gap_pp):.1f}pp abaixo do modelo em {LABELS_CLS.get(cls, cls)}"
+        else:
+            prioridade = "baixa"
+            motivo = f"Desvio leve de {abs(gap_pp):.1f}pp em {LABELS_CLS.get(cls, cls)}"
+
+        # Filtrar produtos do HP para esta classe
+        prods_cls = []
+        cls_prods = produtos_hp.get(cls, []) if isinstance(produtos_hp, dict) else []
+        ORDEM_PERFIL = ["super_conservadora", "conservadora", "moderada", "arrojada", "agressiva", "super_agressiva"]
+        idx_perfil = ORDEM_PERFIL.index(perfil_cli) if perfil_cli in ORDEM_PERFIL else 2
+        for p in (cls_prods if isinstance(cls_prods, list) else []):
+            perfis_prod = p.get("perfis") or []
+            if not perfis_prod:
+                prods_cls.append(p)
+            else:
+                perfis_norm = [x.lower().replace(" ", "_") for x in perfis_prod]
+                if any(ORDEM_PERFIL.index(pf) <= idx_perfil for pf in perfis_norm if pf in ORDEM_PERFIL):
+                    prods_cls.append(p)
+
+        produtos_formatados = []
+        for p in prods_cls[:4]:
+            produtos_formatados.append({
+                "nome":      p.get("nome") or p.get("titulo", "—"),
+                "tipo":      p.get("tipo", ""),
+                "descricao": p.get("descricao", ""),
+                "taxa":      p.get("taxa") or p.get("rentabilidade", ""),
+            })
+
+        sugestoes_por_classe.append({
+            "classe":       cls,
+            "label_classe": LABELS_CLS.get(cls, cls),
+            "gap_pp":       round(gap_pp, 2),
+            "gap_valor":    round(gap_valor, 2),
+            "prioridade":   prioridade,
+            "motivo":       motivo,
+            "produtos":     produtos_formatados,
+        })
+
+    # Ordenar: alta > media > baixa
+    _ord = {"alta": 0, "media": 1, "baixa": 2}
+    sugestoes_por_classe.sort(key=lambda x: (_ord.get(x["prioridade"], 9), x["gap_pp"]))
+
+    # ── PARTE B: Alertas de ações (com cotação em tempo real via brapi.dev) ─────
+    acoes_alerta = []
+    calls_by_ticker = {}
+    for c in (calls_hp if isinstance(calls_hp, list) else []):
+        tk = (c.get("ticker") or c.get("ativo") or "").upper().strip()
+        if tk:
+            calls_by_ticker[tk] = c
+
+    # Buscar cotações em tempo real para todos os tickers do cliente
+    tickers_cli = [(a.get("ticker") or "").upper().strip() for a in acoes_cli if a.get("ticker")]
+    tickers_cli += list(calls_by_ticker.keys())  # também para tickers do HP sem posição do cliente
+    cotacoes_rt = _buscar_cotacoes_brapi(list(set(t for t in tickers_cli if t)))
+
+    for acao in acoes_cli:
+        ticker     = (acao.get("ticker") or "").upper().strip()
+        saldo      = float(acao.get("saldo", 0) or 0)
+        pct_cart   = float(acao.get("pct_carteira", 0) or 0)
+        call       = calls_by_ticker.get(ticker)
+
+        if not call:
+            continue
+
+        preco_alvo    = call.get("preco_alvo") or call.get("alvo")
+        preco_entrada = call.get("preco_entrada") or call.get("entrada")
+        stop_val      = call.get("stop")
+        tese_call     = call.get("tese", "")
+
+        # Cotação real (brapi.dev) — prioridade máxima
+        cotacao_rt  = cotacoes_rt.get(ticker, {})
+        preco_atual = cotacao_rt.get("preco")
+        variacao_d  = cotacao_rt.get("variacao_dia")
+
+        # Calcular upside real se temos preco_atual + preco_alvo
+        upside = None
+        if preco_atual and preco_alvo:
+            try:
+                upside = round((float(preco_alvo) / float(preco_atual) - 1) * 100, 1)
+            except Exception:
+                pass
+
+        # Fallback: upside do call HP
+        if upside is None:
+            upside_call = call.get("upside")
+            if upside_call is not None:
+                try:
+                    upside = float(str(upside_call).replace("%", "").replace(",", ".").strip())
+                except Exception:
+                    pass
+
+        if upside is None and stop_val is None:
+            continue
+
+        # Determinar situação e recomendação
+        if upside is not None and upside < -10:
+            situacao    = "acima_alvo"
+            acao_rec    = (
+                f"Realizar lucro parcial — {ticker} acima do preço-teto"
+                + (f" (alvo: R$ {preco_alvo:.2f}, atual: R$ {preco_atual:.2f})" if preco_atual else "")
+            )
+            estruturada = "Compra de Put (proteção de carteira) para precaver queda"
+        elif upside is not None and upside < 0:
+            situacao    = "acima_alvo"
+            acao_rec    = (
+                f"{ticker} próximo ao preço-teto — considerar realização parcial"
+                + (f" (alvo: R$ {preco_alvo:.2f}, atual: R$ {preco_atual:.2f})" if preco_atual else "")
+            )
+            estruturada = "Trava de alta (call spread) para travar ganho e reduzir risco"
+        elif stop_val is not None and preco_atual is not None:
+            try:
+                if float(preco_atual) <= float(stop_val) * 1.03:  # dentro de 3% do stop
+                    situacao    = "proximo_stop"
+                    acao_rec    = f"{ticker} próximo ao stop (stop: R$ {stop_val:.2f}, atual: R$ {preco_atual:.2f})"
+                    estruturada = "Avaliar redução de posição ou Put de proteção"
+                else:
+                    situacao    = "monitorar"
+                    acao_rec    = f"{ticker} dentro dos limites — stop em R$ {stop_val:.2f}"
+                    estruturada = ""
+            except Exception:
+                situacao    = "monitorar"
+                acao_rec    = f"Verificar stop de {ticker}: R$ {stop_val}"
+                estruturada = ""
+        else:
+            situacao    = "monitorar"
+            acao_rec    = f"{ticker} em acompanhamento — upside estimado: {upside:.1f}%" if upside is not None else f"{ticker} em acompanhamento"
+            estruturada = ""
+
+        acoes_alerta.append({
+            "ticker":              ticker,
+            "saldo":               saldo,
+            "pct_carteira":        pct_cart,
+            "preco_atual":         preco_atual,
+            "preco_alvo":          preco_alvo,
+            "preco_entrada":       preco_entrada,
+            "variacao_dia":        variacao_d,
+            "upside":              upside,
+            "situacao":            situacao,
+            "acao_recomendada":    acao_rec,
+            "estruturada_sugerida": estruturada,
+            "tese":                tese_call,
+        })
+
+    # ── PARTE C: Carteira FII sugerida ────────────────────────────────────────
+    CARTEIRA_FII_PADRAO = [
+        {"ticker": "HGLG11", "nome": "CSHG Logística",       "tipo": "Logística",  "pct_rel": 0.30,
+         "descricao": "Maior fundo de logística do Brasil, galpões de alta qualidade"},
+        {"ticker": "KNRI11", "nome": "Kinea Renda Imobiliária","tipo": "Híbrido",   "pct_rel": 0.20,
+         "descricao": "Fundo híbrido Kinea — lajes corporativas e galpões"},
+        {"ticker": "HSML11", "nome": "HSI Mall",              "tipo": "Shopping",   "pct_rel": 0.15,
+         "descricao": "Shopping centers premium — renda garantida por contratos"},
+        {"ticker": "IFIX11", "nome": "ETF IFIX",              "tipo": "ETF",        "pct_rel": 0.25,
+         "descricao": "Exposição diversificada ao setor imobiliário via B3"},
+        {"ticker": "MXRF11", "nome": "Maxi Renda",            "tipo": "CRI/CRA",    "pct_rel": 0.10,
+         "descricao": "CRI/CRA com alta liquidez — yield atrativo"},
+    ]
+
+    # Identificar gap de FII
+    fii_atual  = float(composicao.get("fiis", 0) or 0)
+    fii_modelo = float(modelo_hp.get("fiis", 0) or 0)
+    fii_gap_pp = max(0.0, fii_modelo - fii_atual)
+    fii_gap_val = patrimonio * fii_gap_pp / 100.0
+
+    # Se o cliente já tem mais FIIs do que o modelo, sugerir com base nos FIIs do modelo
+    total_sugerido_pct  = fii_gap_pp if fii_gap_pp > 0.5 else max(fii_modelo, fii_atual)
+    total_sugerido_val  = patrimonio * total_sugerido_pct / 100.0
+
+    # Tentar usar gestora do HP
+    gestora_nome = "Carteira Braúna FII"
+    referencia   = datetime.now().strftime("%B %Y")
+    posicoes_fii = []
+
+    gestora_match = None
+    if gestoras2_hp and isinstance(gestoras2_hp, dict):
+        for gid, gdata in gestoras2_hp.items():
+            perfis_g = gdata.get("perfis", {}) or {}
+            if perfil_cli in perfis_g or any(perfil_cli in k for k in perfis_g):
+                gestora_match = gdata
+                break
+
+    if gestora_match:
+        gestora_nome = gestora_match.get("nome", gestora_nome)
+        referencia   = gestora_match.get("referencia", referencia)
+        # Tentar extrair posições da gestora para a classe FII
+        perfis_g  = gestora_match.get("perfis", {}) or {}
+        cls_alloc = (perfis_g.get(perfil_cli) or list(perfis_g.values())[0] if perfis_g else {})
+        # cls_alloc pode ter distribuição de FIIs — usar padrão mesmo assim, só muda nome
+        for item in CARTEIRA_FII_PADRAO:
+            pct_c = item["pct_rel"] * total_sugerido_pct
+            posicoes_fii.append({
+                "ticker":       item["ticker"],
+                "nome":         item["nome"],
+                "tipo":         item["tipo"],
+                "pct_carteira": round(pct_c, 2),
+                "valor":        round(patrimonio * pct_c / 100, 2),
+                "descricao":    item["descricao"],
+            })
+    else:
+        # Conservador/moderado: aumenta peso ETF IFIX
+        perfis_conserv = {"super_conservadora", "conservadora", "moderada"}
+        if perfil_cli in perfis_conserv:
+            CARTEIRA_FII_PADRAO[3]["pct_rel"] = 0.35
+            soma = sum(x["pct_rel"] for x in CARTEIRA_FII_PADRAO)
+            for item in CARTEIRA_FII_PADRAO:
+                item["pct_rel"] /= soma  # normaliza
+
+        for item in CARTEIRA_FII_PADRAO:
+            pct_c = item["pct_rel"] * total_sugerido_pct
+            posicoes_fii.append({
+                "ticker":       item["ticker"],
+                "nome":         item["nome"],
+                "tipo":         item["tipo"],
+                "pct_carteira": round(pct_c, 2),
+                "valor":        round(patrimonio * pct_c / 100, 2),
+                "descricao":    item["descricao"],
+            })
+
+    carteira_fiis_sugerida = {
+        "gestora_nome":          gestora_nome,
+        "referencia":            referencia,
+        "total_sugerido_pct":    round(total_sugerido_pct, 2),
+        "total_sugerido_valor":  round(total_sugerido_val, 2),
+        "posicoes":              posicoes_fii,
+    }
+
+    # ── PARTE D: Troca de produtos ────────────────────────────────────────────
+    troca_produtos = []
+    sugs_prod = body.get("sugestoes_produtos", []) or []
+    saldos_por_cls = body.get("saldos_por_classe", {}) or {}
+
+    for sug in sugs_prod[:6]:
+        prod = sug.get("produto") if isinstance(sug, dict) and "produto" in sug else sug
+        if not isinstance(prod, dict):
+            continue
+        cls_s      = sug.get("classe") or prod.get("classe") or prod.get("cls", "")
+        gap_s      = float(sug.get("gap", 0) or 0)
+        prod_nome  = prod.get("nome") or prod.get("titulo", "")
+        if not prod_nome or not cls_s:
+            continue
+
+        # Verificar se existe produto atual abaixo do benchmark
+        saldo_cls = float(saldos_por_cls.get(cls_s, 0) or 0)
+        if saldo_cls > 0 and gap_s < -1.0:
+            impacto = "alto" if gap_s < -3 else "medio"
+            troca_produtos.append({
+                "atual_nome":      f"Posição atual em {LABELS_CLS.get(cls_s, cls_s)}",
+                "atual_pct":       round(float(composicao.get(cls_s, 0) or 0), 1),
+                "sugestao_nome":   prod_nome,
+                "sugestao_motivo": f"Aumentar exposição em {LABELS_CLS.get(cls_s, cls_s)} — {abs(gap_s):.1f}pp abaixo do modelo",
+                "impacto_receita": impacto,
+            })
+
+    return {
+        "sugestoes_por_classe":   sugestoes_por_classe,
+        "acoes_alerta":           acoes_alerta,
+        "carteira_fiis_sugerida": carteira_fiis_sugerida,
+        "troca_produtos":         troca_produtos,
+    }
+
+
 @app.route("/api/gerar-pptx", methods=["POST"])
 def gerar_pptx():
     """Gera PPTX de apresentação de reunião com identidade Braúna."""
@@ -4611,6 +5017,134 @@ def gerar_pptx():
         cdi_12m   = cdi_rent.get("12m", 0)
         body["rent_12m"] = rent_12m
         body["pct_cdi"]  = round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0
+
+        # Injeta modelo_hp para o slide Carteira vs Modelo
+        hp_porto = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+        ORDEM_PERFIL_ALL = ["super_conservadora","conservadora","moderada","arrojada","agressiva","super_agressiva"]
+        perfil_key = perfil_cli if perfil_cli in hp_porto.get("perfis",{}) else "moderada"
+        modelo_escolhido = hp_porto.get("perfis",{}).get(perfil_key, {})
+        body["modelo_hp"] = {k: v for k, v in modelo_escolhido.items()
+                             if k not in ("label",)}
+
+        # Normaliza desvios: garante campos cls, alvo, desvio_pp, classe, modelo
+        desvios_norm = []
+        for d in body.get("desvios", []):
+            cls_key = d.get("cls") or d.get("classe", "")
+            desvio_val = d.get("desvio_pp", d.get("desvio", 0))
+            alvo_val   = d.get("alvo", d.get("modelo", modelo_escolhido.get(cls_key, 0)))
+            desvios_norm.append({
+                **d,
+                "cls":       cls_key,
+                "classe":    cls_key,
+                "label":     d.get("label", LABELS.get(cls_key, cls_key)),
+                "atual":     d.get("atual", 0),
+                "alvo":      alvo_val,
+                "modelo":    alvo_val,
+                "desvio":    desvio_val,
+                "desvio_pp": desvio_val,
+                "status":    d.get("status", "ok"),
+            })
+        body["desvios"] = desvios_norm
+
+        # Normaliza sugestoes_produtos: garante wrapper com classe/gap/label_classe
+        sugs_norm = []
+        for s in body.get("sugestoes_produtos", []):
+            if "produto" in s:
+                sugs_norm.append(s)
+            else:
+                cls_s = s.get("classe", s.get("cls", ""))
+                gap_s = s.get("gap", 0)
+                if not gap_s and cls_s:
+                    gap_s = next((d["desvio"] for d in desvios_norm if d["cls"] == cls_s), 0)
+                sugs_norm.append({
+                    "classe":       cls_s,
+                    "label_classe": LABELS.get(cls_s, cls_s),
+                    "gap":          gap_s,
+                    "produto":      s,
+                })
+        body["sugestoes_produtos"] = sugs_norm
+
+        # ── Metas do assessor (dados_assessores.json) ──────────────────────────
+        try:
+            import os as _os
+            _proj_dir = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+            _asses_path = _os.path.join(_proj_dir, "dados_assessores.json")
+            with open(_asses_path, encoding="utf-8") as _f:
+                _todos_asses = json.load(_f)
+            _nome_asses = body.get("assessor", "")
+            _asses_data = next(
+                (a for a in _todos_asses
+                 if _nome_asses and (
+                     _nome_asses.lower() in a.get("nome","").lower() or
+                     a.get("nome","").lower() in _nome_asses.lower() or
+                     # match por primeiro sobrenome
+                     any(part.lower() in a.get("nome","").lower()
+                         for part in _nome_asses.split() if len(part) > 3)
+                 )), None)
+            body["assessor_metas"] = _asses_data
+        except Exception:
+            body["assessor_metas"] = None
+
+        # ── Regra 15% Internacional (estudo Braúna) ────────────────────────────
+        _pat = body.get("patrimonio", 0) or 0
+        _composicao = body.get("composicao", {}) or {}
+        _intl_atual  = float(_composicao.get("internacional", 0) or 0)
+        _intl_modelo = float(modelo_escolhido.get("internacional", 9.0) or 9.0)
+        _META_INTL   = 15.0   # mínimo de dólar/internacional recomendado
+        _PERFIS_INTL = {"moderada","moderado","arrojada","arrojado","agressiva","agressivo","super_agressiva"}
+        _perfil_elegivel = perfil_cli.lower() in _PERFIS_INTL
+
+        if _perfil_elegivel:
+            _meta_efetiva = max(_intl_modelo, _META_INTL)
+            _gap_pp       = _meta_efetiva - _intl_atual
+            _gap_valor    = _pat * _gap_pp / 100
+            body["alerta_internacional"] = {
+                "perfil_elegivel": True,
+                "atual_pct":   _intl_atual,
+                "modelo_pct":  _intl_modelo,
+                "meta_15pct":  _META_INTL,
+                "meta_efetiva": _meta_efetiva,
+                "gap_pp":      round(_gap_pp, 2),
+                "gap_valor":   round(_gap_valor, 2),
+                "produtos_sugeridos": [
+                    {"ticker":"IVVB11", "nome":"iShares S&P 500 ETF",    "tipo":"ETF",
+                     "descricao":"Exposição ao S&P 500 via B3 — alta liquidez"},
+                    {"ticker":"GOGL34", "nome":"Alphabet (Google) BDR",   "tipo":"BDR",
+                     "descricao":"Tecnologia global — Google / YouTube"},
+                    {"ticker":"AAPL34", "nome":"Apple BDR",               "tipo":"BDR",
+                     "descricao":"BDR tech premium — ecossistema Apple"},
+                    {"ticker":"NVDC34", "nome":"NVIDIA BDR",              "tipo":"BDR",
+                     "descricao":"Semicondutores e inteligência artificial"},
+                    {"ticker":"MSFT34", "nome":"Microsoft BDR",           "tipo":"BDR",
+                     "descricao":"Cloud (Azure), Office e IA"},
+                    {"ticker":"BNDX11", "nome":"ETF Bonds Internacionais","tipo":"ETF",
+                     "descricao":"Renda fixa global — hedge cambial"},
+                ],
+            }
+        else:
+            body["alerta_internacional"] = {"perfil_elegivel": False}
+
+        # ── Sugestão automática de estruturada em RV ───────────────────────────
+        _acoes = body.get("acoes", []) or []
+        _tem_rv_expressiva = float(_composicao.get("acoes", 0) or 0) >= 3.0
+        if _tem_rv_expressiva and not body.get("estruturadas"):
+            _estrut_hp = _load(_HP_ESTRUTURADAS_FILE, [])
+            body["estruturadas"] = _estrut_hp[:4] if _estrut_hp else []
+        # flag para slide RV saber que deve sugerir estruturada
+        body["sugerir_estruturada_rv"] = _tem_rv_expressiva
+
+        # Gestoras (carteira FII e análise inteligente)
+        gestoras2_hp = _load(_HP_GESTORAS2_FILE, {})
+
+        # Análise inteligente de portfólio
+        _analise = _analisar_sugestoes_inteligentes(
+            body, produtos_hp, calls_hp, gestoras2_hp,
+            assessor_metas=body.get("assessor_metas")
+        )
+        body["sugestoes_por_classe"]   = _analise.get("sugestoes_por_classe", [])
+        body["acoes_alerta"]           = _analise.get("acoes_alerta", [])
+        body["carteira_fiis_sugerida"] = _analise.get("carteira_fiis_sugerida", {})
+        body["troca_produtos"]         = _analise.get("troca_produtos", [])
 
         pptx_bytes = _gerar_pptx(body)
     except Exception as e:
@@ -5513,9 +6047,11 @@ async function entrar(){
   }
 }
 
-// Seleciona automaticamente se já existe role salvo
+// Auto-redirect se já existe sessão salva
 const saved = localStorage.getItem("brauna_role");
-if(saved && ROLES[saved]) selRole(saved);
+if(saved && ROLES[saved]){
+  window.location.replace(ROLES[saved].dest);
+}
 </script>
 </body></html>"""
 
@@ -5859,7 +6395,7 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 // Auth guard
 (function(){
   const role = localStorage.getItem("brauna_role");
-  if(role !== "lider" && role !== "admin") { localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+  if(role !== "lider" && role !== "admin"){ localStorage.removeItem("brauna_role"); window.location.replace("/"); return; }
   const nome = localStorage.getItem("brauna_nome") || "Lider";
   fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({role:"lider",nome,acao:"acesso",detalhe:"Abriu a pagina do Lider"})});
