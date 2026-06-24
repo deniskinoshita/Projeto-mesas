@@ -8615,7 +8615,7 @@ function colorirVies(cls){
 }
 
 function coletarPortfolios(){
-  const ref = document.getElementById("porto-ref").value;
+  const ref = document.getElementById("porto-ref")?.value || "";
   const perfis = {};
   PERFIS.forEach(p=>{
     perfis[p] = {label: p.replace(/_/g," ")};
@@ -9621,11 +9621,21 @@ async function publicar(){
   _pubProgress(20);
   st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Preparando dados...</span>`;
 
-  const payload = {
-    portfolios: coletarPortfolios(),
-    cenario:    coletarCenario(),
-    produtos:   coletarProdutos(),
-  };
+  let payload;
+  try {
+    payload = {
+      portfolios: coletarPortfolios(),
+      cenario:    coletarCenario(),
+      produtos:   coletarProdutos(),
+    };
+  } catch(eColeta) {
+    _pubProgress(100, "#FF4444");
+    st.innerHTML = `<span class="status-err">Erro ao coletar dados: ${eColeta.message}</span>`;
+    btn.disabled = false;
+    btn.textContent = "📤 Publicar agora";
+    setTimeout(()=>_pubProgressHide(), 1500);
+    return;
+  }
 
   // Progresso simulado enquanto salva (container já aquecido: ~2-4s)
   const etapas = [
