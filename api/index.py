@@ -347,6 +347,39 @@ def _save(path, data):
     except Exception:
         pass
 
+# ── Carteira de referência (gestora escolhida pelo assessor) ────────────────────
+# Ordem de risco comum p/ mapear perfil do cliente -> perfil disponível na gestora.
+_RISCO_ORDEM = {"super_conservadora":0,"conservadora":1,"moderada":2,"arrojada":3,"agressiva":4,"super_agressiva":5}
+
+def _mapear_perfil(perfil, perfis_disp):
+    """Mapeia o perfil do cliente para o perfil mais próximo disponível na gestora.
+    Ex.: 'arrojada' (não existe na gestora) -> nearest entre os perfis cadastrados."""
+    perfis_disp = list(perfis_disp or [])
+    if perfil in perfis_disp:
+        return perfil
+    if not perfis_disp:
+        return perfil
+    alvo = _RISCO_ORDEM.get(perfil, 2)
+    # menor distância; empate -> perfil de maior risco
+    return min(perfis_disp, key=lambda p: (abs(_RISCO_ORDEM.get(p, 2) - alvo), -_RISCO_ORDEM.get(p, 2)))
+
+def _modelo_gestora(gestora_id, perfil):
+    """Retorna o modelo (alocação por classe) da gestora escolhida para o perfil.
+    Retorna None se a gestora não existe — chamador deve cair p/ o modelo Levante."""
+    if not gestora_id:
+        return None
+    g = _load(_HP_GESTORAS2_FILE, {}).get(gestora_id)
+    if not g:
+        return None
+    perfis = g.get("perfis", {}) or {}
+    pk = _mapear_perfil(perfil, list(perfis.keys()))
+    return {
+        "modelo":     perfis.get(pk, {}) or {},
+        "perfil_key": pk,
+        "nome":       g.get("nome", ""),
+        "referencia": g.get("referencia", "") or g.get("nome", ""),
+    }
+
 # ── Base de Conhecimento: armazenamento por-documento (escala p/ 200+ arquivos) ─
 # Índice leve (metadados) num registro; texto completo de cada doc num registro próprio.
 import re as _re_kb
@@ -1467,8 +1500,14 @@ select option{background:#1A1A1A}
   <div id="macro-badges" style="margin-bottom:14px"></div>
 
   <div style="background:#111;border-radius:8px;padding:10px 14px;margin-bottom:14px">
-    <p style="font-size:10px;color:#3A6A48;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">MODELO LEVANTE — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+      <p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin:0"><span id="modelo-gestora-lbl" style="color:#C9A96E">CARTEIRA DE REFERÊNCIA</span> — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
+      <select id="gestora-sel" onchange="onGestoraChange()" style="background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:7px 10px;color:#C9A96E;font-size:12px;outline:none;min-width:210px;cursor:pointer">
+        <option value="">— selecione a carteira —</option>
+      </select>
+    </div>
     <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px"></div>
+    <p id="gestora-vazia-hint" style="display:none;font-size:11px;color:#8A6A2A;margin-top:8px">⚠️ Nenhuma carteira de gestora cadastrada. Peça ao Admin para cadastrar as carteiras de referência.</p>
   </div>
 
   <div style="margin-bottom:10px">
@@ -1478,7 +1517,7 @@ select option{background:#1A1A1A}
         style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
         onchange="onXpFileChange(this)">
       <div class="icon">📊</div>
-      <p id="upload-hint-text">XPerformance — arraste ou clique para identificar o cliente</p>
+      <p id="upload-hint-text">XPerformance — clique para identificar o cliente</p>
       <p class="fname" id="fname-xp"></p>
     </div>
   </div>
@@ -2062,20 +2101,68 @@ if(document.readyState === "loading"){
 var _hpPortfolios = null;
 fetch("/api/hp/portfolios").then(r=>r.json()).then(d=>{ _hpPortfolios = d.perfis||null; atualizarModelo(); }).catch(()=>{});
 
+// ── Carteiras de referência (gestoras cadastradas) ──────────────────────────
+var _gestoras = {};   // id -> {id, nome, referencia, perfis}
+var _RISCO_ORDEM_JS = {super_conservadora:0,conservadora:1,moderada:2,arrojada:3,agressiva:4,super_agressiva:5};
+function _mapearPerfilJS(perfil, perfisDisp){
+  if(perfisDisp.indexOf(perfil) >= 0) return perfil;
+  if(!perfisDisp.length) return perfil;
+  const alvo = (_RISCO_ORDEM_JS[perfil] != null) ? _RISCO_ORDEM_JS[perfil] : 2;
+  return perfisDisp.slice().sort(function(a,b){
+    const da = Math.abs(((_RISCO_ORDEM_JS[a]!=null)?_RISCO_ORDEM_JS[a]:2) - alvo);
+    const db = Math.abs(((_RISCO_ORDEM_JS[b]!=null)?_RISCO_ORDEM_JS[b]:2) - alvo);
+    if(da !== db) return da - db;
+    return (_RISCO_ORDEM_JS[b]||0) - (_RISCO_ORDEM_JS[a]||0); // empate -> maior risco
+  })[0];
+}
+function carregarGestoras(){
+  fetch("/api/hp/gestoras2").then(r=>r.json()).then(d=>{
+    _gestoras = d || {};
+    const sel  = document.getElementById("gestora-sel");
+    const hint = document.getElementById("gestora-vazia-hint");
+    const ids  = Object.keys(_gestoras);
+    if(sel){
+      const atual = sel.value;
+      sel.innerHTML = '<option value="">— selecione a carteira —</option>' +
+        ids.map(id => '<option value="'+id+'">'+(_gestoras[id].nome||id)+'</option>').join("");
+      if(atual && _gestoras[atual]) sel.value = atual;
+    }
+    if(hint) hint.style.display = ids.length ? "none" : "block";
+    atualizarModelo();
+  }).catch(()=>{});
+}
+carregarGestoras();
+function onGestoraChange(){ atualizarModelo(); }
+
 function atualizarModelo(){
   const sel = document.getElementById("perfil");
   if(!sel) return;
   const p = sel.value;
-
-  // Label — atualiza imediatamente, síncrono
-  const lbl = document.getElementById("perfil-lbl");
   const NOMES = {conservadora:"CONSERVADORA",moderada:"MODERADA",arrojada:"ARROJADA",agressiva:"AGRESSIVA",super_conservadora:"SUPER CONSERVADORA"};
-  if(lbl) lbl.textContent = NOMES[p] || p.toUpperCase();
 
-  // Modelo: HP publicado tem prioridade; senão usa fallback local
-  const hp = _hpPortfolios && _hpPortfolios[p];
-  const m  = (hp && Object.keys(hp).filter(k=>k!=="label").length > 0) ? hp : MODELOS[p];
-  if(!m) return;
+  // Carteira escolhida: gestora cadastrada tem prioridade; senão cai p/ Levante.
+  const gselEl = document.getElementById("gestora-sel");
+  const gid    = gselEl ? gselEl.value : "";
+  const gestora = gid && _gestoras[gid];
+
+  let m, gestoraLbl;
+  if(gestora && gestora.perfis){
+    const pk = _mapearPerfilJS(p, Object.keys(gestora.perfis));
+    m = gestora.perfis[pk];
+    gestoraLbl = (gestora.nome || "CARTEIRA").toUpperCase();
+  } else {
+    const hp = _hpPortfolios && _hpPortfolios[p];
+    m = (hp && Object.keys(hp).filter(k=>k!=="label").length > 0) ? hp : MODELOS[p];
+    gestoraLbl = "MODELO LEVANTE";
+  }
+
+  // Labels
+  const lbl  = document.getElementById("perfil-lbl");
+  if(lbl) lbl.textContent = NOMES[p] || p.toUpperCase();
+  const glbl = document.getElementById("modelo-gestora-lbl");
+  if(glbl) glbl.textContent = gestoraLbl;
+
+  if(!m) { const gg=document.getElementById("modelo-grid"); if(gg) gg.innerHTML=""; return; }
 
   const g = document.getElementById("modelo-grid");
   if(!g) return;
@@ -2129,18 +2216,8 @@ function onXpFileChange(input){
   identificarCliente(file);
 }
 
-function setupDrop(dropId,inputId,fnameId){
-  const drop=document.getElementById(dropId), input=document.getElementById(inputId), fname=document.getElementById(fnameId);
-  // Drag-and-drop support
-  drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("drag");});
-  drop.addEventListener("dragleave",()=>drop.classList.remove("drag"));
-  drop.addEventListener("drop",e=>{
-    e.preventDefault();drop.classList.remove("drag");
-    const f = e.dataTransfer.files[0];
-    if(f){ const dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; onXpFileChange(input); }
-  });
-}
-setupDrop("drop1","pdf-xp","fname-xp");
+// Upload do XPerformance: apenas clique (o div #drop1 dispara o input via onclick).
+// Drag-and-drop foi removido a pedido — não funcionava de forma confiável.
 
 // ── Identificação automática do cliente ao subir o XPerformance ──────────────
 var _clienteIdentificado = null;
@@ -2174,6 +2251,10 @@ async function identificarCliente(file){
     if(d.ficha_salva?.nome)    document.getElementById("nome").value = d.ficha_salva.nome;
     if(d.ficha_salva?.perfil){ document.getElementById("perfil").value = d.ficha_salva.perfil; atualizarModelo(); }
     if(d.ficha_salva?.objetivo) document.getElementById("objetivo").value = d.ficha_salva.objetivo || "";
+    if(d.ficha_salva?.gestora){
+      const _gs = document.getElementById("gestora-sel");
+      if(_gs && _gestoras[d.ficha_salva.gestora]){ _gs.value = d.ficha_salva.gestora; atualizarModelo(); }
+    }
 
     // ── Restaura checklist do modelo de servir
     if(d.ficha_salva?.checklist){
@@ -2557,7 +2638,7 @@ async function buscarClientesSalvos(){
       <button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
         style="padding:6px 12px;border-radius:20px;border:1px solid #1C4A34;background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
         onmouseover="this.style.borderColor='#C9A96E'" onmouseout="this.style.borderColor='#1C4A34'">
-        ${c.nome}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""} <span style="color:#3A6A48;font-size:10px">${c.perfil}</span>
+        ${c.nome}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""} <span style="color:#3A6A48;font-size:10px">${c.perfil}</span>${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}
       </button>`).join("");
     box.style.display="block";
   }catch(e){}
@@ -2568,6 +2649,9 @@ function carregarFicha(jsonStr){
   document.getElementById("nome").value   = c.nome    || "";
   if(c.perfil) document.getElementById("perfil").value = c.perfil;
   document.getElementById("objetivo").value = c.objetivo || "";
+  // Restaura a carteira de referência escolhida (se ainda existir cadastrada)
+  const gsel = document.getElementById("gestora-sel");
+  if(gsel && c.gestora && _gestoras[c.gestora]) gsel.value = c.gestora;
   atualizarModelo();
 
   // Restaura checklist
@@ -2802,6 +2886,8 @@ async function analisar(){
   const nome=document.getElementById("nome").value.trim();
   const perfil=document.getElementById("perfil").value;
   const objetivo=document.getElementById("objetivo").value.trim();
+  const gestora=(document.getElementById("gestora-sel")||{}).value||"";
+  const gestoraNome=(gestora && _gestoras[gestora]) ? (_gestoras[gestora].nome||"") : "";
   const fileXP=document.getElementById("pdf-xp").files[0];
 
   if(!assessor){alert("Digite seu nome como assessor.");return;}
@@ -2823,6 +2909,8 @@ async function analisar(){
     // Faz os dois requests em paralelo
     const fd2 = new FormData();
     fd2.append("assessor", assessor);
+    fd2.append("perfil", perfil);
+    fd2.append("gestora", gestora);
     fd2.append("pdf", fileXP);
 
     const [res, resXP] = await Promise.all([
@@ -2869,6 +2957,7 @@ async function analisar(){
       body: JSON.stringify({
         conta: _clienteIdentificado?.conta || "",
         nome, perfil, objetivo, assessor,
+        gestora, gestora_nome: gestoraNome,
         checklist,
         cross_ativos: Object.keys(crossSell).filter(k=>crossSell[k]),
       })
@@ -3390,6 +3479,7 @@ async function gerarApresentacao(){
     conta:               xp.conta || "",
     assessor:            analiseData.assessor || document.getElementById("assessor")?.value || "",
     perfil:              analiseData.perfil || "moderada",
+    gestora:             xp.gestora || (document.getElementById("gestora-sel")||{}).value || "",
     data_ref:            analiseData.data_ref || new Date().toLocaleDateString("pt-BR"),
     patrimonio:          analiseData.patrimonio || xp.patrimonio || 0,
     rent:                analiseData.rent || xp.rent || {},
@@ -3844,6 +3934,8 @@ def ficha_endpoint():
             "nome": d.get("nome",""),
             "assessor": d.get("assessor",""),
             "perfil": d.get("perfil","conservadora"),
+            "gestora": d.get("gestora", ficha_anterior.get("gestora","")),
+            "gestora_nome": d.get("gestora_nome", ficha_anterior.get("gestora_nome","")),
             "objetivo": d.get("objetivo",""),
             "checklist": checklist_final,
             "cross_ativos": cross_final,
@@ -4900,25 +4992,40 @@ def analyze_xp():
 
     comp = dados["comp"]
 
-    # Carrega modelo HP publicado (ou default Levante)
-    hp_porto = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
-    perfis_hp = hp_porto.get("perfis", {})
+    # Carteira de referência: gestora escolhida pelo assessor (se houver),
+    # senão cai p/ o modelo Levante publicado (default).
+    gestora_id  = (request.form.get("gestora", "") or "").strip()
+    perfil_form = (request.form.get("perfil", "") or "").strip().lower()
+    gestora_obj = _load(_HP_GESTORAS2_FILE, {}).get(gestora_id) if gestora_id else None
 
-    # Detecta perfil mais próximo pela composição atual
+    if gestora_obj:
+        perfis_hp     = gestora_obj.get("perfis", {}) or {}
+        referencia_hp = gestora_obj.get("referencia") or gestora_obj.get("nome", "")
+        gestora_nome  = gestora_obj.get("nome", "")
+    else:
+        hp_porto      = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+        perfis_hp     = hp_porto.get("perfis", {})
+        referencia_hp = hp_porto.get("referencia", "Levante Asset")
+        gestora_nome  = ""
+
+    # Perfil: respeita o escolhido no formulário (mapeado p/ os perfis da gestora);
+    # se não vier, detecta o mais próximo pela composição atual.
     def distancia(comp, modelo_perfil):
         return sum(abs(comp.get(cls, 0) - modelo_perfil.get(cls, 0)) for cls in CATS)
 
-    melhor_perfil = "moderada"
-    menor_dist = float("inf")
-    for pk, pv in perfis_hp.items():
-        d = distancia(comp, pv)
-        if d < menor_dist:
-            menor_dist = d
-            melhor_perfil = pk
+    if perfil_form and perfis_hp:
+        melhor_perfil = perfil_form if perfil_form in perfis_hp else _mapear_perfil(perfil_form, list(perfis_hp.keys()))
+    else:
+        melhor_perfil = "moderada"
+        menor_dist = float("inf")
+        for pk, pv in perfis_hp.items():
+            d = distancia(comp, pv)
+            if d < menor_dist:
+                menor_dist = d
+                melhor_perfil = pk
 
     modelo_escolhido = perfis_hp.get(melhor_perfil, {})
     label_perfil = modelo_escolhido.get("label", melhor_perfil.capitalize())
-    referencia_hp = hp_porto.get("referencia", "Levante Asset")
 
     # Desvios por classe
     desvios = []
@@ -5167,6 +5274,8 @@ def analyze_xp():
         "patrimonio":  dados["patrimonio"],
         "perfil_detectado": label_perfil,
         "referencia_modelo": referencia_hp,
+        "gestora":     gestora_id,
+        "gestora_nome": gestora_nome,
         "composicao":  comp,
         "caixa":       dados["caixa"],
         "rent":        dados["rent"],
@@ -5740,11 +5849,15 @@ def gerar_pptx():
         body["rent_12m"] = rent_12m
         body["pct_cdi"]  = round(rent_12m / cdi_12m * 100, 1) if cdi_12m else 0
 
-        # Injeta modelo_hp para o slide Carteira vs Modelo
-        hp_porto = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
-        ORDEM_PERFIL_ALL = ["super_conservadora","conservadora","moderada","arrojada","agressiva","super_agressiva"]
-        perfil_key = perfil_cli if perfil_cli in hp_porto.get("perfis",{}) else "moderada"
-        modelo_escolhido = hp_porto.get("perfis",{}).get(perfil_key, {})
+        # Injeta modelo_hp para o slide Carteira vs Modelo.
+        # Usa a gestora escolhida pelo assessor (se houver); senão, o modelo Levante.
+        _gestora_modelo = _modelo_gestora(body.get("gestora", ""), perfil_cli)
+        if _gestora_modelo:
+            modelo_escolhido = _gestora_modelo["modelo"]
+        else:
+            hp_porto = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+            perfil_key = perfil_cli if perfil_cli in hp_porto.get("perfis", {}) else "moderada"
+            modelo_escolhido = hp_porto.get("perfis", {}).get(perfil_key, {})
         body["modelo_hp"] = {k: v for k, v in modelo_escolhido.items()
                              if k not in ("label",)}
 
