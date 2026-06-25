@@ -3,7 +3,7 @@ Gerador de Apresentação PPTX — Braúna Investimentos
 Identidade visual teal premium, gráficos nativos python-pptx, 15 slides.
 Modelo: Reunião_Trimestral_15slides_Brauna.pptx
 """
-import io, math, datetime
+import io, math, datetime, os as _os
 from pptx import Presentation
 from pptx.util import Pt, Cm, Emu
 from pptx.dml.color import RGBColor
@@ -157,7 +157,36 @@ def _pct_float(v):
         return 0.0
 
 def new_slide(prs):
-    return prs.slides.add_slide(prs.slide_layouts[6])
+    # Layout 6 = blank; index pode variar — tenta 6, 11, 0
+    for idx in (6, 11, 5, 0):
+        try:
+            return prs.slides.add_slide(prs.slide_layouts[idx])
+        except Exception:
+            pass
+    return prs.slides.add_slide(prs.slide_layouts[0])
+
+
+def _new_prs():
+    """Abre template Brauna ou cria apresentação em branco."""
+    template = _os.path.join(_os.path.dirname(__file__), "template_brauna.pptx")
+    if not _os.path.exists(template):
+        prs = Presentation()
+        prs.slide_width  = SW
+        prs.slide_height = SH
+        return prs
+    prs = Presentation(template)
+    # Remover todos os slides do template (mantém apenas master/layouts)
+    sldIdLst = prs.slides._sldIdLst
+    for sldId in list(sldIdLst):
+        rId = sldId.get(
+            '{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id')
+        sldIdLst.remove(sldId)
+        if rId:
+            try:
+                prs.part.drop_rel(rId)
+            except Exception:
+                pass
+    return prs
 
 def _get_base(d):
     """Extrai campos comuns do dict d."""
@@ -1953,6 +1982,486 @@ def s_carteira_fiis(prs, d, num=9):
                  size=8, color=C_LGRAY, italic=True)
 
 
+# ── SLIDE: RV DESTAQUES — ALTAS / QUEDAS / 24M ───────────────────────────────
+def s_rv_destaques(prs, d, num=5):
+    """NN | Renda Variável — Altas, Quedas e Destaques 24M"""
+    sl = new_slide(prs)
+    bg(sl)
+    b = _get_base(d)
+
+    acoes = d.get("acoes", [])
+    try:
+        mes_nome = ["", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                    "Jul", "Ago", "Set", "Out", "Nov", "Dez"][int(b["data_ref"].split("/")[1])]
+        ano_nome = b["data_ref"].split("/")[2]
+        mes_label = f"{mes_nome}/{ano_nome[-2:]}"
+    except Exception:
+        mes_label = b["data_ref"]
+
+    pat_rv = sum(float(a.get("saldo", 0) or 0) for a in acoes)
+    header(sl, num, "Renda Variável — Destaques da Carteira",
+           sub=f"Principais posições e performance no mês  |  Carteira RV: {fmt_brl(pat_rv)}",
+           **b)
+
+    if not acoes:
+        add_text(sl, "Sem posições de renda variável registradas.",
+                 MARGIN, Cm(5), Cm(28), Cm(1), size=12, color=C_LGRAY)
+        return
+
+    # Helper
+    def _pv(v):
+        try:
+            return float(str(v).replace("%","").replace(",",".").replace("+","").strip())
+        except Exception:
+            return None
+
+    acoes_saldo = sorted(acoes, key=lambda a: float(a.get("saldo",0) or 0), reverse=True)
+
+    def _perf_key(a):
+        for k in ("mes","rentabilidade_mes","r_mes"):
+            v = _pv(a.get(k,""))
+            if v is not None:
+                return v
+        return 0.0
+
+    def _perf_12m(a):
+        for k in ("12m","rentabilidade_12m","r_12m","24m","rentabilidade_24m"):
+            v = _pv(a.get(k,""))
+            if v is not None:
+                return v
+        return 0.0
+
+    altas  = sorted(acoes, key=_perf_key, reverse=True)[:6]
+    quedas = sorted(acoes, key=_perf_key)[:6]
+    top24m = sorted(acoes, key=_perf_12m, reverse=True)[:6]
+
+    # ── Tabela esquerda — Maiores posições ──────────────────────────────────
+    tab_w  = Cm(18.5)
+    tab_y  = Cm(2.65)
+    COLS   = ["Ticker", "Saldo", "% Carteira", "Mês", "Ano", "24M"]
+    col_xs = [MARGIN + Cm(0.1), Cm(4.3), Cm(8.8), Cm(12.2), Cm(15.0), Cm(17.8)]
+    col_ws = [Cm(3.7), Cm(4.2), Cm(3.2), Cm(2.8), Cm(2.8), Cm(2.8)]
+
+    add_text(sl, "Maiores Posições (por saldo)",
+             MARGIN, tab_y - Cm(0.45), tab_w, Cm(0.45),
+             size=12, bold=True, color=C_WHITE)
+    add_rect(sl, MARGIN, tab_y, tab_w, Cm(0.6), C_TEAL_D)
+    for cx, cw, ch in zip(col_xs, col_ws, COLS):
+        if cx > MARGIN + tab_w: break
+        add_text(sl, ch, cx, tab_y + Cm(0.05), cw, Cm(0.5), size=10, bold=True, color=C_LGRAY)
+
+    row_h = Cm(0.72)
+    for ri, ativo in enumerate(acoes_saldo[:9]):
+        ry = tab_y + Cm(0.6) + ri * row_h
+        add_rect(sl, MARGIN, ry, tab_w, row_h, C_CARD if ri % 2 == 0 else C_CARD2)
+        ticker = ativo.get("ticker","—")
+        saldo  = float(ativo.get("saldo", ativo.get("valor",0)) or 0)
+        pct_c  = float(ativo.get("pct_carteira", ativo.get("percentual",0)) or 0)
+        r_mes  = ativo.get("mes", ativo.get("rentabilidade_mes","—"))
+        r_ano  = ativo.get("ano", ativo.get("rentabilidade_ano","—"))
+        r_12m  = ativo.get("12m", ativo.get("rentabilidade_12m","—"))
+        row_v  = [(ticker, C_TEAL_D, True),
+                  (fmt_brl_short(saldo), C_TEXT, True),
+                  (f"{pct_c:.2f}%", C_TEXT, True),
+                  (str(r_mes), pct_cor(r_mes), False),
+                  (str(r_ano), pct_cor(r_ano), False),
+                  (str(r_12m), pct_cor(r_12m), False)]
+        for (val, cor, bld), cx, cw in zip(row_v, col_xs, col_ws):
+            if cx > MARGIN + tab_w: break
+            add_text(sl, val, cx, ry + Cm(0.1), cw, Cm(0.55), size=10, bold=bld, color=cor)
+
+    # ── Coluna direita — Altas & Quedas ──────────────────────────────────────
+    rx  = MARGIN + tab_w + Cm(0.5)
+    rw  = SW - rx - Cm(0.8)
+    ry_ = tab_y
+
+    # Maiores Altas
+    add_rect(sl, rx, ry_, rw, Cm(0.55), C_GREEN)
+    add_text(sl, f"✅ Maiores Altas — {mes_label}",
+             rx + Cm(0.2), ry_ + Cm(0.05), rw - Cm(0.3), Cm(0.5),
+             size=12, bold=True, color=C_BG)
+    iy = ry_ + Cm(0.6)
+    for ativo in altas[:5]:
+        ticker = ativo.get("ticker","—")
+        saldo  = float(ativo.get("saldo",0) or 0)
+        pct_m  = _perf_key(ativo)
+        add_rect(sl, rx, iy, rw, Cm(0.9), C_CARD)
+        add_text(sl, ticker, rx + Cm(0.2), iy + Cm(0.05), Cm(2.5), Cm(0.65),
+                 size=11, bold=True, color=C_TEAL_D)
+        add_text(sl, f"{pct_m:+.2f}%", rx + Cm(2.9), iy + Cm(0.05), Cm(2.5), Cm(0.65),
+                 size=14, bold=True, color=C_GREEN)
+        add_text(sl, fmt_brl_short(saldo),
+                 rx + Cm(5.6), iy + Cm(0.2), rw - Cm(5.8), Cm(0.45), size=8, color=C_LGRAY)
+        iy += Cm(0.95)
+
+    # Maiores Quedas
+    iy += Cm(0.25)
+    add_rect(sl, rx, iy, rw, Cm(0.55), C_RED)
+    add_text(sl, "⚠️ Atenção — Maiores Quedas no Mês",
+             rx + Cm(0.2), iy + Cm(0.05), rw - Cm(0.3), Cm(0.5),
+             size=12, bold=True, color=C_WHITE)
+    iy += Cm(0.6)
+    for ativo in quedas[:5]:
+        ticker = ativo.get("ticker","—")
+        saldo  = float(ativo.get("saldo",0) or 0)
+        pct_m  = _perf_key(ativo)
+        add_rect(sl, rx, iy, rw, Cm(0.9), C_CARD)
+        add_text(sl, ticker, rx + Cm(0.2), iy + Cm(0.05), Cm(2.5), Cm(0.65),
+                 size=11, bold=True, color=C_RED)
+        add_text(sl, f"{pct_m:+.2f}%", rx + Cm(2.9), iy + Cm(0.05), Cm(2.5), Cm(0.65),
+                 size=13, bold=True, color=C_RED)
+        add_text(sl, fmt_brl_short(saldo),
+                 rx + Cm(5.6), iy + Cm(0.2), rw - Cm(5.8), Cm(0.45), size=8, color=C_LGRAY)
+        iy += Cm(0.95)
+
+    # ── Faixa inferior — Destaques 24M ───────────────────────────────────────
+    d24_y = SH - Cm(2.8)
+    if len(top24m) >= 2:
+        add_rect(sl, MARGIN, d24_y, SW - Cm(1.6), Cm(0.55), C_TEAL_D)
+        add_text(sl, "⭐ Destaques em 24 Meses (acumulado)",
+                 MARGIN + Cm(0.3), d24_y + Cm(0.05), SW - Cm(2.0), Cm(0.5),
+                 size=12, bold=True, color=C_WHITE)
+        col_w24 = (SW - Cm(1.6)) / min(len(top24m), 6)
+        for i, ativo in enumerate(top24m[:6]):
+            ticker = ativo.get("ticker","—")
+            pct_v  = _perf_12m(ativo)
+            desc_a = ativo.get("nome", ativo.get("descricao",""))
+            ax = MARGIN + i * col_w24
+            ay = d24_y + Cm(0.6)
+            add_rect(sl, ax, ay, col_w24 - Cm(0.08), Cm(1.85), C_CARD)
+            add_text(sl, ticker, ax + Cm(0.2), ay + Cm(0.05), col_w24 - Cm(0.4), Cm(0.65),
+                     size=11, bold=True, color=C_TEAL_D)
+            add_text(sl, f"{pct_v:+.2f}%", ax + Cm(0.2), ay + Cm(0.7), col_w24 - Cm(0.4), Cm(0.65),
+                     size=13, bold=True, color=C_GREEN)
+            if desc_a:
+                add_text(sl, str(desc_a)[:20], ax + Cm(0.2), ay + Cm(1.35),
+                         col_w24 - Cm(0.3), Cm(0.4), size=8, color=C_LGRAY)
+
+
+# ── SLIDE: RENDA FIXA DETALHADA ───────────────────────────────────────────────
+def s_rf_detalhada(prs, d, num=6):
+    """NN | Renda Fixa & Alternativo — Posição Detalhada"""
+    sl = new_slide(prs)
+    bg(sl)
+    b = _get_base(d)
+    header(sl, num, "Renda Fixa & Alternativo — Posição Detalhada",
+           sub="Posição em crédito privado, debêntures incentivadas e alternativos",
+           **b)
+
+    composicao = d.get("composicao", {})
+    saldos     = d.get("saldos_por_classe", {})
+    rents      = d.get("rents_por_classe", {}) or {}
+    pat        = d.get("patrimonio", 0) or 0
+
+    # Seções RF
+    secoes_rf = [
+        ("pos_fixado",  "📊  Pós Fixado",        C_GOLD),
+        ("inflacao",    "📊  Inflação (IPCA+)",   C_AMBER),
+        ("pre_fixado",  "📊  Pré Fixado",         RGBColor(0xF0, 0x78, 0x50)),
+        ("multimercado","📊  Multimercado",        RGBColor(0xB0, 0x8F, 0xCF)),
+    ]
+
+    COLS_RF = ["Produto / Fundo", "Saldo", "% Ptf", "Mês", "% CDI", "Ano", "24M", "Obs"]
+    col_xs = [MARGIN, Cm(8.5), Cm(13.0), Cm(16.0), Cm(18.8), Cm(21.5), Cm(24.5), Cm(27.5)]
+    col_ws = [Cm(8.0), Cm(4.2), Cm(2.8), Cm(2.8), Cm(2.5), Cm(2.8), Cm(2.8), Cm(5.5)]
+
+    current_y = Cm(2.65)
+    sec_h_header = Cm(0.6)
+    row_h = Cm(0.62)
+
+    rf_classes_show = [c for c in secoes_rf if saldos.get(c[0], 0) > 0]
+    if not rf_classes_show:
+        add_text(sl, "Sem posições de renda fixa registradas.",
+                 MARGIN, Cm(5), Cm(28), Cm(1), size=12, color=C_LGRAY)
+        return
+
+    for cls_key, cls_label, cls_cor in rf_classes_show:
+        saldo_cls = float(saldos.get(cls_key, 0) or 0)
+        pct_cls   = float(composicao.get(cls_key, 0) or 0)
+        rent_d    = rents.get(cls_key, {}) if isinstance(rents, dict) else {}
+
+        # Cabeçalho da seção
+        add_rect(sl, MARGIN, current_y, SW - Cm(1.6), sec_h_header, C_CARD2)
+        add_rect(sl, MARGIN, current_y, Cm(0.1), sec_h_header, cls_cor)
+        lbl_txt = f"{cls_label}  —  {fmt_brl(saldo_cls)}  ({pct_cls:.2f}%)"
+        add_text(sl, lbl_txt, MARGIN + Cm(0.3), current_y + Cm(0.05),
+                 SW - Cm(2.0), Cm(0.5), size=12, bold=True, color=C_WHITE)
+        current_y += sec_h_header
+
+        # Cabeçalho da tabela
+        add_rect(sl, MARGIN, current_y, SW - Cm(1.6), Cm(0.45), C_TEAL_D)
+        for cx, cw, ch in zip(col_xs, col_ws, COLS_RF):
+            add_text(sl, ch, cx + Cm(0.08), current_y + Cm(0.02), cw, Cm(0.4),
+                     size=8, bold=True, color=C_WHITE)
+        current_y += Cm(0.45)
+
+        # Produtos individuais (usa ativos_rf se disponível, senão linha de classe)
+        produtos_cls = []
+        for p in (d.get("ativos_rf") or d.get("renda_fixa_produtos") or []):
+            if isinstance(p, dict) and p.get("classe") == cls_key:
+                produtos_cls.append(p)
+
+        if produtos_cls:
+            for ri, prod in enumerate(produtos_cls[:4]):
+                nome_p = str(prod.get("nome", prod.get("produto","—")))[:55]
+                saldo_p = float(prod.get("saldo", 0) or 0)
+                pct_p   = round(saldo_p / pat * 100, 2) if pat else 0.0
+                r_mes_p = prod.get("mes", prod.get("rentabilidade_mes","—"))
+                pct_cdi_p = prod.get("pct_cdi", prod.get("percentual_cdi","—"))
+                r_ano_p = prod.get("ano", prod.get("rentabilidade_ano","—"))
+                r_24m_p = prod.get("24m", prod.get("rentabilidade_24m","—"))
+                obs_p   = str(prod.get("obs", prod.get("destaque",""))[:25])
+                cor_obs = C_GREEN if "✅" in obs_p or "acima" in obs_p.lower() else \
+                          (C_RED if "⚠️" in obs_p or "abaixo" in obs_p.lower() else C_LGRAY)
+                add_rect(sl, MARGIN, current_y, SW - Cm(1.6), row_h,
+                         C_CARD if ri % 2 == 0 else C_CARD2)
+                vals = [nome_p, fmt_brl_short(saldo_p), f"{pct_p:.2f}%",
+                        str(r_mes_p), str(pct_cdi_p), str(r_ano_p), str(r_24m_p), obs_p]
+                cors = [C_WHITE, C_TEXT, C_TEXT,
+                        pct_cor(r_mes_p), pct_cor(pct_cdi_p), pct_cor(r_ano_p), pct_cor(r_24m_p), cor_obs]
+                for val, cor, cx, cw in zip(vals, cors, col_xs, col_ws):
+                    add_text(sl, val, cx + Cm(0.08), current_y + Cm(0.06),
+                             cw, Cm(0.5), size=8, bold=False, color=cor)
+                current_y += row_h
+        else:
+            # Linha única de classe
+            r_mes_c = rent_d.get("mes","—")
+            r_ano_c = rent_d.get("ano", rent_d.get("12m","—"))
+            add_rect(sl, MARGIN, current_y, SW - Cm(1.6), row_h, C_CARD)
+            vals = [CLS_LABEL.get(cls_key, cls_key),
+                    fmt_brl_short(saldo_cls), f"{pct_cls:.2f}%",
+                    str(r_mes_c), "—", str(r_ano_c), "—", ""]
+            cors = [C_WHITE, C_TEXT, C_TEXT,
+                    pct_cor(r_mes_c), C_LGRAY, pct_cor(r_ano_c), C_LGRAY, C_LGRAY]
+            for val, cor, cx, cw in zip(vals, cors, col_xs, col_ws):
+                add_text(sl, val, cx + Cm(0.08), current_y + Cm(0.06),
+                         cw, Cm(0.5), size=8, color=cor)
+            current_y += row_h
+
+        current_y += Cm(0.25)  # espaço entre seções
+
+    # Alternativo
+    saldo_alt = float(saldos.get("alternativos", saldos.get("criptomoedas", 0)) or 0)
+    pct_alt   = float(composicao.get("alternativos", composicao.get("criptomoedas", 0)) or 0)
+    ativos_alt = d.get("ativos_alternativos", [])
+    if saldo_alt > 0 and current_y < SH - Cm(2.0):
+        add_rect(sl, MARGIN, current_y, SW - Cm(1.6), Cm(0.6), C_CARD2)
+        add_rect(sl, MARGIN, current_y, Cm(0.1), Cm(0.6), RGBColor(0x4E,0xC9,0xB0))
+        if ativos_alt:
+            txt = "  |  ".join(f"{a.get('ticker','')}: {fmt_brl_short(float(a.get('saldo',0) or 0))}"
+                                for a in ativos_alt[:4])
+        else:
+            txt = f"Alternativos  —  {fmt_brl(saldo_alt)}  ({pct_alt:.2f}%)"
+        add_text(sl, f"🔶  {txt}", MARGIN + Cm(0.3), current_y + Cm(0.08),
+                 SW - Cm(2.0), Cm(0.5), size=10, color=C_AMBER)
+
+
+# ── SLIDE: RENTABILIDADE HISTÓRICA MENSAL ─────────────────────────────────────
+def s_historico_mensal(prs, d, num=8):
+    """NN | Rentabilidade Histórica — tabela mês × ano"""
+    sl = new_slide(prs)
+    bg(sl)
+    b = _get_base(d)
+
+    data_r = b["data_ref"]
+    try:
+        ano_atual = int(data_r.split("/")[2])
+    except Exception:
+        ano_atual = datetime.datetime.now().year
+
+    header(sl, num, "Rentabilidade Histórica — Mensal",
+           sub=f"Rentabilidade mensal do portfólio vs CDI  |  Fonte: XP Performance",
+           **b)
+
+    hist = d.get("historico_mensal", {})  # {"2024": {"jan": "-0.34%", ...}, ...}
+    hist_anos = d.get("historico_anos", [])
+
+    # Usar anos disponíveis (máx 4 anos)
+    anos_disp = sorted([int(k) for k in hist.keys() if str(k).isdigit()], reverse=True)[:4] \
+        if hist else []
+
+    # Fallback: construir da rentabilidade disponível
+    if not anos_disp:
+        fallback = {}
+        if d.get("rentabilidade_mes"):
+            try:
+                mes_num = int(data_r.split("/")[1])
+                mes_keys = ["jan","fev","mar","abr","mai","jun",
+                            "jul","ago","set","out","nov","dez"]
+                fallback[str(ano_atual)] = {mes_keys[mes_num - 1]: d["rentabilidade_mes"]}
+            except Exception:
+                pass
+        hist = fallback
+        anos_disp = [ano_atual] if fallback else []
+
+    if not anos_disp:
+        add_text(sl, "Histórico mensal não disponível para este cliente.",
+                 MARGIN, Cm(5), Cm(28), Cm(2), size=13, color=C_LGRAY)
+        return
+
+    meses = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]
+    MESES_H = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
+
+    # Dimensões da tabela
+    col_ano_w = Cm(2.4)
+    col_m_w   = Cm(2.08)
+    col_ano_tot_w = Cm(2.4)
+    col_acum_w    = Cm(2.7)
+    tab_y = Cm(2.65)
+    row_h = Cm(0.9)
+
+    # Cabeçalho
+    add_rect(sl, MARGIN, tab_y, SW - Cm(1.6), Cm(0.65), C_TEAL_D)
+    hdrs_all = [("Ano", col_ano_w)] + [(m, col_m_w) for m in MESES_H] + \
+               [("ANO", col_ano_tot_w), ("Acum.", col_acum_w)]
+    cx_cur = MARGIN
+    for hdr, cw in hdrs_all:
+        add_text(sl, hdr, cx_cur + Cm(0.05), tab_y + Cm(0.08), cw - Cm(0.05), Cm(0.5),
+                 size=8, bold=True, color=C_WHITE)
+        cx_cur += cw
+
+    # Linhas de anos
+    cdi_map = {}
+    for ha in hist_anos:
+        if isinstance(ha, dict):
+            try:
+                cdi_map[int(ha.get("ano", 0))] = ha.get("cdi_acumulado") or ha.get("cdi")
+            except Exception:
+                pass
+
+    for ri, ano in enumerate(anos_disp):
+        ry = tab_y + Cm(0.65) + ri * row_h
+        add_rect(sl, MARGIN, ry, SW - Cm(1.6), row_h, C_CARD if ri % 2 == 0 else C_CARD2)
+
+        ano_data = hist.get(str(ano), {})
+        ano_ret  = next((ha.get("retorno") for ha in hist_anos
+                         if isinstance(ha, dict) and str(ha.get("ano","")) == str(ano)), None)
+        acum_ret = next((ha.get("acumulado") for ha in hist_anos
+                         if isinstance(ha, dict) and str(ha.get("ano","")) == str(ano)), None)
+
+        cx_cur = MARGIN
+        # Coluna Ano
+        add_text(sl, str(ano), cx_cur + Cm(0.1), ry + Cm(0.2), col_ano_w - Cm(0.1), Cm(0.55),
+                 size=8, bold=True, color=C_TEAL_D)
+        cx_cur += col_ano_w
+
+        # Meses
+        for mes_k in meses:
+            val = ano_data.get(mes_k, "—")
+            cor = pct_cor(val) if val != "—" else C_LGRAY
+            add_text(sl, str(val), cx_cur + Cm(0.05), ry + Cm(0.2), col_m_w - Cm(0.05), Cm(0.55),
+                     size=8, color=cor)
+            cx_cur += col_m_w
+
+        # ANO total
+        if ano_ret:
+            add_text(sl, str(ano_ret), cx_cur + Cm(0.05), ry + Cm(0.2),
+                     col_ano_tot_w - Cm(0.05), Cm(0.55),
+                     size=8, bold=True, color=pct_cor(ano_ret))
+        cx_cur += col_ano_tot_w
+
+        # Acumulado
+        if acum_ret:
+            add_text(sl, str(acum_ret), cx_cur + Cm(0.05), ry + Cm(0.2),
+                     col_acum_w - Cm(0.05), Cm(0.55),
+                     size=8, bold=True, color=C_GREEN)
+
+    # Nota rodapé
+    nota_y = tab_y + Cm(0.65) + len(anos_disp) * row_h + Cm(0.3)
+    if nota_y < SH - Cm(1.2):
+        add_rect(sl, MARGIN, nota_y, SW - Cm(1.6), Cm(0.6), C_TEAL_D)
+        add_text(sl, "✅ Verde = retorno positivo  |  🔴 Vermelho = retorno negativo  "
+                     "|  Fonte: Extrato XP Performance",
+                 MARGIN + Cm(0.3), nota_y + Cm(0.1), SW - Cm(2.0), Cm(0.45),
+                 size=9, color=C_DKGRAY)
+
+
+# ── SLIDE: PIRÂMIDE FINANCEIRA ────────────────────────────────────────────────
+def s_piramide(prs, d, num=9):
+    """NN | Estruturação Financeira — Pirâmide de Objetivos"""
+    sl = new_slide(prs)
+    bg(sl)
+    b = _get_base(d)
+    pat_str = fmt_brl(d.get("patrimonio", 0))
+    header(sl, num, "Estruturação Financeira — Pirâmide de Objetivos",
+           sub=f"A carteira de {pat_str} é apenas uma das camadas. Precisamos cuidar de todo o patrimônio.",
+           **b)
+
+    piramide_data = d.get("piramide_financeira", {}) or {}
+
+    # 7 níveis (base → topo)
+    niveis = [
+        ("Plano de Saúde",          "piramide_saude",           C_GREEN,   "plano_saude"),
+        ("Proteção Financeira",     "piramide_protecao",        C_TEAL,    "protecao"),
+        ("Reserva de Emergência",   "piramide_reserva_emerg",   C_GREEN,   "reserva_emergencia"),
+        ("Reserva de Médio Prazo",  "piramide_reserva_medio",   C_AMBER,   "reserva_medio"),
+        ("Investimentos",           "piramide_invest",          C_GOLD,    "investimentos"),
+        ("Reserva de Longo Prazo",  "piramide_reserva_longo",   C_AMBER,   "reserva_longo"),
+        ("Legado Familiar",         "piramide_legado",          C_TEAL_DP, "legado"),
+    ]
+
+    STATUS_ICON = {"ok": "✅", "em_construcao": "🔄", "pendente": "⏳",
+                   "ativo": "✅", "constituida": "✅", "vigente": "✅"}
+
+    # Pirâmide desenhada com retângulos de largura decrescente
+    piramide_x = MARGIN
+    piramide_w_base = Cm(19.0)
+    piramide_h_total = Cm(15.0)
+    nivel_h = piramide_h_total / len(niveis)
+    start_y = Cm(2.65)
+
+    for i, (label, _key, cor, data_key) in enumerate(niveis):
+        nivel_idx = i  # 0 = base, 6 = topo
+        inv_idx   = len(niveis) - 1 - i  # para largura decrescente no topo
+        frac      = (inv_idx + 1) / len(niveis)
+        nivel_w   = piramide_w_base * frac
+        x_offset  = (piramide_w_base - nivel_w) / 2
+        x = piramide_x + x_offset
+        y = start_y + i * nivel_h
+
+        add_rect(sl, x, y, nivel_w, nivel_h - Cm(0.08), cor)
+        add_text(sl, label, x + Cm(0.3), y + nivel_h / 2 - Cm(0.35),
+                 nivel_w - Cm(0.6), Cm(0.7), size=12, bold=True, color=C_WHITE,
+                 align=PP_ALIGN.CENTER)
+
+    # Painel de status (lado direito)
+    status_x = piramide_x + piramide_w_base + Cm(1.0)
+    status_w  = SW - status_x - MARGIN
+    status_y  = start_y
+
+    add_text(sl, "Status & Próximas Ações",
+             status_x, status_y, status_w, Cm(0.65),
+             size=13, bold=True, color=C_TEXT)
+
+    item_h_s = Cm(1.9)
+    for i, (label, _key, cor, data_key) in enumerate(niveis):
+        iy = status_y + Cm(0.8) + i * item_h_s
+        nivel_info = piramide_data.get(data_key, {})
+        if isinstance(nivel_info, str):
+            nivel_info = {"status": nivel_info}
+        status = nivel_info.get("status", "pendente")
+        obs    = nivel_info.get("obs", nivel_info.get("descricao", ""))
+        icone  = STATUS_ICON.get(status, "⏳")
+
+        add_rect(sl, status_x, iy, status_w, item_h_s - Cm(0.1), C_CARD, C_TEAL_D, 0.3)
+        add_rect(sl, status_x, iy, Cm(0.1), item_h_s - Cm(0.1), cor)
+
+        add_text(sl, f"{icone} {label}", status_x + Cm(0.3), iy + Cm(0.1),
+                 status_w - Cm(0.4), Cm(0.65), size=11, bold=True, color=C_TEXT)
+
+        obs_txt = obs or {
+            "ok": "Ativo — revisar anualmente",
+            "em_construcao": "Em construção — próximo passo",
+            "pendente": "Planejar junto ao assessor",
+            "ativo": "Ativo — acompanhar",
+            "constituida": "Constituída — manter",
+            "vigente": "Vigente — atualizar",
+        }.get(status, "Conversar com assessor")
+        add_text(sl, str(obs_txt)[:50],
+                 status_x + Cm(0.3), iy + Cm(0.82), status_w - Cm(0.4), Cm(0.6),
+                 size=10, color=C_LGRAY)
+
+
 # ── FUNÇÃO PRINCIPAL ──────────────────────────────────────────────────────────
 def gerar_apresentacao_pptx(d: dict) -> bytes:
     """
@@ -1962,9 +2471,7 @@ def gerar_apresentacao_pptx(d: dict) -> bytes:
             [10-Internacional (perfis moderado+)], [11-Sugestões],
             12-Estratégias, 13-Ecossistema, 14-Próximos Passos, 15-Encerramento
     """
-    prs = Presentation()
-    prs.slide_width  = SW
-    prs.slide_height = SH
+    prs = _new_prs()
 
     tem_desvios  = bool(d.get("desvios"))
     tem_calls    = bool(d.get("calls") or d.get("estruturadas"))
@@ -1980,6 +2487,14 @@ def gerar_apresentacao_pptx(d: dict) -> bytes:
     tem_acoes_alerta     = bool(d.get("acoes_alerta"))
     tem_carteira_fiis    = bool(d.get("carteira_fiis_sugerida"))
 
+    # Slides melhorados
+    tem_rv_destaques  = bool(d.get("acoes") and len(d.get("acoes", [])) >= 3)
+    tem_rf_detalhada  = bool(d.get("saldos_por_classe") and
+                             any(d.get("saldos_por_classe", {}).get(c, 0) > 0
+                                 for c in ("pos_fixado","inflacao","pre_fixado","multimercado")))
+    tem_historico     = bool(d.get("historico_mensal") or d.get("historico_anos"))
+    tem_piramide      = True  # sempre gera (usa defaults quando sem dados)
+
     # Agenda dinâmica
     agenda_items = [
         (1, "Contexto Macro & Mercado",    "SELIC, IPCA, câmbio e perspectivas"),
@@ -1992,8 +2507,16 @@ def gerar_apresentacao_pptx(d: dict) -> bytes:
         agenda_items.append((n, "Análise de Risco & Diagnóstico", "Desvios e pontos de atenção")); n += 1
     if tem_calls:
         agenda_items.append((n, "Calls & Oportunidades", "Recomendações e operações estruturadas")); n += 1
-    if tem_rv:
+    if tem_rv_destaques:
+        agenda_items.append((n, "Destaques: Renda Variável", "Top performers, maiores posições e ações de atenção")); n += 1
+    elif tem_rv:
         agenda_items.append((n, "Renda Variável", "Posições, performance e operação estruturada sugerida")); n += 1
+    if tem_rf_detalhada:
+        agenda_items.append((n, "Destaques: Renda Fixa & Alt.", "Crédito privado, debêntures e alternativos")); n += 1
+    if tem_historico:
+        agenda_items.append((n, "Rentabilidade Histórica", "Rentabilidade mensal por ano vs CDI")); n += 1
+    if tem_piramide:
+        agenda_items.append((n, "Estruturação Financeira", "Pirâmide financeira e status dos objetivos de vida")); n += 1
     if tem_intl:
         agenda_items.append((n, "Internacional — 15% em Dólar", "Proteção cambial e diversificação global")); n += 1
     if tem_sugs:
@@ -2027,8 +2550,16 @@ def gerar_apresentacao_pptx(d: dict) -> bytes:
         s_desvios(prs, d,  num=_N())
     if tem_calls:
         s_calls(prs, d,    num=_N())
-    if tem_rv:
+    if tem_rv_destaques:
+        s_rv_destaques(prs, d, num=_N())
+    elif tem_rv:
         s_rv(prs, d,       num=_N())
+    if tem_rf_detalhada:
+        s_rf_detalhada(prs, d, num=_N())
+    if tem_historico:
+        s_historico_mensal(prs, d, num=_N())
+    if tem_piramide:
+        s_piramide(prs, d, num=_N())
     if tem_intl:
         s_internacional(prs, d, num=_N())
     if tem_sugs:
