@@ -363,6 +363,18 @@ def _mapear_perfil(perfil, perfis_disp):
     # menor distância; empate -> perfil de maior risco
     return min(perfis_disp, key=lambda p: (abs(_RISCO_ORDEM.get(p, 2) - alvo), -_RISCO_ORDEM.get(p, 2)))
 
+def _portfolios_validos(port):
+    """True se o portfolios tem ao menos um perfil com alocação > 0.
+    Evita que um 'Publicar' com editor vazio sobrescreva o modelo com zeros."""
+    if not isinstance(port, dict):
+        return False
+    perfis = port.get("perfis", {}) or {}
+    for p in perfis.values():
+        if isinstance(p, dict) and any(isinstance(v, (int, float)) and v > 0
+                                       for k, v in p.items() if k != "label"):
+            return True
+    return False
+
 def _modelo_gestora(gestora_id, perfil):
     """Retorna o modelo (alocação por classe) da gestora escolhida para o perfil.
     Retorna None se a gestora não existe — chamador deve cair p/ o modelo Levante."""
@@ -4398,7 +4410,9 @@ def hp_publicar():
         except Exception as e:
             erros.append(str(e))
     threads = []
-    if portfolios: threads.append(threading.Thread(target=_s, args=(_HP_PORT_FILE, portfolios)))
+    # Só salva portfolios se vier com alocação válida — evita zerar o modelo por engano
+    if portfolios and _portfolios_validos(portfolios):
+        threads.append(threading.Thread(target=_s, args=(_HP_PORT_FILE, portfolios)))
     if cenario:    threads.append(threading.Thread(target=_s, args=(_HP_CENARIO_FILE, cenario)))
     if produtos:   threads.append(threading.Thread(target=_s, args=(_HP_PROD_FILE, produtos)))
     for t in threads: t.start()
@@ -5205,6 +5219,8 @@ def analyze_xp():
         gestora_nome  = gestora_obj.get("nome", "")
     else:
         hp_porto      = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+        if not _portfolios_validos(hp_porto):   # modelo salvo vazio/zerado -> usa oficial
+            hp_porto = HP_PORTFOLIOS_DEFAULT
         perfis_hp     = hp_porto.get("perfis", {})
         referencia_hp = hp_porto.get("referencia", "Levante Asset")
         gestora_nome  = ""
@@ -6057,6 +6073,8 @@ def gerar_pptx():
             modelo_escolhido = _gestora_modelo["modelo"]
         else:
             hp_porto = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+            if not _portfolios_validos(hp_porto):   # modelo salvo vazio/zerado -> usa oficial
+                hp_porto = HP_PORTFOLIOS_DEFAULT
             perfil_key = perfil_cli if perfil_cli in hp_porto.get("perfis", {}) else "moderada"
             modelo_escolhido = hp_porto.get("perfis", {}).get(perfil_key, {})
         body["modelo_hp"] = {k: v for k, v in modelo_escolhido.items()
