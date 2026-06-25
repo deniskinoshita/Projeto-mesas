@@ -2557,7 +2557,7 @@ async function buscarClientesSalvos(){
       <button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
         style="padding:6px 12px;border-radius:20px;border:1px solid #1C4A34;background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
         onmouseover="this.style.borderColor='#C9A96E'" onmouseout="this.style.borderColor='#1C4A34'">
-        ${c.nome} <span style="color:#3A6A48;font-size:10px">${c.perfil}</span>
+        ${c.nome}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""} <span style="color:#3A6A48;font-size:10px">${c.perfil}</span>
       </button>`).join("");
     box.style.display="block";
   }catch(e){}
