@@ -506,20 +506,25 @@ def load_know_text(doc_id: str) -> str:
             return d["texto"]
     return ""
 
-def save_know_text(doc_id: str, texto: str):
+def save_know_text(doc_id: str, texto: str) -> bool:
+    """Grava o texto completo do doc. Retorna True se persistiu no KV (durável).
+    Em produção (Vercel) o /tmp é efêmero: gravar só lá significa perder o texto no
+    próximo cold start, gerando doc com meta mas sem texto. Quem chama deve abortar
+    a criação do meta se o KV estava configurado mas a gravação não foi durável."""
     payload = {"id": doc_id, "texto": texto}
     kv = _kv_client()
     if kv:
         try:
             kv.set(_know_doc_key(doc_id), json.dumps(payload, ensure_ascii=False))
-            return
+            return True
         except Exception:
-            pass
+            pass  # cai p/ /tmp, mas sinaliza que NÃO foi durável
     try:
         with open(_know_doc_path(doc_id), "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False)
     except Exception:
         pass
+    return False
 
 def delete_know_text(doc_id: str):
     kv = _kv_client()
@@ -4698,8 +4703,11 @@ def hp_knowledge_upload():
         return jsonify({"error": msg}), 400
 
     doc_id = str(uuid.uuid4())[:8]
-    # Texto completo vai para registro próprio (escala p/ centenas de docs)
-    save_know_text(doc_id, texto)
+    # Texto completo vai para registro próprio (escala p/ centenas de docs).
+    # Se o KV está configurado mas a gravação não foi durável, NÃO cria o meta —
+    # senão sobra um doc no índice apontando p/ texto que se perde no cold start.
+    if not save_know_text(doc_id, texto) and _kv_client() is not None:
+        return jsonify({"error": "Falha ao gravar o texto no banco (KV). Tente novamente."}), 503
 
     # Índice guarda só metadados + prévia curta + tickers p/ busca rápida
     meta = {
@@ -4743,7 +4751,8 @@ def hp_knowledge_upload_texto():
     if not texto or len(texto) < 50:
         return jsonify({"error": "texto vazio ou muito curto"}), 400
     doc_id = str(uuid.uuid4())[:8]
-    save_know_text(doc_id, texto)
+    if not save_know_text(doc_id, texto) and _kv_client() is not None:
+        return jsonify({"error": "Falha ao gravar o texto no banco (KV). Tente novamente."}), 503
     meta = {
         "id":        doc_id,
         "nome":      nome or "Documento",
@@ -4799,11 +4808,39 @@ def hp_knowledge_debug():
                     total += len(chaves)
                     if str(cursor) == "0": break
                 out[label] = total
-            # testa mget de uma amostra
+            # testa mget de uma amostra (apenas sanidade da leitura de META — NÃO mede texto)
             if ids:
                 sample_keys = [_know_meta_key(i) for i in list(ids)[:3]]
                 vals = kv.mget(*sample_keys)
-                out["mget_sample_nonempty"] = sum(1 for v in vals if v)
+                out["meta_mget_sample_nonempty"] = f"{sum(1 for v in vals if v)}/{len(sample_keys)}"
+
+            # Conta EXATAMENTE quantos docs do índice têm texto vazio/ausente.
+            # (Este é o número que importa p/ detectar perda de conteúdo — antes só
+            #  havia uma amostra de 3 metas, que enganava ao parecer '3 de 131'.)
+            ids_list = list(ids)
+            texto_vazio, texto_ok = [], 0
+            for inicio in range(0, len(ids_list), 25):
+                lote = ids_list[inicio:inicio+25]
+                doc_keys = [_know_doc_key(i) for i in lote]
+                try:
+                    vals = kv.mget(*doc_keys)
+                except Exception:
+                    vals = [None] * len(doc_keys)
+                for i, v in zip(lote, vals):
+                    t = ""
+                    if v:
+                        try:
+                            d = json.loads(v) if isinstance(v, str) else v
+                            t = d.get("texto", "") if isinstance(d, dict) else (d or "")
+                        except Exception:
+                            t = ""
+                    if len(t or "") < 50:
+                        texto_vazio.append(i)
+                    else:
+                        texto_ok += 1
+            out["docs_com_texto"]   = texto_ok
+            out["docs_texto_vazio"] = len(texto_vazio)
+            out["ids_texto_vazio"]  = texto_vazio[:50]   # cap p/ resposta enxuta
         except Exception as e:
             out["erro"] = str(e)
     return jsonify(out)
@@ -5023,6 +5060,11 @@ def hp_carteira_extrair():
         doc_id = body.get("id", "")
         if doc_id:
             texto = load_know_text(doc_id) or ""
+            if len(texto) < 50:
+                # Distingue 'id não existe na base' de 'doc existe mas sem texto'.
+                existe = any(d.get("id") == doc_id for d in load_know_index())
+                if not existe:
+                    return jsonify({"ok": False, "error": f"Documento '{doc_id}' não está na base de conhecimento."}), 404
     if not texto or len(texto) < 50:
         return jsonify({"ok": False, "error": "Texto insuficiente para extrair a alocação."}), 400
 
