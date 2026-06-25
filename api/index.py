@@ -4969,6 +4969,39 @@ CARTA:
 
     return jsonify({"ok": True, "texto": texto[:3000]})
 
+def _extrair_alocacao_heuristica(texto):
+    """Extrai a alocação (% por classe) direto do texto da carta, sem IA.
+    Casa números adjacentes a rótulos de classe conhecidos (ex.: '70,00% Pós-fixado').
+    Ignora rótulos que não são classes (CDI, nome do perfil, etc.)."""
+    import re as _re
+    SIN = {
+        "pos_fixado":   ["pós-fixado", "pos-fixado", "pós fixado", "pos fixado", "posfixado"],
+        "inflacao":     ["inflação", "inflacao", "ipca"],
+        "pre_fixado":   ["pré-fixado", "pre-fixado", "pré fixado", "pre fixado", "prefixado"],
+        "acoes":        ["ações", "acoes", "renda variável", "renda variavel"],
+        "fiis":         ["fiis", "fii", "fundos imobiliários", "fundos imobiliarios"],
+        "multimercado": ["multimercado", "multi mercado", "multimercados"],
+        "internacional":["internacional", "exterior", "dólar", "dolar", "renda fixa global"],
+        "alternativos": ["alternativos", "alternativo"],
+        "criptomoedas": ["criptomoedas", "cripto", "bitcoin"],
+    }
+    low = (texto or "").lower()
+    aloc = {}
+    achou = 0
+    for key, syns in SIN.items():
+        val = 0.0
+        for s in syns:
+            s_re = _re.escape(s)
+            m = _re.search(r'(\d{1,3}(?:[.,]\d{1,2})?)\s*%?\s*' + s_re, low)  # "70,00% pós-fixado"
+            if not m:
+                m = _re.search(s_re + r'[\s:]*?(\d{1,3}(?:[.,]\d{1,2})?)\s*%', low)  # "pós-fixado 70%"
+            if m:
+                v = float(m.group(1).replace(",", "."))
+                if 0 <= v <= 100:
+                    val = round(v, 2); achou += 1; break
+        aloc[key] = val
+    return aloc if achou else None
+
 @app.route("/api/hp/carteira-extrair", methods=["POST"])
 def hp_carteira_extrair():
     """Extrai a alocação (% por classe) de uma carta de carteira via IA e, opcionalmente,
@@ -5042,6 +5075,14 @@ CARTA:
                 perfil_detectado = (parsed.get("perfil", "") or "").strip().lower()
         except Exception as e:
             app.logger.warning(f"carteira-extrair IA falhou: {e}")
+
+    # Fallback sem IA: parser direto do texto (funciona p/ cartas com composição legível)
+    metodo = "ia"
+    if alocacao is None:
+        heur = _extrair_alocacao_heuristica(texto)
+        if heur:
+            alocacao = {c: round(float(heur.get(c, 0) or 0), 2) for c in CLASSES}
+            metodo = "texto"
     if alocacao is None:
         return jsonify({"ok": False, "error": "Não consegui extrair a alocação. Verifique se a carta tem a composição (%) legível, ou preencha manualmente."}), 422
 
@@ -5082,6 +5123,7 @@ CARTA:
         "perfil_detectado": perfil_detectado,
         "destino": destino,
         "salvo": salvo,
+        "metodo": metodo,
         "soma": round(sum(alocacao.values()), 1),
     })
 
