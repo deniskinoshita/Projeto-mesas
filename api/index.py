@@ -2123,11 +2123,12 @@ function carregarGestoras(){
     const ids  = Object.keys(_gestoras);
     if(sel){
       const atual = sel.value;
-      sel.innerHTML = '<option value="">— selecione a carteira —</option>' +
+      // Levante (modelo principal) é a opção padrão (value=""); gestoras vêm depois.
+      sel.innerHTML = '<option value="">Levante (modelo principal)</option>' +
         ids.map(id => '<option value="'+id+'">'+(_gestoras[id].nome||id)+'</option>').join("");
       if(atual && _gestoras[atual]) sel.value = atual;
     }
-    if(hint) hint.style.display = ids.length ? "none" : "block";
+    if(hint) hint.style.display = "none";
     atualizarModelo();
   }).catch(()=>{});
 }
@@ -4967,6 +4968,122 @@ CARTA:
         })
 
     return jsonify({"ok": True, "texto": texto[:3000]})
+
+@app.route("/api/hp/carteira-extrair", methods=["POST"])
+def hp_carteira_extrair():
+    """Extrai a alocação (% por classe) de uma carta de carteira via IA e, opcionalmente,
+    salva no modelo Levante (portfolios) ou numa gestora (gestoras2).
+    Entrada: PDF (multipart 'pdf') OU doc_id da base ('id'). Campos: destino, perfil, gestora_nome, salvar."""
+    CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"]
+
+    # 1) Obtém o texto: PDF enviado ou documento já na base de conhecimento
+    texto = ""
+    pdf_file = request.files.get("pdf")
+    if pdf_file:
+        try:
+            texto = extrair_texto_pdf(pdf_file.read())
+        except Exception as e:
+            return jsonify({"ok": False, "error": f"Falha ao ler o PDF: {e}"}), 400
+        body = request.form
+    else:
+        body = request.get_json(silent=True) or {}
+        doc_id = body.get("id", "")
+        if doc_id:
+            texto = load_know_text(doc_id) or ""
+    if not texto or len(texto) < 50:
+        return jsonify({"ok": False, "error": "Texto insuficiente para extrair a alocação."}), 400
+
+    destino      = (body.get("destino", "") or "levante").strip()
+    perfil       = (body.get("perfil", "") or "").strip().lower()
+    gestora_nome = (body.get("gestora_nome", "") or "").strip()
+    _sv          = body.get("salvar", False)
+    salvar       = (_sv is True) or (str(_sv).lower() in ("1", "true", "yes", "on"))
+
+    # 2) Extrai a alocação via IA
+    alocacao = None
+    perfil_detectado = ""
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if api_key:
+        try:
+            import anthropic as _anthropic
+            client = _anthropic.Anthropic(api_key=api_key)
+            prompt = f"""Você é analista de investimentos. Abaixo está uma carta/relatório de uma CARTEIRA MODELO. Extraia a COMPOSIÇÃO / ASSET ALLOCATION (percentual por classe de ativo).
+
+Mapeie para EXATAMENTE estas chaves (use 0 quando a classe não aparecer). Os números devem somar ~100:
+- pos_fixado (Pós-fixado, CDI)
+- inflacao (Inflação, IPCA+)
+- pre_fixado (Pré-fixado)
+- acoes (Ações, Renda Variável Brasil)
+- fiis (FIIs, Fundos Imobiliários)
+- multimercado (Multimercado)
+- internacional (Internacional, Dólar, Exterior, Renda Fixa Global)
+- alternativos (Alternativos)
+- criptomoedas (Cripto)
+
+Identifique também o PERFIL da carteira (super_conservadora, conservadora, moderada, arrojada, agressiva, super_agressiva) se houver.
+
+Responda SOMENTE em JSON:
+{{"perfil": "<perfil ou vazio>", "alocacao": {{"pos_fixado": 0, "inflacao": 0, "pre_fixado": 0, "acoes": 0, "fiis": 0, "multimercado": 0, "internacional": 0, "alternativos": 0, "criptomoedas": 0}}}}
+
+CARTA:
+{texto[:7000]}"""
+            msg = client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=400,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            raw = msg.content[0].text.strip()
+            import re as _re
+            m = _re.search(r'\{.*\}', raw, _re.DOTALL)
+            if m:
+                parsed = json.loads(m.group())
+                aloc_raw = parsed.get("alocacao", {}) or {}
+                alocacao = {c: round(float(aloc_raw.get(c, 0) or 0), 2) for c in CLASSES}
+                perfil_detectado = (parsed.get("perfil", "") or "").strip().lower()
+        except Exception as e:
+            app.logger.warning(f"carteira-extrair IA falhou: {e}")
+    if alocacao is None:
+        return jsonify({"ok": False, "error": "Não consegui extrair a alocação. Verifique se a carta tem a composição (%) legível, ou preencha manualmente."}), 422
+
+    perfil_final = perfil or perfil_detectado or "moderada"
+
+    # 3) Salva (opcional)
+    salvo = False
+    if salvar:
+        if destino == "levante":
+            port = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+            port.setdefault("perfis", {})
+            ant = port["perfis"].get(perfil_final, {})
+            label = ant.get("label", perfil_final.replace("_", " ").title())
+            port["perfis"][perfil_final] = {"label": label, **alocacao}
+            _save(_HP_PORT_FILE, port)
+            salvo = True
+        else:
+            gestoras = _load(_HP_GESTORAS2_FILE, {})
+            if destino and destino in gestoras:
+                gid = destino
+            else:
+                gid = (gestora_nome.lower().replace(" ", "_")[:20]) or "gestora"
+            if gid not in gestoras and len(gestoras) >= 5:
+                return jsonify({"ok": False, "error": "Máximo de 5 gestoras atingido."}), 400
+            g = gestoras.get(gid, {"id": gid, "nome": gestora_nome or gid, "referencia": "", "perfis": {}})
+            if gestora_nome:
+                g["nome"] = gestora_nome
+            g.setdefault("perfis", {})
+            g["perfis"][perfil_final] = alocacao
+            gestoras[gid] = g
+            _save(_HP_GESTORAS2_FILE, gestoras)
+            salvo = True
+
+    return jsonify({
+        "ok": True,
+        "alocacao": alocacao,
+        "perfil": perfil_final,
+        "perfil_detectado": perfil_detectado,
+        "destino": destino,
+        "salvo": salvo,
+        "soma": round(sum(alocacao.values()), 1),
+    })
 
 @app.route("/api/hp/knowledge/publicar", methods=["POST"])
 def hp_knowledge_publicar():
@@ -8376,6 +8493,42 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
 </div>
 
+<!-- Extrair Carteira da Carta (IA) -->
+<div class="card">
+  <div class="card-title" style="color:#5DCAA5">🧩 Extrair Carteira da Carta (IA)</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Suba o PDF de uma carteira modelo (ex.: perfil Conservadora da Levante, ou uma carteira da XP). A IA lê a composição (% por classe) e preenche a carteira que o assessor seleciona. Faça <b>uma carta por perfil</b>.</p>
+  <div class="grid-2" style="gap:14px">
+    <div>
+      <label>Carta (PDF)</label>
+      <div class="upload-area" id="drop-extrair" onclick="document.getElementById('pdf-extrair').click()" style="cursor:pointer">
+        <input type="file" id="pdf-extrair" accept=".pdf" style="display:none" onchange="document.getElementById('fname-extrair').textContent=this.files[0]?this.files[0].name:''">
+        <div class="ui"><div class="icon">📄</div><p>Clique para escolher o PDF</p><div class="fname" id="fname-extrair"></div></div>
+      </div>
+    </div>
+    <div>
+      <label>Destino (carteira)</label>
+      <select id="ex-destino" onchange="exDestinoChange()"><option value="levante">Levante (modelo principal)</option></select>
+      <div id="ex-nova-wrap" style="display:none;margin-top:8px">
+        <label>Nome da nova gestora</label>
+        <input type="text" id="ex-gestora-nome" placeholder="Ex: XP">
+      </div>
+      <label style="margin-top:8px">Perfil desta carta</label>
+      <select id="ex-perfil">
+        <option value="super_conservadora">Super Conservadora</option>
+        <option value="conservadora">Conservadora</option>
+        <option value="moderada" selected>Moderada</option>
+        <option value="arrojada">Arrojada</option>
+        <option value="agressiva">Agressiva</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-sm" id="btn-extrair" onclick="extrairCarteiraIA()">🤖 Extrair e salvar</button>
+    <span id="st-extrair" style="font-size:11px"></span>
+  </div>
+  <div id="ex-resultado" style="display:none;margin-top:12px"></div>
+</div>
+
 <!-- Sugestões de Alocação -->
 <div class="card">
   <div class="card-title" style="color:#5DCAA5">💡 Sugestões de Alocação para Assessores</div>
@@ -8646,6 +8799,71 @@ async function uploadCarta(){
   } catch(e){ st.innerHTML = `<span class="status-err">Erro ao processar.</span>`; }
   finally{ btn.disabled=false; btn.textContent="Processar carta"; }
 }
+
+// ── Extrair Carteira da Carta (IA) ─────────────────────────────────────────────
+function carregarDestinosCarteira(){
+  fetch("/api/hp/gestoras2").then(r=>r.json()).then(d=>{
+    const sel = document.getElementById("ex-destino");
+    if(!sel) return;
+    const atual = sel.value;
+    const ids = Object.keys(d||{});
+    sel.innerHTML = '<option value="levante">Levante (modelo principal)</option>' +
+      ids.map(id=>'<option value="'+id+'">'+((d[id].nome)||id)+'</option>').join("") +
+      '<option value="__nova__">+ Nova gestora…</option>';
+    if(atual) sel.value = atual;
+    exDestinoChange();
+  }).catch(()=>{});
+}
+function exDestinoChange(){
+  const sel = document.getElementById("ex-destino");
+  const w = document.getElementById("ex-nova-wrap");
+  if(w) w.style.display = (sel && sel.value==="__nova__") ? "block" : "none";
+}
+async function extrairCarteiraIA(){
+  const f   = document.getElementById("pdf-extrair").files[0];
+  const st  = document.getElementById("st-extrair");
+  const btn = document.getElementById("btn-extrair");
+  const res = document.getElementById("ex-resultado");
+  if(!f){ st.innerHTML = '<span class="status-err">Selecione o PDF da carta.</span>'; return; }
+  let destino = document.getElementById("ex-destino").value;
+  const perfil = document.getElementById("ex-perfil").value;
+  const gestoraNome = (document.getElementById("ex-gestora-nome")||{}).value || "";
+  if(destino==="__nova__"){
+    if(!gestoraNome.trim()){ st.innerHTML='<span class="status-err">Dê um nome à nova gestora.</span>'; return; }
+    destino = gestoraNome.trim();   // backend cria a gestora pelo nome
+  }
+  btn.disabled = true; btn.textContent = "🤖 Extraindo...";
+  st.innerHTML = '<span style="color:#C9A96E">IA lendo a composição da carta…</span>';
+  res.style.display = "none";
+  try{
+    const fd = new FormData();
+    fd.append("pdf", f);
+    fd.append("destino", destino);
+    fd.append("perfil", perfil);
+    fd.append("gestora_nome", gestoraNome);
+    fd.append("salvar", "true");
+    const r = await fetch("/api/hp/carteira-extrair", {method:"POST", body:fd});
+    const d = await r.json();
+    if(!d.ok){ throw new Error(d.error||"Falha na extração"); }
+    const LBL = {pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
+    const linhas = Object.entries(d.alocacao).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1])
+      .map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span style="color:#888">${LBL[k]||k}</span><b style="color:#5DCAA5">${v}%</b></div>`).join("");
+    const somaCor = (Math.abs(d.soma-100) <= 2) ? "#5DCAA5" : "#FF9F40";
+    st.innerHTML = `<span class="status-ok">✓ ${d.salvo?"Salvo":"Extraído"} — perfil ${d.perfil}</span>`;
+    res.style.display = "block";
+    res.innerHTML = `<div class="info-box" style="font-size:12px">
+      <div style="color:#C9A96E;font-weight:700;margin-bottom:6px">Alocação extraída ${d.destino==="levante"?"→ Levante":""}</div>
+      ${linhas}
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0 0;border-top:1px solid #1E1E1E;margin-top:6px"><span style="color:#888">Soma</span><b style="color:${somaCor}">${d.soma}%</b></div>
+    </div>`;
+    carregarDestinosCarteira();
+  }catch(e){
+    st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`;
+  }finally{
+    btn.disabled = false; btn.textContent = "🤖 Extrair e salvar";
+  }
+}
+carregarDestinosCarteira();
 
 // ── Comunicado ────────────────────────────────────────────────────────────────
 async function salvarMensagem(){
