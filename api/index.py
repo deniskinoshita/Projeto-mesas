@@ -4589,7 +4589,7 @@ def hp_gestoras2():
         _save(_HP_GESTORAS2_FILE, gestoras)
         return jsonify({"ok": True})
     CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"]
-    PERFIS  = ["super_conservadora","conservadora","moderada","agressiva","super_agressiva"]
+    PERFIS  = ["super_conservadora","conservadora","moderada","arrojada","agressiva"]
     gestoras = _load(_HP_GESTORAS2_FILE, {})
     if len(gestoras) >= 5 and data.get("id","") not in gestoras:
         return jsonify({"ok": False, "error": "Máximo de 5 gestoras atingido."}), 400
@@ -5053,7 +5053,7 @@ Mapeie para EXATAMENTE estas chaves (use 0 quando a classe não aparecer). Os n�
 - alternativos (Alternativos)
 - criptomoedas (Cripto)
 
-Identifique também o PERFIL da carteira (super_conservadora, conservadora, moderada, arrojada, agressiva, super_agressiva) se houver.
+Identifique também o PERFIL da carteira (super_conservadora, conservadora, moderada, arrojada, agressiva) se houver.
 
 Responda SOMENTE em JSON:
 {{"perfil": "<perfil ou vazio>", "alocacao": {{"pos_fixado": 0, "inflacao": 0, "pre_fixado": 0, "acoes": 0, "fiis": 0, "multimercado": 0, "internacional": 0, "alternativos": 0, "criptomoedas": 0}}}}
@@ -5679,7 +5679,7 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
         # Filtrar produtos do HP para esta classe
         prods_cls = []
         cls_prods = produtos_hp.get(cls, []) if isinstance(produtos_hp, dict) else []
-        ORDEM_PERFIL = ["super_conservadora", "conservadora", "moderada", "arrojada", "agressiva", "super_agressiva"]
+        ORDEM_PERFIL = ["super_conservadora", "conservadora", "moderada", "arrojada", "agressiva"]
         idx_perfil = ORDEM_PERFIL.index(perfil_cli) if perfil_cli in ORDEM_PERFIL else 2
         for p in (cls_prods if isinstance(cls_prods, list) else []):
             perfis_prod = p.get("perfis") or []
@@ -5985,7 +5985,7 @@ def gerar_pptx():
         # Produtos do Head filtrados pelo perfil do cliente
         # (usa o que veio do frontend; complementa se vazio)
         if not body.get("sugestoes_produtos"):
-            ORDEM_PERFIL = ["super_conservadora","conservadora","moderada","agressiva","super_agressiva"]
+            ORDEM_PERFIL = ["super_conservadora","conservadora","moderada","arrojada","agressiva"]
             idx = ORDEM_PERFIL.index(perfil_cli) if perfil_cli in ORDEM_PERFIL else 2
             sugs = []
             for cls, lista in produtos_hp.items():
@@ -9679,8 +9679,8 @@ textarea{resize:vertical}
       <button type="button" class="gest2-ptab active" data-p="super_conservadora" onclick="gest2SwitchPerfil('super_conservadora',this)">Super Conserv.</button>
       <button type="button" class="gest2-ptab" data-p="conservadora" onclick="gest2SwitchPerfil('conservadora',this)">Conservadora</button>
       <button type="button" class="gest2-ptab" data-p="moderada" onclick="gest2SwitchPerfil('moderada',this)">Moderada</button>
+      <button type="button" class="gest2-ptab" data-p="arrojada" onclick="gest2SwitchPerfil('arrojada',this)">Arrojada</button>
       <button type="button" class="gest2-ptab" data-p="agressiva" onclick="gest2SwitchPerfil('agressiva',this)">Agressiva</button>
-      <button type="button" class="gest2-ptab" data-p="super_agressiva" onclick="gest2SwitchPerfil('super_agressiva',this)">Super Agressiva</button>
     </div>
     <div id="gest2-aloc-panel" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
       <div><label style="color:#4A7055">Pós Fixado %</label><input type="number" id="g2aloc-pos_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
@@ -9934,8 +9934,8 @@ textarea{resize:vertical}
               <option value="super_conservadora">Super Conservadora</option>
               <option value="conservadora">Conservadora</option>
               <option value="moderada" selected>Moderada</option>
+              <option value="arrojada">Arrojada</option>
               <option value="agressiva">Agressiva</option>
-              <option value="super_agressiva">Super Agressiva</option>
             </select>
           </div>
           <div>
@@ -10969,7 +10969,7 @@ async function carregarEstruturadas(){
       lista.innerHTML=`<div style="color:#2A2A18;font-size:11px;text-align:center;padding:16px">Nenhuma operação cadastrada ainda.</div>`;
       return;
     }
-    const PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",agressiva:"Agressiva",super_agressiva:"Super Agressiva"};
+    const PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva"};
     lista.innerHTML = ops.map(op=>`
       <div style="background:#080C06;border:1px solid #2A1A10;border-left:3px solid #C9A96E;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
         <div style="flex:1">
@@ -11003,8 +11003,8 @@ let _gest2_perfil_ativo = "super_conservadora";
 let _gest2_perfis_temp  = {};
 
 const G2_CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"];
-const G2_PERFIS  = ["super_conservadora","conservadora","moderada","agressiva","super_agressiva"];
-const G2_PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",agressiva:"Agressiva",super_agressiva:"Super Agressiva"};
+const G2_PERFIS  = ["super_conservadora","conservadora","moderada","arrojada","agressiva"];
+const G2_PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva"};
 
 async function carregarGest2(){
   try{
