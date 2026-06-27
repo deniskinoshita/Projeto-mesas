@@ -7536,24 +7536,27 @@ async function entrar(){
   btn.disabled = true; btn.textContent = "Verificando...";
   document.getElementById("erro").textContent = "";
 
-  // Tenta login
-  let d = null, _dbg = "";
-  try{
-    const r = await fetch("/api/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({role: roleAtual, senha})
-    });
-    _dbg = "status:" + r.status + " ";
-    const text = await r.text();
-    _dbg += "len:" + text.length + " start:" + text.substring(0,30);
-    try{ d = JSON.parse(text); } catch(pe){ _dbg += " parseErr:" + pe.message.substring(0,40); }
-  } catch(fe){
-    _dbg = "fetchErr:" + fe.message.substring(0,60);
+  // Tenta login — até 5 vezes, aguardando 4s entre cada tentativa
+  let d = null;
+  for(let t = 0; t < 5; t++){
+    try{
+      const r = await fetch("/api/login",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({role: roleAtual, senha})
+      });
+      const text = await r.text();
+      try{ d = JSON.parse(text); } catch{ d = null; }
+      if(d) break;
+    } catch(e){ d = null; }
+    if(t < 4){
+      document.getElementById("erro").textContent = `Servidor iniciando, aguarde... (${t+1}/5)`;
+      await new Promise(res => setTimeout(res, 4000));
+    }
   }
   btn.disabled = false; btn.textContent = "Continuar";
   if(!d){
-    document.getElementById("erro").textContent = "Erro [" + _dbg + "]";
+    document.getElementById("erro").textContent = "Serviço indisponível. Recarregue a página e aguarde 20 segundos antes de tentar novamente.";
     return;
   }
   if(d.ok && d.etapa === "senha_pessoal"){
@@ -7698,8 +7701,21 @@ async function solicitarReset(){
   }
 }
 
-// Aquece a função serverless em background (evita timeout no 1º login)
-fetch("/api/ping").catch(()=>{});
+// Aquece a função serverless e aguarda ela ficar pronta antes de liberar o login
+(async function warmup(){
+  const btn = document.getElementById("btn-entrar");
+  btn.disabled = true;
+  // Dispara o cold start imediatamente (vai falhar com 499, mas inicia a função)
+  fetch("/api/ping").catch(()=>{});
+  // Aguarda 18s — tempo suficiente para a função terminar o cold start
+  // e mostrar progresso ao usuário
+  let t = 18;
+  const iv = setInterval(()=>{
+    t--;
+    btn.textContent = t > 0 ? `Aguarde ${t}s...` : "Continuar";
+    if(t <= 0){ clearInterval(iv); btn.disabled = false; }
+  }, 1000);
+})();
 
 // Seleciona automaticamente se já existe role salvo
 const saved = localStorage.getItem("brauna_role");
