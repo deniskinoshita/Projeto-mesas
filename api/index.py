@@ -7532,26 +7532,40 @@ async function entrar(){
   btn.disabled = true; btn.textContent = "Verificando...";
   document.getElementById("erro").textContent = "";
 
-  try{
-    const r = await fetch("/api/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({role: roleAtual, senha})
-    });
-    const d = await r.json();
-    if(d.ok && d.etapa === "senha_pessoal"){
-      _sessaoPendente = {role: d.role, nome: d.nome, codigo: d.codigo, identity: d.identity};
-      mostrarSenhaPessoal(d.precisa_criar);
-    } else {
-      document.getElementById("erro").textContent = d.msg || "Credencial inválida. Tente novamente.";
-      document.getElementById("senha").value="";
-      document.getElementById("senha").focus();
+  // Retry até 3x (cold start Vercel pode retornar 499 com HTML na 1ª tentativa)
+  let d = null;
+  for(let tentativa = 0; tentativa < 3; tentativa++){
+    try{
+      const r = await fetch("/api/login",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({role: roleAtual, senha})
+      });
+      const text = await r.text();
+      try{ d = JSON.parse(text); } catch{ d = null; }
+      if(d) break;
+      // Resposta não-JSON (499/cold start): aguarda antes de tentar de novo
+      if(tentativa < 2){
+        document.getElementById("erro").textContent = `Inicializando... (tentativa ${tentativa+2}/3)`;
+        await new Promise(res => setTimeout(res, 3000));
+      }
+    } catch(e){
+      if(tentativa === 2){ d = null; break; }
+      await new Promise(res => setTimeout(res, 3000));
     }
-  } catch(e){
-    document.getElementById("erro").textContent = "Erro de conexão.";
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Continuar";
+  }
+  btn.disabled = false; btn.textContent = "Continuar";
+  if(!d){
+    document.getElementById("erro").textContent = "Serviço indisponível. Aguarde alguns segundos e tente novamente.";
+    return;
+  }
+  if(d.ok && d.etapa === "senha_pessoal"){
+    _sessaoPendente = {role: d.role, nome: d.nome, codigo: d.codigo, identity: d.identity};
+    mostrarSenhaPessoal(d.precisa_criar);
+  } else {
+    document.getElementById("erro").textContent = d.msg || "Credencial inválida. Tente novamente.";
+    document.getElementById("senha").value="";
+    document.getElementById("senha").focus();
   }
 }
 
@@ -7597,11 +7611,24 @@ async function entrarPessoal(){
     const email = criar ? (document.getElementById("email-pessoal").value.trim().toLowerCase()) : "";
     if(criar && !email){ erro.textContent = "Informe seu e-mail corporativo."; btn.disabled=false; btn.textContent="Criar e entrar"; return; }
     if(criar && !email.endsWith("@grupobrauna.com.br")){ erro.textContent = "Use seu e-mail corporativo @grupobrauna.com.br."; btn.disabled=false; btn.textContent="Criar e entrar"; return; }
-    const r = await fetch("/api/login-pessoal",{
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({identity: _sessaoPendente.identity, senha_pessoal: senha, criar, email})
-    });
-    const d = await r.json();
+    let d2 = null;
+    for(let t = 0; t < 3; t++){
+      try{
+        const r2 = await fetch("/api/login-pessoal",{
+          method:"POST", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({identity: _sessaoPendente.identity, senha_pessoal: senha, criar, email})
+        });
+        const txt = await r2.text();
+        try{ d2 = JSON.parse(txt); } catch{ d2 = null; }
+        if(d2) break;
+        if(t < 2){ erro.textContent = `Inicializando... (${t+2}/3)`; await new Promise(res=>setTimeout(res,3000)); }
+      } catch(e){
+        if(t===2){ d2=null; break; }
+        await new Promise(res=>setTimeout(res,3000));
+      }
+    }
+    const d = d2;
+    if(!d){ erro.textContent = "Serviço indisponível. Aguarde alguns segundos e tente novamente."; btn.disabled=false; btn.textContent=criar?"Criar e entrar":"Entrar"; return; }
     if(d.ok){
       localStorage.setItem("brauna_role", _sessaoPendente.role);
       localStorage.setItem("brauna_role_ts", Date.now());
