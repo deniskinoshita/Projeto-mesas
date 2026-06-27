@@ -3859,6 +3859,10 @@ def index():
     pilares_html = "\n".join(_pilar_html_inicial(p) for p in MODELO_SERVIR)
     return render_template_string(HTML, pilares_html=pilares_html)
 
+@app.route("/api/ping")
+def ping():
+    return jsonify({"ok": True})
+
 @app.route("/api/login", methods=["POST"])
 def login():
     """Etapa 1: valida a credencial do papel (código do assessor ou senha do papel)
@@ -7700,6 +7704,9 @@ async function solicitarReset(){
     btn.disabled = false; btn.textContent = "Tentar novamente";
   }
 }
+
+// Aquece a função serverless em background (evita timeout no 1º login)
+fetch("/api/ping").catch(()=>{});
 
 // Seleciona automaticamente se já existe role salvo
 const saved = localStorage.getItem("brauna_role");
