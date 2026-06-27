@@ -7536,31 +7536,24 @@ async function entrar(){
   btn.disabled = true; btn.textContent = "Verificando...";
   document.getElementById("erro").textContent = "";
 
-  // Retry até 3x (cold start Vercel pode retornar 499 com HTML na 1ª tentativa)
-  let d = null;
-  for(let tentativa = 0; tentativa < 3; tentativa++){
-    try{
-      const r = await fetch("/api/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({role: roleAtual, senha})
-      });
-      const text = await r.text();
-      try{ d = JSON.parse(text); } catch{ d = null; }
-      if(d) break;
-      // Resposta não-JSON (499/cold start): aguarda antes de tentar de novo
-      if(tentativa < 2){
-        document.getElementById("erro").textContent = `Inicializando... (tentativa ${tentativa+2}/3)`;
-        await new Promise(res => setTimeout(res, 3000));
-      }
-    } catch(e){
-      if(tentativa === 2){ d = null; break; }
-      await new Promise(res => setTimeout(res, 3000));
-    }
+  // Tenta login
+  let d = null, _dbg = "";
+  try{
+    const r = await fetch("/api/login",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({role: roleAtual, senha})
+    });
+    _dbg = "status:" + r.status + " ";
+    const text = await r.text();
+    _dbg += "len:" + text.length + " start:" + text.substring(0,30);
+    try{ d = JSON.parse(text); } catch(pe){ _dbg += " parseErr:" + pe.message.substring(0,40); }
+  } catch(fe){
+    _dbg = "fetchErr:" + fe.message.substring(0,60);
   }
   btn.disabled = false; btn.textContent = "Continuar";
   if(!d){
-    document.getElementById("erro").textContent = "Serviço indisponível. Aguarde alguns segundos e tente novamente.";
+    document.getElementById("erro").textContent = "Erro [" + _dbg + "]";
     return;
   }
   if(d.ok && d.etapa === "senha_pessoal"){
