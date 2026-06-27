@@ -6375,11 +6375,12 @@ def analyze():
         fichas[fkey_conta] = ficha_nova
     save_fichas(fichas)
 
-    # Salva histórico de análises (até 4 por cliente)
+    # Salva histórico de análises (últimos 3 por cliente, com ativos completos)
     hist = load_hist()
     entrada_hist = {
         "data": datetime.now().strftime("%d/%m/%Y"),
         "hora": datetime.now().strftime("%H:%M"),
+        "data_ref": xp_parsed.get("data_ref", ""),
         "patrimonio": patrimonio,
         "perfil": perfil,
         "composicao": comp,
@@ -6388,11 +6389,33 @@ def analyze():
         "status": status,
         "rent12_pct_cdi": rent12,
         "objetivo": objetivo,
+        "rent": rent,
+        # Ativos individuais completos (não só indexadores)
+        "acoes": [
+            {"ticker": a.get("ticker",""), "nome": a.get("nome",""),
+             "saldo": a.get("saldo",0), "qtd": a.get("qtd",0), "perc": a.get("perc", a.get("pct",0))}
+            for a in xp_parsed.get("acoes",[])[:40]
+        ],
+        "fiis": [
+            {"ticker": a.get("ticker",""), "nome": a.get("nome",""),
+             "saldo": a.get("saldo",0), "qtd": a.get("qtd",0), "perc": a.get("perc", a.get("pct",0))}
+            for a in xp_parsed.get("fiis",[])[:30]
+        ],
+        "rf_ativos": [
+            {"nome": a.get("nome",""), "classe": a.get("classe",""),
+             "saldo": a.get("saldo",0), "perc": a.get("perc",0),
+             "rent_mes": a.get("rent_mes"), "rent_12m": a.get("rent_12m")}
+            for a in xp_parsed.get("rf_ativos",[])[:60]
+        ],
     }
     reg_hist = hist.get(fkey, {"assessor": assessor, "nome": nome, "perfil": perfil, "objetivo": objetivo, "entradas": []})
     reg_hist["perfil"]   = perfil
     reg_hist["objetivo"] = objetivo
-    reg_hist["entradas"] = ([entrada_hist] + reg_hist.get("entradas", []))[:4]
+    # Mantém apenas os 3 últimos snapshots para economizar memória (3000 clientes × 3 = 9000 entradas)
+    entradas_anteriores = reg_hist.get("entradas", [])
+    # Evita duplicata do mesmo dia
+    entradas_anteriores = [e for e in entradas_anteriores if e.get("data") != entrada_hist["data"]]
+    reg_hist["entradas"] = ([entrada_hist] + entradas_anteriores)[:3]
     hist[fkey] = reg_hist
     save_hist(hist)
 
@@ -11795,15 +11818,15 @@ def painel_carteiras():
                         "produto": p.get("nome", p) if isinstance(p, dict) else str(p),
                         "ticker": p.get("ticker","") if isinstance(p, dict) else "",
                     })
-            elif d["desvio"] > 2:  # sobre-alocado
-                # Sugere reduzir: usa ativos da carteira nesta classe
+            elif d["desvio"] > 2:  # sobre-alocado — usa ativos do último snapshot
                 ativos_cls = []
                 if d["cls"] == "acoes":
-                    ativos_cls = [a.get("ticker","") or a.get("nome","") for a in ficha.get("acoes",[])[:3]]
+                    ativos_cls = [a.get("ticker","") or a.get("nome","") for a in ultima.get("acoes", ficha.get("acoes",[]))[:3]]
                 elif d["cls"] == "fiis":
-                    ativos_cls = [a.get("ticker","") or a.get("nome","") for a in ficha.get("fiis",[])[:3]]
-                elif d["cls"] in ("pos_fixado","inflacao","pre_fixado"):
-                    ativos_cls = [a.get("nome","") for a in ficha.get("rf_ativos",[]) if a.get("classe","").lower() in (d["cls"], d["label"].lower())][:2]
+                    ativos_cls = [a.get("ticker","") or a.get("nome","") for a in ultima.get("fiis", ficha.get("fiis",[]))[:3]]
+                elif d["cls"] in ("pos_fixado","inflacao","pre_fixado","multimercado","internacional","alternativos"):
+                    rf = ultima.get("rf_ativos", ficha.get("rf_ativos",[]))
+                    ativos_cls = [a.get("nome","") for a in rf if a.get("classe","") == d["cls"]][:2]
                 trocas.append({
                     "acao": "reduzir",
                     "cls": d["cls"],
@@ -11815,6 +11838,20 @@ def painel_carteiras():
 
         status_geral = "ok" if urgencia == 0 else ("atencao" if urgencia < 15 else "critico")
 
+        # Snapshots para exibição (até 3, com ativos completos do histórico)
+        snapshots = []
+        for e in entradas:
+            snapshots.append({
+                "data":       e.get("data",""),
+                "data_ref":   e.get("data_ref",""),
+                "patrimonio": e.get("patrimonio",0),
+                "composicao": e.get("composicao",{}),
+                "rent":       e.get("rent",{}),
+                "acoes":      e.get("acoes", [])[:20],
+                "fiis":       e.get("fiis", [])[:15],
+                "rf_ativos":  e.get("rf_ativos", [])[:30],
+            })
+
         clientes_painel.append({
             "nome": nome,
             "assessor": ficha.get("assessor", ""),
@@ -11823,11 +11860,12 @@ def painel_carteiras():
             "data_analise": data_analise,
             "status": status_geral,
             "urgencia": round(urgencia, 1),
-            "desvios": desvios[:5],  # top 5
+            "desvios": desvios[:5],
             "trocas": trocas,
-            "acoes": ficha.get("acoes", [])[:10],
-            "fiis": ficha.get("fiis", [])[:8],
-            "rf_ativos": ficha.get("rf_ativos", [])[:10],
+            "snapshots": snapshots,              # últimos 3 XPerformances completos
+            "acoes":    ultima.get("acoes",    ficha.get("acoes",    []))[:20],
+            "fiis":     ultima.get("fiis",     ficha.get("fiis",     []))[:15],
+            "rf_ativos":ultima.get("rf_ativos",ficha.get("rf_ativos",[]))[:30],
             "objetivo": ficha.get("objetivo", ""),
         })
 
@@ -12011,8 +12049,9 @@ body{padding:0 0 60px}
 
 <script>
 let todos = [];
+const LABELS_PT = {pos_fixado:'Pós Fix',inflacao:'Inflação',pre_fixado:'Pré Fix',acoes:'Ações',fiis:'FIIs',multimercado:'Multi',internacional:'Intl',alternativos:'Alt',criptomoedas:'Cripto'};
 
-function brl(v){ return v >= 1e6 ? 'R$ '+(v/1e6).toFixed(1)+'M' : v >= 1e3 ? 'R$ '+(v/1e3).toFixed(0)+'k' : 'R$ '+v.toFixed(0); }
+function brl(v){ if(!v) return '—'; return v >= 1e6 ? 'R$ '+(v/1e6).toFixed(1)+'M' : v >= 1e3 ? 'R$ '+(v/1e3).toFixed(0)+'k' : 'R$ '+v.toFixed(0); }
 function perfil_label(p){ return ({super_conservadora:'Super Conservadora',conservadora:'Conservadora',moderada:'Moderada',arrojada:'Arrojada',agressiva:'Agressiva'})[p] || p; }
 
 async function carregar(){
@@ -12168,12 +12207,34 @@ function clienteCard(c, i){
     </div>`).join('')
     : '<p style="font-size:12px;color:#2A4A38">Carteira alinhada ao modelo ✓</p>';
 
-  const acoesHtml = c.acoes.length ? c.acoes.slice(0,6).map(a=>
-    `<div class="ativo-chip"><span>${a.ticker||'—'}</span> ${a.pct?a.pct.toFixed(1)+'%':''}</div>`).join('') : '';
-  const fiisHtml = c.fiis.length ? c.fiis.slice(0,4).map(a=>
-    `<div class="ativo-chip"><span>${a.ticker||'—'}</span> ${a.pct?a.pct.toFixed(1)+'%':''}</div>`).join('') : '';
-  const rfHtml = c.rf_ativos.length ? c.rf_ativos.slice(0,5).map(a=>
-    `<div class="ativo-chip">${a.nome||'—'}</div>`).join('') : '';
+  const acoesHtml = c.acoes.length ? c.acoes.slice(0,12).map(a=>{
+    const pct = a.perc||a.pct||0;
+    const sld = a.saldo ? ' · '+brl(a.saldo) : '';
+    return `<div class="ativo-chip"><span>${a.ticker||'—'}</span>${pct?' '+pct.toFixed(1)+'%':''}${sld}</div>`;
+  }).join('') : '';
+  const fiisHtml = c.fiis.length ? c.fiis.slice(0,10).map(a=>{
+    const pct = a.perc||a.pct||0;
+    const sld = a.saldo ? ' · '+brl(a.saldo) : '';
+    return `<div class="ativo-chip"><span>${a.ticker||'—'}</span>${pct?' '+pct.toFixed(1)+'%':''}${sld}</div>`;
+  }).join('') : '';
+  const rfHtml = c.rf_ativos.length ? c.rf_ativos.slice(0,20).map(a=>{
+    const sld = a.saldo ? brl(a.saldo) : '';
+    const r12 = a.rent_12m != null ? ' · '+a.rent_12m.toFixed(1)+'% 12m' : '';
+    return `<div class="ativo-chip" title="${a.nome||''}">${(a.nome||'—').slice(0,35)}${(a.nome||'').length>35?'…':''} <span>${sld}${r12}</span></div>`;
+  }).join('') : '';
+
+  // Histórico de snapshots
+  const snapshotsHtml = (c.snapshots||[]).length > 1 ? `
+    <div class="section-title">Histórico de XPerformances (${(c.snapshots||[]).length} snapshots)</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    ${(c.snapshots||[]).map((s,si)=>`
+      <div style="background:#0F1A10;border:1px solid #1A2A18;border-radius:10px;padding:10px 14px;min-width:180px">
+        <div style="font-size:10px;color:#C9A96E;font-weight:700;margin-bottom:4px">${si===0?'Mais recente':'Anterior '+(si)} · ${s.data_ref||s.data}</div>
+        <div style="font-size:13px;color:#F0F0F0;font-weight:600">${brl(s.patrimonio||0)}</div>
+        ${s.rent&&s.rent.portfolio?`<div style="font-size:11px;color:#3A6A48;margin-top:2px">12m: ${(s.rent.portfolio['12m']||0).toFixed(1)}%</div>`:''}
+        <div style="font-size:10px;color:#2A4A38;margin-top:4px">${Object.entries(s.composicao||{}).filter(([,v])=>v>3).map(([k,v])=>`${LABELS_PT[k]||k}: ${v.toFixed(0)}%`).join(' · ')}</div>
+      </div>`).join('')}
+    </div>` : '';
 
   const objetivoHtml = c.objetivo ? `<div style="font-size:11px;color:#3A6A48;margin-top:8px">🎯 ${c.objetivo}</div>` : '';
 
@@ -12198,9 +12259,10 @@ function clienteCard(c, i){
     <div class="section-title">Sugestões de realocação</div>
     <div class="trocas-grid">${trocasHtml}</div>
 
+    ${snapshotsHtml}
     ${acoesHtml ? `<div class="section-title">Ações na carteira</div><div class="ativos-grid">${acoesHtml}</div>` : ''}
     ${fiisHtml  ? `<div class="section-title">FIIs na carteira</div><div class="ativos-grid">${fiisHtml}</div>`   : ''}
-    ${rfHtml    ? `<div class="section-title">Renda Fixa principal</div><div class="ativos-grid">${rfHtml}</div>` : ''}
+    ${rfHtml    ? `<div class="section-title">Renda Fixa (${c.rf_ativos.length} ativos)</div><div class="ativos-grid">${rfHtml}</div>` : ''}
   </div>
 </div>`;
 }
