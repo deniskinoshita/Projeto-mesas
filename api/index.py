@@ -3819,7 +3819,10 @@ async function baixarPpt(){
 # ── Rotas ─────────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def login_page():
-    return render_template_string(HTML_LOGIN)
+    resp = app.make_response(render_template_string(HTML_LOGIN))
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
 
 def _pilar_html_inicial(p):
     imp = p.get("importancia", "CRÍTICA")
