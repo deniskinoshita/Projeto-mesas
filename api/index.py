@@ -11700,5 +11700,438 @@ init();
 </script>
 </body></html>"""
 
+@app.route("/painel")
+def painel_page():
+    return render_template_string(HTML_PAINEL)
+
+@app.route("/api/painel-carteiras", methods=["GET"])
+def painel_carteiras():
+    """Retorna todos os clientes com carteiras salvas, desvios do modelo e sugestões de troca."""
+    fichas = load_fichas()
+    hist   = load_hist()
+    hp_porto = _load(_HP_PORT_FILE, HP_PORTFOLIOS_DEFAULT)
+    if not _portfolios_validos(hp_porto):
+        hp_porto = HP_PORTFOLIOS_DEFAULT
+    perfis_hp = hp_porto.get("perfis", {})
+    hp_prods  = _load(_HP_PROD_FILE, {})
+
+    # Índice por conta: ficha_conta -> ficha_nome (evitar duplicatas)
+    vistas = set()
+    clientes_painel = []
+
+    for fkey, ficha in fichas.items():
+        if not isinstance(ficha, dict):
+            continue
+        # Pula chaves duplicadas (conta:XXXX já foi processada via nome|assessor)
+        conta = ficha.get("conta", "").strip()
+        nome  = ficha.get("nome", "").strip()
+        if not nome:
+            continue
+        dedup_key = f"{ficha.get('assessor','')}|{nome}".lower()
+        if dedup_key in vistas:
+            continue
+        vistas.add(dedup_key)
+
+        perfil = ficha.get("perfil", "moderada").lower().replace(" ", "_")
+        # Busca modelo do perfil
+        modelo_perfil = None
+        for pk, pv in perfis_hp.items():
+            if pk.lower().replace(" ","_") == perfil or pk.lower() == perfil:
+                modelo_perfil = pv
+                break
+        if not modelo_perfil:
+            modelo_perfil = MODELOS.get(perfil, MODELOS.get("moderada", {}))
+
+        # Busca última composição salva no histórico
+        hist_key = f"{ficha.get('assessor','')}|{nome}".lower().strip()
+        reg_hist  = hist.get(hist_key) or hist.get(conta) or {}
+        entradas  = reg_hist.get("entradas", []) if isinstance(reg_hist, dict) else []
+        ultima    = entradas[0] if entradas else {}
+        comp      = ultima.get("composicao", {})
+        patrimonio = ultima.get("patrimonio", 0)
+        data_analise = ultima.get("data", "")
+
+        # Sem composição → pula
+        if not comp:
+            continue
+
+        # Calcula desvios
+        desvios = []
+        urgencia = 0
+        for cls in CATS:
+            atual = comp.get(cls, 0.0)
+            alvo  = float(modelo_perfil.get(cls, 0))
+            desvio = round(atual - alvo, 2)
+            status = "ok" if abs(desvio) <= 2 else ("atencao" if abs(desvio) <= 5 else "fora")
+            if status == "fora":
+                urgencia += abs(desvio)
+            elif status == "atencao":
+                urgencia += abs(desvio) * 0.3
+            desvios.append({
+                "cls": cls,
+                "label": LABELS.get(cls, cls),
+                "atual": round(atual, 2),
+                "alvo": round(alvo, 2),
+                "desvio": desvio,
+                "status": status,
+            })
+        desvios.sort(key=lambda x: abs(x["desvio"]), reverse=True)
+
+        # Sugestões de troca: sub-alocados → produto sugerido
+        trocas = []
+        for d in desvios:
+            if d["desvio"] < -2:  # sub-alocado
+                prods = hp_prods.get(d["cls"], [])
+                for p in prods[:1]:
+                    trocas.append({
+                        "acao": "comprar",
+                        "cls": d["cls"],
+                        "label": d["label"],
+                        "gap": d["desvio"],
+                        "produto": p.get("nome", p) if isinstance(p, dict) else str(p),
+                        "ticker": p.get("ticker","") if isinstance(p, dict) else "",
+                    })
+            elif d["desvio"] > 2:  # sobre-alocado
+                # Sugere reduzir: usa ativos da carteira nesta classe
+                ativos_cls = []
+                if d["cls"] == "acoes":
+                    ativos_cls = [a.get("ticker","") or a.get("nome","") for a in ficha.get("acoes",[])[:3]]
+                elif d["cls"] == "fiis":
+                    ativos_cls = [a.get("ticker","") or a.get("nome","") for a in ficha.get("fiis",[])[:3]]
+                elif d["cls"] in ("pos_fixado","inflacao","pre_fixado"):
+                    ativos_cls = [a.get("nome","") for a in ficha.get("rf_ativos",[]) if a.get("classe","").lower() in (d["cls"], d["label"].lower())][:2]
+                trocas.append({
+                    "acao": "reduzir",
+                    "cls": d["cls"],
+                    "label": d["label"],
+                    "gap": d["desvio"],
+                    "produto": ", ".join(filter(None, ativos_cls)) or "—",
+                    "ticker": "",
+                })
+
+        status_geral = "ok" if urgencia == 0 else ("atencao" if urgencia < 15 else "critico")
+
+        clientes_painel.append({
+            "nome": nome,
+            "assessor": ficha.get("assessor", ""),
+            "perfil": perfil,
+            "patrimonio": patrimonio,
+            "data_analise": data_analise,
+            "status": status_geral,
+            "urgencia": round(urgencia, 1),
+            "desvios": desvios[:5],  # top 5
+            "trocas": trocas,
+            "acoes": ficha.get("acoes", [])[:10],
+            "fiis": ficha.get("fiis", [])[:8],
+            "rf_ativos": ficha.get("rf_ativos", [])[:10],
+            "objetivo": ficha.get("objetivo", ""),
+        })
+
+    clientes_painel.sort(key=lambda x: -x["urgencia"])
+    return jsonify({"clientes": clientes_painel, "total": len(clientes_painel)})
+
+
+HTML_PAINEL = r"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel de Carteiras — Braúna</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;background:#0A0A0A;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+body{padding:0 0 60px}
+
+/* Header */
+.header{background:#081F18;border-bottom:1px solid #1A4030;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-size:16px;font-weight:800;color:#C9A96E;letter-spacing:1.5px;text-transform:uppercase}
+.header-sub{font-size:11px;color:#2A5A3A;letter-spacing:.5px}
+.header-nav{display:flex;gap:10px}
+.nav-btn{background:transparent;border:1px solid #1A4030;border-radius:8px;padding:7px 14px;color:#3A6A48;font-size:12px;cursor:pointer;text-decoration:none;transition:all .2s}
+.nav-btn:hover{border-color:#C9A96E;color:#C9A96E}
+.nav-btn.active{background:#C9A96E;color:#081F18;border-color:#C9A96E;font-weight:700}
+
+/* Layout */
+.container{max-width:1300px;margin:0 auto;padding:24px 20px}
+
+/* Topo stats */
+.stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.stat-card{background:#111;border:1px solid #1A1A1A;border-radius:12px;padding:14px 20px;min-width:140px;flex:1}
+.stat-label{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:700;color:#C9A96E}
+.stat-val.ok{color:#5DCAA5}
+.stat-val.atencao{color:#FFD966}
+.stat-val.critico{color:#FF6B6B}
+
+/* Filtros */
+.filtros{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.filtros input,.filtros select{background:#111;border:1px solid #1A4030;border-radius:8px;padding:8px 12px;color:#F0F0F0;font-size:13px;outline:none}
+.filtros input{flex:1;min-width:200px}
+.filtros input::placeholder{color:#3A6A48}
+
+/* Cards de clientes */
+.cliente-card{background:#111;border:1px solid #1E1E1E;border-radius:14px;margin-bottom:14px;overflow:hidden;transition:border-color .2s}
+.cliente-card:hover{border-color:#2A4A38}
+.cliente-card.critico{border-left:4px solid #FF6B6B}
+.cliente-card.atencao{border-left:4px solid #FFD966}
+.cliente-card.ok{border-left:4px solid #5DCAA5}
+
+.cliente-header{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;flex-wrap:wrap}
+.cliente-nome{font-size:15px;font-weight:700;color:#F0F0F0;flex:1;min-width:140px}
+.cliente-assessor{font-size:11px;color:#3A6A48}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge.ok{background:#0F2A1F;color:#5DCAA5;border:1px solid #1A4030}
+.badge.atencao{background:#2A2000;color:#FFD966;border:1px solid #4A3A00}
+.badge.critico{background:#2A0808;color:#FF6B6B;border:1px solid #4A1010}
+.badge.perfil{background:#1A1008;color:#C9A96E;border:1px solid #3A2A10}
+.patrimonio{font-size:13px;color:#C9A96E;font-weight:600;white-space:nowrap}
+.data-tag{font-size:10px;color:#2A4A38}
+.expand-icon{font-size:12px;color:#3A6A48;transition:transform .2s}
+
+/* Detalhe expandido */
+.cliente-body{display:none;padding:0 18px 18px;border-top:1px solid #1A1A1A;margin-top:0}
+.cliente-body.open{display:block}
+
+.section-title{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:14px 0 8px}
+
+/* Desvios */
+.desvio-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.desvio-label{font-size:12px;color:#888;width:110px;flex-shrink:0}
+.desvio-bar-wrap{flex:1;min-width:100px;height:6px;background:#1A1A1A;border-radius:3px;overflow:hidden}
+.desvio-bar{height:100%;border-radius:3px}
+.desvio-bar.ok{background:#5DCAA5}
+.desvio-bar.atencao{background:#FFD966}
+.desvio-bar.fora{background:#FF6B6B}
+.desvio-nums{font-size:11px;white-space:nowrap;min-width:130px;text-align:right}
+.desvio-delta{font-size:11px;font-weight:700;min-width:60px;text-align:right}
+.desvio-delta.pos{color:#FF6B6B}
+.desvio-delta.neg{color:#5DCAA5}
+
+/* Trocas sugeridas */
+.trocas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:4px}
+.troca-card{background:#0A1A12;border:1px solid #1A3020;border-radius:10px;padding:12px 14px}
+.troca-card.reduzir{background:#1A0A0A;border-color:#3A1010}
+.troca-acao{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.troca-acao.comprar{color:#5DCAA5}
+.troca-acao.reduzir{color:#FF6B6B}
+.troca-produto{font-size:13px;color:#F0F0F0;font-weight:600;margin-bottom:2px}
+.troca-cls{font-size:11px;color:#3A6A48}
+.troca-gap{font-size:10px;color:#888;margin-top:4px}
+
+/* Ativos */
+.ativos-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ativo-chip{background:#181818;border:1px solid #222;border-radius:8px;padding:4px 10px;font-size:11px;color:#BBB}
+.ativo-chip span{color:#C9A96E;font-weight:600}
+
+/* Vazio */
+.empty-state{text-align:center;padding:60px 20px;color:#2A4A38}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-msg{font-size:15px;color:#3A6A48}
+.empty-sub{font-size:12px;color:#1A3A28;margin-top:6px}
+
+.spinner-wrap{text-align:center;padding:60px;color:#2A5A3A}
+.spin{width:36px;height:36px;border:3px solid #1A3A28;border-top-color:#C9A96E;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:600px){
+  .cliente-header{gap:8px}
+  .desvio-nums{display:none}
+  .trocas-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">Braúna Investimentos</div>
+    <div class="header-sub">Painel de Carteiras — Sugestões de Realocação</div>
+  </div>
+  <div class="header-nav">
+    <a href="/" class="nav-btn">← Analisar</a>
+    <a href="/lider" class="nav-btn">Líder</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-label">Total de clientes</div><div class="stat-val" id="st-total">—</div></div>
+    <div class="stat-card"><div class="stat-label">Críticos</div><div class="stat-val critico" id="st-critico">—</div></div>
+    <div class="stat-card"><div class="stat-label">Atenção</div><div class="stat-val atencao" id="st-atencao">—</div></div>
+    <div class="stat-card"><div class="stat-label">OK</div><div class="stat-val ok" id="st-ok">—</div></div>
+    <div class="stat-card"><div class="stat-label">Patrimônio total</div><div class="stat-val" id="st-patrimonio">—</div></div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <input type="text" id="filtro-busca" placeholder="Buscar cliente ou assessor..." oninput="filtrar()">
+    <select id="filtro-status" onchange="filtrar()">
+      <option value="">Todos os status</option>
+      <option value="critico">Crítico</option>
+      <option value="atencao">Atenção</option>
+      <option value="ok">OK</option>
+    </select>
+    <select id="filtro-perfil" onchange="filtrar()">
+      <option value="">Todos os perfis</option>
+      <option value="super_conservadora">Super Conservadora</option>
+      <option value="conservadora">Conservadora</option>
+      <option value="moderada">Moderada</option>
+      <option value="arrojada">Arrojada</option>
+      <option value="agressiva">Agressiva</option>
+    </select>
+    <select id="filtro-assessor" onchange="filtrar()">
+      <option value="">Todos os assessores</option>
+    </select>
+  </div>
+
+  <!-- Lista -->
+  <div id="lista"></div>
+
+</div>
+
+<script>
+let todos = [];
+
+function brl(v){ return v >= 1e6 ? 'R$ '+(v/1e6).toFixed(1)+'M' : v >= 1e3 ? 'R$ '+(v/1e3).toFixed(0)+'k' : 'R$ '+v.toFixed(0); }
+function perfil_label(p){ return ({super_conservadora:'Super Conservadora',conservadora:'Conservadora',moderada:'Moderada',arrojada:'Arrojada',agressiva:'Agressiva'})[p] || p; }
+
+async function carregar(){
+  document.getElementById('lista').innerHTML = '<div class="spinner-wrap"><div class="spin"></div><p>Carregando carteiras salvas...</p></div>';
+  try{
+    const r = await fetch('/api/painel-carteiras');
+    const d = await r.json();
+    todos = d.clientes || [];
+    renderStats(todos);
+    popularFiltroAssessor(todos);
+    filtrar();
+  }catch(e){
+    document.getElementById('lista').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-msg">Erro ao carregar dados</div><div class="empty-sub">'+e.message+'</div></div>';
+  }
+}
+
+function renderStats(lista){
+  const critico = lista.filter(c=>c.status==='critico').length;
+  const atencao = lista.filter(c=>c.status==='atencao').length;
+  const ok      = lista.filter(c=>c.status==='ok').length;
+  const pat     = lista.reduce((s,c)=>s+(c.patrimonio||0),0);
+  document.getElementById('st-total').textContent    = lista.length;
+  document.getElementById('st-critico').textContent  = critico;
+  document.getElementById('st-atencao').textContent  = atencao;
+  document.getElementById('st-ok').textContent       = ok;
+  document.getElementById('st-patrimonio').textContent = brl(pat);
+}
+
+function popularFiltroAssessor(lista){
+  const sel = document.getElementById('filtro-assessor');
+  const assessores = [...new Set(lista.map(c=>c.assessor).filter(Boolean))].sort();
+  assessores.forEach(a=>{
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a;
+    sel.appendChild(o);
+  });
+}
+
+function filtrar(){
+  const busca   = document.getElementById('filtro-busca').value.toLowerCase();
+  const status  = document.getElementById('filtro-status').value;
+  const perfil  = document.getElementById('filtro-perfil').value;
+  const assessor= document.getElementById('filtro-assessor').value;
+
+  const filtrados = todos.filter(c=>{
+    if(busca && !(c.nome.toLowerCase().includes(busca) || (c.assessor||'').toLowerCase().includes(busca))) return false;
+    if(status && c.status !== status) return false;
+    if(perfil && c.perfil !== perfil) return false;
+    if(assessor && c.assessor !== assessor) return false;
+    return true;
+  });
+
+  renderStats(filtrados);
+  renderLista(filtrados);
+}
+
+function renderLista(lista){
+  const el = document.getElementById('lista');
+  if(!lista.length){
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-msg">Nenhum cliente encontrado</div><div class="empty-sub">Analise XPerformances na tela principal para popular este painel.</div></div>';
+    return;
+  }
+  el.innerHTML = lista.map((c,i) => clienteCard(c,i)).join('');
+}
+
+function clienteCard(c, i){
+  const statusIcon = {critico:'🔴',atencao:'🟡',ok:'🟢'}[c.status]||'⚪';
+  const patStr = c.patrimonio ? brl(c.patrimonio) : '—';
+
+  const desviosHtml = c.desvios.map(d=>{
+    const pct = Math.min(100, (d.atual/Math.max(d.alvo||1,d.atual||1))*100);
+    const deltaStr = (d.desvio>0?'+':'')+d.desvio.toFixed(1)+'pp';
+    const deltaClass = d.desvio > 0 ? 'pos' : 'neg';
+    return `<div class="desvio-row">
+      <div class="desvio-label">${d.label}</div>
+      <div class="desvio-bar-wrap"><div class="desvio-bar ${d.status}" style="width:${pct}%"></div></div>
+      <div class="desvio-nums" style="color:#888;font-size:11px">${d.atual.toFixed(1)}% → alvo ${d.alvo.toFixed(1)}%</div>
+      <div class="desvio-delta ${deltaClass}">${deltaStr}</div>
+    </div>`;
+  }).join('');
+
+  const trocasHtml = c.trocas.length ? c.trocas.map(t=>`
+    <div class="troca-card ${t.acao}">
+      <div class="troca-acao ${t.acao}">${t.acao==='comprar'?'▲ Adicionar':'▼ Reduzir'} — ${t.label}</div>
+      <div class="troca-produto">${t.produto}</div>
+      ${t.ticker?`<div class="troca-cls">${t.ticker}</div>`:''}
+      <div class="troca-gap">Desvio: ${(t.gap>0?'+':'')+t.gap.toFixed(1)}pp em relação ao modelo</div>
+    </div>`).join('')
+    : '<p style="font-size:12px;color:#2A4A38">Carteira alinhada ao modelo ✓</p>';
+
+  const acoesHtml = c.acoes.length ? c.acoes.slice(0,6).map(a=>
+    `<div class="ativo-chip"><span>${a.ticker||'—'}</span> ${a.pct?a.pct.toFixed(1)+'%':''}</div>`).join('') : '';
+  const fiisHtml = c.fiis.length ? c.fiis.slice(0,4).map(a=>
+    `<div class="ativo-chip"><span>${a.ticker||'—'}</span> ${a.pct?a.pct.toFixed(1)+'%':''}</div>`).join('') : '';
+  const rfHtml = c.rf_ativos.length ? c.rf_ativos.slice(0,5).map(a=>
+    `<div class="ativo-chip">${a.nome||'—'}</div>`).join('') : '';
+
+  const objetivoHtml = c.objetivo ? `<div style="font-size:11px;color:#3A6A48;margin-top:8px">🎯 ${c.objetivo}</div>` : '';
+
+  return `
+<div class="cliente-card ${c.status}" id="card-${i}">
+  <div class="cliente-header" onclick="toggle(${i})">
+    <div>
+      <div class="cliente-nome">${c.nome}</div>
+      <div class="cliente-assessor">${c.assessor||''}${c.data_analise?' · '+c.data_analise:''}</div>
+    </div>
+    <span class="badge perfil">${perfil_label(c.perfil)}</span>
+    <span class="badge ${c.status}">${statusIcon} ${c.status==='critico'?'Crítico':c.status==='atencao'?'Atenção':'OK'}</span>
+    <div class="patrimonio">${patStr}</div>
+    <div class="expand-icon" id="icon-${i}">▼</div>
+  </div>
+  <div class="cliente-body" id="body-${i}">
+    ${objetivoHtml}
+
+    <div class="section-title">Desvios do modelo</div>
+    ${desviosHtml}
+
+    <div class="section-title">Sugestões de realocação</div>
+    <div class="trocas-grid">${trocasHtml}</div>
+
+    ${acoesHtml ? `<div class="section-title">Ações na carteira</div><div class="ativos-grid">${acoesHtml}</div>` : ''}
+    ${fiisHtml  ? `<div class="section-title">FIIs na carteira</div><div class="ativos-grid">${fiisHtml}</div>`   : ''}
+    ${rfHtml    ? `<div class="section-title">Renda Fixa principal</div><div class="ativos-grid">${rfHtml}</div>` : ''}
+  </div>
+</div>`;
+}
+
+function toggle(i){
+  const body = document.getElementById('body-'+i);
+  const icon = document.getElementById('icon-'+i);
+  const open = body.classList.toggle('open');
+  icon.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+carregar();
+</script>
+</body></html>"""
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
