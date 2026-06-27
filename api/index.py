@@ -11873,6 +11873,139 @@ def painel_carteiras():
     return jsonify({"clientes": clientes_painel, "total": len(clientes_painel)})
 
 
+@app.route("/api/processar-zip-xp", methods=["POST"])
+def processar_zip_xp():
+    """Recebe ZIP com até 50 PDFs XPerformance, processa cada um e salva snapshots."""
+    import zipfile
+
+    arq = request.files.get("zip")
+    if not arq:
+        return jsonify({"erro": "Nenhum arquivo enviado"}), 400
+
+    nome_arq = arq.filename or ""
+    dados_arq = arq.read()
+
+    # Aceita PDF avulso também
+    pdfs = []  # lista de (nome_arquivo, bytes)
+    if nome_arq.lower().endswith(".pdf"):
+        pdfs = [(nome_arq, dados_arq)]
+    elif nome_arq.lower().endswith(".zip"):
+        try:
+            with zipfile.ZipFile(io.BytesIO(dados_arq)) as zf:
+                for membro in zf.namelist():
+                    if membro.lower().endswith(".pdf") and not membro.startswith("__MACOSX"):
+                        pdfs.append((membro, zf.read(membro)))
+        except Exception as e:
+            return jsonify({"erro": f"ZIP inválido: {e}"}), 400
+    else:
+        return jsonify({"erro": "Envie um arquivo .zip ou .pdf"}), 400
+
+    if not pdfs:
+        return jsonify({"erro": "Nenhum PDF encontrado dentro do ZIP"}), 400
+    if len(pdfs) > 100:
+        return jsonify({"erro": "Máximo de 100 PDFs por envio"}), 400
+
+    fichas = load_fichas()
+    hist   = load_hist()
+    fichas_alteradas = False
+    hist_alterado    = False
+
+    processados = []
+    erros       = []
+
+    for nome_pdf, pdf_bytes in pdfs:
+        try:
+            xp = extrair_xperformance(pdf_bytes)
+        except Exception as e:
+            erros.append({"arquivo": nome_pdf, "erro": str(e)})
+            continue
+
+        conta    = xp.get("conta", "").strip()
+        assessor = xp.get("assessor", "").strip()
+        data_ref = xp.get("data_ref", "")
+        patrimonio = xp.get("patrimonio", 0)
+        comp     = xp.get("comp", {})
+
+        if not conta and not assessor:
+            erros.append({"arquivo": nome_pdf, "erro": "Não foi possível identificar o cliente"})
+            continue
+
+        # Busca ficha existente por conta
+        ficha = fichas.get(f"conta:{conta}") or fichas.get(conta) or {}
+
+        # Se não há ficha, cria uma mínima com os dados do XP
+        if not ficha and conta:
+            ficha = {"conta": conta, "assessor": assessor, "nome": "", "perfil": "moderada"}
+
+        nome  = ficha.get("nome", "")
+        perfil = ficha.get("perfil", "moderada")
+        fkey  = f"{assessor}|{nome}".lower().strip() if nome else f"conta:{conta}"
+
+        # Atualiza ficha com ativos do XP (sempre sobrescreve com o mais recente)
+        ficha_upd = {
+            **ficha,
+            "conta":    conta,
+            "assessor": assessor or ficha.get("assessor",""),
+            "acoes":    [{"ticker":a.get("ticker",""),"nome":a.get("nome",""),"saldo":a.get("saldo",0),"qtd":a.get("qtd",0),"perc":a.get("perc",0)} for a in xp.get("acoes",[])[:40]],
+            "fiis":     [{"ticker":a.get("ticker",""),"nome":a.get("nome",""),"saldo":a.get("saldo",0),"qtd":a.get("qtd",0),"perc":a.get("perc",0)} for a in xp.get("fiis",[])[:30]],
+            "rf_ativos":[{"nome":a.get("nome",""),"classe":a.get("classe",""),"saldo":a.get("saldo",0),"perc":a.get("perc",0),"rent_mes":a.get("rent_mes"),"rent_12m":a.get("rent_12m")} for a in xp.get("rf_ativos",[])[:60]],
+            "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        }
+        fichas[f"conta:{conta}"] = ficha_upd
+        if fkey and fkey != f"conta:{conta}":
+            fichas[fkey] = ficha_upd
+        fichas_alteradas = True
+
+        # Monta snapshot para o histórico
+        entrada = {
+            "data":      datetime.now().strftime("%d/%m/%Y"),
+            "hora":      datetime.now().strftime("%H:%M"),
+            "data_ref":  data_ref,
+            "patrimonio": patrimonio,
+            "perfil":    perfil,
+            "composicao": comp,
+            "rent":      xp.get("rent", {}),
+            "acoes":     ficha_upd["acoes"],
+            "fiis":      ficha_upd["fiis"],
+            "rf_ativos": ficha_upd["rf_ativos"],
+            "status":    "importado",
+            "score_servir": 0,
+            "rent12_pct_cdi": 0,
+        }
+
+        reg = hist.get(fkey, {"assessor": assessor, "nome": nome, "perfil": perfil, "entradas": []})
+        anteriores = [e for e in reg.get("entradas", []) if e.get("data") != entrada["data"]]
+        reg["entradas"] = ([entrada] + anteriores)[:3]
+        hist[fkey] = reg
+        hist_alterado = True
+
+        processados.append({
+            "arquivo":   nome_pdf,
+            "conta":     conta,
+            "assessor":  assessor,
+            "nome":      nome or conta,
+            "data_ref":  data_ref,
+            "patrimonio": patrimonio,
+            "acoes_n":   len(ficha_upd["acoes"]),
+            "fiis_n":    len(ficha_upd["fiis"]),
+            "rf_n":      len(ficha_upd["rf_ativos"]),
+        })
+
+    if fichas_alteradas:
+        save_fichas(fichas)
+    if hist_alterado:
+        save_hist(hist)
+
+    return jsonify({
+        "ok": True,
+        "total_pdfs":   len(pdfs),
+        "processados":  len(processados),
+        "erros_n":      len(erros),
+        "clientes":     processados,
+        "erros":        erros,
+    })
+
+
 HTML_PAINEL = r"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11995,6 +12128,34 @@ body{padding:0 0 60px}
 </div>
 
 <div class="container">
+
+  <!-- Upload ZIP / PDF em lote -->
+  <div id="upload-lote-box" style="background:#0A1208;border:1.5px dashed #1A4020;border-radius:14px;padding:20px 24px;margin-bottom:22px">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:13px;font-weight:700;color:#C9A96E;margin-bottom:4px">📦 Importar XPerformances em lote</div>
+        <div style="font-size:12px;color:#3A6A48">Arraste ou selecione um <strong style="color:#C9A96E">.zip</strong> com até 50 PDFs, ou um <strong style="color:#C9A96E">PDF</strong> individual. Os dados de cada cliente são salvos automaticamente.</div>
+      </div>
+      <label id="lote-label" style="background:#1A3018;border:1px solid #2A5028;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#5DCAA5;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#C9A96E';this.style.color='#C9A96E'" onmouseout="this.style.borderColor='#2A5028';this.style.color='#5DCAA5'">
+        Selecionar arquivo
+        <input type="file" id="input-lote" accept=".zip,.pdf" style="display:none" onchange="processarLote(this)">
+      </label>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div id="lote-progress" style="display:none;margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#3A6A48;margin-bottom:6px">
+        <span id="lote-progress-txt">Processando...</span>
+        <span id="lote-progress-pct">0%</span>
+      </div>
+      <div style="height:6px;background:#1A1A1A;border-radius:3px;overflow:hidden">
+        <div id="lote-progress-bar" style="height:100%;background:#5DCAA5;border-radius:3px;width:0%;transition:width .3s"></div>
+      </div>
+    </div>
+
+    <!-- Resultado -->
+    <div id="lote-resultado" style="display:none;margin-top:14px"></div>
+  </div>
 
   <!-- Stats -->
   <div class="stats-row" id="stats-row">
@@ -12272,6 +12433,82 @@ function toggle(i){
   const icon = document.getElementById('icon-'+i);
   const open = body.classList.toggle('open');
   icon.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+async function processarLote(input){
+  const file = input.files[0];
+  if(!file) return;
+
+  // Reset UI
+  const progBox  = document.getElementById('lote-progress');
+  const progBar  = document.getElementById('lote-progress-bar');
+  const progTxt  = document.getElementById('lote-progress-txt');
+  const progPct  = document.getElementById('lote-progress-pct');
+  const resBox   = document.getElementById('lote-resultado');
+  progBox.style.display  = 'block';
+  resBox.style.display   = 'none';
+  progBar.style.width    = '10%';
+  progTxt.textContent    = `Enviando ${file.name} (${(file.size/1024/1024).toFixed(1)} MB)...`;
+  progPct.textContent    = '10%';
+
+  const fd = new FormData();
+  fd.append('zip', file);
+
+  try{
+    const r = await fetch('/api/processar-zip-xp', {method:'POST', body:fd});
+    progBar.style.width = '80%'; progPct.textContent = '80%';
+    const d = await r.json();
+
+    if(d.erro){ throw new Error(d.erro); }
+
+    progBar.style.width = '100%'; progPct.textContent = '100%';
+    progTxt.textContent = 'Concluído!';
+
+    // Monta resultado
+    const ok   = d.processados || 0;
+    const err  = d.erros_n || 0;
+    const lista = (d.clientes||[]).slice(0,20).map(c=>
+      `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #1A1A1A;font-size:12px">
+        <span style="color:#5DCAA5;font-size:14px">✓</span>
+        <span style="flex:1;color:#CCC">${c.nome||c.conta}</span>
+        <span style="color:#3A6A48">${c.data_ref}</span>
+        <span style="color:#C9A96E">${brl(c.patrimonio)}</span>
+        <span style="color:#2A4A38;font-size:10px">${c.acoes_n}ações · ${c.fiis_n}FIIs · ${c.rf_n}RF</span>
+      </div>`).join('');
+    const errosHtml = (d.erros||[]).map(e=>
+      `<div style="font-size:11px;color:#FF6B6B;padding:3px 0">⚠ ${e.arquivo}: ${e.erro}</div>`).join('');
+    const maisHtml = ok > 20 ? `<div style="font-size:11px;color:#3A6A48;margin-top:6px">... e mais ${ok-20} clientes processados</div>` : '';
+
+    resBox.innerHTML = `
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="background:#0F2A1F;border:1px solid #1A4030;border-radius:8px;padding:8px 16px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#5DCAA5">${ok}</div>
+          <div style="font-size:10px;color:#3A6A48">clientes salvos</div>
+        </div>
+        <div style="background:#0A0A0A;border:1px solid #1A1A1A;border-radius:8px;padding:8px 16px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#888">${d.total_pdfs}</div>
+          <div style="font-size:10px;color:#3A6A48">PDFs no arquivo</div>
+        </div>
+        ${err ? `<div style="background:#1A0808;border:1px solid #3A1010;border-radius:8px;padding:8px 16px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#FF6B6B">${err}</div>
+          <div style="font-size:10px;color:#FF4444">erros</div>
+        </div>` : ''}
+      </div>
+      <div style="max-height:240px;overflow-y:auto">${lista}${maisHtml}</div>
+      ${errosHtml ? `<div style="margin-top:8px;padding:10px;background:#1A0808;border-radius:8px">${errosHtml}</div>` : ''}
+      <button onclick="carregar()" style="margin-top:12px;background:#1A3018;border:1px solid #2A5028;border-radius:8px;padding:8px 18px;color:#5DCAA5;font-size:12px;cursor:pointer">
+        ↻ Atualizar painel
+      </button>`;
+    resBox.style.display = 'block';
+
+  }catch(e){
+    progBar.style.background = '#FF6B6B';
+    progTxt.textContent = 'Erro: '+e.message;
+    progPct.textContent = '';
+  }
+
+  // Limpa input para permitir reenvio do mesmo arquivo
+  input.value = '';
 }
 
 carregar();
