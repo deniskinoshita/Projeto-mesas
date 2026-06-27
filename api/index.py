@@ -237,6 +237,7 @@ _CLIENTS_FILE         = "/tmp/brauna_clients.json"
 _ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
 _NOTIF_FILE           = "/tmp/brauna_notificacoes.json"
 _SENHAS_PESSOAIS_FILE = "/tmp/brauna_senhas_pessoais.json"
+_RESET_TOKENS_FILE    = "/tmp/brauna_reset_tokens.json"
 
 # ── Senha pessoal (2ª senha, criada no 1º acesso) ─────────────────────────────
 import hashlib as _hashlib, secrets as _secrets
@@ -256,6 +257,85 @@ def _verifica_senha(senha: str, guardado: str) -> bool:
 
 def load_senhas_pessoais():  return _load(_SENHAS_PESSOAIS_FILE, {})
 def save_senhas_pessoais(d): _save(_SENHAS_PESSOAIS_FILE, d)
+def load_reset_tokens():     return _load(_RESET_TOKENS_FILE, {})
+def save_reset_tokens(d):    _save(_RESET_TOKENS_FILE, d)
+
+def _enviar_email_reset(destinatario: str, nome: str, token: str):
+    """Envia e-mail de reset de senha via SMTP. Configurar vars de ambiente no Vercel:
+       SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+    """
+    import smtplib, os
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    host  = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    port  = int(os.environ.get("SMTP_PORT", "587"))
+    user  = os.environ.get("SMTP_USER", "")
+    pwd   = os.environ.get("SMTP_PASS", "")
+    frm   = os.environ.get("SMTP_FROM", user)
+    base  = os.environ.get("APP_URL", "https://analise-carteiras-brauna.vercel.app")
+
+    if not user or not pwd:
+        app.logger.warning("SMTP não configurado — e-mail de reset não enviado")
+        return False
+
+    link = f"{base}/reset-senha?token={token}"
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "Braúna Investimentos — Redefinição de senha"
+    msg["From"]    = frm
+    msg["To"]      = destinatario
+
+    txt = f"""Olá, {nome}!
+
+Recebemos uma solicitação para redefinir sua senha no sistema Braúna Investimentos.
+
+Clique no link abaixo para criar uma nova senha:
+{link}
+
+Este link expira em 1 hora.
+
+Se você não solicitou a redefinição, ignore este e-mail — sua senha continua a mesma.
+
+Braúna Investimentos
+"""
+    html = f"""<!DOCTYPE html>
+<html><body style="font-family:Segoe UI,sans-serif;background:#081F18;color:#F0F0F0;padding:40px 20px;margin:0">
+<div style="max-width:480px;margin:0 auto;background:#111;border-radius:16px;padding:32px;border:1px solid #1A4030">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:22px;font-weight:800;color:#C9A96E;letter-spacing:2px">BRAÚNA INVESTIMENTOS</div>
+    <div style="font-size:12px;color:#3A6A48;margin-top:4px">Sistema de Análise de Carteiras</div>
+  </div>
+  <p style="color:#CCC;font-size:14px;margin-bottom:8px">Olá, <strong style="color:#F0F0F0">{nome}</strong>!</p>
+  <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:24px">
+    Recebemos uma solicitação para redefinir sua senha no sistema Braúna.<br>
+    Clique no botão abaixo para criar uma nova senha.
+  </p>
+  <div style="text-align:center;margin-bottom:24px">
+    <a href="{link}" style="display:inline-block;background:#C9A96E;color:#081F18;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;text-decoration:none;letter-spacing:.5px">
+      Redefinir minha senha
+    </a>
+  </div>
+  <p style="color:#3A6A48;font-size:11px;text-align:center">Este link expira em <strong>1 hora</strong>.<br>
+  Se não foi você, ignore este e-mail — sua senha continua a mesma.</p>
+  <hr style="border:none;border-top:1px solid #1A2A1A;margin:24px 0">
+  <p style="color:#1A4030;font-size:10px;text-align:center">Braúna Investimentos · Uso interno · Acesso restrito</p>
+</div>
+</body></html>"""
+
+    msg.attach(MIMEText(txt, "plain"))
+    msg.attach(MIMEText(html, "html"))
+
+    try:
+        with smtplib.SMTP(host, port) as s:
+            s.ehlo()
+            s.starttls()
+            s.login(user, pwd)
+            s.sendmail(frm, destinatario, msg.as_string())
+        return True
+    except Exception as e:
+        app.logger.error(f"Erro ao enviar e-mail: {e}")
+        return False
 
 def _entry_hash(entry):
     """Compat: entrada pode ser string (formato antigo) ou dict {hash, criada_em}."""
@@ -3862,7 +3942,12 @@ def login_pessoal():
             return jsonify({"ok": False, "msg": "Senha já existe. Faça login normalmente."}), 400
         if len(senha) < 4:
             return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
-        senhas[identity] = {"hash": _hash_senha(senha), "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M")}
+        email = (d.get("email") or "").strip().lower()
+        senhas[identity] = {
+            "hash": _hash_senha(senha),
+            "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "email": email,
+        }
         save_senhas_pessoais(senhas)
         return jsonify({"ok": True, "criada": True})
     # Validação
@@ -3872,6 +3957,125 @@ def login_pessoal():
     if _verifica_senha(senha, _entry_hash(guardado)):
         return jsonify({"ok": True})
     return jsonify({"ok": False, "msg": "Senha pessoal incorreta."}), 401
+
+
+@app.route("/api/solicitar-reset", methods=["POST"])
+def solicitar_reset():
+    """Gera token de reset e envia e-mail ao assessor."""
+    import time
+    d = request.get_json() or {}
+    role  = d.get("role", "assessor")
+    senha = (d.get("senha") or "").strip().upper()
+
+    # Monta identity igual ao login
+    if role == "assessor":
+        nome = ASSESSORES.get(senha)
+        if not nome:
+            return jsonify({"ok": False, "msg": "Código de assessor não encontrado"}), 404
+        identity = f"assessor:{senha}"
+    elif role in ("lider", "head", "admin"):
+        identity = role
+        nome = role.capitalize()
+    else:
+        return jsonify({"ok": False, "msg": "Perfil inválido"}), 400
+
+    senhas = load_senhas_pessoais()
+    entrada = senhas.get(identity)
+    if not entrada:
+        return jsonify({"ok": False, "msg": "Nenhuma senha cadastrada para este usuário. Faça o primeiro acesso normalmente."}), 404
+
+    email = entrada.get("email", "") if isinstance(entrada, dict) else ""
+    if not email:
+        return jsonify({"ok": False, "msg": "E-mail não cadastrado. Entre em contato com o administrador."}), 400
+
+    # Gera token único com validade de 1h
+    token = _secrets.token_urlsafe(32)
+    tokens = load_reset_tokens()
+    # Limpa tokens expirados
+    agora = time.time()
+    tokens = {k: v for k, v in tokens.items() if v.get("expira", 0) > agora}
+    tokens[token] = {
+        "identity": identity,
+        "nome": nome,
+        "email": email,
+        "expira": agora + 3600,
+        "criado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+    }
+    save_reset_tokens(tokens)
+
+    enviado = _enviar_email_reset(email, nome, token)
+    if not enviado:
+        # Em dev/sem SMTP configurado: retorna o token para facilitar teste
+        import os
+        if os.environ.get("FLASK_ENV") == "development" or not os.environ.get("SMTP_USER"):
+            return jsonify({"ok": True, "dev_token": token, "email_mascarado": email,
+                            "aviso": "SMTP não configurado — use o dev_token para testar"})
+        return jsonify({"ok": False, "msg": "Falha ao enviar e-mail. Tente novamente ou contate o admin."}), 500
+
+    # Mascara o e-mail: jo**@gmail.com
+    partes = email.split("@")
+    visivel = partes[0][:2] + "**"
+    mascarado = visivel + "@" + partes[1] if len(partes) > 1 else email
+    return jsonify({"ok": True, "email_mascarado": mascarado})
+
+
+@app.route("/api/confirmar-reset", methods=["POST"])
+def confirmar_reset():
+    """Valida token e define nova senha."""
+    import time
+    d = request.get_json() or {}
+    token     = (d.get("token") or "").strip()
+    nova_senha = d.get("senha", "")
+
+    if not token:
+        return jsonify({"ok": False, "msg": "Token inválido"}), 400
+    if len(nova_senha) < 4:
+        return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
+
+    tokens = load_reset_tokens()
+    entrada = tokens.get(token)
+    if not entrada:
+        return jsonify({"ok": False, "msg": "Link inválido ou já utilizado."}), 400
+    if entrada.get("expira", 0) < time.time():
+        del tokens[token]
+        save_reset_tokens(tokens)
+        return jsonify({"ok": False, "msg": "Este link expirou. Solicite um novo reset."}), 400
+
+    identity = entrada["identity"]
+    senhas = load_senhas_pessoais()
+    existente = senhas.get(identity) or {}
+    email = existente.get("email", entrada.get("email", "")) if isinstance(existente, dict) else ""
+
+    senhas[identity] = {
+        "hash": _hash_senha(nova_senha),
+        "criada_em": existente.get("criada_em", "") if isinstance(existente, dict) else "",
+        "atualizada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "email": email,
+    }
+    save_senhas_pessoais(senhas)
+
+    # Invalida o token após uso
+    del tokens[token]
+    save_reset_tokens(tokens)
+
+    return jsonify({"ok": True, "nome": entrada.get("nome", "")})
+
+
+@app.route("/api/verificar-token-reset", methods=["POST"])
+def verificar_token_reset():
+    """Verifica se o token ainda é válido (para a página de reset saber se pode mostrar o form)."""
+    import time
+    token = (request.get_json() or {}).get("token", "").strip()
+    tokens = load_reset_tokens()
+    entrada = tokens.get(token)
+    if not entrada or entrada.get("expira", 0) < time.time():
+        return jsonify({"ok": False, "msg": "Link inválido ou expirado."})
+    return jsonify({"ok": True, "nome": entrada.get("nome", "")})
+
+
+@app.route("/reset-senha")
+def reset_senha_page():
+    return render_template_string(HTML_RESET_SENHA)
 
 
 @app.route("/api/macro", methods=["GET"])
@@ -6958,6 +7162,137 @@ def pdf_endpoint():
     return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=nome_arq)
 
 
+HTML_RESET_SENHA = r"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Braúna — Redefinir Senha</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#081F18;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.card{background:#111;border:1px solid #1A4030;border-radius:16px;padding:36px 32px;width:100%;max-width:400px}
+.logo{text-align:center;margin-bottom:28px}
+.logo-title{font-size:20px;font-weight:800;color:#C9A96E;letter-spacing:2px}
+.logo-sub{font-size:11px;color:#3A6A48;margin-top:4px}
+h2{font-size:15px;color:#F0F0F0;margin-bottom:6px}
+p.desc{font-size:12px;color:#3A6A48;margin-bottom:22px;line-height:1.5}
+label{font-size:11px;color:#3A6A48;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:11px 14px;color:#F0F0F0;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
+input:focus{border-color:#C9A96E}
+.btn{width:100%;background:#C9A96E;color:#081F18;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.msg{font-size:12px;margin-top:12px;text-align:center;min-height:18px}
+.msg.ok{color:#5DCAA5}
+.msg.err{color:#FF6B6B}
+.back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#3A6A48;text-decoration:none}
+.back:hover{color:#C9A96E}
+.loading{display:inline-block;width:16px;height:16px;border:2px solid #081F18;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="logo">
+    <div class="logo-title">BRAÚNA INVESTIMENTOS</div>
+    <div class="logo-sub">Redefinição de senha</div>
+  </div>
+
+  <!-- Estado: verificando token -->
+  <div id="state-loading" style="text-align:center;padding:20px 0">
+    <div class="loading" style="width:24px;height:24px;border-color:#C9A96E;border-top-color:transparent;display:inline-block"></div>
+    <p style="color:#3A6A48;font-size:13px;margin-top:12px">Verificando link...</p>
+  </div>
+
+  <!-- Estado: token inválido -->
+  <div id="state-invalido" style="display:none;text-align:center;padding:10px 0">
+    <div style="font-size:36px;margin-bottom:12px">⚠️</div>
+    <h2 style="color:#FF6B6B;margin-bottom:8px">Link inválido ou expirado</h2>
+    <p style="font-size:12px;color:#888;line-height:1.5;margin-bottom:20px">Este link de redefinição já foi utilizado ou expirou.<br>Solicite um novo na tela de login.</p>
+    <a href="/" class="btn" style="display:block;text-align:center;text-decoration:none;padding:13px">Voltar ao login</a>
+  </div>
+
+  <!-- Estado: formulário de nova senha -->
+  <div id="state-form" style="display:none">
+    <h2>Olá, <span id="nome-usuario"></span>!</h2>
+    <p class="desc">Escolha uma nova senha para acessar o sistema.</p>
+    <div>
+      <label>Nova senha</label>
+      <input type="password" id="nova-senha" placeholder="Mínimo 4 caracteres" minlength="4">
+    </div>
+    <div>
+      <label>Confirmar senha</label>
+      <input type="password" id="conf-senha" placeholder="Repita a senha">
+    </div>
+    <button class="btn" id="btn-salvar" onclick="salvar()">Salvar nova senha</button>
+    <div class="msg" id="msg-form"></div>
+  </div>
+
+  <!-- Estado: sucesso -->
+  <div id="state-sucesso" style="display:none;text-align:center;padding:10px 0">
+    <div style="font-size:36px;margin-bottom:12px">✅</div>
+    <h2 style="color:#5DCAA5;margin-bottom:8px">Senha redefinida!</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:20px">Sua nova senha foi salva com sucesso. Você já pode fazer login.</p>
+    <a href="/" class="btn" style="display:block;text-align:center;text-decoration:none;padding:13px">Ir para o login</a>
+  </div>
+</div>
+
+<script>
+let tokenAtual = '';
+
+function estado(id){
+  ['state-loading','state-invalido','state-form','state-sucesso'].forEach(s=>{
+    document.getElementById(s).style.display = s===id ? 'block' : 'none';
+  });
+}
+
+async function init(){
+  const params = new URLSearchParams(location.search);
+  tokenAtual = params.get('token') || '';
+  if(!tokenAtual){ estado('state-invalido'); return; }
+
+  try{
+    const r = await fetch('/api/verificar-token-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tokenAtual})});
+    const d = await r.json();
+    if(!d.ok){ estado('state-invalido'); return; }
+    document.getElementById('nome-usuario').textContent = d.nome;
+    estado('state-form');
+  }catch(e){
+    estado('state-invalido');
+  }
+}
+
+async function salvar(){
+  const nova = document.getElementById('nova-senha').value;
+  const conf = document.getElementById('conf-senha').value;
+  const msg  = document.getElementById('msg-form');
+  const btn  = document.getElementById('btn-salvar');
+
+  if(nova.length < 4){ msg.className='msg err'; msg.textContent='A senha precisa ter ao menos 4 caracteres.'; return; }
+  if(nova !== conf){   msg.className='msg err'; msg.textContent='As senhas não coincidem.'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span>Salvando...';
+  msg.textContent = '';
+
+  try{
+    const r = await fetch('/api/confirmar-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tokenAtual,senha:nova})});
+    const d = await r.json();
+    if(d.ok){ estado('state-sucesso'); return; }
+    msg.className='msg err'; msg.textContent = d.msg || 'Erro ao salvar. Tente novamente.';
+  }catch(e){
+    msg.className='msg err'; msg.textContent = 'Erro de conexão.';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Salvar nova senha';
+}
+
+init();
+</script>
+</body></html>"""
+
+
 HTML_LOGIN = r"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7120,9 +7455,29 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
     <input type="password" id="senha-pessoal-confirma" class="senha-input" placeholder="Repita a senha pessoal" onkeydown="if(event.key==='Enter')entrarPessoal()">
     <button class="toggle-pw" onclick="togglePessoal('senha-pessoal-confirma')" type="button">👁</button>
   </div>
+  <!-- Campo de e-mail — só aparece no 1º acesso -->
+  <div id="email-wrap" style="display:none;margin-top:10px">
+    <input type="email" id="email-pessoal" class="senha-input" placeholder="Seu e-mail (para reset de senha)"
+      style="letter-spacing:normal;font-size:13px" onkeydown="if(event.key==='Enter')entrarPessoal()">
+  </div>
   <button class="btn-entrar" id="btn-pessoal" onclick="entrarPessoal()">Entrar</button>
   <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #333;color:#888;margin-top:8px">Voltar</button>
   <div class="erro-msg" id="erro-pessoal"></div>
+  <!-- Esqueci minha senha -->
+  <div id="esqueci-wrap" style="display:none;text-align:center;margin-top:14px">
+    <button onclick="esqueceuSenha()" style="background:none;border:none;color:#3A6A48;font-size:12px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
+  </div>
+</div>
+
+<!-- Caixa de reset de senha (esqueci) -->
+<div class="senha-box" id="reset-box" style="display:none">
+  <div class="senha-label"><span>📧</span><span style="color:var(--role-color)">Redefinir senha</span></div>
+  <div style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.5" id="reset-aviso">
+    Enviaremos um link de redefinição para o e-mail cadastrado no seu perfil.
+  </div>
+  <button class="btn-entrar" id="btn-reset" onclick="solicitarReset()">Enviar link por e-mail</button>
+  <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #333;color:#888;margin-top:8px">Voltar</button>
+  <div class="erro-msg" id="erro-reset"></div>
 </div>
 
 <div class="rodape">Braúna Investimentos · Uso interno · Acesso restrito</div>
@@ -7204,13 +7559,16 @@ function mostrarSenhaPessoal(precisaCriar){
   box.style.display = "block";
   box.dataset.criar = precisaCriar ? "1" : "0";
   document.getElementById("confirma-wrap").style.display = precisaCriar ? "block" : "none";
+  document.getElementById("email-wrap").style.display    = precisaCriar ? "block" : "none";
+  document.getElementById("esqueci-wrap").style.display  = precisaCriar ? "none"  : "block";
   document.getElementById("pessoal-titulo").textContent = precisaCriar ? "Crie sua senha pessoal" : "Senha pessoal";
   document.getElementById("pessoal-aviso").innerHTML = precisaCriar
-    ? "🔒 Primeiro acesso: crie uma <b>senha pessoal só sua</b>. Você vai precisar dela toda vez para entrar — ninguém com seu código consegue acessar sem ela."
+    ? "🔒 Primeiro acesso: crie uma <b>senha pessoal só sua</b> e informe seu e-mail para recuperação. Ninguém com seu código consegue acessar sem ela."
     : "Digite sua senha pessoal para acessar.";
   document.getElementById("btn-pessoal").textContent = precisaCriar ? "Criar e entrar" : "Entrar";
   document.getElementById("senha-pessoal").value = "";
   document.getElementById("senha-pessoal-confirma").value = "";
+  document.getElementById("email-pessoal") && (document.getElementById("email-pessoal").value = "");
   document.getElementById("erro-pessoal").textContent = "";
   setTimeout(()=>document.getElementById("senha-pessoal").focus(), 50);
 }
@@ -7232,9 +7590,11 @@ async function entrarPessoal(){
   const btn = document.getElementById("btn-pessoal");
   btn.disabled = true; btn.textContent = "Verificando...";
   try{
+    const email = criar ? (document.getElementById("email-pessoal").value.trim()) : "";
+    if(criar && !email){ erro.textContent = "Informe seu e-mail para recuperação."; btn.disabled=false; btn.textContent="Criar e entrar"; return; }
     const r = await fetch("/api/login-pessoal",{
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({identity: _sessaoPendente.identity, senha_pessoal: senha, criar})
+      body: JSON.stringify({identity: _sessaoPendente.identity, senha_pessoal: senha, criar, email})
     });
     const d = await r.json();
     if(d.ok){
@@ -7263,11 +7623,50 @@ function togglePessoal(id){
 function voltarLogin(){
   _sessaoPendente = null;
   document.getElementById("pessoal-box").style.display = "none";
-  document.getElementById("senha-box").style.display = "block";
+  document.getElementById("reset-box").style.display   = "none";
+  document.getElementById("senha-box").style.display   = "block";
   document.querySelector(".roles").style.opacity = "1";
   document.querySelector(".roles").style.pointerEvents = "auto";
   document.getElementById("senha").value = "";
   document.getElementById("senha").focus();
+}
+
+function esqueceuSenha(){
+  document.getElementById("pessoal-box").style.display = "none";
+  document.getElementById("reset-box").style.display   = "block";
+  document.getElementById("erro-reset").textContent = "";
+  document.getElementById("btn-reset").disabled = false;
+  document.getElementById("btn-reset").textContent = "Enviar link por e-mail";
+  // Pré-preenche aviso com o nome do usuário
+  if(_sessaoPendente){
+    document.getElementById("reset-aviso").textContent =
+      `Vamos enviar um link de redefinição para o e-mail cadastrado em "${_sessaoPendente.nome}".`;
+  }
+}
+
+async function solicitarReset(){
+  if(!_sessaoPendente) return voltarLogin();
+  const btn  = document.getElementById("btn-reset");
+  const erro = document.getElementById("erro-reset");
+  btn.disabled = true; btn.textContent = "Enviando..."; erro.textContent = "";
+  try{
+    const r = await fetch("/api/solicitar-reset",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({role: _sessaoPendente.role, senha: _sessaoPendente.codigo || document.getElementById("senha").value})
+    });
+    const d = await r.json();
+    if(d.ok){
+      document.getElementById("reset-aviso").innerHTML =
+        `✅ Link enviado para <b>${d.email_mascarado}</b>.<br><span style="color:#3A6A48">Verifique sua caixa de entrada e clique no link para criar nova senha.</span>`;
+      btn.style.display = "none";
+    } else {
+      erro.textContent = d.msg || "Não foi possível enviar o e-mail.";
+      btn.disabled = false; btn.textContent = "Tentar novamente";
+    }
+  }catch(e){
+    erro.textContent = "Erro de conexão.";
+    btn.disabled = false; btn.textContent = "Tentar novamente";
+  }
 }
 
 // Seleciona automaticamente se já existe role salvo
