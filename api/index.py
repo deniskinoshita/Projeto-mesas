@@ -1452,6 +1452,7 @@ select option{background:#1A1A1A}
         <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #C9A96E;color:#C9A96E;text-decoration:none;font-weight:700">📊 Assessor</a>
         <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">👥 Líder</a>
         <a href="/head-produtos" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">🏛️ Head</a>
+        <a href="/painel" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">📋 Painel</a>
         <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">⚙️ Admin</a>
         <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer">Sair</button>`;
     }
@@ -7438,13 +7439,14 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   <nav class="nav" id="nav-lider">
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider" class="active">👥 Líder</a>
+    <a href="/painel">📋 Painel</a>
     <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#4A7055;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#4A7055'">Sair</button>
   </nav>
   <script>
   (function(){
     if(localStorage.getItem("brauna_role")==="admin"){
       const nav=document.getElementById("nav-lider");
-      nav.innerHTML='<a href="/assessor">📊 Assessor</a><a href="/lider" class="active">👥 Líder</a><a href="/head-produtos">🏛️ Head</a><a href="/admin">⚙️ Admin</a>';
+      nav.innerHTML='<a href="/assessor">📊 Assessor</a><a href="/lider" class="active">👥 Líder</a><a href="/painel">📋 Painel</a><a href="/head-produtos">🏛️ Head</a><a href="/admin">⚙️ Admin</a>';
     }
   })();
   </script>
@@ -8390,6 +8392,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider">👥 Líder</a>
     <a href="/head-produtos">🏛️ Head</a>
+    <a href="/painel">📋 Painel</a>
     <a href="/admin" class="active">⚙️ Admin</a>
   </nav>
 </header>
@@ -9640,13 +9643,14 @@ textarea{resize:vertical}
   </div>
   <nav class="nav" id="nav-head">
     <a href="/head-produtos" class="active">🏛️ Head</a>
+    <a href="/painel">📋 Painel</a>
     <button onclick="sair()">Sair</button>
   </nav>
   <script>
   (function(){
     if(localStorage.getItem("brauna_role")==="admin"){
       const nav=document.getElementById("nav-head");
-      nav.innerHTML=`<a href="/assessor">📊 Assessor</a><a href="/lider">👥 Líder</a><a href="/head-produtos" class="active">🏛️ Head</a><a href="/admin">⚙️ Admin</a>`;
+      nav.innerHTML=`<a href="/assessor">📊 Assessor</a><a href="/lider">👥 Líder</a><a href="/head-produtos" class="active">🏛️ Head</a><a href="/painel">📋 Painel</a><a href="/admin">⚙️ Admin</a>`;
     }
   })();
   </script>
@@ -11963,6 +11967,21 @@ body{padding:0 0 60px}
     <div class="stat-card"><div class="stat-label">Patrimônio total</div><div class="stat-val" id="st-patrimonio">—</div></div>
   </div>
 
+  <!-- Visão macro — Head de Produtos -->
+  <div id="macro-head" style="display:none;background:#0A1208;border:1px solid #1A3010;border-radius:14px;padding:18px 20px;margin-bottom:22px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:11px;color:#8A6A2A;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:2px">🏛️ Visão Head de Produtos — Oportunidade de Realocação da Base</div>
+        <div style="font-size:12px;color:#3A6A48">Classes mais sub-alocadas e sobre-alocadas considerando todos os clientes</div>
+      </div>
+    </div>
+    <div id="macro-classes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px"></div>
+    <div style="margin-top:16px;border-top:1px solid #1A3010;padding-top:14px">
+      <div style="font-size:11px;color:#8A6A2A;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">💡 Produtos com maior potencial de encaixe na base atual</div>
+      <div id="macro-produtos" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+  </div>
+
   <!-- Filtros -->
   <div class="filtros">
     <input type="text" id="filtro-busca" placeholder="Buscar cliente ou assessor..." oninput="filtrar()">
@@ -12003,11 +12022,76 @@ async function carregar(){
     const d = await r.json();
     todos = d.clientes || [];
     renderStats(todos);
+    renderMacroHead(todos);
     popularFiltroAssessor(todos);
     filtrar();
   }catch(e){
     document.getElementById('lista').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-msg">Erro ao carregar dados</div><div class="empty-sub">'+e.message+'</div></div>';
   }
+}
+
+function renderMacroHead(lista){
+  if(!lista.length) return;
+  // Agrupa desvios por classe considerando todos os clientes
+  const LABELS = {pos_fixado:'Pós Fixado',inflacao:'Inflação',pre_fixado:'Pré Fixado',acoes:'Ações',fiis:'FIIs',multimercado:'Multimercado',internacional:'Internacional',alternativos:'Alternativos',criptomoedas:'Criptomoedas'};
+  const agg = {}; // cls -> {soma_desvio, count_sub, count_sobre, count_ok}
+  lista.forEach(c=>{
+    (c.desvios||[]).forEach(d=>{
+      if(!agg[d.cls]) agg[d.cls]={label:d.label,soma:0,sub:0,sobre:0,ok:0,total:0};
+      agg[d.cls].soma += d.desvio;
+      agg[d.cls].total++;
+      if(d.desvio < -2) agg[d.cls].sub++;
+      else if(d.desvio > 2) agg[d.cls].sobre++;
+      else agg[d.cls].ok++;
+    });
+  });
+
+  const classes = Object.entries(agg)
+    .map(([cls,v])=>({cls, ...v, media: v.total ? v.soma/v.total : 0}))
+    .filter(c=>c.total>0)
+    .sort((a,b)=>Math.abs(b.media)-Math.abs(a.media));
+
+  const el = document.getElementById('macro-classes');
+  el.innerHTML = classes.map(c=>{
+    const pctSub   = Math.round(c.sub/c.total*100);
+    const pctSobre = Math.round(c.sobre/c.total*100);
+    const mediaStr = (c.media>0?'+':'')+c.media.toFixed(1)+'pp';
+    const cor = c.media < -2 ? '#5DCAA5' : c.media > 2 ? '#FF6B6B' : '#FFD966';
+    const icon = c.media < -2 ? '▲' : c.media > 2 ? '▼' : '≈';
+    const desc = c.media < -2
+      ? `${pctSub}% dos clientes sub-alocados`
+      : c.media > 2
+      ? `${pctSobre}% dos clientes sobre-alocados`
+      : 'Base alinhada nesta classe';
+    return `<div style="background:#111;border:1px solid #1A1A1A;border-radius:10px;padding:12px 14px;border-left:3px solid ${cor}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;color:#CCC;font-weight:600">${c.label}</span>
+        <span style="font-size:13px;font-weight:700;color:${cor}">${icon} ${mediaStr}</span>
+      </div>
+      <div style="font-size:11px;color:#3A6A48">${desc}</div>
+      <div style="margin-top:6px;height:4px;background:#1A1A1A;border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(100,Math.abs(c.media)*5)}%;background:${cor};border-radius:2px"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Produtos mais relevantes: busca os de classes mais sub-alocadas
+  const subCls = classes.filter(c=>c.media<-2).map(c=>c.cls);
+  fetch('/api/hp/produtos').then(r=>r.json()).then(prods=>{
+    const chips = [];
+    subCls.forEach(cls=>{
+      (prods[cls]||[]).slice(0,2).forEach(p=>{
+        const nome = typeof p==='string'?p:(p.nome||'');
+        const ticker = typeof p==='object'?p.ticker||'':'';
+        if(nome) chips.push(`<div style="background:#0A1A10;border:1px solid #1A3018;border-radius:20px;padding:6px 14px;font-size:12px;color:#C9A96E;display:flex;align-items:center;gap:6px"><span style="color:#3A6A48;font-size:10px">${LABELS[cls]||cls}</span> ${nome}${ticker?` <span style="color:#2A4A2A;font-size:10px">${ticker}</span>`:''}</div>`);
+      });
+    });
+    document.getElementById('macro-produtos').innerHTML = chips.length
+      ? chips.join('')
+      : '<span style="font-size:12px;color:#2A4A38">Nenhum produto cadastrado para as classes sub-alocadas. Cadastre na área do Head de Produtos.</span>';
+  }).catch(()=>{});
+
+  document.getElementById('macro-head').style.display = 'block';
 }
 
 function renderStats(lista){
