@@ -215,7 +215,7 @@ ASSESSORES = {
     "A26364": "Felipe Santos Nishio",
     "A56767": "Michael Ademilson Santos da Silva",
     "A38890": "Marcelo Ramos Dias",
-    "DENIS KINOSHITA": "Denis Kinoshita",
+    "A22075": "Denis Kinoshita",
 }
 _DATA_FILE  = "/tmp/brauna_clientes.json"
 _OKR_FILE   = "/tmp/brauna_okrs.json"
