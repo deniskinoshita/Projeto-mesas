@@ -3943,6 +3943,8 @@ def login_pessoal():
         if len(senha) < 4:
             return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
         email = (d.get("email") or "").strip().lower()
+        if not email.endswith("@grupobrauna.com.br"):
+            return jsonify({"ok": False, "msg": "Use seu e-mail corporativo @grupobrauna.com.br."}), 400
         senhas[identity] = {
             "hash": _hash_senha(senha),
             "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
@@ -3987,6 +3989,8 @@ def solicitar_reset():
     email = entrada.get("email", "") if isinstance(entrada, dict) else ""
     if not email:
         return jsonify({"ok": False, "msg": "E-mail não cadastrado. Entre em contato com o administrador."}), 400
+    if not email.endswith("@grupobrauna.com.br"):
+        return jsonify({"ok": False, "msg": "Reset só permitido para e-mails @grupobrauna.com.br."}), 403
 
     # Gera token único com validade de 1h
     token = _secrets.token_urlsafe(32)
@@ -7457,7 +7461,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   </div>
   <!-- Campo de e-mail — só aparece no 1º acesso -->
   <div id="email-wrap" style="display:none;margin-top:10px">
-    <input type="email" id="email-pessoal" class="senha-input" placeholder="Seu e-mail (para reset de senha)"
+    <input type="email" id="email-pessoal" class="senha-input" placeholder="nome@grupobrauna.com.br"
       style="letter-spacing:normal;font-size:13px" onkeydown="if(event.key==='Enter')entrarPessoal()">
   </div>
   <button class="btn-entrar" id="btn-pessoal" onclick="entrarPessoal()">Entrar</button>
@@ -7590,8 +7594,9 @@ async function entrarPessoal(){
   const btn = document.getElementById("btn-pessoal");
   btn.disabled = true; btn.textContent = "Verificando...";
   try{
-    const email = criar ? (document.getElementById("email-pessoal").value.trim()) : "";
-    if(criar && !email){ erro.textContent = "Informe seu e-mail para recuperação."; btn.disabled=false; btn.textContent="Criar e entrar"; return; }
+    const email = criar ? (document.getElementById("email-pessoal").value.trim().toLowerCase()) : "";
+    if(criar && !email){ erro.textContent = "Informe seu e-mail corporativo."; btn.disabled=false; btn.textContent="Criar e entrar"; return; }
+    if(criar && !email.endsWith("@grupobrauna.com.br")){ erro.textContent = "Use seu e-mail corporativo @grupobrauna.com.br."; btn.disabled=false; btn.textContent="Criar e entrar"; return; }
     const r = await fetch("/api/login-pessoal",{
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({identity: _sessaoPendente.identity, senha_pessoal: senha, criar, email})
