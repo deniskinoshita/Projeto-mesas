@@ -3862,9 +3862,6 @@ def index():
     pilares_html = "\n".join(_pilar_html_inicial(p) for p in MODELO_SERVIR)
     return render_template_string(HTML, pilares_html=pilares_html)
 
-@app.route("/api/ping")
-def ping():
-    return jsonify({"ok": True})
 
 @app.route("/api/login", methods=["POST"])
 def login():
