@@ -34,7 +34,7 @@ const ASSESSORES = {
 // ── Upstash KV (via REST API) ─────────────────────────────────────────────────
 
 function kvRequest(method, path, body) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const url  = (process.env.KV_REST_API_URL || "").replace(/\/$/, "");
     const tok  = process.env.KV_REST_API_TOKEN || "";
     if (!url || !tok) { resolve(null); return; }
@@ -45,19 +45,24 @@ function kvRequest(method, path, body) {
       path: parsed.pathname + parsed.search,
       method,
       headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json" },
+      timeout: 5000,
     };
     const payload = body ? JSON.stringify(body) : undefined;
     if (payload) opts.headers["Content-Length"] = Buffer.byteLength(payload);
+
+    let done = false;
+    const finish = (v) => { if (!done) { done = true; resolve(v); } };
 
     const req = https.request(opts, (res) => {
       let data = "";
       res.on("data", (c) => (data += c));
       res.on("end", () => {
-        try { resolve(JSON.parse(data)); }
-        catch { resolve(null); }
+        try { finish(JSON.parse(data)); }
+        catch { finish(null); }
       });
     });
-    req.on("error", () => resolve(null));
+    req.on("error", () => finish(null));
+    req.on("timeout", () => { req.destroy(); finish(null); });
     if (payload) req.write(payload);
     req.end();
   });
