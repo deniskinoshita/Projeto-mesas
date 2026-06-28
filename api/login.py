@@ -1,15 +1,19 @@
+"""
+Login Lambda — WSGI puro sem Flask.
+Importa apenas stdlib: json, os, time, hashlib, secrets, datetime.
+Cold start < 1s (vs ~10s com Flask).
+"""
 import json, os, time
 import hashlib as _hashlib
 import secrets as _secrets
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template_string
 
-app = Flask(__name__)
+# ── Dados ────────────────────────────────────────────────────────────────────
 
 SENHAS = {
-    "lider":    "lider2026",
-    "admin":    "admin2026",
-    "head":     "head2026",
+    "lider": "lider2026",
+    "admin": "admin2026",
+    "head":  "head2026",
 }
 
 ASSESSORES = {
@@ -34,6 +38,8 @@ ASSESSORES = {
 _SENHAS_PESSOAIS_FILE = "/tmp/brauna_senhas_pessoais.json"
 _RESET_TOKENS_FILE    = "/tmp/brauna_reset_tokens.json"
 
+# ── KV / persistência ────────────────────────────────────────────────────────
+
 def _kv_client():
     url   = os.environ.get("KV_REST_API_URL")
     token = os.environ.get("KV_REST_API_TOKEN")
@@ -45,7 +51,7 @@ def _kv_client():
     except Exception:
         return None
 
-def _key(path: str) -> str:
+def _key(path):
     name = os.path.basename(path).replace("brauna_", "").replace(".json", "")
     return f"brauna:{name}"
 
@@ -79,12 +85,12 @@ def _save(path, data):
     except Exception:
         pass
 
-def _hash_senha(senha: str) -> str:
+def _hash_senha(senha):
     salt = _secrets.token_hex(16)
     h = _hashlib.pbkdf2_hmac("sha256", senha.encode("utf-8"), bytes.fromhex(salt), 100000).hex()
     return f"{salt}${h}"
 
-def _verifica_senha(senha: str, guardado: str) -> bool:
+def _verifica_senha(senha, guardado):
     try:
         salt, h = guardado.split("$", 1)
         calc = _hashlib.pbkdf2_hmac("sha256", senha.encode("utf-8"), bytes.fromhex(salt), 100000).hex()
@@ -102,7 +108,9 @@ def save_senhas_pessoais(d): _save(_SENHAS_PESSOAIS_FILE, d)
 def load_reset_tokens():     return _load(_RESET_TOKENS_FILE, {})
 def save_reset_tokens(d):    _save(_RESET_TOKENS_FILE, d)
 
-def _enviar_email_reset(destinatario: str, nome: str, token: str):
+# ── E-mail ───────────────────────────────────────────────────────────────────
+
+def _enviar_email_reset(destinatario, nome, token):
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
@@ -118,7 +126,6 @@ def _enviar_email_reset(destinatario: str, nome: str, token: str):
         return False
 
     link = f"{base}/reset-senha?token={token}"
-
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "Braúna Investimentos — Redefinição de senha"
     msg["From"]    = frm
@@ -160,6 +167,7 @@ def _enviar_email_reset(destinatario: str, nome: str, token: str):
     except Exception:
         return False
 
+# ── HTML ─────────────────────────────────────────────────────────────────────
 
 HTML_RESET_SENHA = r"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -480,7 +488,7 @@ async function entrar(){
   btn.disabled = true; btn.textContent = "Verificando...";
   document.getElementById("erro").textContent = "";
   let d = null;
-  for(let t = 0; t < 12; t++){
+  for(let t = 0; t < 5; t++){
     try{
       const r = await fetch("/api/login",{
         method:"POST",
@@ -491,9 +499,9 @@ async function entrar(){
       try{ d = JSON.parse(text); } catch{ d = null; }
       if(d) break;
     } catch(e){ d = null; }
-    if(t < 11){
-      document.getElementById("erro").textContent = `Servidor iniciando, aguarde... (${t+1}/12)`;
-      await new Promise(res => setTimeout(res, 3000));
+    if(t < 4){
+      document.getElementById("erro").textContent = `Servidor iniciando, aguarde... (${t+1}/5)`;
+      await new Promise(res => setTimeout(res, 2000));
     }
   }
   btn.disabled = false; btn.textContent = "Continuar";
@@ -562,10 +570,10 @@ async function entrarPessoal(){
         const txt = await r2.text();
         try{ d2 = JSON.parse(txt); } catch{ d2 = null; }
         if(d2) break;
-        if(t < 2){ erro.textContent = `Inicializando... (${t+2}/3)`; await new Promise(res=>setTimeout(res,3000)); }
+        if(t < 2){ erro.textContent = `Inicializando... (${t+2}/3)`; await new Promise(res=>setTimeout(res,2000)); }
       } catch(e){
         if(t===2){ d2=null; break; }
-        await new Promise(res=>setTimeout(res,3000));
+        await new Promise(res=>setTimeout(res,2000));
       }
     }
     const d = d2;
@@ -641,21 +649,6 @@ async function solicitarReset(){
   }
 }
 
-// Aquece múltiplas instâncias Lambda em paralelo
-(async function warmup(){
-  const btn = document.getElementById("btn-entrar");
-  if(btn){ btn.disabled = true; btn.textContent = "Conectando..."; }
-  try{
-    const pings = Array.from({length:10}, () => fetch("/api/ping").catch(()=>{}));
-    await Promise.any(pings);
-  } catch(e){}
-  if(btn){ btn.disabled = false; btn.textContent = "Continuar"; }
-  // Mantém instâncias aquecidas enquanto página está aberta
-  setInterval(() => {
-    Array.from({length:3}, () => fetch("/api/ping").catch(()=>{}));
-  }, 25000);
-})();
-
 const saved = localStorage.getItem("brauna_role");
 if(saved && ROLES[saved]){
   window.location.replace(ROLES[saved].dest);
@@ -664,175 +657,221 @@ if(saved && ROLES[saved]){
 </body></html>"""
 
 
-# ── Rotas ─────────────────────────────────────────────────────────────────────
+# ── WSGI puro — sem Flask ────────────────────────────────────────────────────
 
-@app.route("/", methods=["GET"])
-def login_page():
-    resp = app.make_response(render_template_string(HTML_LOGIN))
-    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    resp.headers["Pragma"] = "no-cache"
-    return resp
+def _read_body(environ):
+    try:
+        length = int(environ.get("CONTENT_LENGTH") or 0)
+        return environ["wsgi.input"].read(length) if length > 0 else b""
+    except Exception:
+        return b""
 
-@app.route("/reset-senha")
-def reset_senha_page():
-    return render_template_string(HTML_RESET_SENHA)
+def _json_body(environ):
+    try:
+        return json.loads(_read_body(environ))
+    except Exception:
+        return {}
 
-@app.route("/api/ping", methods=["GET", "POST"])
-def ping():
-    return jsonify({"ok": True, "ts": datetime.now().isoformat()})
+def _ok(start_response, body, status="200 OK", ct="application/json"):
+    data = body.encode("utf-8") if isinstance(body, str) else body
+    start_response(status, [
+        ("Content-Type", ct + "; charset=utf-8"),
+        ("Content-Length", str(len(data))),
+        ("Cache-Control", "no-store"),
+    ])
+    return [data]
 
-@app.route("/api/login", methods=["POST"])
-def login():
-    d     = request.get_json()
-    role  = d.get("role", "")
-    senha = d.get("senha", "").strip()
+def _json(start_response, obj, status="200 OK"):
+    return _ok(start_response, json.dumps(obj, ensure_ascii=False), status)
 
-    identity, nome, codigo = None, None, None
-    if role == "assessor":
-        cod = senha.upper()
-        nome = ASSESSORES.get(cod)
-        if not nome:
-            return jsonify({"ok": False, "msg": "Código de assessor inválido"}), 401
-        identity, codigo = f"assessor:{cod}", cod
-    elif role in ("lider", "head", "admin"):
-        if SENHAS.get(role) != senha:
-            return jsonify({"ok": False, "msg": "Senha do perfil incorreta"}), 401
-        identity, nome = role, role.capitalize()
-    else:
-        return jsonify({"ok": False, "msg": "Perfil inválido"}), 401
+def _html(start_response, html):
+    return _ok(start_response, html, ct="text/html")
 
-    senhas = load_senhas_pessoais()
-    precisa_criar = identity not in senhas
-    return jsonify({
-        "ok": True, "etapa": "senha_pessoal",
-        "role": role, "nome": nome, "codigo": codigo,
-        "identity": identity, "precisa_criar": precisa_criar,
-    })
+def _err(start_response, msg, code=400):
+    status = {400: "400 Bad Request", 401: "401 Unauthorized",
+              403: "403 Forbidden", 404: "404 Not Found", 500: "500 Internal Server Error"}.get(code, str(code))
+    return _json(start_response, {"ok": False, "msg": msg}, status)
 
-@app.route("/api/login-pessoal", methods=["POST"])
-def login_pessoal():
-    d        = request.get_json() or {}
-    identity = d.get("identity", "").strip()
-    senha    = d.get("senha_pessoal", "")
-    criar    = bool(d.get("criar"))
-    if not identity:
-        return jsonify({"ok": False, "msg": "Sessão inválida. Recomece o login."}), 400
 
-    senhas = load_senhas_pessoais()
-    if criar:
-        if identity in senhas:
-            return jsonify({"ok": False, "msg": "Senha já existe. Faça login normalmente."}), 400
-        if len(senha) < 4:
-            return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
-        email = (d.get("email") or "").strip().lower()
+def _handle(environ, start_response):
+    method = environ.get("REQUEST_METHOD", "GET").upper()
+    path   = environ.get("PATH_INFO", "/").rstrip("/") or "/"
+
+    # ── GET pages ─────────────────────────────────────────────────────────────
+    if method == "GET" and path == "/":
+        return _html(start_response, HTML_LOGIN)
+
+    if method == "GET" and path == "/reset-senha":
+        return _html(start_response, HTML_RESET_SENHA)
+
+    # ── ping ──────────────────────────────────────────────────────────────────
+    if path == "/api/ping":
+        return _json(start_response, {"ok": True, "ts": datetime.now().isoformat()})
+
+    # ── /api/login ────────────────────────────────────────────────────────────
+    if method == "POST" and path == "/api/login":
+        d     = _json_body(environ)
+        role  = d.get("role", "")
+        senha = d.get("senha", "").strip()
+
+        identity = nome = codigo = None
+        if role == "assessor":
+            cod  = senha.upper()
+            nome = ASSESSORES.get(cod)
+            if not nome:
+                return _err(start_response, "Código de assessor inválido", 401)
+            identity, codigo = f"assessor:{cod}", cod
+        elif role in ("lider", "head", "admin"):
+            if SENHAS.get(role) != senha:
+                return _err(start_response, "Senha do perfil incorreta", 401)
+            identity, nome = role, role.capitalize()
+        else:
+            return _err(start_response, "Perfil inválido", 401)
+
+        senhas = load_senhas_pessoais()
+        precisa_criar = identity not in senhas
+        return _json(start_response, {
+            "ok": True, "etapa": "senha_pessoal",
+            "role": role, "nome": nome, "codigo": codigo,
+            "identity": identity, "precisa_criar": precisa_criar,
+        })
+
+    # ── /api/login-pessoal ────────────────────────────────────────────────────
+    if method == "POST" and path == "/api/login-pessoal":
+        d        = _json_body(environ)
+        identity = d.get("identity", "").strip()
+        senha    = d.get("senha_pessoal", "")
+        criar    = bool(d.get("criar"))
+
+        if not identity:
+            return _err(start_response, "Sessão inválida. Recomece o login.")
+
+        senhas = load_senhas_pessoais()
+        if criar:
+            if identity in senhas:
+                return _err(start_response, "Senha já existe. Faça login normalmente.")
+            if len(senha) < 4:
+                return _err(start_response, "A senha precisa ter ao menos 4 caracteres.")
+            email = (d.get("email") or "").strip().lower()
+            if not email.endswith("@grupobrauna.com.br"):
+                return _err(start_response, "Use seu e-mail corporativo @grupobrauna.com.br.", 400)
+            senhas[identity] = {
+                "hash": _hash_senha(senha),
+                "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "email": email,
+            }
+            save_senhas_pessoais(senhas)
+            return _json(start_response, {"ok": True, "criada": True})
+
+        guardado = senhas.get(identity)
+        if not guardado:
+            return _err(start_response, "Senha pessoal não cadastrada.", 400)
+        if _verifica_senha(senha, _entry_hash(guardado)):
+            return _json(start_response, {"ok": True})
+        return _err(start_response, "Senha pessoal incorreta.", 401)
+
+    # ── /api/solicitar-reset ──────────────────────────────────────────────────
+    if method == "POST" and path == "/api/solicitar-reset":
+        d     = _json_body(environ)
+        role  = d.get("role", "assessor")
+        senha = (d.get("senha") or "").strip().upper()
+
+        if role == "assessor":
+            nome = ASSESSORES.get(senha)
+            if not nome:
+                return _err(start_response, "Código de assessor não encontrado", 404)
+            identity = f"assessor:{senha}"
+        elif role in ("lider", "head", "admin"):
+            identity = role
+            nome = role.capitalize()
+        else:
+            return _err(start_response, "Perfil inválido", 400)
+
+        senhas  = load_senhas_pessoais()
+        entrada = senhas.get(identity)
+        if not entrada:
+            return _err(start_response, "Nenhuma senha cadastrada para este usuário. Faça o primeiro acesso normalmente.", 404)
+
+        email = entrada.get("email", "") if isinstance(entrada, dict) else ""
+        if not email:
+            return _err(start_response, "E-mail não cadastrado. Entre em contato com o administrador.", 400)
         if not email.endswith("@grupobrauna.com.br"):
-            return jsonify({"ok": False, "msg": "Use seu e-mail corporativo @grupobrauna.com.br."}), 400
+            return _err(start_response, "Reset só permitido para e-mails @grupobrauna.com.br.", 403)
+
+        token  = _secrets.token_urlsafe(32)
+        tokens = load_reset_tokens()
+        agora  = time.time()
+        tokens = {k: v for k, v in tokens.items() if v.get("expira", 0) > agora}
+        tokens[token] = {
+            "identity": identity, "nome": nome, "email": email,
+            "expira": agora + 3600,
+            "criado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        }
+        save_reset_tokens(tokens)
+
+        enviado = _enviar_email_reset(email, nome, token)
+        if not enviado:
+            if not os.environ.get("SMTP_USER"):
+                return _json(start_response, {"ok": True, "dev_token": token, "email_mascarado": email,
+                                              "aviso": "SMTP não configurado — use o dev_token para testar"})
+            return _err(start_response, "Falha ao enviar e-mail. Tente novamente ou contate o admin.", 500)
+
+        partes    = email.split("@")
+        visivel   = partes[0][:2] + "**"
+        mascarado = visivel + "@" + partes[1] if len(partes) > 1 else email
+        return _json(start_response, {"ok": True, "email_mascarado": mascarado})
+
+    # ── /api/confirmar-reset ──────────────────────────────────────────────────
+    if method == "POST" and path == "/api/confirmar-reset":
+        d          = _json_body(environ)
+        token      = (d.get("token") or "").strip()
+        nova_senha = d.get("senha", "")
+
+        if not token:
+            return _err(start_response, "Token inválido")
+        if len(nova_senha) < 4:
+            return _err(start_response, "A senha precisa ter ao menos 4 caracteres.")
+
+        tokens  = load_reset_tokens()
+        entrada = tokens.get(token)
+        if not entrada:
+            return _err(start_response, "Link inválido ou já utilizado.")
+        if entrada.get("expira", 0) < time.time():
+            del tokens[token]
+            save_reset_tokens(tokens)
+            return _err(start_response, "Este link expirou. Solicite um novo reset.")
+
+        identity  = entrada["identity"]
+        senhas    = load_senhas_pessoais()
+        existente = senhas.get(identity) or {}
+        email     = existente.get("email", entrada.get("email", "")) if isinstance(existente, dict) else ""
+
         senhas[identity] = {
-            "hash": _hash_senha(senha),
-            "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "hash": _hash_senha(nova_senha),
+            "criada_em": existente.get("criada_em", "") if isinstance(existente, dict) else "",
+            "atualizada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
             "email": email,
         }
         save_senhas_pessoais(senhas)
-        return jsonify({"ok": True, "criada": True})
-    guardado = senhas.get(identity)
-    if not guardado:
-        return jsonify({"ok": False, "msg": "Senha pessoal não cadastrada.", "precisa_criar": True}), 400
-    if _verifica_senha(senha, _entry_hash(guardado)):
-        return jsonify({"ok": True})
-    return jsonify({"ok": False, "msg": "Senha pessoal incorreta."}), 401
-
-@app.route("/api/solicitar-reset", methods=["POST"])
-def solicitar_reset():
-    d = request.get_json() or {}
-    role  = d.get("role", "assessor")
-    senha = (d.get("senha") or "").strip().upper()
-
-    if role == "assessor":
-        nome = ASSESSORES.get(senha)
-        if not nome:
-            return jsonify({"ok": False, "msg": "Código de assessor não encontrado"}), 404
-        identity = f"assessor:{senha}"
-    elif role in ("lider", "head", "admin"):
-        identity = role
-        nome = role.capitalize()
-    else:
-        return jsonify({"ok": False, "msg": "Perfil inválido"}), 400
-
-    senhas = load_senhas_pessoais()
-    entrada = senhas.get(identity)
-    if not entrada:
-        return jsonify({"ok": False, "msg": "Nenhuma senha cadastrada para este usuário. Faça o primeiro acesso normalmente."}), 404
-
-    email = entrada.get("email", "") if isinstance(entrada, dict) else ""
-    if not email:
-        return jsonify({"ok": False, "msg": "E-mail não cadastrado. Entre em contato com o administrador."}), 400
-    if not email.endswith("@grupobrauna.com.br"):
-        return jsonify({"ok": False, "msg": "Reset só permitido para e-mails @grupobrauna.com.br."}), 403
-
-    token = _secrets.token_urlsafe(32)
-    tokens = load_reset_tokens()
-    agora = time.time()
-    tokens = {k: v for k, v in tokens.items() if v.get("expira", 0) > agora}
-    tokens[token] = {
-        "identity": identity, "nome": nome, "email": email,
-        "expira": agora + 3600,
-        "criado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
-    }
-    save_reset_tokens(tokens)
-
-    enviado = _enviar_email_reset(email, nome, token)
-    if not enviado:
-        if not os.environ.get("SMTP_USER"):
-            return jsonify({"ok": True, "dev_token": token, "email_mascarado": email,
-                            "aviso": "SMTP não configurado — use o dev_token para testar"})
-        return jsonify({"ok": False, "msg": "Falha ao enviar e-mail. Tente novamente ou contate o admin."}), 500
-
-    partes = email.split("@")
-    visivel = partes[0][:2] + "**"
-    mascarado = visivel + "@" + partes[1] if len(partes) > 1 else email
-    return jsonify({"ok": True, "email_mascarado": mascarado})
-
-@app.route("/api/confirmar-reset", methods=["POST"])
-def confirmar_reset():
-    d = request.get_json() or {}
-    token      = (d.get("token") or "").strip()
-    nova_senha = d.get("senha", "")
-
-    if not token:
-        return jsonify({"ok": False, "msg": "Token inválido"}), 400
-    if len(nova_senha) < 4:
-        return jsonify({"ok": False, "msg": "A senha precisa ter ao menos 4 caracteres."}), 400
-
-    tokens = load_reset_tokens()
-    entrada = tokens.get(token)
-    if not entrada:
-        return jsonify({"ok": False, "msg": "Link inválido ou já utilizado."}), 400
-    if entrada.get("expira", 0) < time.time():
         del tokens[token]
         save_reset_tokens(tokens)
-        return jsonify({"ok": False, "msg": "Este link expirou. Solicite um novo reset."}), 400
+        return _json(start_response, {"ok": True, "nome": entrada.get("nome", "")})
 
-    identity = entrada["identity"]
-    senhas = load_senhas_pessoais()
-    existente = senhas.get(identity) or {}
-    email = existente.get("email", entrada.get("email", "")) if isinstance(existente, dict) else ""
+    # ── /api/verificar-token-reset ────────────────────────────────────────────
+    if method == "POST" and path == "/api/verificar-token-reset":
+        token   = (_json_body(environ).get("token") or "").strip()
+        tokens  = load_reset_tokens()
+        entrada = tokens.get(token)
+        if not entrada or entrada.get("expira", 0) < time.time():
+            return _json(start_response, {"ok": False, "msg": "Link inválido ou expirado."})
+        return _json(start_response, {"ok": True, "nome": entrada.get("nome", "")})
 
-    senhas[identity] = {
-        "hash": _hash_senha(nova_senha),
-        "criada_em": existente.get("criada_em", "") if isinstance(existente, dict) else "",
-        "atualizada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "email": email,
-    }
-    save_senhas_pessoais(senhas)
-    del tokens[token]
-    save_reset_tokens(tokens)
-    return jsonify({"ok": True, "nome": entrada.get("nome", "")})
+    # ── 404 ───────────────────────────────────────────────────────────────────
+    return _err(start_response, "Not found", 404)
 
-@app.route("/api/verificar-token-reset", methods=["POST"])
-def verificar_token_reset():
-    token = (request.get_json() or {}).get("token", "").strip()
-    tokens = load_reset_tokens()
-    entrada = tokens.get(token)
-    if not entrada or entrada.get("expira", 0) < time.time():
-        return jsonify({"ok": False, "msg": "Link inválido ou expirado."})
-    return jsonify({"ok": True, "nome": entrada.get("nome", "")})
+
+def app(environ, start_response):
+    try:
+        return _handle(environ, start_response)
+    except Exception as e:
+        return _err(start_response, f"Erro interno: {e}", 500)
