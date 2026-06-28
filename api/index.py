@@ -1791,6 +1791,11 @@ select option{background:#1A1A1A}
       <p style="font-size:10px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
       <p id="plano-objetivo-txt" style="font-size:13px;color:#F0F0F0"></p>
     </div>
+    <!-- Carteira atual do cliente no Plano de Ação -->
+    <div id="plano-carteira-atual" style="display:none;margin-bottom:14px;background:#0A1A14;border:1px solid #1C4A34;border-radius:8px;padding:10px 14px">
+      <p style="font-size:10px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual do cliente</p>
+      <div id="plano-carteira-barras"></div>
+    </div>
     <div id="plano-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"></div>
     <div id="plano-valores" style="margin-top:8px"></div>
   </div>
@@ -1809,7 +1814,14 @@ select option{background:#1A1A1A}
     <div class="tab-panel active" id="tab-desvios">
       <div class="grid-2">
         <div id="desvios-list"></div>
-        <div id="diagnostico"></div>
+        <div>
+          <!-- Carteira atual ao lado dos desvios -->
+          <div id="desvios-carteira-atual" style="display:none;background:#0A1A14;border:1px solid #1C4A34;border-radius:8px;padding:10px 14px;margin-bottom:12px">
+            <p style="font-size:10px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual</p>
+            <div id="desvios-carteira-barras"></div>
+          </div>
+          <div id="diagnostico"></div>
+        </div>
       </div>
     </div>
 
@@ -3317,6 +3329,41 @@ function renderClassesAtivos(desvios, patrimonio){
   }).join("");
 }
 
+const CLS_LBL_JS = {
+  pos_fixado:"Pós Fixado", inflacao:"Inflação", pre_fixado:"Pré Fixado",
+  acoes:"Ações / RV", fiis:"FIIs", multimercado:"Multimercado",
+  alternativos:"Alternativos", internacional:"Internacional", criptomoedas:"Cripto"
+};
+const CLS_COR_JS = {
+  pos_fixado:"#3EB8A8", inflacao:"#C8A733", pre_fixado:"#5DCAA5",
+  acoes:"#E88038", fiis:"#9E8FE8", multimercado:"#5DAAD8",
+  alternativos:"#C0A878", internacional:"#5DDAA8", criptomoedas:"#FF8A65"
+};
+
+function renderCarteiraAtual(comp, patrimonio, containerBarrasId, containerWrapId){
+  const wrapEl = document.getElementById(containerWrapId);
+  const barrasEl = document.getElementById(containerBarrasId);
+  if(!wrapEl || !barrasEl) return;
+  const entries = Object.entries(comp||{}).filter(([,v])=>Number(v)>0.1).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){ wrapEl.style.display="none"; return; }
+  const pat = patrimonio||0;
+  barrasEl.innerHTML = entries.map(([k,v])=>{
+    const cor = CLS_COR_JS[k]||"#C9A96E";
+    const lbl = CLS_LBL_JS[k]||k;
+    const valBrl = pat>0 ? "R$ "+(pat*v/100).toLocaleString("pt-BR",{maximumFractionDigits:0}) : "";
+    return `<div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+        <span style="font-size:11px;color:#CCC">${lbl}</span>
+        <span style="font-size:11px;color:${cor};font-weight:700">${Number(v).toFixed(1)}%${valBrl?' <span style="font-size:10px;color:#3A6A48;font-weight:400">'+valBrl+'</span>':''}</span>
+      </div>
+      <div style="height:5px;background:#1A2E28;border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(v,100)}%;background:${cor};border-radius:3px"></div>
+      </div>
+    </div>`;
+  }).join("");
+  wrapEl.style.display="block";
+}
+
 function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   document.getElementById("plano-perfil").textContent=perfil;
 
@@ -3437,6 +3484,12 @@ function renderizar(data){
   // Diversificação por classe e plano de ação
   renderClassesAtivos(desvios, patrimonio);
   renderPlanoAcao(desvios, data.perfil||"", patrimonio, data.objetivo||"");
+
+  // Carteira atual do cliente — exibe no Plano de Ação e ao lado dos Desvios
+  const _compAtual = (_clienteIdentificado && _clienteIdentificado.composicao_atual) || data.composicao_atual || {};
+  const _patAtual  = (_clienteIdentificado && _clienteIdentificado.patrimonio) || patrimonio || 0;
+  renderCarteiraAtual(_compAtual, _patAtual, "plano-carteira-barras", "plano-carteira-atual");
+  renderCarteiraAtual(_compAtual, _patAtual, "desvios-carteira-barras", "desvios-carteira-atual");
   renderSugestoes(data.sugestoes||null);
 
   // Desvios
