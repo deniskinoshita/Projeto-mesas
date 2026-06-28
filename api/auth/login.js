@@ -297,10 +297,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 
 <script>
 const ROLES={
-  assessor:{color:'#C9A96E',label:'ASSESSOR',icon:'📊',placeholder:'Código do assessor (ex: A74621)',dest:'/menu'},
-  lider:{color:'#8B9FE8',label:'LÍDER',icon:'👥',placeholder:'Senha do perfil',dest:'/menu-lider'},
-  head:{color:'#D4B483',label:'HEAD DE PRODUTOS',icon:'🏛️',placeholder:'Senha do perfil',dest:'/menu-head'},
-  admin:{color:'#5DCAA5',label:'ADMINISTRAÇÃO',icon:'⚙️',placeholder:'Senha do perfil',dest:'/menu-admin'},
+  assessor:{color:'#C9A96E',label:'ASSESSOR',icon:'📊',placeholder:'Código do assessor (ex: A74621)',dest:'/assessor'},
+  lider:{color:'#8B9FE8',label:'LÍDER',icon:'👥',placeholder:'Senha do perfil',dest:'/lider'},
+  head:{color:'#D4B483',label:'HEAD DE PRODUTOS',icon:'🏛️',placeholder:'Senha do perfil',dest:'/head-produtos'},
+  admin:{color:'#5DCAA5',label:'ADMINISTRAÇÃO',icon:'⚙️',placeholder:'Senha do perfil',dest:'/admin'},
 };
 let roleAtual=null,_sessaoPendente=null;
 
