@@ -1568,6 +1568,7 @@ select option{background:#1A1A1A}
     <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
 
+  <!-- LINHA 1: Assessor + Código do cliente -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
     <div>
       <label>Assessor</label>
@@ -1576,10 +1577,34 @@ select option{background:#1A1A1A}
         <option value="">— Selecione o assessor —</option>
       </select>
     </div>
-    <div><label>Nome do cliente</label><input type="text" id="nome" placeholder="Ex: Lucia Silva"></div>
+    <div>
+      <label>Código do cliente</label>
+      <input type="text" id="codigo-cliente" placeholder="Ex: C-123456" oninput="buscarPorCodigoCliente(this.value)" autocomplete="off"
+        style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#E8D5A3;font-size:13px;outline:none;box-sizing:border-box">
+      <input type="text" id="nome" placeholder="" style="display:none">
+      <p id="cliente-encontrado-label" style="display:none;font-size:11px;color:#5DCAA5;margin-top:4px;font-weight:700"></p>
+    </div>
   </div>
-  <div class="grid-3" style="margin-bottom:14px">
-    <div><label>Perfil</label>
+
+  <!-- LINHA 2: Upload XPerformance -->
+  <div style="margin-bottom:14px">
+    <label>Relatório XPerformance (PDF)</label>
+    <div class="upload-area" id="drop1" onclick="document.getElementById('pdf-xp').click()" style="cursor:pointer;padding:14px 10px">
+      <input type="file" id="pdf-xp" accept=".pdf"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
+        onchange="onXpFileChange(this)">
+      <div class="icon" style="font-size:22px;margin-bottom:4px">📊</div>
+      <p id="upload-hint-text" style="font-size:12px;margin:0">XPerformance — clique para identificar o cliente</p>
+      <p class="fname" id="fname-xp" style="font-size:11px;margin:2px 0 0"></p>
+    </div>
+  </div>
+
+  <!-- Preview dos dados extraídos do PDF -->
+  <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#0A1F18;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
+
+  <!-- LINHA 3: Perfil + Objetivo -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+    <div><label>Perfil do cliente</label>
       <select id="perfil" onchange="var _nm={super_conservadora:'SUPER CONSERVADORA',conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();">
         <option value="super_conservadora">Super Conservadora</option>
         <option value="conservadora">Conservadora</option>
@@ -1588,12 +1613,16 @@ select option{background:#1A1A1A}
         <option value="agressiva">Agressiva</option>
       </select>
     </div>
-    <div><label>Objetivo do cliente</label><input type="text" id="objetivo" placeholder="Ex: aposentadoria, compra de imóvel..."></div>
-    <div id="carta-ativa-info" style="display:flex;align-items:flex-end"><p style="font-size:11px;color:#3A6A48">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
+    <div>
+      <label>Objetivo do cliente</label>
+      <input type="text" id="objetivo" placeholder="Ex: aposentadoria, compra de imóvel...">
+      <div id="carta-ativa-info" style="margin-top:4px"><p style="font-size:10px;color:#3A6A48;margin:0">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
+    </div>
   </div>
 
   <div id="macro-badges" style="margin-bottom:14px"></div>
 
+  <!-- LINHA 4: Carteira de referência -->
   <div style="background:#111;border-radius:8px;padding:10px 14px;margin-bottom:14px">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap">
       <p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin:0"><span id="modelo-gestora-lbl" style="color:#C9A96E">CARTEIRA DE REFERÊNCIA</span> — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
@@ -1605,22 +1634,7 @@ select option{background:#1A1A1A}
     <p id="gestora-vazia-hint" style="display:none;font-size:11px;color:#8A6A2A;margin-top:8px">⚠️ Nenhuma carteira de gestora cadastrada. Peça ao Admin para cadastrar as carteiras de referência.</p>
   </div>
 
-  <div style="margin-bottom:10px">
-    <label>Relatório XPerformance (PDF) *</label>
-    <div class="upload-area" id="drop1" onclick="document.getElementById('pdf-xp').click()" style="cursor:pointer">
-      <input type="file" id="pdf-xp" accept=".pdf"
-        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-        onchange="onXpFileChange(this)">
-      <div class="icon">📊</div>
-      <p id="upload-hint-text">XPerformance — clique para identificar o cliente</p>
-      <p class="fname" id="fname-xp"></p>
-    </div>
-  </div>
-
-  <!-- Preview dos dados extraídos do PDF — aparece ANTES do botão avançar -->
-  <div id="box-preview-pdf" style="display:none;margin-top:14px;background:#0A1F18;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
-
-  <!-- Botão para avançar — aparece após PDF carregado -->
+  <!-- Botão para avançar -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
     <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#C9A96E;color:#081F18;font-size:15px;padding:15px">
       Continuar para Etapa 2 — Perfil &amp; Cross Sell →
@@ -2345,6 +2359,11 @@ async function identificarCliente(file){
 
     // ── Preenche campos com dados salvos
     if(d.ficha_salva?.nome)    document.getElementById("nome").value = d.ficha_salva.nome;
+    // Preenche código do cliente com o número da conta do XPerformance
+    const _codEl = document.getElementById("codigo-cliente");
+    const _codLbl = document.getElementById("cliente-encontrado-label");
+    if(_codEl && d.conta && d.conta !== "-"){ _codEl.value = d.conta; }
+    if(_codLbl && d.ficha_salva?.nome){ _codLbl.textContent="✓ "+d.ficha_salva.nome; _codLbl.style.display="block"; }
     if(d.ficha_salva?.perfil){ document.getElementById("perfil").value = d.ficha_salva.perfil; atualizarModelo(); }
     if(d.ficha_salva?.objetivo) document.getElementById("objetivo").value = d.ficha_salva.objetivo || "";
     if(d.ficha_salva?.gestora){
@@ -2721,6 +2740,29 @@ function tab(name){
 }
 
 // ─── Clientes salvos ───────────────────────────────────────────────────────
+let _buscaCodigoTimer = null;
+function buscarPorCodigoCliente(codigo){
+  clearTimeout(_buscaCodigoTimer);
+  const lbl = document.getElementById("cliente-encontrado-label");
+  if(!codigo || codigo.length < 2){ if(lbl) lbl.style.display="none"; return; }
+  _buscaCodigoTimer = setTimeout(async ()=>{
+    const assessor = document.getElementById("assessor").value.trim();
+    if(!assessor) return;
+    try{
+      const r = await fetch("/api/ficha?assessor="+encodeURIComponent(assessor.toLowerCase()));
+      const lista = await r.json();
+      const cod = codigo.trim().toLowerCase();
+      const match = lista.find(c=>(c.conta||"").toLowerCase()===cod || (c.nome||"").toLowerCase().includes(cod));
+      if(match){
+        carregarFicha(JSON.stringify(match));
+        if(lbl){ lbl.textContent="✓ Cliente encontrado: "+match.nome; lbl.style.display="block"; }
+      } else {
+        if(lbl){ lbl.textContent=""; lbl.style.display="none"; }
+      }
+    }catch(e){}
+  }, 400);
+}
+
 async function buscarClientesSalvos(){
   const assessor = document.getElementById("assessor").value.trim();
   if(!assessor) return;
@@ -2742,7 +2784,11 @@ async function buscarClientesSalvos(){
 
 function carregarFicha(jsonStr){
   const c = JSON.parse(jsonStr);
-  document.getElementById("nome").value   = c.nome    || "";
+  document.getElementById("nome").value = c.nome || "";
+  const codEl = document.getElementById("codigo-cliente");
+  if(codEl && !codEl.value && c.conta) codEl.value = c.conta;
+  const lbl = document.getElementById("cliente-encontrado-label");
+  if(lbl && c.nome){ lbl.textContent="✓ "+c.nome; lbl.style.display="block"; }
   if(c.perfil) document.getElementById("perfil").value = c.perfil;
   document.getElementById("objetivo").value = c.objetivo || "";
   // Restaura a carteira de referência escolhida (se ainda existir cadastrada)
