@@ -468,15 +468,21 @@ if(saved&&ROLES[saved])window.location.replace(ROLES[saved].dest);
 // ── Handler principal ─────────────────────────────────────────────────────────
 
 function readBody(req) {
+  // Vercel pre-parses JSON bodies into req.body — stream events never fire
+  if (req.body !== undefined && req.body !== null) {
+    const b = req.body;
+    return Promise.resolve(typeof b === "string" ? tryParse(b) : b);
+  }
   return new Promise((resolve) => {
     let data = "";
     req.on("data", (c) => (data += c));
-    req.on("end", () => {
-      try { resolve(JSON.parse(data)); }
-      catch { resolve({}); }
-    });
+    req.on("end", () => resolve(tryParse(data)));
     req.on("error", () => resolve({}));
   });
+}
+
+function tryParse(s) {
+  try { return JSON.parse(s); } catch { return {}; }
 }
 
 function sendJson(res, obj, status = 200) {
