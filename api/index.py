@@ -3032,7 +3032,7 @@ async function analisar(){
   const fileXP=document.getElementById("pdf-xp").files[0];
 
   if(!assessor){alert("Digite seu nome como assessor.");return;}
-  if(!nome){alert("Digite o nome do cliente.");return;}
+
   if(!fileXP){alert("Selecione o PDF do relatório XP.");return;}
 
   document.getElementById("spinner").classList.add("show");
