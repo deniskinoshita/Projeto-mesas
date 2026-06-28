@@ -528,7 +528,10 @@ module.exports = async function handler(req, res) {
 
     // POST /api/login
     if (method === "POST" && path === "/api/login") {
+      const t0 = Date.now();
+      console.log("[login] start body type:", typeof req.body, "defined:", req.body !== undefined);
       const d     = await readBody(req);
+      console.log("[login] body read in", Date.now()-t0, "ms — role:", d.role);
       const role  = d.role || "";
       const senha = (d.senha || "").trim();
 
@@ -548,7 +551,9 @@ module.exports = async function handler(req, res) {
         return err(res, "Perfil inválido", 401);
       }
 
+      console.log("[login] loading senhas at", Date.now()-t0, "ms");
       const senhas      = await loadSenhasPessoais();
+      console.log("[login] senhas loaded in", Date.now()-t0, "ms total");
       const precisa_criar = !(identity in senhas);
       return sendJson(res, { ok: true, etapa: "senha_pessoal", role, nome, codigo, identity, precisa_criar });
     }
