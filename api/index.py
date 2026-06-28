@@ -1602,8 +1602,8 @@ select option{background:#1A1A1A}
   <!-- Preview dos dados extraídos do PDF -->
   <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#0A1F18;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
 
-  <!-- LINHA 3: Perfil + Objetivo -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+  <!-- LINHA 3: Perfil + Carteira de referência -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
     <div><label>Perfil do cliente</label>
       <select id="perfil" onchange="var _nm={super_conservadora:'SUPER CONSERVADORA',conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();">
         <option value="super_conservadora">Super Conservadora</option>
@@ -1614,25 +1614,24 @@ select option{background:#1A1A1A}
       </select>
     </div>
     <div>
-      <label>Objetivo do cliente</label>
-      <input type="text" id="objetivo" placeholder="Ex: aposentadoria, compra de imóvel...">
+      <label>Carteira de referência <span id="perfil-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase"></span></label>
+      <select id="gestora-sel" onchange="onGestoraChange()" style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#C9A96E;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box">
+        <option value="">— selecione a carteira —</option>
+      </select>
       <div id="carta-ativa-info" style="margin-top:4px"><p style="font-size:10px;color:#3A6A48;margin:0">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
+      <p id="gestora-vazia-hint" style="display:none;font-size:11px;color:#8A6A2A;margin-top:4px">⚠️ Nenhuma carteira cadastrada.</p>
     </div>
+  </div>
+  <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px"></div>
+  <span id="modelo-gestora-lbl" style="display:none"></span>
+
+  <!-- LINHA 4: Objetivo do cliente -->
+  <div style="margin-bottom:14px">
+    <label>Objetivo do cliente</label>
+    <input type="text" id="objetivo" placeholder="Ex: aposentadoria, compra de imóvel..." style="width:100%;box-sizing:border-box">
   </div>
 
   <div id="macro-badges" style="margin-bottom:14px"></div>
-
-  <!-- LINHA 4: Carteira de referência -->
-  <div style="background:#111;border-radius:8px;padding:10px 14px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-      <p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin:0"><span id="modelo-gestora-lbl" style="color:#C9A96E">CARTEIRA DE REFERÊNCIA</span> — <span id="perfil-lbl" style="color:#C9A96E">CONSERVADORA</span></p>
-      <select id="gestora-sel" onchange="onGestoraChange()" style="background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:7px 10px;color:#C9A96E;font-size:12px;outline:none;min-width:210px;cursor:pointer">
-        <option value="">— selecione a carteira —</option>
-      </select>
-    </div>
-    <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px"></div>
-    <p id="gestora-vazia-hint" style="display:none;font-size:11px;color:#8A6A2A;margin-top:8px">⚠️ Nenhuma carteira de gestora cadastrada. Peça ao Admin para cadastrar as carteiras de referência.</p>
-  </div>
 
   <!-- Botão para avançar -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
