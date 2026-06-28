@@ -650,6 +650,10 @@ async function solicitarReset(){
     await Promise.any(pings);
   } catch(e){}
   if(btn){ btn.disabled = false; btn.textContent = "Continuar"; }
+  // Mantém instâncias aquecidas enquanto página está aberta
+  setInterval(() => {
+    Array.from({length:3}, () => fetch("/api/ping").catch(()=>{}));
+  }, 25000);
 })();
 
 const saved = localStorage.getItem("brauna_role");
