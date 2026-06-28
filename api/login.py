@@ -7,6 +7,7 @@ import json, os, time
 import hashlib as _hashlib
 import secrets as _secrets
 from datetime import datetime
+import urllib.request as _urllib
 
 # ── Dados ────────────────────────────────────────────────────────────────────
 
@@ -40,28 +41,54 @@ _RESET_TOKENS_FILE    = "/tmp/brauna_reset_tokens.json"
 
 # ── KV / persistência ────────────────────────────────────────────────────────
 
-def _kv_client():
-    url   = os.environ.get("KV_REST_API_URL")
-    token = os.environ.get("KV_REST_API_TOKEN")
-    if not url or not token:
-        return None
-    try:
-        from upstash_redis import Redis
-        return Redis(url=url, token=token)
-    except Exception:
-        return None
+def _kv_url():
+    return os.environ.get("KV_REST_API_URL", "").rstrip("/")
+
+def _kv_token():
+    return os.environ.get("KV_REST_API_TOKEN", "")
 
 def _key(path):
     name = os.path.basename(path).replace("brauna_", "").replace(".json", "")
     return f"brauna:{name}"
 
+def _kv_get(key):
+    url, tok = _kv_url(), _kv_token()
+    if not url or not tok:
+        return None
+    try:
+        req = _urllib.Request(
+            f"{url}/get/{key}",
+            headers={"Authorization": f"Bearer {tok}"},
+        )
+        with _urllib.urlopen(req, timeout=5) as r:
+            body = json.loads(r.read())
+        return body.get("result")
+    except Exception:
+        return None
+
+def _kv_set(key, value):
+    url, tok = _kv_url(), _kv_token()
+    if not url or not tok:
+        return False
+    try:
+        payload = json.dumps(["SET", key, value]).encode("utf-8")
+        req = _urllib.Request(
+            url,
+            data=payload,
+            headers={"Authorization": f"Bearer {tok}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        with _urllib.urlopen(req, timeout=5):
+            pass
+        return True
+    except Exception:
+        return False
+
 def _load(path, default):
-    kv = _kv_client()
-    if kv:
+    val = _kv_get(_key(path))
+    if val is not None:
         try:
-            val = kv.get(_key(path))
-            if val is not None:
-                return json.loads(val) if isinstance(val, str) else val
+            return json.loads(val) if isinstance(val, str) else val
         except Exception:
             pass
     try:
@@ -71,17 +98,13 @@ def _load(path, default):
         return default
 
 def _save(path, data):
-    kv = _kv_client()
-    if kv:
-        try:
-            kv.set(_key(path), json.dumps(data, ensure_ascii=False))
-            return
-        except Exception:
-            pass
+    serialized = json.dumps(data, ensure_ascii=False)
+    if _kv_set(_key(path), serialized):
+        return
     try:
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.write(serialized)
     except Exception:
         pass
 
