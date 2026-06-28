@@ -1579,7 +1579,7 @@ select option{background:#1A1A1A}
     </div>
     <div>
       <label>Código do cliente</label>
-      <input type="text" id="codigo-cliente" placeholder="Ex: C-123456" oninput="buscarPorCodigoCliente(this.value)" autocomplete="off"
+      <input type="text" id="codigo-cliente" placeholder="Ex: 7712906 — Enter para carregar" oninput="buscarPorCodigoCliente(this.value)" onkeydown="if(event.key==='Enter')buscarUltimoXpPorCodigo(this.value)" autocomplete="off"
         style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#E8D5A3;font-size:13px;outline:none;box-sizing:border-box">
       <input type="text" id="nome" placeholder="" style="display:none">
       <p id="cliente-encontrado-label" style="display:none;font-size:11px;color:#5DCAA5;margin-top:4px;font-weight:700"></p>
@@ -2429,9 +2429,16 @@ function mostrarPreviewPDF(d){
   const semDados = !d.conta || d.conta === "-" || !d.patrimonio;
   const semComp  = Object.values(comp).every(v => v === 0);
 
-  if(semDados || semComp){
+  if(semDados){
     box.style.display = "block";
     box.innerHTML = '<p style="color:#E8A87C;font-weight:700;font-size:13px;margin-bottom:4px">⚠️ PDF sem carteira detectada</p><p style="color:#888;font-size:12px">Preencha os dados manualmente na Etapa 2.</p>';
+    return;
+  }
+  if(semComp){
+    const fmtBrl = v => "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+    box.style.display = "block";
+    box.innerHTML = `<p style="color:#5DCAA5;font-weight:700;font-size:13px;margin-bottom:4px">✓ Conta ${d.conta} identificada — ${fmtBrl(d.patrimonio)}</p>
+      <p style="color:#888;font-size:12px">Composição por classe não disponível neste PDF. A análise continuará com os dados de perfil e carteira de referência selecionados.</p>`;
     return;
   }
 
@@ -2772,6 +2779,68 @@ function buscarPorCodigoCliente(codigo){
       }
     }catch(e){}
   }, 400);
+}
+
+async function buscarUltimoXpPorCodigo(conta){
+  conta = (conta||"").trim();
+  if(!conta) return;
+  const lbl = document.getElementById("cliente-encontrado-label");
+  const box = document.getElementById("box-preview-pdf");
+  if(lbl){ lbl.textContent="⏳ Buscando..."; lbl.style.display="block"; lbl.style.color="#C9A96E"; }
+  try{
+    // Busca ficha salva por conta
+    const [fichaRes, histRes] = await Promise.all([
+      fetch("/api/ficha?conta="+encodeURIComponent(conta)).then(r=>r.json()),
+      fetch("/api/historico").then(r=>r.json()),
+    ]);
+    const ficha = fichaRes && fichaRes.nome ? fichaRes : null;
+    const hist  = histRes && histRes[conta] ? histRes[conta] : null;
+    const entradas = Array.isArray(hist) ? hist : (hist?.entradas||[]);
+    const ultimo = entradas.length ? entradas[entradas.length-1] : null;
+
+    if(!ficha && !ultimo){
+      if(lbl){ lbl.textContent="Cliente não encontrado no sistema"; lbl.style.color="#FF6B6B"; }
+      return;
+    }
+
+    // Preenche ficha salva
+    if(ficha){
+      carregarFicha(JSON.stringify(ficha));
+    }
+
+    // Preenche composição do último XPerformance salvo
+    if(ultimo && ultimo.composicao){
+      _clienteIdentificado = _clienteIdentificado || {};
+      _clienteIdentificado.composicao_atual = ultimo.composicao;
+      _clienteIdentificado.patrimonio = ultimo.patrimonio || 0;
+      _clienteIdentificado.conta = conta;
+      _clienteIdentificado.data_ref = ultimo.data_ref || ultimo.salvo_em?.split(" ")[0] || "";
+
+      const fmtBrl = v => "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+      const pat = ultimo.patrimonio||0;
+      const dataRef = ultimo.data_ref || ultimo.salvo_em?.split(" ")[0] || "";
+      if(box){
+        box.style.display="block";
+        box.innerHTML=`<p style="color:#5DCAA5;font-weight:700;font-size:13px;margin-bottom:4px">✓ Último XPerformance carregado — Conta ${conta}${dataRef?" · "+dataRef:""}</p>
+          <p style="color:#C9A96E;font-size:13px;margin-bottom:8px;font-weight:700">${pat?fmtBrl(pat):""}</p>
+          <p style="color:#888;font-size:11px">Composição do último relatório salvo. Faça o upload do XPerformance atual para dados em tempo real.</p>`;
+      }
+      const fname = document.getElementById("fname-xp");
+      if(fname){ fname.style.color="#C9A96E"; fname.textContent="Último XP salvo — "+dataRef; }
+
+      const wBtn = document.getElementById("btn-proxima-etapa-wrap");
+      const btn  = document.getElementById("btn-proxima-etapa");
+      if(wBtn) wBtn.style.display="block";
+      if(btn){ btn.innerHTML="Continuar para Etapa 2 — Perfil &amp; Cross Sell →"; btn.disabled=false; btn.style.opacity="1"; }
+    }
+
+    if(lbl){
+      lbl.textContent = ficha ? "✓ "+(ficha.nome||conta) : "✓ Conta "+conta+" encontrada";
+      lbl.style.color="#5DCAA5";
+    }
+  }catch(e){
+    if(lbl){ lbl.textContent="Erro ao buscar cliente"; lbl.style.color="#FF6B6B"; }
+  }
 }
 
 async function buscarClientesSalvos(){
