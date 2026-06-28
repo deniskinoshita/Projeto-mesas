@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/auth/login.py": {
+    "api/auth/login.js": {
       "maxDuration": 30,
       "memory": 512
     },
@@ -11,14 +11,14 @@
     }
   },
   "routes": [
-    { "src": "^/$",                          "dest": "api/auth/login.py" },
-    { "src": "^/reset-senha$",               "dest": "api/auth/login.py" },
-    { "src": "^/api/ping$",                  "dest": "api/auth/login.py" },
-    { "src": "^/api/login$",                 "dest": "api/auth/login.py" },
-    { "src": "^/api/login-pessoal$",         "dest": "api/auth/login.py" },
-    { "src": "^/api/solicitar-reset$",       "dest": "api/auth/login.py" },
-    { "src": "^/api/confirmar-reset$",       "dest": "api/auth/login.py" },
-    { "src": "^/api/verificar-token-reset$", "dest": "api/auth/login.py" },
+    { "src": "^/$",                          "dest": "api/auth/login.js" },
+    { "src": "^/reset-senha$",               "dest": "api/auth/login.js" },
+    { "src": "^/api/ping$",                  "dest": "api/auth/login.js" },
+    { "src": "^/api/login$",                 "dest": "api/auth/login.js" },
+    { "src": "^/api/login-pessoal$",         "dest": "api/auth/login.js" },
+    { "src": "^/api/solicitar-reset$",       "dest": "api/auth/login.js" },
+    { "src": "^/api/confirmar-reset$",       "dest": "api/auth/login.js" },
+    { "src": "^/api/verificar-token-reset$", "dest": "api/auth/login.js" },
     { "src": "/(.*)",                        "dest": "api/index.py" }
   ]
 }
