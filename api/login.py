@@ -480,7 +480,7 @@ async function entrar(){
   btn.disabled = true; btn.textContent = "Verificando...";
   document.getElementById("erro").textContent = "";
   let d = null;
-  for(let t = 0; t < 5; t++){
+  for(let t = 0; t < 12; t++){
     try{
       const r = await fetch("/api/login",{
         method:"POST",
@@ -491,9 +491,9 @@ async function entrar(){
       try{ d = JSON.parse(text); } catch{ d = null; }
       if(d) break;
     } catch(e){ d = null; }
-    if(t < 4){
-      document.getElementById("erro").textContent = `Servidor iniciando, aguarde... (${t+1}/5)`;
-      await new Promise(res => setTimeout(res, 4000));
+    if(t < 11){
+      document.getElementById("erro").textContent = `Servidor iniciando, aguarde... (${t+1}/12)`;
+      await new Promise(res => setTimeout(res, 3000));
     }
   }
   btn.disabled = false; btn.textContent = "Continuar";
@@ -641,11 +641,14 @@ async function solicitarReset(){
   }
 }
 
-// Aquece o Lambda e habilita o botão quando pronto
+// Aquece múltiplas instâncias Lambda em paralelo
 (async function warmup(){
   const btn = document.getElementById("btn-entrar");
   if(btn){ btn.disabled = true; btn.textContent = "Conectando..."; }
-  try{ await fetch("/api/ping"); } catch(e){}
+  try{
+    const pings = Array.from({length:10}, () => fetch("/api/ping").catch(()=>{}));
+    await Promise.any(pings);
+  } catch(e){}
   if(btn){ btn.disabled = false; btn.textContent = "Continuar"; }
 })();
 
