@@ -2343,8 +2343,12 @@ function onXpFileChange(input){
   if(drop)  drop.style.borderColor = "#C9A96E";
   if(wrap)  wrap.style.display = "block";
   if(btn){  btn.innerHTML = "⏳ Identificando cliente..."; btn.disabled = true; btn.style.opacity = ".6"; }
+  // Timeout: se demorar mais de 12s, libera o botão mesmo sem identificação
+  var _idTimer = setTimeout(function(){
+    if(btn && btn.disabled){ btn.disabled=false; btn.style.opacity="1"; btn.innerHTML="Continuar para Etapa 2 →"; }
+  }, 12000);
   // Processa em background (async)
-  identificarCliente(file);
+  identificarCliente(file).finally(function(){ clearTimeout(_idTimer); });
 }
 
 // Upload do XPerformance: apenas clique (o div #drop1 dispara o input via onclick).
