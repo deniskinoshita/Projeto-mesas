@@ -1605,8 +1605,10 @@ select option{background:#1A1A1A}
   <!-- LINHA 3: Seletor visual de perfil -->
   <div style="margin-bottom:14px">
     <label style="margin-bottom:8px;display:block">Perfil do cliente</label>
-    <!-- Cards clicáveis por perfil -->
-    <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"></div>
+    <!-- Cards clicáveis por perfil — renderizados pelo servidor -->
+    <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      {{ perfil_cards | safe }}
+    </div>
     <!-- Select oculto para manter compatibilidade com o restante do código -->
     <select id="perfil" style="display:none" onchange="var _nm={super_conservadora:'SUPER CONSERVADORA',conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();renderPerfilCards();">
       <option value="super_conservadora">Super Conservadora</option>
@@ -4134,10 +4136,53 @@ def _pilar_html_inicial(p):
   </div>
 </div>'''
 
+def _perfil_cards_html():
+    """Gera os cards de seleção de perfil renderizados no servidor."""
+    PERFIS_UI = [
+        {"key":"super_conservadora","lbl":"Super Conservadora","emoji":"&#128737;","cor":"#5DCAA5","desc":"Preservação de capital"},
+        {"key":"conservadora",      "lbl":"Conservadora",      "emoji":"&#127974;","cor":"#C9A96E","desc":"Renda segura"},
+        {"key":"moderada",          "lbl":"Moderada",          "emoji":"&#9878;",  "cor":"#7DCFEF","desc":"Equilíbrio"},
+        {"key":"arrojada",          "lbl":"Arrojada",          "emoji":"&#128200;","cor":"#E88038","desc":"Crescimento"},
+        {"key":"agressiva",         "lbl":"Agressiva",         "emoji":"&#128640;","cor":"#FF6B6B","desc":"Alto crescimento"},
+    ]
+    GRUPOS = [
+        {"chaves":["pos_fixado","inflacao","pre_fixado"],"cor":"#C9A96E","lbl":"RF"},
+        {"chaves":["acoes","fiis"],                      "cor":"#8B9FE8","lbl":"RV"},
+        {"chaves":["multimercado"],                      "cor":"#5DCAA5","lbl":"Multi"},
+        {"chaves":["internacional"],                     "cor":"#E88B8B","lbl":"Intl"},
+        {"chaves":["alternativos","criptomoedas"],        "cor":"#B8A0E8","lbl":"Alt"},
+    ]
+    html_parts = []
+    for p in PERFIS_UI:
+        m = HP_PORTFOLIOS_DEFAULT["perfis"].get(p["key"], MODELOS.get(p["key"], {}))
+        # Mini barra empilhada
+        bar_segs = ""
+        for g in GRUPOS:
+            pct = sum(float(m.get(k, 0) or 0) for k in g["chaves"])
+            if pct > 0.5:
+                bar_segs += f'<div title="{g["lbl"]} {pct:.0f}%" style="flex:{pct};background:{g["cor"]};height:100%;border-radius:2px"></div>'
+        # Top 3 alocações
+        itens = sorted([(k,v) for k,v in m.items() if isinstance(v,(int,float)) and v>0 and k!="label"], key=lambda x: -x[1])[:3]
+        top_html = "".join(f'<span style="font-size:9px;color:#AAA;margin-bottom:1px;display:block">{LABELS.get(k,k)}: <b style="color:#E0C878">{v}%</b></span>' for k,v in itens)
+        card = (
+            f'<div onclick="selecionarPerfil(\'{p["key"]}\')" data-perfil="{p["key"]}" class="perfil-card-item" style="'
+            f'background:#081F18;border:2px solid #1E2E28;border-radius:10px;padding:10px 12px;'
+            f'cursor:pointer;flex:1;min-width:110px;max-width:180px;position:relative;overflow:hidden;transition:all .2s;box-sizing:border-box">'
+            f'<div style="font-size:18px;margin-bottom:3px">{p["emoji"]}</div>'
+            f'<div style="font-size:11px;font-weight:700;color:#F0F0F0;margin-bottom:2px">{p["lbl"]}</div>'
+            f'<div style="font-size:9px;color:#3A6A48;margin-bottom:8px">{p["desc"]}</div>'
+            f'<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#0A0A0A;margin-bottom:6px;gap:1px">{bar_segs}</div>'
+            f'<div>{top_html}</div>'
+            f'</div>'
+        )
+        html_parts.append(card)
+    return "\n".join(html_parts)
+
 @app.route("/assessor")
 def index():
     pilares_html = "\n".join(_pilar_html_inicial(p) for p in MODELO_SERVIR)
-    return render_template_string(HTML, pilares_html=pilares_html)
+    perfil_cards = _perfil_cards_html()
+    return render_template_string(HTML, pilares_html=pilares_html, perfil_cards=perfil_cards)
 
 
 @app.route("/api/login", methods=["POST"])
