@@ -3172,8 +3172,8 @@ async function analisar(){
       analiseData._xp = xpData;
     }
 
-    renderizar(analiseData);
-    if(analiseData._xp) renderAnaliseHP(analiseData._xp);
+    try{ renderizar(analiseData); }catch(e){ console.error("[renderizar]",e); alert("Erro em renderizar: "+e.message); }
+    try{ if(analiseData._xp) renderAnaliseHP(analiseData._xp); }catch(e){ console.error("[renderAnaliseHP]",e); alert("Erro em renderAnaliseHP: "+e.message); }
 
     // Log de atividade
     const _nomeLog = localStorage.getItem("brauna_nome") || document.getElementById("assessor")?.value || "Assessor";
@@ -3576,15 +3576,15 @@ function renderizar(data){
   });
 
   // Diversificação por classe e plano de ação
-  renderClassesAtivos(desvios, patrimonio);
-  renderPlanoAcao(desvios, data.perfil||"", patrimonio, data.objetivo||"");
+  try{ renderClassesAtivos(desvios, patrimonio); }catch(e){ console.error("[renderClassesAtivos]",e); }
+  try{ renderPlanoAcao(desvios, data.perfil||"", patrimonio, data.objetivo||""); }catch(e){ console.error("[renderPlanoAcao]",e); }
 
   // Carteira atual do cliente — exibe no Plano de Ação e ao lado dos Desvios
-  const _compAtual = (_clienteIdentificado && _clienteIdentificado.composicao_atual) || data.composicao_atual || {};
+  const _compAtual = (_clienteIdentificado && _clienteIdentificado.composicao_atual) || data.composicao_atual || data.composicao || {};
   const _patAtual  = (_clienteIdentificado && _clienteIdentificado.patrimonio) || patrimonio || 0;
-  renderCarteiraAtual(_compAtual, _patAtual, "plano-carteira-barras", "plano-carteira-atual");
-  renderCarteiraAtual(_compAtual, _patAtual, "desvios-carteira-barras", "desvios-carteira-atual");
-  renderSugestoes(data.sugestoes||null);
+  try{ renderCarteiraAtual(_compAtual, _patAtual, "plano-carteira-barras", "plano-carteira-atual"); }catch(e){ console.error("[renderCarteiraAtual plano]",e); }
+  try{ renderCarteiraAtual(_compAtual, _patAtual, "desvios-carteira-barras", "desvios-carteira-atual"); }catch(e){ console.error("[renderCarteiraAtual desvios]",e); }
+  try{ renderSugestoes(data.sugestoes||null); }catch(e){ console.error("[renderSugestoes]",e); }
 
   // Desvios
   const dl=document.getElementById("desvios-list");
