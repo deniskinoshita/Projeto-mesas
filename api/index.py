@@ -1910,6 +1910,7 @@ select option{background:#1A1A1A}
       <button class="tab-btn" onclick="tab('crosssell')">Cross Sell</button>
       <button class="tab-btn" onclick="tab('gestores')">Visão dos Gestores</button>
       <button class="tab-btn" onclick="tab('sugestoes')" id="tab-btn-sugestoes" style="display:none">💡 Sugestões</button>
+      <button class="tab-btn" onclick="tab('posicao')" id="tab-btn-posicao" style="display:none">📋 Posição Consolidada</button>
     </div>
 
     <div class="tab-panel active" id="tab-desvios">
@@ -1944,6 +1945,10 @@ select option{background:#1A1A1A}
 
     <div class="tab-panel" id="tab-sugestoes">
       <div id="sugestoes-list"></div>
+    </div>
+
+    <div class="tab-panel" id="tab-posicao">
+      <div id="posicao-consolidada-list"></div>
     </div>
   </div>
 
@@ -3791,6 +3796,124 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   } else { pv.innerHTML=""; }
 }
 
+function renderPosicaoConsolidada(data){
+  var el = document.getElementById("posicao-consolidada-list");
+  if(!el) return;
+  var rf    = data.rf_ativos   || [];
+  var acoes = data.acoes       || [];
+  var fiis  = data.fiis        || [];
+  var diags = data.diagnosticos|| [];
+  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#3A6A48'>Nenhuma posição detalhada disponível — suba o PDF do XPerformance.</p>"; return; }
+
+  // Mostra aba
+  var tabBtn = document.getElementById("tab-btn-posicao");
+  if(tabBtn) tabBtn.style.display="";
+
+  var fmt = function(v){ return v!=null&&v!==undefined ? "R$ "+parseFloat(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; };
+  var pct = function(v){ return v!=null&&v!==undefined ? parseFloat(v).toFixed(2)+"%" : "—"; };
+
+  // Alertas de diagnóstico
+  var diagHtml = "";
+  if(diags.length){
+    var COR = {alto:"#FF6B6B", medio:"#FFD966", baixo:"#7DCFEF"};
+    diagHtml = '<div style="margin-bottom:18px">';
+    diagHtml += '<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Diagnósticos Automáticos</p>';
+    diags.forEach(function(a){
+      var cor = COR[a.nivel]||"#AAA";
+      diagHtml += '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:#0A1A10;border-left:3px solid '+cor+';border-radius:0 6px 6px 0;margin-bottom:6px">';
+      diagHtml += '<span style="font-size:14px">'+(a.nivel==="alto"?"🔴":a.nivel==="medio"?"🟡":"🔵")+'</span>';
+      diagHtml += '<span style="font-size:12px;color:#F0F0F0">'+a.msg+'</span>';
+      diagHtml += '</div>';
+    });
+    diagHtml += '</div>';
+  }
+
+  // Tabela RF
+  var rfHtml = "";
+  if(rf.length){
+    rfHtml = '<div style="margin-bottom:20px">';
+    rfHtml += '<p style="font-size:11px;color:#7DCFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Renda Fixa ('+rf.length+' ativos)</p>';
+    rfHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+    rfHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
+    rfHtml += '<th style="text-align:left;padding:6px 8px">Ativo</th><th style="text-align:left;padding:6px 8px">Classe</th>';
+    rfHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
+    rfHtml += '<th style="text-align:right;padding:6px 8px">Rent. Mês</th><th style="text-align:right;padding:6px 8px">Rent. 12M</th>';
+    rfHtml += '</tr></thead><tbody>';
+    rf.forEach(function(a,i){
+      var bg = i%2===0?"#071E17":"#081F18";
+      var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#5DCAA5">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#FF6B6B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "—";
+      var r12 = a.rent_12m!=null ? parseFloat(a.rent_12m).toFixed(2)+"%" : "—";
+      rfHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
+      rfHtml += '<td style="padding:6px 8px;color:#F0F0F0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.nome+'">'+a.nome+'</td>';
+      rfHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.classe||"—")+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right">'+rm+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#AAA">'+r12+'</td>';
+      rfHtml += '</tr>';
+    });
+    rfHtml += '</tbody></table></div></div>';
+  }
+
+  // Tabela Ações
+  var acoesHtml = "";
+  if(acoes.length){
+    acoesHtml = '<div style="margin-bottom:20px">';
+    acoesHtml += '<p style="font-size:11px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📈 Ações / Renda Variável ('+acoes.length+' ativos)</p>';
+    acoesHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+    acoesHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
+    acoesHtml += '<th style="text-align:left;padding:6px 8px">Ticker</th><th style="text-align:left;padding:6px 8px">Nome</th>';
+    acoesHtml += '<th style="text-align:right;padding:6px 8px">Qtd</th><th style="text-align:right;padding:6px 8px">Preço Médio</th>';
+    acoesHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
+    acoesHtml += '<th style="text-align:right;padding:6px 8px">Resultado</th>';
+    acoesHtml += '</tr></thead><tbody>';
+    acoes.forEach(function(a,i){
+      var bg = i%2===0?"#071E17":"#081F18";
+      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#5DCAA5">'+fmt(a.resultado)+'</span>':'<span style="color:#FF6B6B">'+fmt(a.resultado)+'</span>') : "—";
+      acoesHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
+      acoesHtml += '<td style="padding:6px 8px;color:#7DCFEF;font-weight:700">'+a.ticker+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.nome||"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#F0F0F0">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#AAA">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
+      acoesHtml += '</tr>';
+    });
+    acoesHtml += '</tbody></table></div></div>';
+  }
+
+  // Tabela FIIs
+  var fiisHtml = "";
+  if(fiis.length){
+    fiisHtml = '<div style="margin-bottom:20px">';
+    fiisHtml += '<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏢 Fundos Imobiliários ('+fiis.length+' ativos)</p>';
+    fiisHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+    fiisHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
+    fiisHtml += '<th style="text-align:left;padding:6px 8px">Ticker</th><th style="text-align:left;padding:6px 8px">Nome</th>';
+    fiisHtml += '<th style="text-align:right;padding:6px 8px">Qtd</th><th style="text-align:right;padding:6px 8px">Preço Médio</th>';
+    fiisHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
+    fiisHtml += '<th style="text-align:right;padding:6px 8px">Resultado</th>';
+    fiisHtml += '</tr></thead><tbody>';
+    fiis.forEach(function(a,i){
+      var bg = i%2===0?"#071E17":"#081F18";
+      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#5DCAA5">'+fmt(a.resultado)+'</span>':'<span style="color:#FF6B6B">'+fmt(a.resultado)+'</span>') : "—";
+      fiisHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
+      fiisHtml += '<td style="padding:6px 8px;color:#C9A96E;font-weight:700">'+a.ticker+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.nome||"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#F0F0F0">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#AAA">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
+      fiisHtml += '</tr>';
+    });
+    fiisHtml += '</tbody></table></div></div>';
+  }
+
+  el.innerHTML = diagHtml + rfHtml + acoesHtml + fiisHtml;
+}
+
 function renderizar(data){
   const{desvios,rent,patrimonio,macro,recomendacoes,alertas,visao_gestores,checklist_servir,score_servir,pendentes_criticos,pendentes_altos,objetivo,perfil}=data;
 
@@ -4015,6 +4138,9 @@ function renderizar(data){
   // Cross Sell
   renderCrossSellResult(data.cross_sell||[], data.cross_tem||[], data.cross_nao_tem||[]);
 
+  // Posição Consolidada + Diagnósticos Automáticos
+  try{ renderPosicaoConsolidada(data); }catch(e){ console.error("[renderPosicaoConsolidada]",e); }
+
   document.getElementById("results").style.display="block";
   document.getElementById("results").scrollIntoView({behavior:"smooth"});
 
@@ -4062,8 +4188,10 @@ async function gerarApresentacao(){
     rent:                analiseData.rent || xp.rent || {},
     composicao:          analiseData.composicao || xp.comp || {},
     desvios:             xp.desvios || analiseData.desvios || [],
-    acoes:               xp.acoes || [],
-    fiis:                xp.fiis || [],
+    acoes:               analiseData.acoes || xp.acoes || [],
+    fiis:                analiseData.fiis  || xp.fiis  || [],
+    rf_ativos:           analiseData.rf_ativos || [],
+    diagnosticos:        analiseData.diagnosticos || [],
     sugestoes_produtos:  xp.sugestoes_produtos || [],
     cenario_macro:       xp.cenario_macro || {},
     alertas_relevantes:  xp.alertas_relevantes || analiseData.alertas || [],
@@ -4337,6 +4465,91 @@ def _pilar_html_inicial(p):
     </div>
   </div>
 </div>'''
+
+def gerar_diagnosticos(xp_parsed, perfil=""):
+    """Gera diagnósticos automáticos a partir dos ativos individuais do XPerformance."""
+    rf_ativos  = xp_parsed.get("rf_ativos", [])
+    acoes_list = xp_parsed.get("acoes", [])
+    fiis_list  = xp_parsed.get("fiis", [])
+    comp       = xp_parsed.get("comp", {})
+    alertas    = []
+
+    # Concentração em ativo único de RF > 8%
+    for ativo in rf_ativos:
+        if ativo.get("perc", 0) > 8:
+            nivel = "alto" if ativo["perc"] > 15 else "medio"
+            alertas.append({
+                "tipo": "concentracao_rf", "nivel": nivel,
+                "msg": f"Concentração alta: {ativo['nome'][:45]} representa {ativo['perc']:.1f}% da carteira",
+                "ativo": ativo["nome"], "classe": ativo.get("classe",""),
+            })
+
+    # Ativo RF com rentabilidade negativa no mês
+    for ativo in rf_ativos:
+        rm = ativo.get("rent_mes")
+        if rm is not None and rm < 0:
+            alertas.append({
+                "tipo": "rentabilidade_negativa", "nivel": "alto",
+                "msg": f"Rentabilidade negativa: {ativo['nome'][:45]} ({rm:+.2f}% no mês)",
+                "ativo": ativo["nome"], "classe": ativo.get("classe",""),
+            })
+
+    # Ativo RF com rentabilidade muito baixa no mês (< 0.3%)
+    for ativo in rf_ativos:
+        rm = ativo.get("rent_mes")
+        if rm is not None and 0 <= rm < 0.3:
+            alertas.append({
+                "tipo": "rentabilidade_baixa", "nivel": "medio",
+                "msg": f"Rentabilidade abaixo da média: {ativo['nome'][:45]} ({rm:.2f}% no mês — verifique custo vs CDI)",
+                "ativo": ativo["nome"], "classe": ativo.get("classe",""),
+            })
+
+    # Concentração em ação única > 5%
+    for ativo in acoes_list:
+        if ativo.get("perc", 0) > 5:
+            alertas.append({
+                "tipo": "concentracao_rv", "nivel": "medio",
+                "msg": f"Posição relevante em ação: {ativo['ticker']} = {ativo['perc']:.1f}% da carteira",
+                "ativo": ativo["ticker"], "classe": "acoes",
+            })
+
+    # Desvios vs. modelo do perfil (se perfil fornecido)
+    if perfil and perfil in HP_PORTFOLIOS_DEFAULT.get("perfis", {}):
+        modelo_alvo = HP_PORTFOLIOS_DEFAULT["perfis"][perfil]
+        for cat in CATS:
+            desvio = comp.get(cat, 0) - modelo_alvo.get(cat, 0)
+            if abs(desvio) >= 5:
+                direcao = "acima" if desvio > 0 else "abaixo"
+                alertas.append({
+                    "tipo": "desvio_modelo", "nivel": "alto" if abs(desvio) >= 10 else "medio",
+                    "msg": f"{LABELS.get(cat, cat)}: {comp.get(cat,0):.1f}% ({desvio:+.1f}% {direcao} do modelo {perfil.replace('_',' ').title()})",
+                    "classe": cat,
+                })
+
+    # Diversificação mínima
+    classes_com_posicao = sum(1 for v in comp.values() if v >= 1.0)
+    if classes_com_posicao < 3:
+        alertas.append({
+            "tipo": "diversificacao", "nivel": "alto",
+            "msg": f"Carteira com apenas {classes_com_posicao} classe(s) de ativos — risco de concentração sistêmica.",
+        })
+
+    # Resumo numérico da posição
+    total_rf   = sum(a.get("saldo", 0) for a in rf_ativos)
+    total_rv   = sum(a.get("saldo", 0) for a in acoes_list)
+    total_fiis = sum(a.get("saldo", 0) for a in fiis_list)
+
+    return {
+        "alertas": alertas,
+        "rf_ativos":  rf_ativos,
+        "acoes":      acoes_list,
+        "fiis":       fiis_list,
+        "total_rf":   round(total_rf, 2),
+        "total_rv":   round(total_rv, 2),
+        "total_fiis": round(total_fiis, 2),
+        "qtd_ativos": len(rf_ativos) + len(acoes_list) + len(fiis_list),
+    }
+
 
 def _perfil_cards_html():
     """Gera os cards de seleção de perfil renderizados no servidor."""
@@ -4785,62 +4998,9 @@ def xp_identificar():
                     "delta": delta,
                 })
 
-    # Diagnósticos automáticos baseados nas posições individuais
-    alertas = []
-    rf_ativos  = xp.get("rf_ativos", [])
-    acoes_list = xp.get("acoes", [])
-    fiis_list  = xp.get("fiis", [])
-    patrimonio_val = xp.get("patrimonio", 0)
-
-    # Concentração em ativo único de RF (> 8% do patrimônio)
-    for ativo in rf_ativos:
-        if ativo.get("perc", 0) > 8:
-            alertas.append({
-                "tipo": "concentracao",
-                "nivel": "alto" if ativo["perc"] > 15 else "medio",
-                "msg": f"Concentração alta: {ativo['nome'][:40]} representa {ativo['perc']:.1f}% da carteira",
-                "ativo": ativo["nome"],
-                "classe": ativo["classe"],
-            })
-
-    # Ativo de RF com rentabilidade negativa no mês
-    for ativo in rf_ativos:
-        rm = ativo.get("rent_mes")
-        if rm is not None and rm < 0:
-            alertas.append({
-                "tipo": "rentabilidade_negativa",
-                "nivel": "alto",
-                "msg": f"Rentabilidade negativa no mês: {ativo['nome'][:40]} ({rm:.2f}%)",
-                "ativo": ativo["nome"],
-                "classe": ativo["classe"],
-            })
-
-    # Concentração em ação única (> 5% do patrimônio)
-    for ativo in acoes_list:
-        if ativo.get("perc", 0) > 5:
-            alertas.append({
-                "tipo": "concentracao_rv",
-                "nivel": "medio",
-                "msg": f"Posição relevante em ação: {ativo['ticker']} = {ativo['perc']:.1f}% da carteira",
-                "ativo": ativo["ticker"],
-                "classe": "acoes",
-            })
-
-    # Desvios vs. modelo do perfil salvo
+    # Diagnósticos automáticos via função centralizada
     ficha_perfil = ficha.get("perfil", "")
-    if ficha_perfil and ficha_perfil in HP_PORTFOLIOS_DEFAULT.get("perfis", {}):
-        modelo_alvo = HP_PORTFOLIOS_DEFAULT["perfis"][ficha_perfil]
-        comp_atual  = xp.get("comp", {})
-        for cat in CATS:
-            desvio = comp_atual.get(cat, 0) - modelo_alvo.get(cat, 0)
-            if abs(desvio) >= 5:
-                direcao = "acima" if desvio > 0 else "abaixo"
-                alertas.append({
-                    "tipo": "desvio_modelo",
-                    "nivel": "alto" if abs(desvio) >= 10 else "medio",
-                    "msg": f"{LABELS.get(cat, cat)}: {comp_atual.get(cat,0):.1f}% ({desvio:+.1f}% {direcao} do modelo {ficha_perfil.replace('_',' ').title()})",
-                    "classe": cat,
-                })
+    diag = gerar_diagnosticos(xp, perfil=ficha_perfil)
 
     return jsonify({
         "conta": conta,
@@ -4854,12 +5014,11 @@ def xp_identificar():
         "ultima_carteira": ultima_carteira,
         "comparativo": comparativo,
         "tem_historico": len(historico_conta) > 0,
-        # Posições individuais
-        "rf_ativos":  rf_ativos,
-        "acoes":      acoes_list,
-        "fiis":       fiis_list,
-        # Diagnósticos
-        "alertas":    alertas,
+        "rf_ativos":  diag["rf_ativos"],
+        "acoes":      diag["acoes"],
+        "fiis":       diag["fiis"],
+        "alertas":    diag["alertas"],
+        "diagnostico": diag,
     })
 
 
@@ -7241,6 +7400,9 @@ def analyze():
     suge_ativa = next((s for s in suge_data.get("historico",[]) if s.get("ativa")), None)
     sugestoes_filtradas = filtrar_sugestoes(suge_ativa, perfil, comp)
 
+    # Diagnósticos automáticos + posição consolidada
+    diag = gerar_diagnosticos(xp_parsed, perfil)
+
     resultado = {
         "id": resumo["id"],
         "assessor": assessor,
@@ -7259,6 +7421,15 @@ def analyze():
         "cross_nao_tem": cross_nao_tem,
         "carta_info": {"nome": carta_info.get("nome",""), "atualizado": carta_info.get("atualizado","")},
         "sugestoes": sugestoes_filtradas,
+        # Posição consolidada e diagnósticos
+        "rf_ativos":    diag["rf_ativos"],
+        "acoes":        diag["acoes"],
+        "fiis":         diag["fiis"],
+        "diagnosticos": diag["alertas"],
+        "total_rf":     diag["total_rf"],
+        "total_rv":     diag["total_rv"],
+        "total_fiis":   diag["total_fiis"],
+        "qtd_ativos":   diag["qtd_ativos"],
     }
     return jsonify(resultado)
 
