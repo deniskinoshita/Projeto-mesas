@@ -355,7 +355,8 @@ async function continuar(){
   if(!d){document.getElementById('erro').textContent='Serviço indisponível. Recarregue a página e tente novamente.';return;}
   if(d.ok&&d.etapa==='senha_pessoal'){
     _sessaoPendente={role:d.role,nome:d.nome,codigo:d.codigo,identity:d.identity};
-    mostrarSenhaPessoal(d.precisa_criar);
+    // precisa_criar:null = backend não verificou ainda; false = tem senha (login normal)
+    mostrarSenhaPessoal(d.precisa_criar===true);
   }else{
     document.getElementById('erro').textContent=d.msg||'Credencial inválida. Tente novamente.';
     document.getElementById('senha').value='';
@@ -408,6 +409,8 @@ async function entrarPessoal(){
     }catch{d2=null;}
   }
   if(!d2){erro.textContent='Serviço indisponível. Tente novamente.';btn.disabled=false;btn.textContent=criar?'CRIAR E ENTRAR':'ENTRAR';return;}
+  // Backend descobriu que ainda não tem senha (primeiro acesso) → troca UI para criação
+  if(!d2.ok&&d2.precisa_criar){mostrarSenhaPessoal(true);return;}
   if(d2.ok){
     localStorage.setItem('brauna_role',_sessaoPendente.role);
     localStorage.setItem('brauna_role_ts',Date.now());
@@ -536,7 +539,7 @@ module.exports = async function handler(req, res) {
     // ping
     if (path === "/api/ping") return sendJson(res, { ok: true, ts: new Date().toISOString() });
 
-    // POST /api/login
+    // POST /api/login  — step 1: só valida código/senha de perfil, SEM chamada KV
     if (method === "POST" && path === "/api/login") {
       const d     = await readBody(req);
       const role  = d.role || "";
@@ -558,9 +561,8 @@ module.exports = async function handler(req, res) {
         return err(res, "Perfil inválido", 401);
       }
 
-      const senhas        = await loadSenhasPessoais();
-      const precisa_criar = !(identity in senhas);
-      return sendJson(res, { ok: true, etapa: "senha_pessoal", role, nome, codigo, identity, precisa_criar });
+      // precisa_criar verificado no step 2 para não bloquear o step 1 com chamada KV
+      return sendJson(res, { ok: true, etapa: "senha_pessoal", role, nome, codigo, identity, precisa_criar: null });
     }
 
     // POST /api/login-pessoal
@@ -589,7 +591,8 @@ module.exports = async function handler(req, res) {
       }
 
       const guardado = senhas[identity];
-      if (!guardado) return err(res, "Senha pessoal não cadastrada.", 400);
+      // Se ainda não tem senha, informa frontend para mostrar tela de criação
+      if (!guardado) return sendJson(res, { ok: false, precisa_criar: true });
       if (verificaSenha(senha, entryHash(guardado)))
         return sendJson(res, { ok: true });
       return err(res, "Senha pessoal incorreta.", 401);
