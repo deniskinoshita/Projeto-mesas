@@ -2095,7 +2095,8 @@ let analiseData=null, chartInst=null, _classesChart=null;
 const checklist={};
 PILARES.forEach(p=>checklist[p.id]=false);
 
-document.getElementById("data").value=new Date().toISOString().split("T")[0];
+var _dataEl = document.getElementById("data");
+if(_dataEl) _dataEl.value = new Date().toISOString().split("T")[0];
 
 // Carrega mensagem do admin e carta ativa
 fetch("/api/admin/mensagem").then(r=>r.json()).then(d=>{
