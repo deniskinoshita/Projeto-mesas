@@ -2336,19 +2336,13 @@ function onXpFileChange(input){
   if(!file) return;
   const fname = document.getElementById("fname-xp");
   const drop  = document.getElementById("drop1");
-  const wrap  = document.getElementById("btn-proxima-etapa-wrap");
-  const btn   = document.getElementById("btn-proxima-etapa");
-  // Feedback imediato — síncrono
+  // Feedback imediato
   if(fname) fname.textContent = "⏳ " + file.name;
   if(drop)  drop.style.borderColor = "#C9A96E";
-  if(wrap)  wrap.style.display = "block";
-  if(btn){  btn.innerHTML = "⏳ Identificando cliente..."; btn.disabled = true; btn.style.opacity = ".6"; }
-  // Timeout: se demorar mais de 12s, libera o botão mesmo sem identificação
-  var _idTimer = setTimeout(function(){
-    if(btn && btn.disabled){ btn.disabled=false; btn.style.opacity="1"; btn.innerHTML="Continuar para Etapa 2 →"; }
-  }, 12000);
-  // Processa em background (async)
-  identificarCliente(file).finally(function(){ clearTimeout(_idTimer); });
+  // Avança para etapa 2 imediatamente com dados provisórios
+  ativarEtapa2({conta:"", ficha_salva:{}, tem_historico:false, ultima_carteira:null, comparativo:[]});
+  // Identifica o cliente em background e atualiza os campos da etapa 2
+  identificarCliente(file);
 }
 
 // Upload do XPerformance: apenas clique (o div #drop1 dispara o input via onclick).
@@ -2424,8 +2418,15 @@ async function identificarCliente(file){
     // ── Exibe preview dos dados extraídos ANTES do botão avançar
     try{ mostrarPreviewPDF(d); }catch(re){ console.error("mostrarPreviewPDF:", re); }
 
-    // ── Atualiza botão com dados do cliente
-    try{ mostrarBotaoProximaEtapa(d); }catch(re){ console.error("mostrarBotaoProximaEtapa:", re); }
+    // ── Atualiza painel de histórico na etapa 2 (já aberta em background)
+    try{ renderPainelCliente(d); }catch(re){ console.error("renderPainelCliente:", re); }
+
+    // ── Atualiza banner da etapa 2 se o cliente foi identificado
+    if(d.conta && d.conta !== "-"){
+      const tituloEl = document.getElementById("step2-titulo");
+      const nome = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
+      if(tituloEl) tituloEl.textContent = nome + (d.tem_historico ? " — Retorno" : " — Primeiro acesso");
+    }
 
   }catch(e){
     // Só exibe erro de PDF se a conta NÃO foi lida (falha real de parse/rede)
