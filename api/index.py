@@ -3403,12 +3403,12 @@ function renderClassesAtivos(desvios, patrimonio){
   }).join("");
 }
 
-const CLS_LBL_JS = {
+var CLS_LBL_JS = {
   pos_fixado:"Pós Fixado", inflacao:"Inflação", pre_fixado:"Pré Fixado",
   acoes:"Ações / RV", fiis:"FIIs", multimercado:"Multimercado",
   alternativos:"Alternativos", internacional:"Internacional", criptomoedas:"Cripto"
 };
-const CLS_COR_JS = {
+var CLS_COR_JS = {
   pos_fixado:"#3EB8A8", inflacao:"#C8A733", pre_fixado:"#5DCAA5",
   acoes:"#E88038", fiis:"#9E8FE8", multimercado:"#5DAAD8",
   alternativos:"#C0A878", internacional:"#5DDAA8", criptomoedas:"#FF8A65"
