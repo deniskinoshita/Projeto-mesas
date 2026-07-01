@@ -1054,7 +1054,81 @@ def avaliar_cross_sell(cross_input):
     return resultado, tem, nao_tem
 
 
-def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto=""):
+def _carregar_compliance():
+    """Carrega texto dos documentos de compliance publicados na base de conhecimento."""
+    try:
+        docs = [d for d in load_know_index() if d.get("publicado") and d.get("tipo") in ("compliance", "outro")]
+        textos = []
+        for doc in docs:
+            t = load_know_text(doc["id"])
+            if t:
+                textos.append(f"[{doc.get('nome','')}]\n{t[:4000]}")
+        return "\n\n---\n\n".join(textos)
+    except Exception:
+        return ""
+
+# Regras extraídas do compliance XP — usadas como guardrail hard-coded para análise offline
+_COMPLIANCE_RULES = [
+    # Concentração máxima por ativo/emissor
+    {"regra": "max_ativo_pct", "valor": 20,
+     "msg": "Compliance XP: concentração máxima de 20% em um único emissor de renda fixa."},
+    {"regra": "max_rv_pct", "valor": 30,
+     "msg": "Compliance XP: exposição máxima de 30% em Renda Variável para perfil não-agressivo."},
+    # Diversificação mínima
+    {"regra": "min_classes", "valor": 3,
+     "msg": "Compliance XP: carteira deve ter no mínimo 3 classes de ativos."},
+    # Produtos estruturados / alternativos
+    {"regra": "alt_max_pct", "valor": 15,
+     "msg": "Compliance XP: Alternativos e Estruturados limitados a 15% do patrimônio total."},
+    # Liquidez mínima
+    {"regra": "liquidez_min_pct", "valor": 10,
+     "msg": "Compliance XP: mínimo de 10% em ativos de liquidez diária (Pós Fixado / Caixa)."},
+]
+
+def aplicar_compliance(recomendacoes, alertas, comp, perfil):
+    """Valida recomendações contra as regras de compliance e adiciona alertas de violação."""
+    compliance_alertas = []
+
+    # Regra: concentração por classe
+    for cat, pct in comp.items():
+        if cat == "alternativos" and pct > 15:
+            compliance_alertas.append(
+                f"🚫 COMPLIANCE: Alternativos em {pct:.1f}% — limite XP é 15%. Realocação obrigatória.")
+        if cat == "acoes" and perfil not in ("arrojada", "agressiva") and pct > 30:
+            compliance_alertas.append(
+                f"🚫 COMPLIANCE: Renda Variável em {pct:.1f}% para perfil {perfil.title()} — limite XP é 30%.")
+
+    # Regra: diversificação mínima
+    classes_com_posicao = sum(1 for v in comp.values() if v >= 1.0)
+    if classes_com_posicao < 3:
+        compliance_alertas.append(
+            "🚫 COMPLIANCE: Carteira com menos de 3 classes de ativos — mínimo de diversificação XP não atingido.")
+
+    # Regra: liquidez mínima (pós fixado + caixa)
+    liquidez = comp.get("pos_fixado", 0)
+    if liquidez < 10:
+        compliance_alertas.append(
+            f"⚠️ COMPLIANCE: Liquidez diária em {liquidez:.1f}% — mínimo recomendado é 10% (Pós Fixado/Caixa).")
+
+    # Injeta alertas de compliance NO INÍCIO da lista de alertas
+    alertas = compliance_alertas + alertas
+
+    # Filtra recomendações que violem compliance
+    recomendacoes_validas = []
+    for rec in recomendacoes:
+        # Bloqueia sugestão de aumentar alternativos se já está no limite
+        if rec.get("classe","").lower() in ("alternativos","estruturados") and comp.get("alternativos",0) >= 15:
+            rec["bloqueado_compliance"] = True
+            rec["compliance_nota"] = "Limite XP de 15% em Alternativos atingido — sugestão bloqueada pelo compliance."
+        # Bloqueia sugestão de RV para perfil conservador/super_conservador
+        if rec.get("classe","").lower() in ("ações / rv","ações","acoes") and perfil in ("conservadora","super_conservadora"):
+            rec["bloqueado_compliance"] = True
+            rec["compliance_nota"] = "Perfil conservador: XP não permite recomendação ativa de aumento em Renda Variável."
+        recomendacoes_validas.append(rec)
+
+    return recomendacoes_validas, alertas
+
+def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=None):
     selic = macro.get("selic_meta")
     ipca  = macro.get("ipca_12m")
     rec_classes = contexto.get("recomendacoes_por_classe", {})
@@ -1125,6 +1199,10 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto=""):
             alertas.append(f"⚠️ {o['label']} com {o['real']:.1f}% vs. alvo {o['alvo']:.1f}% — XP Asset e Verde alertam para concentração excessiva em pós-fixado. Realocar gradualmente para inflação.")
         else:
             alertas.append(f"⚠️ {o['label']} com excesso de {o['desvio']:.1f}% — candidato à realocação.")
+
+    # Aplica guardrails de compliance antes de retornar
+    if comp:
+        recomendacoes, alertas = aplicar_compliance(recomendacoes, alertas, comp, perfil)
 
     return recomendacoes, alertas
 
@@ -5920,12 +5998,17 @@ CARTA:
 
 @app.route("/api/hp/knowledge/publicar", methods=["POST"])
 def hp_knowledge_publicar():
-    """Publica ou despublica um documento. Aceita {id, publicado: true/false} (default true)."""
-    body   = request.get_json()
-    doc_id = body.get("id")
+    """Publica/despublica e atualiza campos extras (tipo, classes, etc)."""
+    body      = request.get_json()
+    doc_id    = body.get("id")
     publicado = body.get("publicado", True)
-    update_know_meta(doc_id, publicado=bool(publicado))   # atômico
-    return jsonify({"ok": True, "publicado": bool(publicado)})
+    changes   = {"publicado": bool(publicado)}
+    # Campos opcionais que podem ser atualizados junto
+    for campo in ("tipo", "classes", "fonte", "nome"):
+        if campo in body:
+            changes[campo] = body[campo]
+    update_know_meta(doc_id, **changes)
+    return jsonify({"ok": True, **changes})
 
 @app.route("/api/analyze-xp", methods=["POST"])
 def analyze_xp():
@@ -7051,7 +7134,7 @@ def analyze():
     macro   = buscar_macro_bcb()
     ctx     = carregar_contexto()
 
-    recomendacoes, alertas = gerar_recomendacoes(desvios, perfil, macro, ctx, carta_texto)
+    recomendacoes, alertas = gerar_recomendacoes(desvios, perfil, macro, ctx, carta_texto, comp=comp)
     checklist_servir, score_servir, pendentes_criticos, pendentes_altos = avaliar_modelo_servir(checklist_input)
     cross_sell_result, cross_tem, cross_nao_tem = avaliar_cross_sell(cross_input)
 
