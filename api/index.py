@@ -2235,7 +2235,8 @@ function _mapearPerfilJS(perfil, perfisDisp){
     return (_RISCO_ORDEM_JS[b]||0) - (_RISCO_ORDEM_JS[a]||0); // empate -> maior risco
   })[0];
 }
-function carregarGestoras(){
+function carregarGestoras(tentativa){
+  tentativa = tentativa || 0;
   fetch("/api/hp/gestoras2").then(r=>r.json()).then(d=>{
     _gestoras = d || {};
     const sel  = document.getElementById("gestora-sel");
@@ -2250,7 +2251,9 @@ function carregarGestoras(){
     }
     if(hint) hint.style.display = "none";
     atualizarModelo();
-  }).catch(()=>{});
+  }).catch(function(){
+    if(tentativa < 4) setTimeout(function(){ carregarGestoras(tentativa+1); }, 4000);
+  });
 }
 carregarGestoras();
 function onGestoraChange(){ atualizarModelo(); }
