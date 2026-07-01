@@ -1602,17 +1602,23 @@ select option{background:#1A1A1A}
   <!-- Preview dos dados extraídos do PDF -->
   <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#0A1F18;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
 
-  <!-- LINHA 3: Perfil + Carteira de referência -->
+  <!-- LINHA 3: Seletor visual de perfil -->
+  <div style="margin-bottom:14px">
+    <label style="margin-bottom:8px;display:block">Perfil do cliente</label>
+    <!-- Cards clicáveis por perfil -->
+    <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"></div>
+    <!-- Select oculto para manter compatibilidade com o restante do código -->
+    <select id="perfil" style="display:none" onchange="var _nm={super_conservadora:'SUPER CONSERVADORA',conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();renderPerfilCards();">
+      <option value="super_conservadora">Super Conservadora</option>
+      <option value="conservadora">Conservadora</option>
+      <option value="moderada">Moderada</option>
+      <option value="arrojada">Arrojada</option>
+      <option value="agressiva">Agressiva</option>
+    </select>
+  </div>
+
+  <!-- LINHA 3b: Carteira de referência + modelo selecionado -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
-    <div><label>Perfil do cliente</label>
-      <select id="perfil" onchange="var _nm={super_conservadora:'SUPER CONSERVADORA',conservadora:'CONSERVADORA',moderada:'MODERADA',arrojada:'ARROJADA',agressiva:'AGRESSIVA'};var _lb=document.getElementById('perfil-lbl');if(_lb)_lb.textContent=_nm[this.value]||this.value.toUpperCase();atualizarModelo();">
-        <option value="super_conservadora">Super Conservadora</option>
-        <option value="conservadora">Conservadora</option>
-        <option value="moderada">Moderada</option>
-        <option value="arrojada">Arrojada</option>
-        <option value="agressiva">Agressiva</option>
-      </select>
-    </div>
     <div>
       <label>Carteira de referência <span id="perfil-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase"></span></label>
       <select id="gestora-sel" onchange="onGestoraChange()" style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#C9A96E;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box">
@@ -1621,9 +1627,11 @@ select option{background:#1A1A1A}
       <div id="carta-ativa-info" style="margin-top:4px"><p style="font-size:10px;color:#3A6A48;margin:0">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
       <p id="gestora-vazia-hint" style="display:none;font-size:11px;color:#8A6A2A;margin-top:4px">⚠️ Nenhuma carteira cadastrada.</p>
     </div>
+    <div>
+      <label>Alocação do modelo <span id="modelo-gestora-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase"></span></label>
+      <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:5px 12px;padding:8px 0"></div>
+    </div>
   </div>
-  <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:10px"></div>
-  <span id="modelo-gestora-lbl" style="display:none"></span>
 
   <!-- LINHA 4: Objetivo do cliente -->
   <div style="margin-bottom:14px">
@@ -2224,7 +2232,7 @@ if(document.readyState === "loading"){
 // Cache do portfólio HP — declarado como var para evitar TDZ (chamado antes da inicialização)
 var _hpPortfolios = null;
 (function carregarHpPortfolios(t){
-  fetch("/api/hp/portfolios").then(r=>r.json()).then(function(d){ _hpPortfolios = d.perfis||null; atualizarModelo(); })
+  fetch("/api/hp/portfolios").then(r=>r.json()).then(function(d){ _hpPortfolios = d.perfis||null; atualizarModelo(); renderPerfilCards(); })
   .catch(function(){ if(t<4) setTimeout(function(){ carregarHpPortfolios(t+1); }, 4000); });
 })(0);
 
@@ -2321,6 +2329,86 @@ function atualizarModelo(){
 const perfilEl = document.getElementById("perfil");
 if(perfilEl){
   perfilEl.addEventListener("change", atualizarModelo);
+}
+
+// ── Cards visuais de seleção de perfil ────────────────────────────────────────
+function renderPerfilCards(){
+  const wrap = document.getElementById("perfil-cards");
+  const sel  = document.getElementById("perfil");
+  if(!wrap || !sel) return;
+
+  const PERFIS = [
+    { key:"super_conservadora", label:"Super\nConservadora", emoji:"🛡️", cor:"#5DCAA5", desc:"Preservação" },
+    { key:"conservadora",       label:"Conservadora",        emoji:"🏦", cor:"#C9A96E", desc:"Renda segura" },
+    { key:"moderada",           label:"Moderada",            emoji:"⚖️", cor:"#7DCFEF", desc:"Equilíbrio"  },
+    { key:"arrojada",           label:"Arrojada",            emoji:"📈", cor:"#E88038", desc:"Crescimento" },
+    { key:"agressiva",          label:"Agressiva",           emoji:"🚀", cor:"#FF6B6B", desc:"Alto risco"  },
+  ];
+
+  // Dados dos portfólios: HP se carregado, senão MODELOS padrão
+  const portfolios = _hpPortfolios || MODELOS;
+
+  const ativo = sel.value;
+
+  // Grupos de classes para mini-barra empilhada
+  const GRUPOS = [
+    { chaves:["pos_fixado","inflacao","pre_fixado"], cor:"#C9A96E", lbl:"RF" },
+    { chaves:["acoes","fiis"],                       cor:"#8B9FE8", lbl:"RV" },
+    { chaves:["multimercado"],                       cor:"#5DCAA5", lbl:"Multi" },
+    { chaves:["internacional"],                      cor:"#E88B8B", lbl:"Intl" },
+    { chaves:["alternativos","criptomoedas"],         cor:"#B8A0E8", lbl:"Alt" },
+  ];
+
+  wrap.innerHTML = PERFIS.map(p => {
+    const m = portfolios[p.key] || {};
+    const isAtivo = p.key === ativo;
+
+    // Mini barra empilhada
+    const barSegs = GRUPOS.map(g => {
+      const pct = g.chaves.reduce((s,k) => s + (Number(m[k])||0), 0);
+      return pct > 0.5 ? `<div title="${g.lbl} ${pct.toFixed(0)}%" style="flex:${pct};background:${g.cor};height:100%"></div>` : "";
+    }).join("");
+
+    // Maiores alocações (top 3)
+    const itens = Object.entries(m)
+      .filter(([k,v]) => typeof v==="number" && v>0 && k!=="label")
+      .sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const itensTxt = itens.map(([k,v])=>`<span style="font-size:9px;color:#888">${LABELS[k]||k}: <b style="color:#CCC">${v}%</b></span>`).join("<span style='color:#2A2A2A;padding:0 3px'>·</span>");
+
+    return `<div onclick="selecionarPerfil('${p.key}')" style="
+      flex:1;min-width:130px;cursor:pointer;
+      background:${isAtivo ? p.cor+"22" : "#081F18"};
+      border:2px solid ${isAtivo ? p.cor : "#1A1A1A"};
+      border-radius:10px;padding:10px 12px;
+      transition:all .2s;position:relative;overflow:hidden
+    ">
+      ${isAtivo ? `<div style="position:absolute;top:6px;right:8px;font-size:9px;color:${p.cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px">✓ selecionado</div>` : ""}
+      <div style="font-size:18px;margin-bottom:4px">${p.emoji}</div>
+      <div style="font-size:12px;font-weight:700;color:${isAtivo ? p.cor : "#F0F0F0"};white-space:pre-line;line-height:1.2;margin-bottom:3px">${p.label}</div>
+      <div style="font-size:10px;color:#3A6A48;margin-bottom:8px">${p.desc}</div>
+      <!-- Mini barra empilhada -->
+      <div style="display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;margin-bottom:7px;background:#0A0A0A">
+        ${barSegs}
+      </div>
+      <!-- Top alocações -->
+      <div style="display:flex;flex-direction:column;gap:2px">${itensTxt}</div>
+    </div>`;
+  }).join("");
+}
+
+function selecionarPerfil(key){
+  const sel = document.getElementById("perfil");
+  if(!sel) return;
+  sel.value = key;
+  sel.dispatchEvent(new Event("change"));
+  renderPerfilCards();
+}
+
+// Renderiza os cards logo que a página carrega (e depois que HP portfolios chegar)
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", renderPerfilCards);
+} else {
+  renderPerfilCards();
 }
 
 fetch("/api/macro").then(r=>r.json()).then(d=>{
