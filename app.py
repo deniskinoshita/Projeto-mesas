@@ -468,6 +468,33 @@ st.markdown("## 📊 Análise de Carteiras")
 st.markdown("**Braúna Investimentos · Denis Kinoshita**")
 st.divider()
 
+
+# —— Instruções de uso
+st.markdown("""
+<div style="background:#1A1A1A; border:1px solid #D6B27A44; border-radius:12px; padding:20px; margin:12px 0 20px 0;">
+<p style="color:#D6B27A; font-weight:600; margin:0 0 14px 0; font-size:15px;">📋 Como usar esta ferramenta</p>
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+<div style="background:#111; border-radius:8px; padding:14px;">
+<p style="color:#D6B27A; margin:0 0 6px 0; font-weight:600;">① XPerformance</p>
+<p style="color:#888; margin:0; font-size:13px;">Baixe o PDF de carteira do cliente na plataforma XP</p>
+</div>
+<div style="background:#111; border-radius:8px; padding:14px;">
+<p style="color:#D6B27A; margin:0 0 6px 0; font-weight:600;">② Dados do cliente</p>
+<p style="color:#888; margin:0; font-size:13px;">Preencha nome, perfil e data na barra lateral</p>
+</div>
+<div style="background:#111; border-radius:8px; padding:14px;">
+<p style="color:#D6B27A; margin:0 0 6px 0; font-weight:600;">③ Upload do PDF</p>
+<p style="color:#888; margin:0; font-size:13px;">Arraste ou selecione o PDF do XPerformance abaixo</p>
+</div>
+<div style="background:#111; border-radius:8px; padding:14px;">
+<p style="color:#D6B27A; margin:0 0 6px 0; font-weight:600;">④ Análise e relatório</p>
+<p style="color:#888; margin:0; font-size:13px;">Veja os desvios e exporte o relatório em PDF</p>
+</div>
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+
 # Sidebar — cadastro do cliente
 with st.sidebar:
     st.markdown("### Cliente")

@@ -1619,19 +1619,32 @@ select option{background:#1A1A1A}
     </select>
   </div>
 
-  <!-- LINHA 3b: Carteira de referência + modelo selecionado -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;align-items:start">
-    <div>
-      <label>Carteira de referência <span id="perfil-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase"></span></label>
-      <select id="gestora-sel" onchange="onGestoraChange()" style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#C9A96E;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box">
-        <option value="">— selecione a carteira —</option>
-      </select>
-      <div id="carta-ativa-info" style="margin-top:4px"><p style="font-size:10px;color:#3A6A48;margin:0">Carta da gestão: <span id="carta-ativa-nome" style="color:#C9A96E">verificando...</span></p></div>
-      <p id="gestora-vazia-hint" style="display:none;font-size:11px;color:#8A6A2A;margin-top:4px">⚠️ Nenhuma carteira cadastrada.</p>
+  <!-- LINHA 3b: Toggle XP / Levante + alocação do modelo -->
+  <div style="margin-bottom:14px">
+    <label style="display:block;margin-bottom:8px">
+      Carteira de referência
+      <span id="perfil-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase;margin-left:6px"></span>
+    </label>
+
+    <!-- Toggle visual XP vs Levante -->
+    <div id="inst-toggle" style="display:flex;gap:8px;margin-bottom:12px">
+      <!-- cards preenchidos por JS após carregar gestoras -->
     </div>
-    <div>
-      <label>Alocação do modelo <span id="modelo-gestora-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase"></span></label>
-      <div id="modelo-grid" style="display:flex;flex-wrap:wrap;gap:5px 12px;padding:8px 0"></div>
+
+    <!-- Select oculto mantém compatibilidade com atualizarModelo() -->
+    <select id="gestora-sel" onchange="onGestoraChange()" style="display:none">
+      <option value="">— —</option>
+    </select>
+    <p id="gestora-vazia-hint" style="display:none"></p>
+
+    <!-- Alocação detalhada do modelo selecionado -->
+    <div style="background:#060F0B;border:1px solid #1A2E1A;border-radius:8px;padding:10px 14px">
+      <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+        Alocação do modelo
+        <span id="modelo-gestora-lbl" style="color:#C9A96E;margin-left:4px;font-weight:700"></span>
+        <span id="carta-ativa-nome" style="color:#3A6A48;margin-left:6px;font-size:9px"></span>
+      </div>
+      <div id="modelo-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:4px 16px"></div>
     </div>
   </div>
 
@@ -2252,21 +2265,71 @@ function _mapearPerfilJS(perfil, perfisDisp){
     return (_RISCO_ORDEM_JS[b]||0) - (_RISCO_ORDEM_JS[a]||0); // empate -> maior risco
   })[0];
 }
+// Ordem preferencial de exibição no toggle
+var _INST_ORDEM = ["xp", "levante_asset"];
+var _INST_ICON  = {xp:"🏦", levante_asset:"📊"};
+var _INST_COR   = {xp:"#7DCFEF", levante_asset:"#C9A96E"};
+var _instAtiva  = "levante_asset";  // default
+
+function renderInstToggle(){
+  var wrap = document.getElementById("inst-toggle");
+  if(!wrap) return;
+  // Ordem: IDs definidos + qualquer outro
+  var ids = _INST_ORDEM.filter(function(id){ return _gestoras[id]; });
+  Object.keys(_gestoras).forEach(function(id){ if(ids.indexOf(id)<0) ids.push(id); });
+  // Adiciona "Levante (padrão)" que usa value="" no select
+  var itens = [{id:"levante_asset_hp", nome:"Levante HP", icon:"📊", cor:"#C9A96E", ref:"HP Portfolio"}];
+  ids.forEach(function(id){
+    var g = _gestoras[id];
+    itens.push({id:id, nome:g.nome||id, icon:_INST_ICON[id]||"🏛️", cor:_INST_COR[id]||"#888", ref:g.referencia||""});
+  });
+  wrap.innerHTML = itens.map(function(it){
+    var isAt = (it.id === _instAtiva);
+    return '<div onclick="selecionarInstituicao(\''+it.id+'\')" style="'
+      +'flex:1;min-width:120px;max-width:220px;cursor:pointer;border-radius:10px;padding:10px 14px;'
+      +'border:2px solid '+(isAt?it.cor:"#1E2E28")+';'
+      +'background:'+(isAt?it.cor+'18':"#081F18")+';'
+      +'transition:all .15s;box-sizing:border-box">'
+      +'<div style="font-size:18px;margin-bottom:3px">'+it.icon+'</div>'
+      +'<div style="font-size:12px;font-weight:700;color:'+(isAt?it.cor:"#F0F0F0")+';margin-bottom:2px">'+it.nome+'</div>'
+      +'<div style="font-size:9px;color:#3A6A48">'+it.ref+'</div>'
+      +(isAt?'<div style="font-size:8px;color:'+it.cor+';font-weight:700;margin-top:4px">&#10003; SELECIONADA</div>':'')
+      +'</div>';
+  }).join("");
+}
+
+function selecionarInstituicao(id){
+  _instAtiva = id;
+  var sel = document.getElementById("gestora-sel");
+  if(!sel) return;
+  // "levante_asset_hp" = Levante HP padrão (sem gestora no select)
+  if(id === "levante_asset_hp"){
+    sel.value = "";
+  } else if(_gestoras[id]){
+    // garante que a option existe
+    if(!sel.querySelector('option[value="'+id+'"]')){
+      var opt = document.createElement("option");
+      opt.value = id; opt.textContent = _gestoras[id].nome||id;
+      sel.appendChild(opt);
+    }
+    sel.value = id;
+  }
+  sel.dispatchEvent(new Event("change"));
+  renderInstToggle();
+}
+
 function carregarGestoras(tentativa){
   tentativa = tentativa || 0;
   fetch("/api/hp/gestoras2").then(r=>r.json()).then(d=>{
     _gestoras = d || {};
-    const sel  = document.getElementById("gestora-sel");
-    const hint = document.getElementById("gestora-vazia-hint");
-    const ids  = Object.keys(_gestoras);
+    // Popula select oculto
+    var sel = document.getElementById("gestora-sel");
     if(sel){
-      const atual = sel.value;
-      // Levante (modelo principal) é a opção padrão (value=""); gestoras vêm depois.
-      sel.innerHTML = '<option value="">Levante (modelo principal)</option>' +
-        ids.map(id => '<option value="'+id+'">'+(_gestoras[id].nome||id)+'</option>').join("");
-      if(atual && _gestoras[atual]) sel.value = atual;
+      var ids = Object.keys(_gestoras);
+      sel.innerHTML = '<option value="">Levante HP</option>' +
+        ids.map(function(id){ return '<option value="'+id+'">'+(d[id].nome||id)+'</option>'; }).join("");
     }
-    if(hint) hint.style.display = "none";
+    renderInstToggle();
     atualizarModelo();
   }).catch(function(){
     if(tentativa < 4) setTimeout(function(){ carregarGestoras(tentativa+1); }, 4000);
@@ -2549,6 +2612,77 @@ function mostrarPreviewPDF(d){
   const assessorNome = d.assessor || "";
   const tipoConta   = d.tipo_conta || "";
 
+  // ── Alertas de diagnóstico ─────────────────────────────────────
+  var alertas = d.alertas || [];
+  var alertasHtml = "";
+  if(alertas.length){
+    var COR_NIVEL = {alto:"#FF6B6B", medio:"#E8A87C", baixo:"#C9A96E"};
+    alertasHtml = '<div style="margin-top:14px;border-top:1px solid #1A2E28;padding-top:12px">'
+      +'<p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔍 Diagnósticos automáticos</p>'
+      + alertas.map(function(a){
+          var cor = COR_NIVEL[a.nivel] || "#888";
+          var icone = a.nivel==="alto" ? "⚠️" : "ℹ️";
+          return '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">'
+            +'<span style="font-size:11px;flex-shrink:0">'+icone+'</span>'
+            +'<span style="font-size:11px;color:'+cor+';line-height:1.4">'+a.msg+'</span>'
+            +'</div>';
+        }).join("")
+      +'</div>';
+  }
+
+  // ── Posições individuais ────────────────────────────────────────
+  function tblAtivos(titulo, items, cols){
+    if(!items || !items.length) return "";
+    var linhas = items.map(function(it){
+      return "<tr>"+ cols.map(function(c){
+        var v = it[c.key];
+        var txt = c.fmt ? c.fmt(v) : (v||"");
+        return '<td style="padding:3px 8px 3px 0;font-size:10px;color:'+(c.cor||"#CCC")+';border-bottom:1px solid #0D2018">'+txt+'</td>';
+      }).join("") +"</tr>";
+    }).join("");
+    var headers = cols.map(function(c){
+      return '<th style="padding:4px 8px 4px 0;font-size:9px;color:#3A6A48;text-align:left;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #1A2E28">'+c.lbl+'</th>';
+    }).join("");
+    return '<div style="margin-top:12px">'
+      +'<p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">'+titulo+'</p>'
+      +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+headers+'</tr></thead><tbody>'+linhas+'</tbody></table></div>'
+      +'</div>';
+  }
+
+  var fmtBrlS = function(v){ return v ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; };
+  var fmtPctS = function(v){ return v != null ? Number(v).toFixed(1)+"%" : "—"; };
+
+  var rfHtml = tblAtivos("Renda Fixa — Posição Detalhada", d.rf_ativos || [], [
+    {key:"nome",      lbl:"Ativo",         cor:"#F0F0F0", fmt:function(v){ return v ? (v.length>38 ? v.slice(0,38)+"…" : v) : "—"; }},
+    {key:"classe",    lbl:"Classe",         cor:"#888"},
+    {key:"saldo",     lbl:"Saldo",          cor:"#C9A96E", fmt:fmtBrlS},
+    {key:"perc",      lbl:"% Carteira",     cor:"#5DCAA5", fmt:fmtPctS},
+    {key:"rent_mes",  lbl:"Rent. Mês",      cor:"#7DCFEF", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
+    {key:"rent_12m",  lbl:"Rent. 12m",      cor:"#7DCFEF", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
+  ]);
+
+  var rvHtml = tblAtivos("Renda Variável — Posição Detalhada", d.acoes || [], [
+    {key:"ticker", lbl:"Ticker",      cor:"#E88038"},
+    {key:"saldo",  lbl:"Saldo",       cor:"#C9A96E", fmt:fmtBrlS},
+    {key:"qtd",    lbl:"Qtd.",        cor:"#888"},
+    {key:"perc",   lbl:"% Carteira",  cor:"#5DCAA5", fmt:fmtPctS},
+  ]);
+
+  var fiisHtml = tblAtivos("FIIs — Posição Detalhada", d.fiis || [], [
+    {key:"ticker", lbl:"Ticker",      cor:"#9E8FE8"},
+    {key:"saldo",  lbl:"Saldo",       cor:"#C9A96E", fmt:fmtBrlS},
+    {key:"qtd",    lbl:"Qtd.",        cor:"#888"},
+    {key:"perc",   lbl:"% Carteira",  cor:"#5DCAA5", fmt:fmtPctS},
+  ]);
+
+  var temPosicoes = (d.rf_ativos&&d.rf_ativos.length)||(d.acoes&&d.acoes.length)||(d.fiis&&d.fiis.length);
+  var posicoesHtml = "";
+  if(temPosicoes){
+    posicoesHtml = '<div style="margin-top:14px;border-top:1px solid #1A2E28;padding-top:12px">'
+      + rfHtml + rvHtml + fiisHtml
+      +'</div>';
+  }
+
   box.style.display = "block";
   box.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -2568,7 +2702,9 @@ function mostrarPreviewPDF(d){
         <p style="font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Composição atual</p>
         ${barras}
       </div>
-    </div>`;
+    </div>
+    ${alertasHtml}
+    ${posicoesHtml}`;
 }
 
 function mostrarBotaoProximaEtapa(d){
@@ -3232,6 +3368,10 @@ async function analisar(){
           patrimonio: xp.patrimonio || 0,
           composicao: xp.comp || {},
           rent: xp.rent || {},
+          // Posições individuais — vindas de _clienteIdentificado
+          rf_ativos: _clienteIdentificado.rf_ativos || [],
+          acoes:     _clienteIdentificado.acoes     || [],
+          fiis:      _clienteIdentificado.fiis      || [],
         })
       }).catch(()=>{});
     }
@@ -4536,6 +4676,63 @@ def xp_identificar():
                     "delta": delta,
                 })
 
+    # Diagnósticos automáticos baseados nas posições individuais
+    alertas = []
+    rf_ativos  = xp.get("rf_ativos", [])
+    acoes_list = xp.get("acoes", [])
+    fiis_list  = xp.get("fiis", [])
+    patrimonio_val = xp.get("patrimonio", 0)
+
+    # Concentração em ativo único de RF (> 8% do patrimônio)
+    for ativo in rf_ativos:
+        if ativo.get("perc", 0) > 8:
+            alertas.append({
+                "tipo": "concentracao",
+                "nivel": "alto" if ativo["perc"] > 15 else "medio",
+                "msg": f"Concentração alta: {ativo['nome'][:40]} representa {ativo['perc']:.1f}% da carteira",
+                "ativo": ativo["nome"],
+                "classe": ativo["classe"],
+            })
+
+    # Ativo de RF com rentabilidade negativa no mês
+    for ativo in rf_ativos:
+        rm = ativo.get("rent_mes")
+        if rm is not None and rm < 0:
+            alertas.append({
+                "tipo": "rentabilidade_negativa",
+                "nivel": "alto",
+                "msg": f"Rentabilidade negativa no mês: {ativo['nome'][:40]} ({rm:.2f}%)",
+                "ativo": ativo["nome"],
+                "classe": ativo["classe"],
+            })
+
+    # Concentração em ação única (> 5% do patrimônio)
+    for ativo in acoes_list:
+        if ativo.get("perc", 0) > 5:
+            alertas.append({
+                "tipo": "concentracao_rv",
+                "nivel": "medio",
+                "msg": f"Posição relevante em ação: {ativo['ticker']} = {ativo['perc']:.1f}% da carteira",
+                "ativo": ativo["ticker"],
+                "classe": "acoes",
+            })
+
+    # Desvios vs. modelo do perfil salvo
+    ficha_perfil = ficha.get("perfil", "")
+    if ficha_perfil and ficha_perfil in HP_PORTFOLIOS_DEFAULT.get("perfis", {}):
+        modelo_alvo = HP_PORTFOLIOS_DEFAULT["perfis"][ficha_perfil]
+        comp_atual  = xp.get("comp", {})
+        for cat in CATS:
+            desvio = comp_atual.get(cat, 0) - modelo_alvo.get(cat, 0)
+            if abs(desvio) >= 5:
+                direcao = "acima" if desvio > 0 else "abaixo"
+                alertas.append({
+                    "tipo": "desvio_modelo",
+                    "nivel": "alto" if abs(desvio) >= 10 else "medio",
+                    "msg": f"{LABELS.get(cat, cat)}: {comp_atual.get(cat,0):.1f}% ({desvio:+.1f}% {direcao} do modelo {ficha_perfil.replace('_',' ').title()})",
+                    "classe": cat,
+                })
+
     return jsonify({
         "conta": conta,
         "assessor_xp": xp.get("assessor",""),
@@ -4544,10 +4741,16 @@ def xp_identificar():
         "patrimonio": xp.get("patrimonio", 0),
         "rent": xp.get("rent", {}),
         "composicao_atual": xp.get("comp", {}),
-        "ficha_salva": ficha,          # modelo de servir + cross-sell salvos
+        "ficha_salva": ficha,
         "ultima_carteira": ultima_carteira,
-        "comparativo": comparativo,    # delta vs. última reunião
+        "comparativo": comparativo,
         "tem_historico": len(historico_conta) > 0,
+        # Posições individuais
+        "rf_ativos":  rf_ativos,
+        "acoes":      acoes_list,
+        "fiis":       fiis_list,
+        # Diagnósticos
+        "alertas":    alertas,
     })
 
 
@@ -4562,11 +4765,15 @@ def salvar_carteira():
     if conta not in hist:
         hist[conta] = []
     hist[conta].append({
-        "data_ref": d.get("data_ref",""),
+        "data_ref":  d.get("data_ref",""),
         "patrimonio": d.get("patrimonio", 0),
         "composicao": d.get("composicao", {}),
-        "rent": d.get("rent", {}),
-        "salvo_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "rent":       d.get("rent", {}),
+        "salvo_em":   datetime.now().strftime("%d/%m/%Y %H:%M"),
+        # Posições individuais — salvas junto ao snapshot
+        "rf_ativos":  d.get("rf_ativos", []),
+        "acoes":      d.get("acoes", []),
+        "fiis":       d.get("fiis", []),
     })
     # Mantém apenas as últimas 12 carteiras
     hist[conta] = hist[conta][-12:]
