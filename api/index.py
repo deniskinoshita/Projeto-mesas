@@ -1914,6 +1914,9 @@ function sair(){
     body:JSON.stringify({role:"assessor",nome,acao:"acesso",detalhe:"Abriu a página do Assessor"})});
 })();
 
+// Aquece o servidor Python imediatamente ao abrir a página
+fetch("/api/ping").catch(function(){});
+
 // ── Notificações do Head de Produtos ─────────────────────────────────────────
 let _notificacoes = [];
 let _notifPanelAberto = false;
@@ -2799,12 +2802,17 @@ async function buscarUltimoXpPorCodigo(conta){
   const lbl = document.getElementById("cliente-encontrado-label");
   const box = document.getElementById("box-preview-pdf");
   if(lbl){ lbl.textContent="⏳ Buscando..."; lbl.style.display="block"; lbl.style.color="#C9A96E"; }
+  // Avisa se demorar mais de 5s (servidor frio)
+  var _lblTimer = setTimeout(function(){
+    if(lbl && lbl.textContent.startsWith("⏳")) lbl.textContent="⏳ Conectando ao servidor... aguarde";
+  }, 5000);
   try{
     // Busca ficha salva por conta
     const [fichaRes, histRes] = await Promise.all([
       fetch("/api/ficha?conta="+encodeURIComponent(conta)).then(r=>r.json()),
       fetch("/api/historico").then(r=>r.json()),
     ]);
+    clearTimeout(_lblTimer);
     const ficha = fichaRes && fichaRes.nome ? fichaRes : null;
     const hist  = histRes && histRes[conta] ? histRes[conta] : null;
     const entradas = Array.isArray(hist) ? hist : (hist?.entradas||[]);
