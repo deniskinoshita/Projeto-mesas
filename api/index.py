@@ -2334,70 +2334,23 @@ if(perfilEl){
 }
 
 // ── Cards visuais de seleção de perfil ────────────────────────────────────────
-var _PERFIS_DEF = [
-  {key:"super_conservadora", lbl:"Super Conservadora", emoji:"🛡", cor:"#5DCAA5", desc:"Preservação"},
-  {key:"conservadora",       lbl:"Conservadora",       emoji:"🏦", cor:"#C9A96E", desc:"Renda segura"},
-  {key:"moderada",           lbl:"Moderada",           emoji:"⚖",  cor:"#7DCFEF", desc:"Equilíbrio"},
-  {key:"arrojada",           lbl:"Arrojada",           emoji:"📈", cor:"#E88038", desc:"Crescimento"},
-  {key:"agressiva",          lbl:"Agressiva",          emoji:"🚀", cor:"#FF6B6B", desc:"Alto risco"},
-];
-var _GRUPOS_CLS = [
-  {chaves:["pos_fixado","inflacao","pre_fixado"], cor:"#C9A96E", lbl:"RF"},
-  {chaves:["acoes","fiis"],                       cor:"#8B9FE8", lbl:"RV"},
-  {chaves:["multimercado"],                       cor:"#5DCAA5", lbl:"Multi"},
-  {chaves:["internacional"],                      cor:"#E88B8B", lbl:"Intl"},
-  {chaves:["alternativos","criptomoedas"],         cor:"#B8A0E8", lbl:"Alt"},
-];
-
 function renderPerfilCards(){
-  var wrap = document.getElementById("perfil-cards");
-  var sel  = document.getElementById("perfil");
-  if(!wrap || !sel) return;
-
-  var portfolios = _hpPortfolios || MODELOS;
+  var cards = document.querySelectorAll(".perfil-card-item");
+  var sel   = document.getElementById("perfil");
+  if(!sel || !cards.length) return;
   var ativo = sel.value;
-  var html = "";
-
-  for(var i=0; i<_PERFIS_DEF.length; i++){
-    var p = _PERFIS_DEF[i];
-    var m = portfolios[p.key] || {};
-    var isAtivo = p.key === ativo;
-    var borda = isAtivo ? p.cor : "#1E2E28";
-    var bg    = isAtivo ? p.cor.replace("#","") : "";
-    var bgStyle = isAtivo ? "background:"+p.cor+"22;" : "background:#081F18;";
-
-    // Mini barra empilhada
-    var barHtml = "";
-    for(var j=0; j<_GRUPOS_CLS.length; j++){
-      var g = _GRUPOS_CLS[j];
-      var pct = 0;
-      for(var ki=0; ki<g.chaves.length; ki++) pct += Number(m[g.chaves[ki]])||0;
-      if(pct > 0.5) barHtml += '<div title="'+g.lbl+' '+pct.toFixed(0)+'%" style="flex:'+pct+';background:'+g.cor+';height:100%"></div>';
-    }
-
-    // Top 3 alocações
-    var entries = [];
-    for(var k in m){ if(typeof m[k]==="number" && m[k]>0 && k!=="label") entries.push([k,m[k]]); }
-    entries.sort(function(a,b){return b[1]-a[1];});
-    var topHtml = "";
-    for(var t=0; t<Math.min(3,entries.length); t++){
-      var lk = entries[t][0], lv = entries[t][1];
-      topHtml += '<span style="font-size:9px;color:#AAA;margin-bottom:1px;display:block">'+(LABELS[lk]||lk)+': <b style="color:#E0C878">'+lv+'%</b></span>';
-    }
-
-    var selecionadoBadge = isAtivo ? '<div style="position:absolute;top:5px;right:7px;font-size:8px;color:'+p.cor+';font-weight:700;letter-spacing:.5px">✓ ativo</div>' : "";
-
-    html += '<div onclick="selecionarPerfil(\''+p.key+'\')" style="'+bgStyle+'border:2px solid '+borda+';border-radius:10px;padding:10px 12px;cursor:pointer;flex:1;min-width:110px;position:relative;overflow:hidden;transition:border-color .2s">';
-    html += selecionadoBadge;
-    html += '<div style="font-size:16px;margin-bottom:3px">'+p.emoji+'</div>';
-    html += '<div style="font-size:11px;font-weight:700;color:'+(isAtivo?p.cor:"#F0F0F0")+';margin-bottom:2px">'+p.lbl+'</div>';
-    html += '<div style="font-size:9px;color:#3A6A48;margin-bottom:8px">'+p.desc+'</div>';
-    html += '<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#0A0A0A;margin-bottom:6px">'+barHtml+'</div>';
-    html += '<div>'+topHtml+'</div>';
-    html += '</div>';
+  for(var i=0; i<cards.length; i++){
+    var card  = cards[i];
+    var key   = card.getAttribute("data-perfil");
+    var cor   = card.getAttribute("data-cor") || "#C9A96E";
+    var isAt  = (key === ativo);
+    card.style.border      = "2px solid " + (isAt ? cor : "#1E2E28");
+    card.style.background  = isAt ? cor + "15" : "#081F18";
+    var nome  = card.querySelector(".perfil-card-nome");
+    if(nome)  nome.style.color = isAt ? cor : "#F0F0F0";
+    var badge = card.querySelector(".perfil-sel-badge");
+    if(badge) badge.style.display = isAt ? "block" : "none";
   }
-
-  wrap.innerHTML = html;
 }
 
 function selecionarPerfil(key){
@@ -2408,7 +2361,7 @@ function selecionarPerfil(key){
   renderPerfilCards();
 }
 
-setTimeout(renderPerfilCards, 50);
+setTimeout(renderPerfilCards, 80);
 
 fetch("/api/macro").then(r=>r.json()).then(d=>{
   const b=document.getElementById("macro-badges");
@@ -4153,7 +4106,7 @@ def _perfil_cards_html():
         {"chaves":["alternativos","criptomoedas"],        "cor":"#B8A0E8","lbl":"Alt"},
     ]
     html_parts = []
-    for p in PERFIS_UI:
+    for i, p in enumerate(PERFIS_UI):
         m = HP_PORTFOLIOS_DEFAULT["perfis"].get(p["key"], MODELOS.get(p["key"], {}))
         # Mini barra empilhada
         bar_segs = ""
@@ -4161,17 +4114,29 @@ def _perfil_cards_html():
             pct = sum(float(m.get(k, 0) or 0) for k in g["chaves"])
             if pct > 0.5:
                 bar_segs += f'<div title="{g["lbl"]} {pct:.0f}%" style="flex:{pct};background:{g["cor"]};height:100%;border-radius:2px"></div>'
-        # Top 3 alocações
-        itens = sorted([(k,v) for k,v in m.items() if isinstance(v,(int,float)) and v>0 and k!="label"], key=lambda x: -x[1])[:3]
-        top_html = "".join(f'<span style="font-size:9px;color:#AAA;margin-bottom:1px;display:block">{LABELS.get(k,k)}: <b style="color:#E0C878">{v}%</b></span>' for k,v in itens)
+        # Todas as alocações > 0
+        itens = sorted([(k,v) for k,v in m.items() if isinstance(v,(int,float)) and v>0 and k!="label"], key=lambda x: -x[1])
+        top_html = "".join(
+            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">'
+            f'<span style="font-size:9px;color:#888">{LABELS.get(k,k)}</span>'
+            f'<span style="font-size:9px;font-weight:700;color:#E0C878">{v}%</span>'
+            f'</div>'
+            for k,v in itens[:4]
+        )
+        # "moderada" é o default selecionado
+        is_default = (p["key"] == "moderada")
+        border_style = f'2px solid {p["cor"]}' if is_default else '2px solid #1E2E28'
+        bg_style = f'{p["cor"]}15' if is_default else '#081F18'
+        badge = f'<div class="perfil-sel-badge" style="position:absolute;top:5px;right:6px;font-size:8px;color:{p["cor"]};font-weight:700;display:{"block" if is_default else "none"}">&#10003; SELECIONADO</div>'
         card = (
-            f'<div onclick="selecionarPerfil(\'{p["key"]}\')" data-perfil="{p["key"]}" class="perfil-card-item" style="'
-            f'background:#081F18;border:2px solid #1E2E28;border-radius:10px;padding:10px 12px;'
-            f'cursor:pointer;flex:1;min-width:110px;max-width:180px;position:relative;overflow:hidden;transition:all .2s;box-sizing:border-box">'
-            f'<div style="font-size:18px;margin-bottom:3px">{p["emoji"]}</div>'
-            f'<div style="font-size:11px;font-weight:700;color:#F0F0F0;margin-bottom:2px">{p["lbl"]}</div>'
+            f'<div onclick="selecionarPerfil(\'{p["key"]}\')" data-perfil="{p["key"]}" data-cor="{p["cor"]}" class="perfil-card-item" style="'
+            f'background:{bg_style};border:{border_style};border-radius:10px;padding:10px 12px;'
+            f'cursor:pointer;flex:1;min-width:115px;max-width:190px;position:relative;overflow:hidden;transition:all .15s;box-sizing:border-box">'
+            f'{badge}'
+            f'<div style="font-size:20px;margin-bottom:4px">{p["emoji"]}</div>'
+            f'<div class="perfil-card-nome" style="font-size:11px;font-weight:700;color:{"" + p["cor"] if is_default else "#F0F0F0"};margin-bottom:2px;line-height:1.2">{p["lbl"]}</div>'
             f'<div style="font-size:9px;color:#3A6A48;margin-bottom:8px">{p["desc"]}</div>'
-            f'<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#0A0A0A;margin-bottom:6px;gap:1px">{bar_segs}</div>'
+            f'<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#0A0A0A;margin-bottom:8px;gap:1px">{bar_segs}</div>'
             f'<div>{top_html}</div>'
             f'</div>'
         )
