@@ -2332,84 +2332,81 @@ if(perfilEl){
 }
 
 // ── Cards visuais de seleção de perfil ────────────────────────────────────────
+var _PERFIS_DEF = [
+  {key:"super_conservadora", lbl:"Super Conservadora", emoji:"🛡", cor:"#5DCAA5", desc:"Preservação"},
+  {key:"conservadora",       lbl:"Conservadora",       emoji:"🏦", cor:"#C9A96E", desc:"Renda segura"},
+  {key:"moderada",           lbl:"Moderada",           emoji:"⚖",  cor:"#7DCFEF", desc:"Equilíbrio"},
+  {key:"arrojada",           lbl:"Arrojada",           emoji:"📈", cor:"#E88038", desc:"Crescimento"},
+  {key:"agressiva",          lbl:"Agressiva",          emoji:"🚀", cor:"#FF6B6B", desc:"Alto risco"},
+];
+var _GRUPOS_CLS = [
+  {chaves:["pos_fixado","inflacao","pre_fixado"], cor:"#C9A96E", lbl:"RF"},
+  {chaves:["acoes","fiis"],                       cor:"#8B9FE8", lbl:"RV"},
+  {chaves:["multimercado"],                       cor:"#5DCAA5", lbl:"Multi"},
+  {chaves:["internacional"],                      cor:"#E88B8B", lbl:"Intl"},
+  {chaves:["alternativos","criptomoedas"],         cor:"#B8A0E8", lbl:"Alt"},
+];
+
 function renderPerfilCards(){
-  const wrap = document.getElementById("perfil-cards");
-  const sel  = document.getElementById("perfil");
+  var wrap = document.getElementById("perfil-cards");
+  var sel  = document.getElementById("perfil");
   if(!wrap || !sel) return;
 
-  const PERFIS = [
-    { key:"super_conservadora", label:"Super\nConservadora", emoji:"🛡️", cor:"#5DCAA5", desc:"Preservação" },
-    { key:"conservadora",       label:"Conservadora",        emoji:"🏦", cor:"#C9A96E", desc:"Renda segura" },
-    { key:"moderada",           label:"Moderada",            emoji:"⚖️", cor:"#7DCFEF", desc:"Equilíbrio"  },
-    { key:"arrojada",           label:"Arrojada",            emoji:"📈", cor:"#E88038", desc:"Crescimento" },
-    { key:"agressiva",          label:"Agressiva",           emoji:"🚀", cor:"#FF6B6B", desc:"Alto risco"  },
-  ];
+  var portfolios = _hpPortfolios || MODELOS;
+  var ativo = sel.value;
+  var html = "";
 
-  // Dados dos portfólios: HP se carregado, senão MODELOS padrão
-  const portfolios = _hpPortfolios || MODELOS;
-
-  const ativo = sel.value;
-
-  // Grupos de classes para mini-barra empilhada
-  const GRUPOS = [
-    { chaves:["pos_fixado","inflacao","pre_fixado"], cor:"#C9A96E", lbl:"RF" },
-    { chaves:["acoes","fiis"],                       cor:"#8B9FE8", lbl:"RV" },
-    { chaves:["multimercado"],                       cor:"#5DCAA5", lbl:"Multi" },
-    { chaves:["internacional"],                      cor:"#E88B8B", lbl:"Intl" },
-    { chaves:["alternativos","criptomoedas"],         cor:"#B8A0E8", lbl:"Alt" },
-  ];
-
-  wrap.innerHTML = PERFIS.map(p => {
-    const m = portfolios[p.key] || {};
-    const isAtivo = p.key === ativo;
+  for(var i=0; i<_PERFIS_DEF.length; i++){
+    var p = _PERFIS_DEF[i];
+    var m = portfolios[p.key] || {};
+    var isAtivo = p.key === ativo;
+    var borda = isAtivo ? p.cor : "#1E2E28";
+    var bg    = isAtivo ? p.cor.replace("#","") : "";
+    var bgStyle = isAtivo ? "background:"+p.cor+"22;" : "background:#081F18;";
 
     // Mini barra empilhada
-    const barSegs = GRUPOS.map(g => {
-      const pct = g.chaves.reduce((s,k) => s + (Number(m[k])||0), 0);
-      return pct > 0.5 ? `<div title="${g.lbl} ${pct.toFixed(0)}%" style="flex:${pct};background:${g.cor};height:100%"></div>` : "";
-    }).join("");
+    var barHtml = "";
+    for(var j=0; j<_GRUPOS_CLS.length; j++){
+      var g = _GRUPOS_CLS[j];
+      var pct = 0;
+      for(var ki=0; ki<g.chaves.length; ki++) pct += Number(m[g.chaves[ki]])||0;
+      if(pct > 0.5) barHtml += '<div title="'+g.lbl+' '+pct.toFixed(0)+'%" style="flex:'+pct+';background:'+g.cor+';height:100%"></div>';
+    }
 
-    // Maiores alocações (top 3)
-    const itens = Object.entries(m)
-      .filter(([k,v]) => typeof v==="number" && v>0 && k!=="label")
-      .sort((a,b)=>b[1]-a[1]).slice(0,3);
-    const itensTxt = itens.map(([k,v])=>`<span style="font-size:9px;color:#888">${LABELS[k]||k}: <b style="color:#CCC">${v}%</b></span>`).join("<span style='color:#2A2A2A;padding:0 3px'>·</span>");
+    // Top 3 alocações
+    var entries = [];
+    for(var k in m){ if(typeof m[k]==="number" && m[k]>0 && k!=="label") entries.push([k,m[k]]); }
+    entries.sort(function(a,b){return b[1]-a[1];});
+    var topHtml = "";
+    for(var t=0; t<Math.min(3,entries.length); t++){
+      var lk = entries[t][0], lv = entries[t][1];
+      topHtml += '<span style="font-size:9px;color:#AAA;margin-bottom:1px;display:block">'+(LABELS[lk]||lk)+': <b style="color:#E0C878">'+lv+'%</b></span>';
+    }
 
-    return `<div onclick="selecionarPerfil('${p.key}')" style="
-      flex:1;min-width:130px;cursor:pointer;
-      background:${isAtivo ? p.cor+"22" : "#081F18"};
-      border:2px solid ${isAtivo ? p.cor : "#1A1A1A"};
-      border-radius:10px;padding:10px 12px;
-      transition:all .2s;position:relative;overflow:hidden
-    ">
-      ${isAtivo ? `<div style="position:absolute;top:6px;right:8px;font-size:9px;color:${p.cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px">✓ selecionado</div>` : ""}
-      <div style="font-size:18px;margin-bottom:4px">${p.emoji}</div>
-      <div style="font-size:12px;font-weight:700;color:${isAtivo ? p.cor : "#F0F0F0"};white-space:pre-line;line-height:1.2;margin-bottom:3px">${p.label}</div>
-      <div style="font-size:10px;color:#3A6A48;margin-bottom:8px">${p.desc}</div>
-      <!-- Mini barra empilhada -->
-      <div style="display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;margin-bottom:7px;background:#0A0A0A">
-        ${barSegs}
-      </div>
-      <!-- Top alocações -->
-      <div style="display:flex;flex-direction:column;gap:2px">${itensTxt}</div>
-    </div>`;
-  }).join("");
+    var selecionadoBadge = isAtivo ? '<div style="position:absolute;top:5px;right:7px;font-size:8px;color:'+p.cor+';font-weight:700;letter-spacing:.5px">✓ ativo</div>' : "";
+
+    html += '<div onclick="selecionarPerfil(\''+p.key+'\')" style="'+bgStyle+'border:2px solid '+borda+';border-radius:10px;padding:10px 12px;cursor:pointer;flex:1;min-width:110px;position:relative;overflow:hidden;transition:border-color .2s">';
+    html += selecionadoBadge;
+    html += '<div style="font-size:16px;margin-bottom:3px">'+p.emoji+'</div>';
+    html += '<div style="font-size:11px;font-weight:700;color:'+(isAtivo?p.cor:"#F0F0F0")+';margin-bottom:2px">'+p.lbl+'</div>';
+    html += '<div style="font-size:9px;color:#3A6A48;margin-bottom:8px">'+p.desc+'</div>';
+    html += '<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#0A0A0A;margin-bottom:6px">'+barHtml+'</div>';
+    html += '<div>'+topHtml+'</div>';
+    html += '</div>';
+  }
+
+  wrap.innerHTML = html;
 }
 
 function selecionarPerfil(key){
-  const sel = document.getElementById("perfil");
+  var sel = document.getElementById("perfil");
   if(!sel) return;
   sel.value = key;
   sel.dispatchEvent(new Event("change"));
   renderPerfilCards();
 }
 
-// Renderiza os cards logo que a página carrega (e depois que HP portfolios chegar)
-if(document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", renderPerfilCards);
-} else {
-  renderPerfilCards();
-}
+setTimeout(renderPerfilCards, 50);
 
 fetch("/api/macro").then(r=>r.json()).then(d=>{
   const b=document.getElementById("macro-badges");
