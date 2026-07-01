@@ -12983,7 +12983,7 @@ function clienteCard(c, i){
   const statusIcon = {critico:'🔴',atencao:'🟡',ok:'🟢'}[c.status]||'⚪';
   const patStr = c.patrimonio ? brl(c.patrimonio) : '—';
 
-  const desviosHtml = c.desvios.map(d=>{
+  const desviosHtml = (c.desvios||[]).map(d=>{
     const pct = Math.min(100, (d.atual/Math.max(d.alvo||1,d.atual||1))*100);
     const deltaStr = (d.desvio>0?'+':'')+d.desvio.toFixed(1)+'pp';
     const deltaClass = d.desvio > 0 ? 'pos' : 'neg';
@@ -12995,7 +12995,7 @@ function clienteCard(c, i){
     </div>`;
   }).join('');
 
-  const trocasHtml = c.trocas.length ? c.trocas.map(t=>`
+  const trocasHtml = (c.trocas||[]).length ? (c.trocas||[]).map(t=>`
     <div class="troca-card ${t.acao}">
       <div class="troca-acao ${t.acao}">${t.acao==='comprar'?'▲ Adicionar':'▼ Reduzir'} — ${t.label}</div>
       <div class="troca-produto">${t.produto}</div>
@@ -13004,17 +13004,17 @@ function clienteCard(c, i){
     </div>`).join('')
     : '<p style="font-size:12px;color:#2A4A38">Carteira alinhada ao modelo ✓</p>';
 
-  const acoesHtml = c.acoes.length ? c.acoes.slice(0,12).map(a=>{
+  const acoesHtml = (c.acoes||[]).length ? (c.acoes||[]).slice(0,12).map(a=>{
     const pct = a.perc||a.pct||0;
     const sld = a.saldo ? ' · '+brl(a.saldo) : '';
     return `<div class="ativo-chip"><span>${a.ticker||'—'}</span>${pct?' '+pct.toFixed(1)+'%':''}${sld}</div>`;
   }).join('') : '';
-  const fiisHtml = c.fiis.length ? c.fiis.slice(0,10).map(a=>{
+  const fiisHtml = (c.fiis||[]).length ? (c.fiis||[]).slice(0,10).map(a=>{
     const pct = a.perc||a.pct||0;
     const sld = a.saldo ? ' · '+brl(a.saldo) : '';
     return `<div class="ativo-chip"><span>${a.ticker||'—'}</span>${pct?' '+pct.toFixed(1)+'%':''}${sld}</div>`;
   }).join('') : '';
-  const rfHtml = c.rf_ativos.length ? c.rf_ativos.slice(0,20).map(a=>{
+  const rfHtml = (c.rf_ativos||[]).length ? (c.rf_ativos||[]).slice(0,20).map(a=>{
     const sld = a.saldo ? brl(a.saldo) : '';
     const r12 = a.rent_12m != null ? ' · '+a.rent_12m.toFixed(1)+'% 12m' : '';
     return `<div class="ativo-chip" title="${a.nome||''}">${(a.nome||'—').slice(0,35)}${(a.nome||'').length>35?'…':''} <span>${sld}${r12}</span></div>`;
@@ -13059,7 +13059,7 @@ function clienteCard(c, i){
     ${snapshotsHtml}
     ${acoesHtml ? `<div class="section-title">Ações na carteira</div><div class="ativos-grid">${acoesHtml}</div>` : ''}
     ${fiisHtml  ? `<div class="section-title">FIIs na carteira</div><div class="ativos-grid">${fiisHtml}</div>`   : ''}
-    ${rfHtml    ? `<div class="section-title">Renda Fixa (${c.rf_ativos.length} ativos)</div><div class="ativos-grid">${rfHtml}</div>` : ''}
+    ${rfHtml    ? `<div class="section-title">Renda Fixa (${(c.rf_ativos||[]).length} ativos)</div><div class="ativos-grid">${rfHtml}</div>` : ''}
   </div>
 </div>`;
 }
