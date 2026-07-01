@@ -2408,16 +2408,21 @@ async function identificarCliente(file){
     }
 
     // ── Exibe preview dos dados extraídos ANTES do botão avançar
-    mostrarPreviewPDF(d);
+    try{ mostrarPreviewPDF(d); }catch(re){ console.error("mostrarPreviewPDF:", re); }
 
     // ── Atualiza botão com dados do cliente
-    mostrarBotaoProximaEtapa(d);
+    try{ mostrarBotaoProximaEtapa(d); }catch(re){ console.error("mostrarBotaoProximaEtapa:", re); }
 
   }catch(e){
+    // Só exibe erro de PDF se a conta NÃO foi lida (falha real de parse/rede)
     console.error("Identificação falhou:", e);
-    const prev = document.getElementById("box-preview-pdf");
-    if(prev){ prev.style.display="block"; prev.innerHTML='<p style="color:#E8A87C;font-size:13px">⚠️ Não foi possível ler o PDF. Verifique se é um XPerformance válido.</p>'; }
-    mostrarBotaoProximaEtapa(null);
+    const fname = document.getElementById("fname-xp");
+    const jaLeu = fname && fname.textContent.includes("Carteira lida");
+    if(!jaLeu){
+      const prev = document.getElementById("box-preview-pdf");
+      if(prev){ prev.style.display="block"; prev.innerHTML='<p style="color:#E8A87C;font-size:13px">⚠️ Não foi possível ler o PDF. Verifique se é um XPerformance válido.</p>'; }
+      mostrarBotaoProximaEtapa(null);
+    }
   }
 }
 
