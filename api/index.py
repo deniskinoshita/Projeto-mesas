@@ -232,6 +232,7 @@ _HP_CALLS_FILE  = "/tmp/brauna_hp_calls.json"
 _HP_GESTORES_FILE   = "/tmp/brauna_hp_gestores.json"
 _HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
 _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
+_HP_CARTEIRA_BRAUNA_FILE = "/tmp/brauna_hp_carteira_brauna.json"
 _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
 _CLIENTS_FILE         = "/tmp/brauna_clients.json"
 _ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
@@ -386,6 +387,92 @@ def _kv_client():
         return Redis(url=url, token=token)
     except Exception:
         return None
+
+HP_CARTEIRA_BRAUNA_DEFAULT = {
+    "data_ref": "30/06/2026",
+    "asset_allocation": {
+        "conservadora": {"pos_fixado":70,"inflacao":16,"pre_fixado":7,"acoes":0,"fiis":0,"multimercado":3,"internacional":4},
+        "moderada":     {"pos_fixado":44,"inflacao":23,"pre_fixado":10,"acoes":4,"fiis":2,"multimercado":7,"internacional":10},
+        "arrojada":     {"pos_fixado":28,"inflacao":28,"pre_fixado":12,"acoes":7,"fiis":3,"multimercado":10,"internacional":12},
+    },
+    "categorias": [
+        {"id":"pos_fixado","nome":"Pós-Fixado","produtos":[
+            {"id":"lca_bdmg","nome":"LCA BDMG","taxa":"86,00% CDI","vencimento":"26/06/2027","rating":"BrA+","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_neon","nome":"CDB Neon Financeira","taxa":"104,00% CDI","vencimento":"26/06/2027","rating":"A-Br (Moodys)","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_xp_pos","nome":"CDB XP","taxa":"102,00% CDI","vencimento":"26/06/2027","rating":"BrAAA (S&P)","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_mercado_livre","nome":"CDB Mercado Livre CFI","taxa":"97,80% CDI","vencimento":"29/07/2026","rating":"AAA (Fitch)","garantia":"FGC","perfis":["moderada","arrojada"],"motivo":""},
+        ]},
+        {"id":"inflacao","nome":"Inflação","produtos":[
+            {"id":"cdb_xp_ipca_29","nome":"CDB Banco XP S.A. - JUN/2029","taxa":"IPC-A + 8,35%","vencimento":"25/06/2029","rating":"brAAA","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_fibra_29","nome":"CDB Fibra - JUN/2029","taxa":"IPC-A + 8,60%","vencimento":"25/06/2029","rating":"brA-","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_pine_ipca","nome":"CDB Pine - JUN/2029","taxa":"IPC-A + 8,80%","vencimento":"25/06/2029","rating":"brA+","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"ntnb_30","nome":"NTN-B - AGO/2030","taxa":"IPC-A + 7,96%","vencimento":"15/08/2030","rating":"Soberano","garantia":"Soberano","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"ntnb_32","nome":"NTN-B - AGO/2032","taxa":"IPC-A + 7,76%","vencimento":"15/08/2032","rating":"Soberano","garantia":"Soberano","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"ntnb_35","nome":"NTN-B - MAI/2035","taxa":"IPC-A + 7,46%","vencimento":"15/05/2035","rating":"Soberano","garantia":"Soberano","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_parana_27","nome":"CDB Paraná Banco - JUN/27","taxa":"IPC-A + 8,30%","vencimento":"29/06/2027","rating":"brAA+ (S&P)","garantia":"FGC","perfis":["moderada","arrojada"],"motivo":""},
+            {"id":"kinea_ipca_fund","nome":"Kinea IPCA Dinâmico II Advisory RF","taxa":"IPCA","tipo":"fundo","gestora":"Kinea","rent_12m":"12,43%","resgate":"D+0","caracteristica":"RF Inflação","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"sparta_deb","nome":"Sparta Debêntures Incentivadas","taxa":"IMA-B 5","tipo":"fundo","gestora":"Sparta","rent_12m":"10,72%","resgate":"D+30","caracteristica":"RF Debêntures Incentivadas","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+        ]},
+        {"id":"pre_fixado","nome":"Pré-Fixado","produtos":[
+            {"id":"cdb_bbc_28","nome":"CDB Banco BBC (Grupo Simpar) - JUN/2028","taxa":"15,05% CDI","vencimento":"25/06/2028","rating":"AA-","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_pine_28","nome":"CDB Pine - JUN/2028","taxa":"14,70% CDI","vencimento":"25/06/2028","rating":"brA+","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_c6_28","nome":"CDB Banco C6 Consignado - JUN/2028","taxa":"14,40% CDI","vencimento":"25/06/2028","rating":"A+","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_pine_dez29","nome":"CDB Pine - DEZ/2029","taxa":"14,80% CDI","vencimento":"07/12/2029","rating":"brA+","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_fibra_nov29","nome":"CDB Fibra - NOV/2029","taxa":"15,00% CDI","vencimento":"08/11/2029","rating":"brA-","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_c6_29","nome":"CDB Banco C6 Consignado - JUN/2029","taxa":"14,70% CDI","vencimento":"25/06/2029","rating":"A+","garantia":"FGC","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"cdb_ml_pre","nome":"CDB Mercado Livre CFI","taxa":"13,99% CDI","vencimento":"29/07/2026","rating":"AAA (Fitch)","garantia":"FGC","perfis":["moderada","arrojada"],"motivo":""},
+        ]},
+        {"id":"fundos_rf","nome":"Fundos RF / Multimercado","produtos":[
+            {"id":"ram_cash","nome":"RAM Cash FIF","taxa":"CDI","tipo":"fundo","gestora":"RAM Capital","rent_12m":"14,73%","resgate":"D+0","caracteristica":"Crédito Liquidez","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"sulameria_credito","nome":"SulAmérica Crédito Ativo FIRF CP LP","taxa":"CDI","tipo":"fundo","gestora":"SulAmérica","rent_12m":"15,00%","resgate":"D+29","caracteristica":"RF High Grade","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"valora_guardian","nome":"Valora Guardian Advisory FIC FIM CP","taxa":"CDI","tipo":"fundo","gestora":"Valora","rent_12m":"15,77%","resgate":"D+75","caracteristica":"RF High Yield","perfis":["moderada","arrojada"],"motivo":""},
+            {"id":"jgp_strategy","nome":"JGP Strategy Advisory FIC FIM","taxa":"CDI","tipo":"fundo","gestora":"JGP","rent_12m":"11,43%","resgate":"D+30","caracteristica":"Multimercado Macro","perfis":["moderada","arrojada"],"motivo":""},
+        ]},
+        {"id":"acoes","nome":"Ações — Carteira Racional","produtos":[
+            {"id":"eqtl3","nome":"EQTL3 — Equatorial Energia","ticker":"EQTL3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 46,00","rating_hp":"Compra","motivo":"Temos recomendação de Compra para Equatorial Energia (EQTL3) com preço-alvo de R$ 46/ação e TIR real de 12%, refletindo a aquisição de 15% de participação na Sabesp. A empresa é um case de sucesso no segmento de distribuição, conhecida por adquirir ativos com dificuldades e implementar programas de turnaround bem-sucedidos, reduzindo perdas e inadimplência, cortando opex e melhorando indicadores de qualidade.","perfis":["moderada","arrojada"]},
+            {"id":"itub4","nome":"ITUB4 — Itaú Unibanco","ticker":"ITUB4","peso_moderada":"15%","peso_arrojada":"15%","preco_alvo":"R$ 51,00","rating_hp":"Compra","motivo":"O Itaú entregou um sólido 4T25, com resultados em linha com as expectativas e ROE acima de 24%. Atualmente, Itaú oferece o maior dividend yield do setor (12,25%), além dos melhores indicadores de eficiência, endividamento e rentabilidade. Mantemos recomendação de Compra e ITUB4 como nossa top pick, com preço-alvo de R$ 51,00.","perfis":["moderada","arrojada"]},
+            {"id":"vale3","nome":"VALE3 — Vale","ticker":"VALE3","peso_moderada":"12,5%","peso_arrojada":"12,5%","preco_alvo":"R$ 112,00","rating_hp":"Compra","motivo":"Apesar de um contexto desafiador, o minério de ferro segue negociado entre US$ 90 e US$ 100 por tonelada — níveis que garantem boa rentabilidade às operações da Vale. As ações são negociadas a EV/EBITDA de 4,5x, patamar atrativo. Dividend yield tendendo a 10% a.a. Preço-alvo: R$ 112,00.","perfis":["moderada","arrojada"]},
+            {"id":"engi11","nome":"ENGI11 — Energisa","ticker":"ENGI11","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 93,50","rating_hp":"Compra","motivo":"Recomendação de Compra para Energisa (ENGI11) com preço-alvo de R$ 93,50/ação e TIR real de 17,1%. Na TIR atual (17,1% real, spread de 400 bps em relação à EQTL), vemos a ENGI como um bom veículo para exposição a queda de juros em uma empresa previsível e com caminho estratégico claro.","perfis":["moderada","arrojada"]},
+            {"id":"petr4","nome":"PETR4 — Petrobras","ticker":"PETR4","peso_moderada":"12,5%","peso_arrojada":"12,5%","preco_alvo":"R$ 47,00","rating_hp":"Compra","motivo":"A Petrobras oferece combinação de rendimentos correntes e crescimento futuro. O plano de negócios estima pagamentos de USD 45 a USD 55 bilhões em dividendos entre 2025 e 2029. A tese oferece bom retorno via geração de caixa livre e dividendos que podem passar de 10% ao ano se os preços de petróleo permanecerem acima de USD 65/bbl. Preço-alvo: R$ 47,00.","perfis":["moderada","arrojada"]},
+            {"id":"cxse3","nome":"CXSE3 — Caixa Seguridade","ticker":"CXSE3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 20,00","rating_hp":"Compra","motivo":"Optamos por Caixa Seguridade com foco em produtos de seguros, previdência e capitalização. Modelo asset light, forte geração de caixa e política de dividendos. A companhia sustenta os indicadores de valuation e endividamento mais atrativos do setor, incluindo dividend yield na casa dos dígitos altos. Preço-alvo: R$ 20,00.","perfis":["moderada","arrojada"]},
+            {"id":"sbsp3","nome":"SBSP3 — Sabesp","ticker":"SBSP3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 40,00","rating_hp":"Compra","motivo":"Recomendação de Compra para Sabesp (SBSP3) com preço justo de R$ 40,00. A companhia reportou resultado sólido no 1T26, com forte expansão operacional e EBITDA acima das projeções. Investiu R$ 3,7 bilhões no trimestre (+31% a/a), mantendo ritmo acelerado de expansão da infraestrutura voltada à universalização.","perfis":["moderada","arrojada"]},
+            {"id":"vivt3","nome":"VIVT3 — Vivo / Telefônica","ticker":"VIVT3","peso_moderada":"7,5%","peso_arrojada":"7,5%","preco_alvo":"R$ 64,00","rating_hp":"Compra","motivo":"Recomendação de Compra e preço-alvo de R$ 64,00 para Vivo (VIVT3). A tese é defendida por impulsionadores estruturais no setor de Telecom: redução do ICMS, consolidação do mercado criou ambiente competitivo mais racional e eficiência aprimorada da infraestrutura por meio de redes neutras e compartilhamento 5G.","perfis":["moderada","arrojada"]},
+            {"id":"ivvb11","nome":"IVVB11 — ETF S&P 500","ticker":"IVVB11","peso_moderada":"7,5%","peso_arrojada":"7,5%","rating_hp":"Compra","motivo":"IVVB11 é um ETF que busca desempenho igual ou superior ao S&P 500. O fundo investe no mínimo 95% do seu patrimônio em ações do S&P 500. Excelente alternativa de mitigação de risco cambial, com exposição às maiores empresas do mundo.","perfis":["moderada","arrojada"]},
+            {"id":"gold11","nome":"GOLD11 — Ouro","ticker":"GOLD11","peso_moderada":"5%","peso_arrojada":"5%","rating_hp":"Compra","motivo":"Selecionado como forma de diversificar o portfólio e compor a classe de ativos alternativos. O ouro tende a ser alternativa de proteção contra a inflação no longo prazo, contribui para reduzir a correlação entre as classes da carteira e é associado ao papel de 'porto seguro' em momentos de elevada percepção de risco global.","perfis":["moderada","arrojada"]},
+        ]},
+        {"id":"fiis","nome":"FIIs — Carteira Levante Híbrida","produtos":[
+            {"id":"knuq11","nome":"Kinea Unique CDI","ticker":"KNUQ11","exposicao":"10,5%","segmento":"Recebíveis","dy_12m":"14,62%","pvp":"1,04x","motivo":"Fundo de Recebíveis High Yield voltado ao CDI da Kinea. PL de R$ 2,2 bilhões. Taxa média de aquisição dos CRIs: CDI + 4,85%. Prazo médio dos ativos: 3,2 anos. Setores: Residencial Pulverizado (40%), Residencial (33%), Galpões Logísticos (13%). Reserva de resultados: R$ 0,57/cota.","perfis":["moderada","arrojada"]},
+            {"id":"mcre11","nome":"Mauá Capital Real Estate","ticker":"MCRE11","exposicao":"9,0%","segmento":"Multiestratégia","dy_12m":"14,30%","pvp":"0,91x","motivo":"Fundo multiestratégia da Mauá Capital. PL de R$ 1,15 bilhão. Distribuição: crédito (45%), imóvel + estruturados (44%). Exposição: IPCA (92%). Taxa média de carrego: IPCA + 9,8% a.a.","perfis":["moderada","arrojada"]},
+            {"id":"pcip11","nome":"Pátria Índice de Preços","ticker":"PCIP11","exposicao":"8,5%","segmento":"Recebíveis","dy_12m":"13,19%","pvp":"0,89x","motivo":"Fundo de recebíveis do Patria (ex-VBI). PL de R$ 1,6 bilhão, com 107 CRIs. Carteira: 90% indexada ao IPCA (IPCA + 10,4% a.a.). LTV médio ponderado de 56% e reserva acumulada de R$ 0,40/cota.","perfis":["moderada","arrojada"]},
+            {"id":"mana11","nome":"Manatí Capital Hedge Fund","ticker":"MANA11","exposicao":"8,0%","segmento":"Multiestratégia","dy_12m":"14,25%","pvp":"0,98x","motivo":"Fundo multiestratégia da Manatí Capital iniciado em agosto de 2022. Diversificação: crédito estruturado (65%), FIIs (12%), incorporação (19%). Indexação: IPCA (52%) e CDI (48%), com taxas médias de IPCA + 10,1% e CDI + 4,8%.","perfis":["moderada","arrojada"]},
+            {"id":"icri11","nome":"Itaú Crédito Imobiliária IPCA","ticker":"ICRI11","exposicao":"8,0%","segmento":"Recebíveis","dy_12m":"12,40%","pvp":"0,94x","motivo":"Fundo de recebíveis da Itaú Asset. PL de R$ 394 milhões. Principais segmentos: Incorporação (31,8%), Carteira Pulverizada (23,1%) e Geração Distribuída (18,0%). Taxas médias de aquisição: IPCA + 9,86% e CDI + 2,70%.","perfis":["moderada","arrojada"]},
+            {"id":"bodb11","nome":"Bocaina Infra","ticker":"BODB11","exposicao":"8,0%","segmento":"FI-Infra","dy_12m":"14,81%","pvp":"0,92x","motivo":"Fundo de RF de Crédito Privado com ênfase em Debêntures Incentivadas de Infraestrutura. PL de R$ 570 milhões. Duration médio: 5,5 anos. Taxa média: IPCA + 10,17%. Setores: Saneamento (26%), Fibra (22%) e Torres (11%).","perfis":["moderada","arrojada"]},
+            {"id":"rbry11","nome":"RBR Crédito Estruturado","ticker":"RBRY11","exposicao":"8,0%","segmento":"Recebíveis","dy_12m":"14,87%","pvp":"0,93x","motivo":"Fundo de recebíveis gerido pelo Patria, administrado pelo BTG Pactual. PL de R$ 1,28 bilhão. Alocação: 99,1% em CRI e Operações Estruturadas, rentabilidade média de 16,2% a.a. (CDI + 2,8% a.a.), prazo médio de 2,1 anos.","perfis":["moderada","arrojada"]},
+            {"id":"cycr11","nome":"Cyrela Crédito","ticker":"CYCR11","exposicao":"7,5%","segmento":"Recebíveis","dy_12m":"14,41%","pvp":"0,95x","motivo":"Fundo de recebíveis com 97% do PL em ativos-alvo. Taxa média da carteira: IPCA + 10,55% e CDI + 4,38%. Rentabilidade desde o início de 82%, contra 52% do CDI líquido e 71% do IMA-B 5. Originação própria em 83% dos CRIs, concentrados no Sudeste.","perfis":["moderada","arrojada"]},
+            {"id":"juro11","nome":"Sparta FI-Infra IPCA","ticker":"JURO11","exposicao":"7,0%","segmento":"FI-Infra","dy_12m":"12,05%","pvp":"1,01x","motivo":"Fundo de infraestrutura que aloca em debêntures, com meta de IPCA + 2% acima do IMA-B5. PL de R$ 2,1 bilhões. Taxa de carrego: IPCA + 9,4% a.a. Duration: 3,0 anos. Principais setores: Geração de Energia (27%), Saneamento (11%) e Rodovias (10%).","perfis":["moderada","arrojada"]},
+            {"id":"vcjr11","nome":"Vectis Juros Real","ticker":"VCJR11","exposicao":"7,0%","segmento":"Recebíveis","dy_12m":"13,60%","pvp":"0,83x","motivo":"Fundo de recebíveis imobiliários com foco em juros reais (IPCA+), agora gerido pelo Patria. Carteira com 40 CRIs, LTV médio de 61% e exposição majoritária ao IPCA (96%). Taxas médias: IPCA + 10,6% e CDI + 5,5% (MTM). Duration IPCA: 4,1 anos.","perfis":["moderada","arrojada"]},
+            {"id":"hsaf11","nome":"HSI Ativos Financeiros","ticker":"HSAF11","exposicao":"6,5%","segmento":"Recebíveis","dy_12m":"13,90%","pvp":"0,92x","motivo":"Fundo de recebíveis da HSI. Spread médio: IPCA + 8,64% a.a. e CDI + 4,66% a.a. Alocação: CRIs (62%), FIIs (24%) e caixa (14%). Resultado contábil acumulado não distribuído: R$ 0,37/cota.","perfis":["moderada","arrojada"]},
+            {"id":"kcre11","nome":"Kinea Creditas","ticker":"KCRE11","exposicao":"6,0%","segmento":"Recebíveis","dy_12m":"12,37%","pvp":"0,99x","motivo":"Fundo desenvolvido em parceria com a fintech Creditas, com foco em CRIs no segmento pulverizado (home equity). Taxa média de carrego: IPCA + 9,93%. Estrutura com subordinação em três níveis, sendo a cota Júnior retida pela Creditas para absorver a inadimplência — historicamente não ultrapassou 4,1%.","perfis":["moderada","arrojada"]},
+            {"id":"kfof11","nome":"Kinea FoF","ticker":"KFOF11","exposicao":"3,0%","segmento":"FoF","dy_12m":"11,68%","pvp":"0,87x","motivo":"FoF da Kinea com PL de R$ 654 milhões. Alocação: FIIs (76,2%), CRIs (4,6%) e caixa/equivalentes (19,2%). Por estratégia: imobiliária (53,7%), tática (27,1%) e caixa (19,2%). Principais segmentos: FIIs de CRI (18,7%), Shopping/Varejo (18,0%) e Logística (11,9%).","perfis":["moderada","arrojada"]},
+            {"id":"sapi11","nome":"Santander Recebíveis IPCA","ticker":"SAPI11","exposicao":"3,0%","segmento":"Recebíveis","dy_12m":"15,52%","pvp":"0,93x","motivo":"Fundo de recebíveis indexado ao IPCA do Santander. PL de R$ 296 milhões. Portfólio: CRIs (84%), caixa (9%). Diversificação setorial: logístico (20%), residencial (25%) e energia (7%). Saldo acumulado não distribuído: R$ 0,10/cota.","perfis":["moderada","arrojada"]},
+            {"id":"rbhg11","nome":"Rio Bravo Crédito High Grade","ticker":"RBHG11","exposicao":"0,0%","segmento":"Recebíveis","dy_12m":"14,61%","pvp":"0,76x","motivo":"Fundo de recebíveis imobiliários com foco em crédito high grade. Incluso na carteira por seu perfil defensivo e exposição a operações de alta qualidade creditícia, servindo como componente de estabilização da carteira de FIIs.","perfis":["moderada","arrojada"]},
+        ]},
+        {"id":"internacional","nome":"Internacional","produtos":[
+            {"id":"clip_etf","nome":"Global X 1-3 Month T-Bill (CLIP)","tipo":"ETF","liquidez":"D+1","retorno_esperado":"USD + 3,5%","aplic_min":"US$5,00","caracteristica":"Liquidez Imediata","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"treasury_note","nome":"Treasury Note","tipo":"Treasury","vencimento":"01/06/2030","liquidez":"D+1","retorno_esperado":"USD + 3,76%","caracteristica":"Renda Fixa Pré","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"pimco_income","nome":"PIMCO GIS Income (E)","tipo":"Mutual Fund","liquidez":"D+2","retorno_esperado":"USD + 6%","aplic_min":"US$1.020","caracteristica":"RF Global High Grade","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"xp_fixed_income","nome":"XP Fixed Income (A)","tipo":"Mutual Fund","liquidez":"D+2","retorno_esperado":"USD + 6%","aplic_min":"US$1.020","caracteristica":"RF Global High Grade","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"oaktree_credit","nome":"Oaktree Global Credit Fund (R)","tipo":"Mutual Fund","liquidez":"D+2","retorno_esperado":"USD + 7%","aplic_min":"US$1.020","caracteristica":"RF Global High Yield","perfis":["conservadora","moderada","arrojada"],"motivo":""},
+            {"id":"iau_ouro","nome":"iShares Gold Trust (IAU)","tipo":"ETF","liquidez":"D+1","retorno_esperado":"USD + 27,7%","aplic_min":"US$5,00","caracteristica":"Ouro","perfis":["moderada","arrojada"],"motivo":""},
+        ]},
+        {"id":"alternativos","nome":"Alternativos — Nexa Resources","produtos":[
+            {"id":"nxcod29","nome":"NXCOD29-4","taxa":"17,00%","vencimento":"01/04/2029","perfis":["moderada","arrojada"],"motivo":""},
+            {"id":"nxcoa27","nome":"NXCOA27-10","taxa":"CDI + 2%","vencimento":"01/01/2027","perfis":["moderada","arrojada"],"motivo":""},
+            {"id":"nxfgtsb31","nome":"NXFGTSB31-2","taxa":"16,00%","vencimento":"01/02/2031","perfis":["moderada","arrojada"],"motivo":""},
+            {"id":"nxnii27","nome":"NXNII27-2","taxa":"USD + 5,5%","vencimento":"01/09/2027","perfis":["moderada","arrojada"],"motivo":""},
+        ]},
+    ]
+}
 
 def _key(path: str) -> str:
     """Converte /tmp/brauna_hp_cenario.json → brauna:hp_cenario"""
@@ -5595,6 +5682,41 @@ def hp_gestoras2():
     gestoras[gid] = {"id": gid, "nome": data.get("nome","").strip(), "referencia": data.get("referencia","").strip(), "perfis": perfis_data}
     _save(_HP_GESTORAS2_FILE, gestoras)
     return jsonify({"ok": True, "id": gid})
+
+@app.route("/api/hp/carteira-brauna", methods=["GET"])
+def hp_carteira_brauna_get():
+    """Retorna a Carteira Braúna com motivos do Head."""
+    data = _load(_HP_CARTEIRA_BRAUNA_FILE, HP_CARTEIRA_BRAUNA_DEFAULT)
+    # Mescla defaults com dados salvos (preserva novos campos do default)
+    if "categorias" not in data:
+        data = HP_CARTEIRA_BRAUNA_DEFAULT
+    return jsonify(data)
+
+@app.route("/api/hp/carteira-brauna/motivo", methods=["POST"])
+def hp_carteira_brauna_motivo():
+    """Salva o motivo de um produto específico."""
+    body = request.get_json()
+    cat_id  = body.get("categoria_id")
+    prod_id = body.get("produto_id")
+    motivo  = body.get("motivo", "")
+    data = _load(_HP_CARTEIRA_BRAUNA_FILE, HP_CARTEIRA_BRAUNA_DEFAULT)
+    for cat in data.get("categorias", []):
+        if cat["id"] == cat_id:
+            for prod in cat.get("produtos", []):
+                if prod["id"] == prod_id:
+                    prod["motivo"] = motivo
+                    break
+    _save(_HP_CARTEIRA_BRAUNA_FILE, data)
+    return jsonify({"ok": True, "produto_id": prod_id})
+
+@app.route("/api/hp/carteira-brauna/data-ref", methods=["POST"])
+def hp_carteira_brauna_data_ref():
+    """Atualiza data de referência."""
+    body = request.get_json()
+    data = _load(_HP_CARTEIRA_BRAUNA_FILE, HP_CARTEIRA_BRAUNA_DEFAULT)
+    data["data_ref"] = body.get("data_ref", data.get("data_ref",""))
+    _save(_HP_CARTEIRA_BRAUNA_FILE, data)
+    return jsonify({"ok": True})
 
 @app.route("/api/hp/estruturadas", methods=["GET","POST"])
 def hp_estruturadas():
@@ -11270,6 +11392,27 @@ textarea{resize:vertical}
   </div>
 </div>
 
+<!-- ══ 6b. CARTEIRA BRAÚNA — DESTAQUE DO MÊS ══════════════════════════════════ -->
+<div class="card" style="border-color:#2A1A3A">
+  <div class="card-title" style="color:#C9A96E"><span>📋</span> Carteira Braúna — Destaque do Mês</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
+    Produtos recomendados por categoria. O Head adiciona o <b style="color:#D4B483">motivo / racional</b> de cada alocação e salva um por um. Essa inteligência embasa os assessores nas conversas com clientes.
+  </p>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <div><label style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">Data de referência</label>
+      <input type="text" id="cb-data-ref" placeholder="30/06/2026" style="max-width:140px;margin-top:4px" onchange="cbSalvarDataRef()">
+    </div>
+    <div style="display:flex;gap:6px;margin-top:18px;flex-wrap:wrap" id="cb-filtro-perfil">
+      <button class="tab-btn active" onclick="cbFiltrarPerfil('todos',this)" style="padding:4px 12px;font-size:11px">Todos</button>
+      <button class="tab-btn" onclick="cbFiltrarPerfil('conservadora',this)" style="padding:4px 12px;font-size:11px">Conservadora</button>
+      <button class="tab-btn" onclick="cbFiltrarPerfil('moderada',this)" style="padding:4px 12px;font-size:11px">Moderada</button>
+      <button class="tab-btn" onclick="cbFiltrarPerfil('arrojada',this)" style="padding:4px 12px;font-size:11px">Arrojada</button>
+    </div>
+  </div>
+  <div id="cb-asset-allocation" style="margin-bottom:20px;background:#060C08;border:1px solid #1A2E1A;border-radius:8px;padding:12px 16px"></div>
+  <div id="cb-categorias"></div>
+</div>
+
 <!-- ══ 6. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A2A18">
   <div class="card-title"><span>📚</span> Base de Conhecimento — Cartas de Gestores</div>
@@ -12945,6 +13088,175 @@ async function salvarGestora(){
   }catch(e){ st.innerHTML=`<span class="status-err">Erro: ${e.message}</span>`; }
   setTimeout(()=>st.textContent="",3000);
 }
+
+init();
+
+// ── Carteira Braúna — Destaque do Mês ────────────────────────────────────────
+var _cbData = null;
+var _cbPerfilFiltro = "todos";
+var _cbSalvarTimer = {};
+
+function cbFiltrarPerfil(perfil, btn){
+  _cbPerfilFiltro = perfil;
+  document.querySelectorAll("#cb-filtro-perfil .tab-btn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  cbRender();
+}
+
+function cbSalvarDataRef(){
+  var dr = document.getElementById("cb-data-ref").value.trim();
+  fetch("/api/hp/carteira-brauna/data-ref",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data_ref:dr})}).catch(()=>{});
+}
+
+async function carregarCarteiraBrauna(){
+  try{
+    var r = await fetch("/api/hp/carteira-brauna");
+    _cbData = await r.json();
+    var drEl = document.getElementById("cb-data-ref");
+    if(drEl && _cbData.data_ref) drEl.value = _cbData.data_ref;
+    cbRender();
+  }catch(e){ console.error("[CarteiraBrauna]",e); }
+}
+
+function cbRender(){
+  if(!_cbData) return;
+  cbRenderAA();
+  cbRenderCategorias();
+}
+
+function cbRenderAA(){
+  var el = document.getElementById("cb-asset-allocation");
+  if(!el) return;
+  var aa = _cbData.asset_allocation || {};
+  var perfis = ["conservadora","moderada","arrojada"];
+  var cats = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional"];
+  var labels = {pos_fixado:"Pós-Fixado",inflacao:"Inflação",pre_fixado:"Pré-Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional"};
+  var h = '<p style="font-size:10px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Asset Allocation</p>';
+  h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+  h += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34"><th style="text-align:left;padding:5px 8px">Classe</th>';
+  perfis.forEach(function(p){ h += '<th style="text-align:center;padding:5px 8px;text-transform:capitalize">'+p+'</th>'; });
+  h += '</tr></thead><tbody>';
+  cats.forEach(function(c,i){
+    var bg = i%2===0?"#071E17":"#081F18";
+    h += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F"><td style="padding:5px 8px;color:#AAA">'+labels[c]+'</td>';
+    perfis.forEach(function(p){ var v=(aa[p]||{})[c]||0; h += '<td style="text-align:center;padding:5px 8px;color:'+(v>0?"#C9A96E":"#2A5A3A")+'">'+v+'%</td>'; });
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+function cbRenderCategorias(){
+  var el = document.getElementById("cb-categorias");
+  if(!el) return;
+  var cats = _cbData.categorias || [];
+  var h = "";
+  cats.forEach(function(cat){
+    // Filtrar produtos pelo perfil selecionado
+    var prods = (cat.produtos||[]).filter(function(p){
+      if(_cbPerfilFiltro==="todos") return true;
+      return (p.perfis||[]).includes(_cbPerfilFiltro);
+    });
+    if(!prods.length) return;
+
+    h += '<div style="margin-bottom:20px;background:#060C08;border:1px solid #1C3A20;border-radius:10px;overflow:hidden">';
+    h += '<div style="background:#0A1A10;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">';
+    h += '<span style="font-size:12px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px">'+cat.nome+'</span>';
+    h += '<span style="font-size:10px;color:#2A5A3A">'+prods.length+' produto(s)</span>';
+    h += '</div>';
+
+    prods.forEach(function(prod){
+      var pKey = cat.id + "__" + prod.id;
+      var temMotivo = (prod.motivo||"").trim().length > 0;
+
+      h += '<div style="padding:12px 14px;border-top:1px solid #0F2A1F" id="cb-prod-'+pKey+'">';
+      // Header do produto
+      h += '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap">';
+      h += '<div style="flex:1;min-width:180px">';
+      h += '<span style="font-size:13px;font-weight:700;color:#F0F0F0">';
+      if(prod.ticker) h += '<span style="color:#7DCFEF;margin-right:6px">'+prod.ticker+'</span>';
+      h += prod.nome+'</span>';
+      // Detalhes
+      var detalhes = [];
+      if(prod.taxa) detalhes.push('<span style="color:#5DCAA5">'+prod.taxa+'</span>');
+      if(prod.vencimento) detalhes.push('venc. '+prod.vencimento);
+      if(prod.rating) detalhes.push('rating: '+prod.rating);
+      if(prod.garantia) detalhes.push(prod.garantia);
+      if(prod.rent_12m) detalhes.push('12M: '+prod.rent_12m);
+      if(prod.resgate) detalhes.push('resgate: '+prod.resgate);
+      if(prod.exposicao) detalhes.push('exp: '+prod.exposicao);
+      if(prod.dy_12m) detalhes.push('DY 12M: '+prod.dy_12m);
+      if(prod.pvp) detalhes.push('P/VP: '+prod.pvp);
+      if(prod.preco_alvo) detalhes.push('alvo: '+prod.preco_alvo);
+      if(prod.peso_moderada) detalhes.push('mod: '+prod.peso_moderada);
+      if(detalhes.length) h += '<div style="font-size:10px;color:#3A6A48;margin-top:3px">'+detalhes.join(' · ')+'</div>';
+      // Perfis
+      if(prod.perfis&&prod.perfis.length){
+        h += '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">';
+        prod.perfis.forEach(function(p){ h += '<span style="font-size:9px;padding:1px 6px;background:#0A2A18;border:1px solid #1C4A34;border-radius:10px;color:#3A8A58;text-transform:capitalize">'+p+'</span>'; });
+        h += '</div>';
+      }
+      h += '</div>';
+      // Status do motivo
+      h += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid '+(temMotivo?"#5DCAA533":"#FF6B6B33")+';color:'+(temMotivo?"#5DCAA5":"#FF6B6B")+';white-space:nowrap">';
+      h += temMotivo ? "✓ Motivo salvo" : "⚠ Sem motivo";
+      h += '</span>';
+      h += '</div>';
+
+      // Textarea e botão salvar
+      h += '<textarea id="cb-motivo-'+pKey+'" rows="3" placeholder="Digite aqui o motivo / racional desta alocação para os assessores..." style="width:100%;font-size:12px;background:#071E17;color:#F0F0F0;border:1px solid #1C4A34;border-radius:6px;padding:8px;resize:vertical;box-sizing:border-box">'+escHtml(prod.motivo||"")+'</textarea>';
+      h += '<div style="display:flex;align-items:center;gap:10px;margin-top:6px">';
+      h += '<button class="btn btn-sm" onclick="cbSalvarMotivo(\''+cat.id+'\',\''+prod.id+'\',\''+pKey+'\')" style="font-size:11px;padding:5px 14px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">💾 Salvar Motivo</button>';
+      h += '<span id="cb-st-'+pKey+'" style="font-size:10px;color:#5DCAA5"></span>';
+      h += '</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+  el.innerHTML = h || '<p style="color:#3A6A48;font-size:12px">Nenhum produto encontrado para o perfil selecionado.</p>';
+}
+
+function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+async function cbSalvarMotivo(catId, prodId, pKey){
+  var ta = document.getElementById("cb-motivo-"+pKey);
+  var st = document.getElementById("cb-st-"+pKey);
+  if(!ta||!st) return;
+  var motivo = ta.value.trim();
+  st.textContent = "Salvando...";
+  st.style.color = "#AAA";
+  try{
+    var r = await fetch("/api/hp/carteira-brauna/motivo",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({categoria_id:catId, produto_id:prodId, motivo:motivo})
+    });
+    var d = await r.json();
+    if(d.ok){
+      st.textContent = "✓ Salvo!";
+      st.style.color = "#5DCAA5";
+      // Atualiza o dado local e re-render parcial (só o badge de status)
+      if(_cbData){
+        var cat = (_cbData.categorias||[]).find(function(c){return c.id===catId;});
+        if(cat){ var prod=cat.produtos.find(function(p){return p.id===prodId;}); if(prod) prod.motivo=motivo; }
+      }
+      // Atualiza badge
+      var el = document.getElementById("cb-prod-"+pKey);
+      if(el){
+        var badge = el.querySelector("span[style*='border-radius:10px']");
+        if(badge && motivo){
+          badge.textContent = "✓ Motivo salvo";
+          badge.style.borderColor = "#5DCAA533";
+          badge.style.color = "#5DCAA5";
+        }
+      }
+    } else { st.textContent="Erro"; st.style.color="#FF6B6B"; }
+  }catch(e){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; }
+  setTimeout(function(){st.textContent="";},3000);
+}
+
+// Carregar na inicialização do painel Head
+carregarCarteiraBrauna();
 
 init();
 </script>
