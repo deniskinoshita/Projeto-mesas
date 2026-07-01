@@ -2060,6 +2060,35 @@ function toggleCS(id){
   const chk=document.getElementById("csck-"+id);
   if(crossSell[id]){ chip.classList.add("ativo"); chk.textContent="✓"; }
   else { chip.classList.remove("ativo"); chk.textContent=""; }
+  autoSalvarFicha();
+}
+
+var _autoSalvarTimer = null;
+function autoSalvarFicha(){
+  // Só salva se tiver cliente identificado ou nome preenchido
+  const conta    = _clienteIdentificado?.conta || "";
+  const nome     = document.getElementById("nome")?.value?.trim() || "";
+  const assessor = document.getElementById("assessor")?.value?.trim() || "";
+  if(!conta && !nome) return;
+
+  clearTimeout(_autoSalvarTimer);
+  _autoSalvarTimer = setTimeout(function(){
+    var perfil    = document.getElementById("perfil")?.value || "";
+    var objetivo  = document.getElementById("objetivo")?.value || "";
+    var gselEl    = document.getElementById("gestora-sel");
+    var gestora   = gselEl ? gselEl.value : "";
+    var gestoraNome = gestora && _gestoras[gestora] ? (_gestoras[gestora].nome||gestora) : "";
+    fetch("/api/ficha", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        conta, nome, perfil, objetivo, assessor,
+        gestora, gestora_nome: gestoraNome,
+        checklist,
+        cross_ativos: Object.keys(crossSell).filter(function(k){ return crossSell[k]; }),
+      })
+    }).catch(function(){});
+  }, 600);
 }
 
 renderCrossForm();
@@ -2229,6 +2258,7 @@ function togglePilar(id){
   const det = document.getElementById("det-"+id);
   if(det) det.style.display = feito ? "none" : "block";
   atualizarGraficoServir();
+  autoSalvarFicha();
 }
 
 // Inicialização: só cross-sell e modelo Levante (pilares já vêm do servidor)
