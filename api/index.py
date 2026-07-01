@@ -2005,6 +2005,7 @@ setInterval(carregarNotificacoes, 5*60*1000);
 
 const MODELOS={conservadora:{pos_fixado:70,inflacao:16,pre_fixado:7,acoes:0,fiis:0,multimercado:3,internacional:4,alternativos:0,criptomoedas:0},moderada:{pos_fixado:44,inflacao:23,pre_fixado:10,acoes:5,fiis:1.5,multimercado:6,internacional:9,alternativos:1,criptomoedas:0.5},arrojada:{pos_fixado:28,inflacao:28,pre_fixado:12,acoes:8,fiis:2.5,multimercado:9.5,internacional:10.25,alternativos:1,criptomoedas:0.75},agressiva:{pos_fixado:13,inflacao:31,pre_fixado:13,acoes:14,fiis:3.5,multimercado:10.5,internacional:13,alternativos:1,criptomoedas:1}};
 const LABELS={pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
+const CATS=Object.keys(LABELS);
 
 const CROSS_AREAS=[
   {id:"aquisicao_bens",nome:"Aquisição de Bens",icone:"🏠"},
@@ -2219,7 +2220,10 @@ if(document.readyState === "loading"){
 
 // Cache do portfólio HP — declarado como var para evitar TDZ (chamado antes da inicialização)
 var _hpPortfolios = null;
-fetch("/api/hp/portfolios").then(r=>r.json()).then(d=>{ _hpPortfolios = d.perfis||null; atualizarModelo(); }).catch(()=>{});
+(function carregarHpPortfolios(t){
+  fetch("/api/hp/portfolios").then(r=>r.json()).then(function(d){ _hpPortfolios = d.perfis||null; atualizarModelo(); })
+  .catch(function(){ if(t<4) setTimeout(function(){ carregarHpPortfolios(t+1); }, 4000); });
+})(0);
 
 // ── Carteiras de referência (gestoras cadastradas) ──────────────────────────
 var _gestoras = {};   // id -> {id, nome, referencia, perfis}
