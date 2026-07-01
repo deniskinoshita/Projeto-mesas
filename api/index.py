@@ -977,7 +977,7 @@ def extrair_xperformance(pdf_bytes):
         "acoes":     acoes,
         "fiis":      fiis_list,
         "rf_ativos": rf_ativos,
-        "texto_completo": texto[:3000],
+        "texto_completo": texto[:1500],
     }
 
 
@@ -5400,7 +5400,7 @@ CARTA:
             "ia": False,
         })
 
-    return jsonify({"ok": True, "texto": texto[:3000]})
+    return jsonify({"ok": True, "texto": texto[:1500]})
 
 def _extrair_alocacao_heuristica(texto):
     """Extrai a alocação (% por classe) direto do texto da carta, sem IA.
@@ -6775,28 +6775,28 @@ def analyze():
         "acoes": [
             {"ticker": a.get("ticker",""), "nome": a.get("nome",""),
              "saldo": a.get("saldo",0), "qtd": a.get("qtd",0), "perc": a.get("perc", a.get("pct",0))}
-            for a in xp_parsed.get("acoes",[])[:40]
+            for a in xp_parsed.get("acoes",[])[:20]
         ],
         "fiis": [
             {"ticker": a.get("ticker",""), "nome": a.get("nome",""),
              "saldo": a.get("saldo",0), "qtd": a.get("qtd",0), "perc": a.get("perc", a.get("pct",0))}
-            for a in xp_parsed.get("fiis",[])[:30]
+            for a in xp_parsed.get("fiis",[])[:15]
         ],
         "rf_ativos": [
             {"nome": a.get("nome",""), "classe": a.get("classe",""),
              "saldo": a.get("saldo",0), "perc": a.get("perc",0),
              "rent_mes": a.get("rent_mes"), "rent_12m": a.get("rent_12m")}
-            for a in xp_parsed.get("rf_ativos",[])[:60]
+            for a in xp_parsed.get("rf_ativos",[])[:30]
         ],
     }
     reg_hist = hist.get(fkey, {"assessor": assessor, "nome": nome, "perfil": perfil, "objetivo": objetivo, "entradas": []})
     reg_hist["perfil"]   = perfil
     reg_hist["objetivo"] = objetivo
-    # Mantém apenas os 3 últimos snapshots para economizar memória (3000 clientes × 3 = 9000 entradas)
+    # Mantém apenas os 2 últimos snapshots para economizar memória (1500 clientes × 2 = 3000 entradas)
     entradas_anteriores = reg_hist.get("entradas", [])
     # Evita duplicata do mesmo dia
     entradas_anteriores = [e for e in entradas_anteriores if e.get("data") != entrada_hist["data"]]
-    reg_hist["entradas"] = ([entrada_hist] + entradas_anteriores)[:3]
+    reg_hist["entradas"] = ([entrada_hist] + entradas_anteriores)[:2]
     hist[fkey] = reg_hist
     save_hist(hist)
 
