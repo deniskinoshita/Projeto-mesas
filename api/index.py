@@ -2229,12 +2229,15 @@ CROSS_AREAS.forEach(a=>crossSell[a.id]=false);
 
 function renderCrossForm(){
   const c=document.getElementById("cross-sell-form");
-  c.innerHTML=CROSS_AREAS.map(a=>`
-    <div class="cs-chip" id="cs-${a.id}" onclick="toggleCS('${a.id}')">
+  c.innerHTML=CROSS_AREAS.map(a=>{
+    const ativo = !!crossSell[a.id];   // reflete os cliques já salvos do cliente
+    return `
+    <div class="cs-chip${ativo?' ativo':''}" id="cs-${a.id}" onclick="toggleCS('${a.id}')">
       <span class="cs-icon">${a.icone}</span>
       <span>${a.nome}</span>
-      <span class="cs-check" id="csck-${a.id}"></span>
-    </div>`).join("");
+      <span class="cs-check" id="csck-${a.id}">${ativo?'✓':''}</span>
+    </div>`;
+  }).join("");
 }
 
 function toggleCS(id){
@@ -2747,12 +2750,10 @@ async function identificarCliente(file){
       atualizarGraficoServir();
     }
 
-    // ── Restaura cross-sell salvo
-    if(d.ficha_salva?.cross_ativos?.length){
-      CROSS_AREAS.forEach(a=>{ crossSell[a.id]=false; });
-      d.ficha_salva.cross_ativos.forEach(id=>{ crossSell[id]=true; });
-      renderCrossForm();
-    }
+    // ── Restaura cross-sell salvo (sempre reflete o cliente identificado)
+    CROSS_AREAS.forEach(a=>{ crossSell[a.id]=false; });
+    (d.ficha_salva?.cross_ativos || []).forEach(id=>{ crossSell[id]=true; });
+    renderCrossForm();
 
     // ── Exibe preview dos dados extraídos ANTES do botão avançar
     try{ mostrarPreviewPDF(d); }catch(re){ console.error("mostrarPreviewPDF:", re); }
