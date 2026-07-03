@@ -1712,7 +1712,12 @@ select option{background:#1A1A1A}
   <div class="step-line"></div>
   <div class="step-item" id="step-item-2">
     <div class="step-circle" id="step-c2">2</div>
-    <span class="step-label">Perfil &amp; Cross Sell</span>
+    <span class="step-label">Cross Sell &amp; Modelo de Servir</span>
+  </div>
+  <div class="step-line"></div>
+  <div class="step-item" id="step-item-3">
+    <div class="step-circle" id="step-c3">3</div>
+    <span class="step-label">Análise de Carteira</span>
   </div>
 </div>
 
@@ -1826,7 +1831,7 @@ select option{background:#1A1A1A}
   <!-- Botão para avançar -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
     <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#C9A96E;color:#081F18;font-size:15px;padding:15px">
-      Continuar para Etapa 2 — Perfil &amp; Cross Sell →
+      Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →
     </button>
   </div>
 </div>
@@ -2651,9 +2656,8 @@ function onXpFileChange(input){
   // Feedback imediato
   if(fname) fname.textContent = "⏳ " + file.name;
   if(drop)  drop.style.borderColor = "#C9A96E";
-  // Avança para etapa 2 imediatamente com dados provisórios
-  ativarEtapa2({conta:"", ficha_salva:{}, tem_historico:false, ultima_carteira:null, comparativo:[]});
-  // Identifica o cliente em background e atualiza os campos da etapa 2
+  // Identifica o cliente na Parte 1. A Parte 2 (Cross Sell + Modelo de Servir)
+  // só abre quando o assessor clicar em "Continuar para a Parte 2".
   identificarCliente(file);
 }
 
@@ -2753,7 +2757,10 @@ async function identificarCliente(file){
     // ── Exibe preview dos dados extraídos ANTES do botão avançar
     try{ mostrarPreviewPDF(d); }catch(re){ console.error("mostrarPreviewPDF:", re); }
 
-    // ── Atualiza painel de histórico na etapa 2 (já aberta em background)
+    // ── Mostra o botão para avançar à Parte 2 (Cross Sell + Modelo de Servir)
+    try{ mostrarBotaoProximaEtapa(d); }catch(re){ console.error("mostrarBotaoProximaEtapa:", re); }
+
+    // ── Pré-carrega o painel de histórico da Parte 2 (ainda oculta)
     try{ renderPainelCliente(d); }catch(re){ console.error("renderPainelCliente:", re); }
 
     // ── Atualiza banner da etapa 2 se o cliente foi identificado
@@ -2953,11 +2960,11 @@ function mostrarBotaoProximaEtapa(d){
     if(d && d.conta){
       const nome = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
       const retorno = d.tem_historico && d.ultima_carteira;
-      btn.innerHTML = retorno
-        ? `🔄 Continuar com ${nome} — Retorno →`
-        : `🆕 Continuar com ${nome} — Primeiro acesso →`;
+      const ico = retorno ? "🔄" : "🆕";
+      const tag = retorno ? "Retorno" : "Primeiro acesso";
+      btn.innerHTML = `${ico} Continuar para a Parte 2 — ${nome} (${tag}) →`;
     } else {
-      btn.innerHTML = "Continuar para Etapa 2 →";
+      btn.innerHTML = "Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →";
     }
   }
 }
@@ -3019,6 +3026,8 @@ function ativarEtapa2(d){
   if(wrapper){
     wrapper.style.display = "block";
     setTimeout(()=> wrapper.scrollIntoView({behavior:"smooth", block:"start"}), 100);
+    // Parte 2 agora visível: re-renderiza o gráfico do Modelo de Servir (evita canvas em branco)
+    setTimeout(()=>{ try{ atualizarGraficoServir(); }catch(e){} }, 150);
   }
 
   // Renderiza painel de histórico no box abaixo do upload
@@ -3266,7 +3275,7 @@ async function buscarUltimoXpPorCodigo(conta){
       const wBtn = document.getElementById("btn-proxima-etapa-wrap");
       const btn  = document.getElementById("btn-proxima-etapa");
       if(wBtn) wBtn.style.display="block";
-      if(btn){ btn.innerHTML="Continuar para Etapa 2 — Perfil &amp; Cross Sell →"; btn.disabled=false; btn.style.opacity="1"; }
+      if(btn){ btn.innerHTML="Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →"; btn.disabled=false; btn.style.opacity="1"; }
     }
 
     if(lbl){
@@ -4289,6 +4298,12 @@ function renderizar(data){
 
   // Posição Consolidada + Diagnósticos Automáticos
   try{ renderPosicaoConsolidada(data); }catch(e){ console.error("[renderPosicaoConsolidada]",e); }
+
+  // Indicador de etapas: conclui a Parte 2 e ativa a Parte 3 (Análise)
+  const _i2=document.getElementById("step-item-2"), _c2=document.getElementById("step-c2"), _i3=document.getElementById("step-item-3");
+  if(_i2){ _i2.classList.remove("active"); _i2.classList.add("done"); }
+  if(_c2) _c2.textContent="✓";
+  if(_i3) _i3.classList.add("active");
 
   document.getElementById("results").style.display="block";
   document.getElementById("results").scrollIntoView({behavior:"smooth"});
