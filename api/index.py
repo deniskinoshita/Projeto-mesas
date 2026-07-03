@@ -2697,16 +2697,21 @@ async function identificarCliente(file){
     if(_codLbl && d.ficha_salva?.nome){ _codLbl.textContent="✓ "+d.ficha_salva.nome; _codLbl.style.display="block"; }
     // ── Perfil: identifica automaticamente pela carteira atual ────────────────
     // Prioridade: perfil salvo na ficha do cliente > perfil sugerido pela composição.
-    const _perfilKey = d.ficha_salva?.perfil || d.perfil_sugerido || "";
+    const _perfilSalvo = d.ficha_salva?.perfil || "";
+    const _perfilKey = _perfilSalvo || d.perfil_sugerido || "";
     const _sugHint = document.getElementById("perfil-sugerido-hint");
+    const _NOMES_PERFIL = {super_conservadora:"Super Conservadora",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva"};
     if(_perfilKey){
       if(typeof selecionarPerfil === "function"){ selecionarPerfil(_perfilKey); }
       else { document.getElementById("perfil").value = _perfilKey; atualizarModelo(); }
-      // Mostra o aviso só quando veio de sugestão automática (não de ficha salva)
+      // Aviso visível sempre que o cliente é identificado (ficha salva ou detectado)
       if(_sugHint){
-        if(!d.ficha_salva?.perfil && d.perfil_sugerido){
+        if(_perfilSalvo){
           _sugHint.style.display = "block";
-          _sugHint.textContent = "✦ Perfil identificado pela carteira atual — confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
+          _sugHint.textContent = "✦ Perfil do cliente: " + (_NOMES_PERFIL[_perfilSalvo]||_perfilSalvo) + " (da ficha salva) — confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
+        } else if(d.perfil_sugerido){
+          _sugHint.style.display = "block";
+          _sugHint.textContent = "✦ Perfil identificado pela carteira atual: " + (_NOMES_PERFIL[d.perfil_sugerido]||d.perfil_sugerido) + " — confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
         } else {
           _sugHint.style.display = "none";
         }
@@ -5077,24 +5082,29 @@ def ficha_endpoint():
     return jsonify(result)
 
 
+# Classes de maior risco/volatilidade — usadas p/ inferir o perfil pela carteira.
+_CLASSES_RISCO = ("acoes", "fiis", "multimercado", "internacional", "alternativos", "criptomoedas")
+
 def _sugerir_perfil_por_composicao(comp):
-    """Sugere o perfil de investidor mais próximo comparando a composição ATUAL
-    do cliente (lida do XPerformance) com os 5 modelos de referência (menor
-    distância L1 por classe). Retorna a chave do perfil (ex.: 'moderada') ou ''
-    quando não há composição suficiente. É apenas uma sugestão — o assessor
-    confirma ou ajusta na tela."""
+    """Sugere o perfil de investidor comparando a EXPOSIÇÃO A RISCO da carteira
+    atual (soma de ações, FIIs, multimercado, internacional, alternativos e
+    cripto) com a de cada modelo de referência, escolhendo o mais próximo.
+
+    Usa a fatia de risco — e não a distância classe-a-classe — para não confundir
+    uma carteira concentrada em renda fixa (ex.: 98% em inflação/IPCA+, que é de
+    baixo risco) com um perfil agressivo. Retorna a chave do perfil ou '' quando
+    não há composição. É apenas uma sugestão — o assessor confirma ou ajusta."""
     if not comp or sum(float(v or 0) for v in comp.values()) < 1:
         return ""
+    risco_cliente = sum(float(comp.get(c, 0) or 0) for c in _CLASSES_RISCO)
     perfis = HP_PORTFOLIOS_DEFAULT.get("perfis", {})
-    melhor, menor_dist = "", None
+    melhor, menor = "", None
     for chave, modelo in perfis.items():
-        dist = 0.0
-        for classe in CATS:
-            atual = float(comp.get(classe, 0) or 0)
-            alvo  = float(modelo.get(classe, 0) or 0)
-            dist += abs(atual - alvo)
-        if menor_dist is None or dist < menor_dist:
-            menor_dist, melhor = dist, chave
+        risco_modelo = sum(float(modelo.get(c, 0) or 0) for c in _CLASSES_RISCO)
+        # empate na distância -> escolhe o perfil mais conservador (menor risco)
+        ordem = (abs(risco_cliente - risco_modelo), risco_modelo)
+        if menor is None or ordem < menor:
+            menor, melhor = ordem, chave
     return melhor
 
 
