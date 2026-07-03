@@ -2935,8 +2935,10 @@ function mostrarPreviewPDF(d){
         ${barras}
       </div>
     </div>
-    ${alertasHtml}
-    ${posicoesHtml}`;
+    ${alertasHtml}`;
+    // Posições detalhadas (RF/Ações/FIIs) NÃO entram no preview de identificação —
+    // ficam na análise (card "Análise Head de Produtos"). Após os diagnósticos,
+    // o fluxo segue direto para o "Perfil do cliente".
 }
 
 function mostrarBotaoProximaEtapa(d){
