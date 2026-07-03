@@ -1770,6 +1770,8 @@ select option{background:#1A1A1A}
   <!-- LINHA 3: Seletor visual de perfil -->
   <div style="margin-bottom:14px">
     <label style="margin-bottom:8px;display:block">Perfil do cliente</label>
+    <!-- Aviso quando o perfil foi sugerido automaticamente pela carteira atual -->
+    <p id="perfil-sugerido-hint" style="display:none;font-size:11px;color:#C9A96E;margin:0 0 8px 0;font-weight:600"></p>
     <!-- Cards clicáveis por perfil — renderizados pelo servidor -->
     <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       {{ perfil_cards | safe }}
@@ -1900,6 +1902,12 @@ select option{background:#1A1A1A}
       <span id="hp-perfil-badge" style="background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700"></span>
     </div>
     <div id="hp-desvios" style="margin-bottom:16px"></div>
+
+    <!-- Renda Fixa individual -->
+    <div id="hp-rf-bloco" style="display:none;margin-bottom:12px">
+      <div style="font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🏦 Renda Fixa — Posição Detalhada</div>
+      <div id="hp-rf-table"></div>
+    </div>
 
     <!-- Ações individuais -->
     <div id="hp-acoes-bloco" style="display:none;margin-bottom:12px">
@@ -2687,7 +2695,25 @@ async function identificarCliente(file){
     const _codLbl = document.getElementById("cliente-encontrado-label");
     if(_codEl && d.conta && d.conta !== "-"){ _codEl.value = d.conta; }
     if(_codLbl && d.ficha_salva?.nome){ _codLbl.textContent="✓ "+d.ficha_salva.nome; _codLbl.style.display="block"; }
-    if(d.ficha_salva?.perfil){ document.getElementById("perfil").value = d.ficha_salva.perfil; atualizarModelo(); }
+    // ── Perfil: identifica automaticamente pela carteira atual ────────────────
+    // Prioridade: perfil salvo na ficha do cliente > perfil sugerido pela composição.
+    const _perfilKey = d.ficha_salva?.perfil || d.perfil_sugerido || "";
+    const _sugHint = document.getElementById("perfil-sugerido-hint");
+    if(_perfilKey){
+      if(typeof selecionarPerfil === "function"){ selecionarPerfil(_perfilKey); }
+      else { document.getElementById("perfil").value = _perfilKey; atualizarModelo(); }
+      // Mostra o aviso só quando veio de sugestão automática (não de ficha salva)
+      if(_sugHint){
+        if(!d.ficha_salva?.perfil && d.perfil_sugerido){
+          _sugHint.style.display = "block";
+          _sugHint.textContent = "✦ Perfil identificado pela carteira atual — confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
+        } else {
+          _sugHint.style.display = "none";
+        }
+      }
+    } else if(_sugHint){
+      _sugHint.style.display = "none";
+    }
     if(d.ficha_salva?.objetivo) document.getElementById("objetivo").value = d.ficha_salva.objetivo || "";
     if(d.ficha_salva?.gestora){
       const _gs = document.getElementById("gestora-sel");
@@ -3409,6 +3435,35 @@ function renderAnaliseHP(xp){
       <span style="font-size:13px">${STATUS_ICON[d.status]||""}</span>
     </div>
   `).join("");
+
+  // Renda Fixa — posição detalhada (junto com o resto da análise)
+  if(xp.rf_ativos && xp.rf_ativos.length){
+    document.getElementById("hp-rf-bloco").style.display = "";
+    const RENT = v => v == null ? '<span style="color:#3A6A48">—</span>'
+      : (v >= 0 ? `<span style="color:#5DCAA5">+${Number(v).toFixed(2)}%</span>`
+                : `<span style="color:#FF6B6B">${Number(v).toFixed(2)}%</span>`);
+    document.getElementById("hp-rf-table").innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr style="background:#071E17">
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ativo</th>
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Classe</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Saldo</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Rent. Mês</th>
+          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Rent. 12M</th>
+        </tr></thead>
+        <tbody>${xp.rf_ativos.map((a,i)=>`
+          <tr style="background:${i%2?"#070707":"#071E17"}">
+            <td style="padding:6px 8px;color:#D4B483;font-weight:700;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(a.nome||"").replace(/"/g,"&quot;")}">${a.nome||"—"}</td>
+            <td style="padding:6px 8px;color:#888">${a.classe||"—"}</td>
+            <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
+            <td style="padding:6px 8px;color:#5DCAA5;text-align:right">${(a.perc||0).toFixed(2)}%</td>
+            <td style="padding:6px 8px;text-align:right">${RENT(a.rent_mes)}</td>
+            <td style="padding:6px 8px;text-align:right;color:#AAA">${a.rent_12m!=null?Number(a.rent_12m).toFixed(2)+"%":"—"}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>`;
+  }
 
   // Ações
   if(xp.acoes && xp.acoes.length){
@@ -5022,6 +5077,27 @@ def ficha_endpoint():
     return jsonify(result)
 
 
+def _sugerir_perfil_por_composicao(comp):
+    """Sugere o perfil de investidor mais próximo comparando a composição ATUAL
+    do cliente (lida do XPerformance) com os 5 modelos de referência (menor
+    distância L1 por classe). Retorna a chave do perfil (ex.: 'moderada') ou ''
+    quando não há composição suficiente. É apenas uma sugestão — o assessor
+    confirma ou ajusta na tela."""
+    if not comp or sum(float(v or 0) for v in comp.values()) < 1:
+        return ""
+    perfis = HP_PORTFOLIOS_DEFAULT.get("perfis", {})
+    melhor, menor_dist = "", None
+    for chave, modelo in perfis.items():
+        dist = 0.0
+        for classe in CATS:
+            atual = float(comp.get(classe, 0) or 0)
+            alvo  = float(modelo.get(classe, 0) or 0)
+            dist += abs(atual - alvo)
+        if menor_dist is None or dist < menor_dist:
+            menor_dist, melhor = dist, chave
+    return melhor
+
+
 @app.route("/api/xp-identificar", methods=["POST"])
 def xp_identificar():
     """Recebe o PDF XPerformance, extrai o código do cliente e retorna dados salvos."""
@@ -5097,6 +5173,8 @@ def xp_identificar():
         "patrimonio": xp.get("patrimonio", 0),
         "rent": xp.get("rent", {}),
         "composicao_atual": xp.get("comp", {}),
+        # Perfil sugerido pela carteira atual (só sugestão; assessor confirma/ajusta)
+        "perfil_sugerido": _sugerir_perfil_por_composicao(xp.get("comp", {})),
         "ficha_salva": ficha,
         "ultima_carteira": ultima_carteira,
         "comparativo": comparativo,
@@ -6596,6 +6674,7 @@ def analyze_xp():
         "caixa":       dados["caixa"],
         "rent":        dados["rent"],
         "desvios":     desvios,
+        "rf_ativos":   dados.get("rf_ativos", []),
         "acoes":       dados["acoes"],
         "fiis":        dados["fiis"],
         "sugestoes_produtos": sugestoes_prods,
