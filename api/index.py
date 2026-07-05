@@ -5605,7 +5605,10 @@ def hp_publicar():
     if portfolios and _portfolios_validos(portfolios):
         threads.append(threading.Thread(target=_s, args=(_HP_PORT_FILE, portfolios)))
     if cenario:    threads.append(threading.Thread(target=_s, args=(_HP_CENARIO_FILE, cenario)))
-    if produtos:   threads.append(threading.Thread(target=_s, args=(_HP_PROD_FILE, produtos)))
+    # Só salva produtos se vier com ao menos um item — evita zerar todos os produtos
+    # por um 'Publicar' feito sem os produtos carregados na tela.
+    if produtos and any(isinstance(v, list) and len(v) > 0 for v in produtos.values()):
+        threads.append(threading.Thread(target=_s, args=(_HP_PROD_FILE, produtos)))
     for t in threads: t.start()
     for t in threads: t.join(timeout=8)
     return jsonify({"ok": True, "publicado_em": datetime.now().strftime("%d/%m/%Y %H:%M")})
@@ -7500,6 +7503,15 @@ def hp_produtos_salvar():
     produtos_por_classe = data.get("produtos", {})
     indicado_por = data.get("indicado_por", "Head de Produtos")
     indicado_em  = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    # Trava de segurança: não sobrescreve os produtos salvos com um conjunto vazio
+    # (evita perder tudo por um salvamento acionado sem itens carregados na tela).
+    total_novo = sum(len(v) for v in produtos_por_classe.values() if isinstance(v, list))
+    if total_novo == 0:
+        atuais = _load(_HP_PROD_FILE, {})
+        total_atual = sum(len(v) for v in atuais.values() if isinstance(v, list))
+        return jsonify({"ok": False, "total": total_atual,
+                        "erro": "Nenhum produto na tela para salvar — os produtos já salvos foram preservados."})
 
     # Enriquecer cada produto com metadata
     for cls, lista in produtos_por_classe.items():
