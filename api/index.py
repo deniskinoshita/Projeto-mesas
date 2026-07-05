@@ -13817,6 +13817,9 @@ body{padding:0 0 60px}
         Selecionar arquivo
         <input type="file" id="input-lote" accept=".zip,.pdf" style="display:none" onchange="processarLote(this)">
       </label>
+      <button id="btn-atualizar-painel" onclick="atualizarPainel(this)" title="Recarrega todos os dados do painel" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#7DCFEF;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#7DCFEF'" onmouseout="this.style.borderColor='#2A5A7A'">
+        ↻ Atualizar
+      </button>
     </div>
 
     <!-- Barra de progresso -->
@@ -13904,6 +13907,17 @@ async function carregar(){
     filtrar();
   }catch(e){
     document.getElementById('lista').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-msg">Erro ao carregar dados</div><div class="empty-sub">'+e.message+'</div></div>';
+  }
+}
+
+// Botão "Atualizar": recarrega todos os dados do painel com feedback visual
+async function atualizarPainel(btn){
+  const original = btn ? btn.innerHTML : '';
+  if(btn){ btn.disabled = true; btn.style.opacity = '0.6'; btn.innerHTML = '↻ Atualizando...'; }
+  try{
+    await carregar();
+  } finally {
+    if(btn){ btn.disabled = false; btn.style.opacity = '1'; btn.innerHTML = original || '↻ Atualizar'; }
   }
 }
 
