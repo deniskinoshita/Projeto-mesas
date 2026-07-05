@@ -13420,9 +13420,12 @@ def painel_carteiras():
         # Pula chaves duplicadas (conta:XXXX já foi processada via nome|assessor)
         conta = ficha.get("conta", "").strip()
         nome  = ficha.get("nome", "").strip()
-        if not nome:
+        # Clientes importados em lote não têm nome (o XPerformance só traz a conta) —
+        # exibe pela conta em vez de descartá-los.
+        nome_exib = nome or (f"Conta {conta}" if conta else "")
+        if not nome_exib:
             continue
-        dedup_key = f"{ficha.get('assessor','')}|{nome}".lower()
+        dedup_key = f"{ficha.get('assessor','')}|{nome}".lower() if nome else f"conta:{conta}"
         if dedup_key in vistas:
             continue
         vistas.add(dedup_key)
@@ -13439,7 +13442,7 @@ def painel_carteiras():
 
         # Busca última composição salva no histórico
         hist_key = f"{ficha.get('assessor','')}|{nome}".lower().strip()
-        reg_hist  = hist.get(hist_key) or hist.get(conta) or {}
+        reg_hist  = hist.get(hist_key) or hist.get(f"conta:{conta}") or hist.get(conta) or {}
         entradas  = reg_hist.get("entradas", []) if isinstance(reg_hist, dict) else []
         ultima    = entradas[0] if entradas else {}
         comp      = ultima.get("composicao", {})
@@ -13521,7 +13524,7 @@ def painel_carteiras():
             })
 
         clientes_painel.append({
-            "nome": nome,
+            "nome": nome_exib,
             "assessor": ficha.get("assessor", ""),
             "perfil": perfil,
             "patrimonio": patrimonio,
