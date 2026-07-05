@@ -14103,6 +14103,18 @@ function toggle(i){
   icon.style.transform = open ? 'rotate(180deg)' : '';
 }
 
+// Carrega o descompactador (fflate) sob demanda — só quando há um .zip
+function _carregarFflate(){
+  return new Promise(function(resolve, reject){
+    if(window.fflate) return resolve(window.fflate);
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';
+    s.onload  = function(){ window.fflate ? resolve(window.fflate) : reject(new Error('descompactador não carregou')); };
+    s.onerror = function(){ reject(new Error('falha ao carregar o descompactador (verifique a conexão)')); };
+    document.head.appendChild(s);
+  });
+}
+
 async function processarLote(input){
   const file = input.files[0];
   if(!file) return;
@@ -14115,36 +14127,83 @@ async function processarLote(input){
   const resBox   = document.getElementById('lote-resultado');
   progBox.style.display  = 'block';
   resBox.style.display   = 'none';
-  progBar.style.width    = '10%';
-  progTxt.textContent    = `Enviando ${file.name} (${(file.size/1024/1024).toFixed(1)} MB)...`;
-  progPct.textContent    = '10%';
-
-  const fd = new FormData();
-  fd.append('zip', file);
+  progBar.style.background = '#5DCAA5';
+  progBar.style.width    = '4%';
+  progPct.textContent    = '4%';
+  progTxt.textContent    = `Abrindo ${file.name}...`;
 
   try{
-    const r = await fetch('/api/processar-zip-xp', {method:'POST', body:fd});
-    progBar.style.width = '80%'; progPct.textContent = '80%';
-    const d = await r.json();
+    const nomeArq = (file.name||'').toLowerCase();
 
-    if(d.erro){ throw new Error(d.erro); }
+    // 1) Monta a lista de PDFs: descompacta o .zip no navegador, ou usa o PDF avulso.
+    //    Assim cada PDF é enviado numa requisição própria — bem abaixo do limite de
+    //    tamanho do servidor (~4,5 MB), que era o que quebrava o envio do zip inteiro.
+    let pdfs = []; // [{name, blob}]
+    if(nomeArq.endsWith('.pdf')){
+      pdfs = [{name:file.name, blob:file}];
+    } else if(nomeArq.endsWith('.zip')){
+      const fflate = await _carregarFflate();
+      const buf = new Uint8Array(await file.arrayBuffer());
+      const entradas = fflate.unzipSync(buf);
+      Object.keys(entradas).forEach(function(n){
+        if(n.toLowerCase().endsWith('.pdf') && n.indexOf('__MACOSX') !== 0 && !n.endsWith('/')){
+          pdfs.push({name:n.split('/').pop(), blob:new Blob([entradas[n]], {type:'application/pdf'})});
+        }
+      });
+    } else {
+      throw new Error('Envie um arquivo .zip ou .pdf');
+    }
+    if(!pdfs.length) throw new Error('Nenhum PDF encontrado no arquivo');
+
+    // 2) Envia um PDF por vez (sequencial: evita corrida no salvamento das fichas)
+    let processados = 0;
+    const total = pdfs.length;
+    let clientes = [];
+    let erros = [];
+    for(let i=0; i<total; i++){
+      const pct = 5 + Math.round((i/total)*90);
+      progBar.style.width = pct+'%'; progPct.textContent = pct+'%';
+      progTxt.textContent = `Processando ${i+1}/${total}: ${pdfs[i].name}`;
+      const fd = new FormData();
+      fd.append('zip', pdfs[i].blob, pdfs[i].name); // o endpoint aceita PDF avulso
+      try{
+        const r = await fetch('/api/processar-zip-xp', {method:'POST', body:fd});
+        if(!r.ok){
+          let msg = 'HTTP '+r.status;
+          try{ const t = await r.text(); if(r.status===413 || /too large|entity/i.test(t)) msg='PDF grande demais para o servidor'; else if(t) msg=t.slice(0,140); }catch(_){}
+          throw new Error(msg);
+        }
+        const ct = r.headers.get('content-type') || '';
+        if(ct.indexOf('application/json') === -1){
+          const t = await r.text();
+          throw new Error((t||'resposta inesperada do servidor').slice(0,140));
+        }
+        const d = await r.json();
+        if(d.erro){ throw new Error(d.erro); }
+        processados += (d.processados || 0);
+        (d.clientes||[]).forEach(function(c){ clientes.push(c); });
+        (d.erros||[]).forEach(function(e){ erros.push(e); });
+      }catch(err){
+        erros.push({arquivo: pdfs[i].name, erro: err.message});
+      }
+    }
 
     progBar.style.width = '100%'; progPct.textContent = '100%';
     progTxt.textContent = 'Concluído!';
 
-    // Monta resultado
-    const ok   = d.processados || 0;
-    const err  = d.erros_n || 0;
-    const lista = (d.clientes||[]).slice(0,20).map(c=>
+    // 3) Monta resultado agregado
+    const ok  = processados;
+    const err = erros.length;
+    const lista = clientes.slice(0,20).map(c=>
       `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #1A1A1A;font-size:12px">
         <span style="color:#5DCAA5;font-size:14px">✓</span>
         <span style="flex:1;color:#CCC">${c.nome||c.conta}</span>
-        <span style="color:#3A6A48">${c.data_ref}</span>
-        <span style="color:#C9A96E">${brl(c.patrimonio)}</span>
-        <span style="color:#2A4A38;font-size:10px">${c.acoes_n}ações · ${c.fiis_n}FIIs · ${c.rf_n}RF</span>
+        <span style="color:#3A6A48">${c.data_ref||''}</span>
+        <span style="color:#C9A96E">${brl(c.patrimonio||0)}</span>
+        <span style="color:#2A4A38;font-size:10px">${c.acoes_n||0}ações · ${c.fiis_n||0}FIIs · ${c.rf_n||0}RF</span>
       </div>`).join('');
-    const errosHtml = (d.erros||[]).map(e=>
-      `<div style="font-size:11px;color:#FF6B6B;padding:3px 0">⚠ ${e.arquivo}: ${e.erro}</div>`).join('');
+    const errosHtml = erros.map(e=>
+      `<div style="font-size:11px;color:#FF6B6B;padding:3px 0">⚠ ${e.arquivo||''}: ${e.erro||''}</div>`).join('');
     const maisHtml = ok > 20 ? `<div style="font-size:11px;color:#3A6A48;margin-top:6px">... e mais ${ok-20} clientes processados</div>` : '';
 
     resBox.innerHTML = `
@@ -14154,7 +14213,7 @@ async function processarLote(input){
           <div style="font-size:10px;color:#3A6A48">clientes salvos</div>
         </div>
         <div style="background:#0A0A0A;border:1px solid #1A1A1A;border-radius:8px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:700;color:#888">${d.total_pdfs}</div>
+          <div style="font-size:20px;font-weight:700;color:#888">${total}</div>
           <div style="font-size:10px;color:#3A6A48">PDFs no arquivo</div>
         </div>
         ${err ? `<div style="background:#1A0808;border:1px solid #3A1010;border-radius:8px;padding:8px 16px;text-align:center">
