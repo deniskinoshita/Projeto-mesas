@@ -13999,15 +13999,19 @@ function renderStats(lista){
 
 function popularFiltroAssessor(lista){
   const sel = document.getElementById('filtro-assessor');
+  const atual = sel.value;                       // preserva a seleção atual
+  sel.innerHTML = '<option value="">Todos os assessores</option>';  // evita duplicados ao atualizar
   const assessores = [...new Set(lista.map(c=>c.assessor).filter(Boolean))].sort();
   assessores.forEach(a=>{
     const o = document.createElement('option');
     o.value = a; o.textContent = a;
     sel.appendChild(o);
   });
+  if(atual) sel.value = atual;
 }
 
 function filtrar(){
+  _renderLimite = _RENDER_PASSO;   // volta para o topo ao mudar qualquer filtro
   const busca   = document.getElementById('filtro-busca').value.toLowerCase();
   const status  = document.getElementById('filtro-status').value;
   const perfil  = document.getElementById('filtro-perfil').value;
@@ -14025,13 +14029,32 @@ function filtrar(){
   renderLista(filtrados);
 }
 
+// Paginação da lista: renderiza em blocos para não travar o navegador com muitos clientes
+const _RENDER_PASSO = 25;
+let _renderLimite = _RENDER_PASSO;
+let _listaAtual = [];
+
 function renderLista(lista){
+  _listaAtual = lista;
   const el = document.getElementById('lista');
   if(!lista.length){
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-msg">Nenhum cliente encontrado</div><div class="empty-sub">Analise XPerformances na tela principal para popular este painel.</div></div>';
     return;
   }
-  el.innerHTML = lista.map((c,i) => clienteCard(c,i)).join('');
+  const mostrar = lista.slice(0, _renderLimite);
+  let html = mostrar.map((c,i) => clienteCard(c,i)).join('');
+  const restantes = lista.length - mostrar.length;
+  if(restantes > 0){
+    html += '<div style="text-align:center;padding:16px 0">'
+      + '<button onclick="verMais()" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 24px;color:#7DCFEF;font-size:13px;cursor:pointer">'
+      + '▼ Ver mais ' + Math.min(_RENDER_PASSO, restantes) + ' de ' + restantes + ' restantes</button></div>';
+  }
+  el.innerHTML = html;
+}
+
+function verMais(){
+  _renderLimite += _RENDER_PASSO;
+  renderLista(_listaAtual);
 }
 
 function clienteCard(c, i){
