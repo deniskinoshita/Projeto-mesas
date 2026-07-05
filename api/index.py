@@ -5269,7 +5269,15 @@ def assessores_dados_endpoint():
 
 @app.route("/api/importar_assessores_xlsx", methods=["POST"])
 def importar_assessores_xlsx():
-    """Importa planilha Excel de dados financeiros dos assessores."""
+    """Importa a planilha financeira dos assessores (formato pivô por escritório).
+
+    Tolerante ao layout: localiza a linha de cabeçalho pela coluna 'Assessor'
+    (ignora linhas de título tipo 'São José dos Campos'), pula a linha 'Total' e
+    mapeia as colunas por posição a partir do cabeçalho:
+      0 Assessor · 1 Patrimônio · 2-4 RF (saldo/volume/receita) · 5-7 RV ·
+      8-10 Estruturadas · 11-13 FII · 14-16 Internacional.
+    Substitui TODA a lista pela planilha. As metas OKR não vêm nesta planilha,
+    então ficam zeradas (o líder preenche depois em '✏️' / 'Adicionar')."""
     try:
         import openpyxl
         from io import BytesIO
@@ -5278,52 +5286,70 @@ def importar_assessores_xlsx():
             return jsonify({"ok": False, "erro": "Nenhum arquivo enviado"}), 400
         wb = openpyxl.load_workbook(BytesIO(arquivo.read()), data_only=True)
         ws = wb.active
+        linhas = [list(r) for r in ws.iter_rows(values_only=True)]
+
+        # Localiza o cabeçalho: 1ª linha cuja primeira célula começa com "assessor"
+        hdr = None
+        for i, r in enumerate(linhas):
+            c0 = str(r[0]).strip().lower() if (r and r[0] is not None) else ""
+            if c0.startswith("assessor"):
+                hdr = i
+                break
+        if hdr is None:
+            return jsonify({"ok": False, "erro": "Cabeçalho não encontrado — a planilha precisa de uma coluna 'Assessor'."}), 422
+
+        def num(row, idx):
+            if idx >= len(row):
+                return 0.0
+            v = row[idx]
+            try:
+                return float(v) if v is not None else 0.0
+            except (TypeError, ValueError):
+                return 0.0
+
         assessores = []
-        for row in ws.iter_rows(min_row=2, max_row=50, values_only=True):
-            nome = row[0]
-            if not nome or not isinstance(nome, str) or not str(nome).strip():
+        for r in linhas[hdr + 1:]:
+            if not r:
                 continue
-            patrimonio    = row[1] or 0
-            rf_saldo      = row[2] or 0
-            rf_pct        = round((row[3] or 0) * 100, 2)
-            rf_receita    = round(row[4] or 0, 2)
-            rf_volume_mes = round(row[5] or 0, 2)
-            rv_saldo      = row[6] or 0
-            rv_pct        = round((row[7] or 0) * 100, 2)
-            rv_receita    = round(row[8] or 0, 2)
-            rv_volume_mes = round(row[9] or 0, 2)
-            estrut_pct_max= round((row[10] or 0) * 100, 2)
-            estrut_volume = round(row[11] or 0, 2)
-            estrut_receita= round(row[12] or 0, 2)
-            fii_saldo     = row[13] or 0
-            fii_pct       = round((row[14] or 0) * 100, 2)
-            fii_receita   = round(row[15] or 0, 2)
-            fii_volume_mes= round(row[16] or 0, 2)
-            intl_saldo    = row[17] or 0
-            intl_pct      = round((row[18] or 0) * 100, 2)
-            intl_receita  = round(row[19] or 0, 2)
-            intl_volume_mes= round(row[20] or 0, 2)
-            receita_total = round(row[22] or 0, 2)
-            roa_anual     = round((row[23] or 0) * 100, 4)
-            okr_mensal    = round(row[24] or 0, 2)
-            okr_anual     = round(row[26] or 0, 2)
-            okr_semestre  = round(row[27] or 0, 2)
-            pct_realizado = round((receita_total / okr_mensal * 100) if okr_mensal > 0 else 0, 1)
+            nome = r[0]
+            if not isinstance(nome, str) or not nome.strip():
+                continue
+            if nome.strip().lower().startswith("total"):
+                continue
+
+            patrimonio = num(r, 1)
+            rf_saldo,  rf_vol,  rf_rec  = num(r, 2),  num(r, 3),  num(r, 4)
+            rv_saldo,  rv_vol,  rv_rec  = num(r, 5),  num(r, 6),  num(r, 7)
+            es_pctmax, es_vol,  es_rec  = num(r, 8),  num(r, 9),  num(r, 10)
+            fii_saldo, fii_vol, fii_rec = num(r, 11), num(r, 12), num(r, 13)
+            in_saldo,  in_vol,  in_rec  = num(r, 14), num(r, 15), num(r, 16)
+
+            def pct(saldo):
+                return round(saldo / patrimonio * 100, 2) if patrimonio > 0 else 0.0
+
+            receita_total = round(rf_rec + rv_rec + es_rec + fii_rec + in_rec, 2)
+            roa_anual = round(receita_total * 12 / patrimonio * 100, 4) if patrimonio > 0 else 0.0
+
             assessores.append({
-                "nome": str(nome).strip(),
-                "patrimonio": patrimonio,
-                "rf":   {"saldo": round(rf_saldo,2), "pct": rf_pct, "receita": rf_receita, "volume_mes": rf_volume_mes},
-                "rv":   {"saldo": round(rv_saldo,2), "pct": rv_pct, "receita": rv_receita, "volume_mes": rv_volume_mes},
-                "estruturadas": {"pct_max": estrut_pct_max, "volume": estrut_volume, "receita": estrut_receita},
-                "fii":  {"saldo": round(fii_saldo,2), "pct": fii_pct, "receita": fii_receita, "volume_mes": fii_volume_mes},
-                "internacional": {"saldo": round(intl_saldo,2), "pct": intl_pct, "receita": intl_receita, "volume_mes": intl_volume_mes},
+                "nome": nome.strip(),
+                "patrimonio": round(patrimonio, 2),
+                "rf":   {"saldo": round(rf_saldo, 2),  "pct": pct(rf_saldo),  "receita": round(rf_rec, 2),  "volume_mes": round(rf_vol, 2)},
+                "rv":   {"saldo": round(rv_saldo, 2),  "pct": pct(rv_saldo),  "receita": round(rv_rec, 2),  "volume_mes": round(rv_vol, 2)},
+                "estruturadas": {"pct_max": round(es_pctmax, 4), "volume": round(es_vol, 2), "receita": round(es_rec, 2)},
+                "fii":  {"saldo": round(fii_saldo, 2), "pct": pct(fii_saldo), "receita": round(fii_rec, 2), "volume_mes": round(fii_vol, 2)},
+                "internacional": {"saldo": round(in_saldo, 2), "pct": pct(in_saldo), "receita": round(in_rec, 2), "volume_mes": round(in_vol, 2)},
                 "receita_total": receita_total,
                 "roa_anual": roa_anual,
-                "okr_mensal": okr_mensal,
-                "okr_anual": okr_anual,
-                "okr_semestre": okr_semestre,
-                "pct_realizado_okr": pct_realizado,
+                # Metas OKR não vêm nesta planilha — zeradas p/ preenchimento manual
+                "okr_mensal": 0,
+                "okr_anual": 0,
+                "okr_semestre": 0,
+                "pct_realizado_okr": 0,
             })
+
+        if not assessores:
+            return jsonify({"ok": False, "erro": "Nenhum assessor encontrado abaixo do cabeçalho."}), 422
+
         payload = {
             "assessores": assessores,
             "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
