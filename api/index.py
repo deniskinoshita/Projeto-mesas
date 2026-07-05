@@ -13441,8 +13441,14 @@ def painel_carteiras():
             modelo_perfil = MODELOS.get(perfil, MODELOS.get("moderada", {}))
 
         # Busca última composição salva no histórico
-        hist_key = f"{ficha.get('assessor','')}|{nome}".lower().strip()
-        reg_hist  = hist.get(hist_key) or hist.get(f"conta:{conta}") or hist.get(conta) or {}
+        # Histórico: com nome, casa por 'assessor|nome'; SEM nome, casa só por
+        # 'conta:{conta}'. Nunca usar 'assessor|' (nome vazio) — colidiria entre
+        # todos os clientes sem nome do mesmo assessor, misturando as carteiras.
+        if nome:
+            hist_key = f"{ficha.get('assessor','')}|{nome}".lower().strip()
+            reg_hist = hist.get(hist_key) or hist.get(f"conta:{conta}") or hist.get(conta) or {}
+        else:
+            reg_hist = hist.get(f"conta:{conta}") or {}
         entradas  = reg_hist.get("entradas", []) if isinstance(reg_hist, dict) else []
         ultima    = entradas[0] if entradas else {}
         comp      = ultima.get("composicao", {})
