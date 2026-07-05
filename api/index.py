@@ -13547,7 +13547,9 @@ def painel_carteiras():
         })
 
     clientes_painel.sort(key=lambda x: -x["urgencia"])
-    return jsonify({"clientes": clientes_painel, "total": len(clientes_painel)})
+    resp = jsonify({"clientes": clientes_painel, "total": len(clientes_painel)})
+    resp.headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate"
+    return resp
 
 
 @app.route("/api/processar-zip-xp", methods=["POST"])
@@ -13821,6 +13823,7 @@ body{padding:0 0 60px}
         ↻ Atualizar
       </button>
     </div>
+    <div id="painel-status-atualizacao" style="font-size:11px;color:#3A6A48;margin-top:8px"></div>
 
     <!-- Barra de progresso -->
     <div id="lote-progress" style="display:none;margin-top:14px">
@@ -13898,7 +13901,7 @@ function perfil_label(p){ return ({super_conservadora:'Super Conservadora',conse
 async function carregar(){
   document.getElementById('lista').innerHTML = '<div class="spinner-wrap"><div class="spin"></div><p>Carregando carteiras salvas...</p></div>';
   try{
-    const r = await fetch('/api/painel-carteiras');
+    const r = await fetch('/api/painel-carteiras?t=' + Date.now(), {cache: 'no-store'});
     const d = await r.json();
     todos = d.clientes || [];
     renderStats(todos);
@@ -13912,12 +13915,19 @@ async function carregar(){
 
 // Botão "Atualizar": recarrega todos os dados do painel com feedback visual
 async function atualizarPainel(btn){
-  const original = btn ? btn.innerHTML : '';
+  const original = (btn ? btn.innerHTML : '') || '↻ Atualizar';
   if(btn){ btn.disabled = true; btn.style.opacity = '0.6'; btn.innerHTML = '↻ Atualizando...'; }
   try{
     await carregar();
+    const st = document.getElementById('painel-status-atualizacao');
+    if(st){ st.textContent = '✓ Atualizado às ' + new Date().toLocaleTimeString('pt-BR'); st.style.color = '#5DCAA5'; }
+    if(btn){ btn.innerHTML = '✓ Atualizado'; btn.style.color = '#5DCAA5'; }
+    setTimeout(function(){ if(btn){ btn.innerHTML = original; btn.style.color = '#7DCFEF'; } }, 1600);
+  } catch(e){
+    if(btn){ btn.innerHTML = '⚠ Erro'; btn.style.color = '#FF6B6B'; }
+    setTimeout(function(){ if(btn){ btn.innerHTML = original; btn.style.color = '#7DCFEF'; } }, 2500);
   } finally {
-    if(btn){ btn.disabled = false; btn.style.opacity = '1'; btn.innerHTML = original || '↻ Atualizar'; }
+    if(btn){ btn.disabled = false; btn.style.opacity = '1'; }
   }
 }
 
