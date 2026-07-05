@@ -7503,11 +7503,13 @@ def hp_produtos_salvar():
     produtos_por_classe = data.get("produtos", {})
     indicado_por = data.get("indicado_por", "Head de Produtos")
     indicado_em  = datetime.now().strftime("%d/%m/%Y %H:%M")
+    force        = bool(data.get("force", False))
 
     # Trava de segurança: não sobrescreve os produtos salvos com um conjunto vazio
     # (evita perder tudo por um salvamento acionado sem itens carregados na tela).
+    # 'force' libera o vazio para remoção/edição explícita feita pelo Head.
     total_novo = sum(len(v) for v in produtos_por_classe.values() if isinstance(v, list))
-    if total_novo == 0:
+    if total_novo == 0 and not force:
         atuais = _load(_HP_PROD_FILE, {})
         total_atual = sum(len(v) for v in atuais.values() if isinstance(v, list))
         return jsonify({"ok": False, "total": total_atual,
@@ -11290,6 +11292,10 @@ textarea{resize:vertical}
     Para cada classe/indexador, cadastre os produtos disponíveis e recomendados. O agente usa estes produtos para sugerir ao assessor como fechar o gap da carteira do cliente.
   </p>
 
+  <!-- Sugestões já salvas no arquivo (persistidas) — nunca são esquecidas -->
+  <div id="sugestoes-salvas" style="background:#060C06;border:1px solid #16241A;border-radius:10px;padding:14px 16px;margin-bottom:16px"></div>
+
+  <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">➕ Cadastrar novos ativos</div>
   <div class="tabs">
     <button class="tab active" onclick="prodTab('pos_fixado',this)">Pós Fixado</button>
     <button class="tab" onclick="prodTab('inflacao',this)">Inflação</button>
@@ -12121,6 +12127,85 @@ function coletarProdutos(){
   return result;
 }
 
+// ── Sugestões salvas no arquivo (persistidas) ─────────────────────────────────
+// _produtosSalvos espelha o que está guardado no servidor. Os formulários acima
+// servem só para CADASTRAR novos; ao salvar, os novos são somados aqui e a área
+// de cadastro é limpa. Assim nenhum ativo salvo é esquecido.
+let _produtosSalvos = {};
+const _PROD_LBL = {pos_fixado:'Pós Fixado',inflacao:'Inflação',pre_fixado:'Pré Fixado',acoes:'Ações',fiis:'FIIs',multimercado:'Multimercado',internacional:'Internacional',alternativos:'Alternativos',criptomoedas:'Cripto'};
+
+function _sanitizaSalvos(obj){
+  const out = {};
+  Object.keys(obj||{}).forEach(k=>{ if(Array.isArray(obj[k])) out[k] = obj[k]; });
+  return out;
+}
+
+async function _persisteSalvos(obj, force){
+  const r = await fetch("/api/hp/produtos/salvar", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ produtos: obj, indicado_por: "Head de Produtos", force: !!force })
+  });
+  return r.json();
+}
+
+function _escapa(s){ return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function renderSugestoesSalvas(){
+  const box = document.getElementById("sugestoes-salvas");
+  if(!box) return;
+  let total = 0, html = "";
+  Object.keys(_PROD_LBL).forEach(cls=>{
+    const arr = _produtosSalvos[cls] || [];
+    if(!arr.length) return;
+    total += arr.length;
+    html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${_PROD_LBL[cls]} <span style="color:#3A6A48">(${arr.length})</span></div>`;
+    arr.forEach((p,idx)=>{
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#081208;border:1px solid #1A2A18;border-radius:8px;margin-bottom:5px">
+        <span style="flex:1;font-size:12px;color:#F0F0F0"><b>${_escapa(p.nome)||'—'}</b>${p.taxa?` · <span style="color:#5DCAA5">${_escapa(p.taxa)}</span>`:''}${p.emissor?` · <span style="color:#888">${_escapa(p.emissor)}</span>`:''}${p.indicado_em?`<span style="color:#2A5A3A;font-size:10px;margin-left:6px">salvo ${_escapa(p.indicado_em)}</span>`:''}</span>
+        <button onclick="editarSalvo('${cls}',${idx})" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:6px;padding:4px 10px;color:#7DCFEF;font-size:11px;cursor:pointer">✏️ editar</button>
+        <button onclick="removerSalvo('${cls}',${idx})" title="Remover do arquivo" style="background:#1A0808;border:1px solid #3A1010;border-radius:6px;padding:4px 10px;color:#FF6B6B;font-size:11px;cursor:pointer">🗑️</button>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  box.innerHTML = total
+    ? `<div style="font-size:12px;color:#5DCAA5;font-weight:700;margin-bottom:10px">📌 Sugestões salvas no arquivo — ${total} ativo(s) · nunca são esquecidos</div>${html}`
+    : `<div style="font-size:12px;color:#2A5A3A">📭 Nenhuma sugestão salva ainda. Cadastre abaixo e clique em "💾 Salvar produtos".</div>`;
+}
+
+async function removerSalvo(cls, idx){
+  const p = (_produtosSalvos[cls]||[])[idx];
+  if(!p) return;
+  if(!confirm(`Remover "${p.nome||'ativo'}" das sugestões salvas?`)) return;
+  const merged = _sanitizaSalvos(JSON.parse(JSON.stringify(_produtosSalvos)));
+  merged[cls].splice(idx,1);
+  if(!merged[cls].length) delete merged[cls];
+  const d = await _persisteSalvos(merged, true);
+  if(d && d.ok){ _produtosSalvos = merged; renderSugestoesSalvas(); marcarPendente(); }
+  else { alert("Erro ao remover: " + ((d&&d.erro)||"")); }
+}
+
+function editarSalvo(cls, idx){
+  const p = (_produtosSalvos[cls]||[])[idx];
+  if(!p) return;
+  // Tira da lista SÓ em memória — NÃO persiste. O arquivo só muda quando você
+  // clicar em "Salvar produtos". Se sair sem salvar e recarregar, o ativo volta
+  // intacto (o arquivo nunca foi tocado). Assim editar não corre risco de perda.
+  _produtosSalvos[cls].splice(idx,1);
+  if(!_produtosSalvos[cls].length) delete _produtosSalvos[cls];
+  renderSugestoesSalvas();
+  // Reabre no formulário com os dados para ajuste
+  if(!_produtos[cls]) _produtos[cls] = [];
+  const nid = Date.now() + Math.floor(Math.random()*1000);
+  _produtos[cls].push(nid);
+  const panel = document.getElementById("prod-"+cls);
+  if(panel) panel.insertAdjacentHTML("beforeend", buildProdHtml(cls, nid, p));
+  const tabBtn = [...document.querySelectorAll('.tabs .tab')].find(b => (b.getAttribute('onclick')||'').includes("'"+cls+"'"));
+  if(tabBtn) tabBtn.click();
+  const st = document.getElementById("prod-save-st");
+  if(st) st.innerHTML = `<span style="color:#7DCFEF">✏️ Ativo movido para o formulário — ajuste e clique em "💾 Salvar produtos" para gravar de volta.</span>`;
+}
+
 // ── Base de Conhecimento ──────────────────────────────────────────────────────
 const KNOW_TIPO_COLORS = {carta:"#5DCAA5", research:"#8B9FE8", cenario:"#D4B483", relatorio:"#B08FCF", outro:"#888"};
 const KNOW_TIPO_LABELS = {carta:"Carta de Gestora", research:"Research", cenario:"Cenário Macro", relatorio:"Relatório", outro:"Outro"};
@@ -12780,22 +12865,37 @@ async function gest2Salvar(){
 async function salvarProdutos(){
   const btn = document.getElementById("btn-salvar-prod");
   const st  = document.getElementById("prod-save-st");
+  const novos = coletarProdutos();  // apenas os ativos nos formulários
+  const totalNovos = Object.values(novos).reduce((s,a)=>s+a.length, 0);
+  if(!totalNovos){
+    st.innerHTML = `<span class="status-err">Nenhum ativo novo no formulário para salvar.</span>`;
+    setTimeout(()=>st.textContent="", 5000);
+    return;
+  }
   btn.disabled = true; btn.textContent = "Salvando...";
-  const prods = coletarProdutos();
-  const total = Object.values(prods).reduce((s,a)=>s+a.length, 0);
+  // SOMA aos já salvos — nunca substitui (não perde os anteriores)
+  const merged = _sanitizaSalvos(JSON.parse(JSON.stringify(_produtosSalvos)));
+  Object.keys(novos).forEach(cls=>{
+    if(!novos[cls].length) return;
+    if(!merged[cls]) merged[cls] = [];
+    merged[cls] = merged[cls].concat(novos[cls]);
+  });
   try{
-    const r = await fetch("/api/hp/produtos/salvar", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ produtos: prods, indicado_por: "Head de Produtos" })
-    });
-    const d = await r.json();
-    if(d.ok){
-      st.innerHTML = `<span class="status-ok">✓ ${d.total} produto(s) salvos · indicado por <strong>${d.indicado_por}</strong> em ${d.indicado_em}</span>`; marcarPendente();
-    } else { st.innerHTML = `<span class="status-err">Erro ao salvar.</span>`; }
+    const d = await _persisteSalvos(merged, false);
+    if(d && d.ok){
+      _produtosSalvos = merged;
+      // limpa a área de cadastro (formulários somem da tela)
+      document.querySelectorAll('.prod-item').forEach(e=>e.remove());
+      _produtos = {};
+      renderSugestoesSalvas();
+      st.innerHTML = `<span class="status-ok">✓ ${totalNovos} ativo(s) salvos no arquivo · ${d.total} no total</span>`;
+      marcarPendente();
+    } else {
+      st.innerHTML = `<span class="status-err">Erro ao salvar: ${(d&&d.erro)||''}</span>`;
+    }
   } catch(e){ st.innerHTML = `<span class="status-err">Erro: ${e.message}</span>`; }
   finally{ btn.disabled=false; btn.textContent="💾 Salvar produtos"; }
-  setTimeout(()=>st.textContent="", 6000);
+  setTimeout(()=>st.textContent="", 7000);
 }
 
 // ── Publicar ──────────────────────────────────────────────────────────────────
@@ -12832,10 +12932,14 @@ async function publicar(){
 
   let payload;
   try {
+    // Snapshot = salvos no arquivo + o que estiver no formulário (não perde nada em edição)
+    const _snapProds = _sanitizaSalvos(JSON.parse(JSON.stringify(_produtosSalvos)));
+    const _nf = coletarProdutos();
+    Object.keys(_nf).forEach(cls=>{ if(_nf[cls].length){ (_snapProds[cls] = _snapProds[cls] || []).push(..._nf[cls]); } });
     payload = {
       portfolios: coletarPortfolios(),
       cenario:    coletarCenario(),
-      produtos:   coletarProdutos(),
+      produtos:   _snapProds,
     };
   } catch(eColeta) {
     _pubProgress(100, "#FF4444");
@@ -13095,8 +13199,10 @@ async function init(){
     ]);
     renderPortoTable(porto);
     carregarCenario(cenario);
-    if(prods.produtos && Object.keys(prods.produtos).length) renderProdutos(prods.produtos);
-    else if(typeof prods === "object" && !prods.produtos) renderProdutos(prods);
+    // Produtos já salvos vão para a lista "Sugestões salvas no arquivo"
+    // (a área de formulários fica limpa, só para cadastrar novos).
+    _produtosSalvos = _sanitizaSalvos((prods && prods.produtos && typeof prods.produtos === "object") ? prods.produtos : (prods || {}));
+    renderSugestoesSalvas();
   } catch(e){
     console.error("Erro ao carregar dados:", e);
   }
