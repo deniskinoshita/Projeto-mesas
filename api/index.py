@@ -1309,7 +1309,7 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
     return recomendacoes, alertas
 
 
-def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomendacoes, alertas, macro, ref_contexto, checklist_servir=None):
+def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomendacoes, alertas, macro, ref_contexto, checklist_servir=None, acoes=None, conta=""):
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import cm
@@ -1466,6 +1466,68 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                 prods=", ".join(rec["produtos"])
                 elems.append(Paragraph(f"Produtos sugeridos: {prods}",s_sug))
             elems.append(Spacer(1,0.15*cm))
+
+    # ── Posicionamento das ações + proteção de posições (Stock Guide Levante + XP)
+    if acoes:
+        guia = (carregar_stock_guide() or {}).get("acoes", {})
+        def _rt(r):
+            r=(r or "").upper()
+            if "COMPRA" in r: return VERDE
+            if "VENDA" in r:  return VERM
+            if "NEUTRO" in r: return AMARELO
+            return colors.HexColor("#AAAAAA")
+        def _pct(v):
+            return (("+" if v*100>=0 else "")+f"{v*100:.0f}%") if v is not None else "—"
+        def _brl(v):
+            return ("R$ "+f"{v:,.2f}".replace(",","X").replace(".",",").replace("X",".")) if v is not None else "—"
+        linhas_pos=[["Ativo","% Cart.","Posição (Levante)","Alvo / Upside","Mercado (XP)"]]
+        estilo_extra=[]; prot_itens=[]
+        for i,a in enumerate(acoes,1):
+            tk=str(a.get("ticker","")).upper()
+            g=guia.get(tk) or {}
+            lev=g.get("levante"); xp=g.get("xp"); src=lev or xp
+            pos_txt=(lev.get("rating") if lev else ((xp.get("rating","")+" (via XP)") if xp else "sem cobertura"))
+            alvo_txt=(_brl(src.get("alvo"))+" ("+_pct(src.get("upside"))+")") if (src and src.get("alvo") is not None) else "—"
+            xp_txt=((xp.get("rating","")+((" "+xp.get("consenso")) if xp.get("consenso") else "")+" "+_pct(xp.get("upside"))) if xp else "—")
+            linhas_pos.append([tk, f'{float(a.get("perc",0) or 0):.1f}%', pos_txt, alvo_txt, xp_txt])
+            estilo_extra.append(("TEXTCOLOR",(2,i),(2,i),_rt(lev.get("rating") if lev else (xp.get("rating") if xp else ""))))
+            if src and src.get("upside") is not None and src.get("upside")<=0.10:
+                prot_itens.append({"ticker":tk,"rating":(lev.get("rating") if lev else xp.get("rating")),
+                    "fonte":("Levante" if lev else "XP"),"alvo":src.get("alvo"),"upside":src.get("upside")})
+        elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+        elems.append(Paragraph("Posicionamento das Ações — Levante (casa principal) + XP (mercado)",s_sec))
+        tp=Table(linhas_pos,colWidths=[2.5*cm,1.7*cm,4.2*cm,3.7*cm,4.4*cm])
+        est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
+                 ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
+                 ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+                 ("ALIGN",(1,0),(1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),3),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
+                 ("TEXTCOLOR",(0,1),(0,-1),DOURADO)]
+        est_pos+=estilo_extra
+        tp.setStyle(TableStyle(est_pos))
+        elems.append(tp); elems.append(Spacer(1,0.15*cm))
+        elems.append(Paragraph("Levante = posicionamento Braúna. XP = como o mercado ve. Preco-alvo e referencia; o preco vivo vem do XPerformance.",s_gest))
+        elems.append(Spacer(1,0.3*cm))
+
+        if prot_itens:
+            status_por_ticker={}
+            if conta:
+                try:
+                    _fic=load_fichas()
+                    _f=_fic.get(f"conta:{conta}") or _fic.get(conta) or {}
+                    for _p in _f.get("protecoes",[]):
+                        status_por_ticker[_p.get("ticker")]=_p.get("status","pendente")
+                except Exception:
+                    pass
+            STATUS_LBL={"pendente":"Pendente","recusada":"Cliente recusou","estruturada":"Estruturada aplicada","caixa":"Vendido p/ caixa"}
+            elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+            elems.append(Paragraph("Protecao de Posicoes — perto do preco-alvo",s_sec))
+            elems.append(Paragraph("Acoes a 10% ou menos do preco-alvo. Proteger o ganho: (a) operacao estruturada (collar / put de protecao / fence) ou (b) realizar a posicao e alocar em caixa (pos-fixado).",s_body))
+            elems.append(Spacer(1,0.1*cm))
+            for it in prot_itens:
+                st=STATUS_LBL.get(status_por_ticker.get(it["ticker"],"pendente"),"Pendente")
+                elems.append(Paragraph(f'{it["ticker"]} — {it["rating"]} ({it["fonte"]}) · alvo {_brl(it["alvo"])} ({_pct(it["upside"])} de upside) · Status: {st}',
+                    S("Prot",fontSize=9,leading=13,tc=LARANJA)))
+            elems.append(Spacer(1,0.3*cm))
 
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
     elems.append(Paragraph(f"Consenso dos Gestores — Ref. {ref_contexto}",s_sec))
@@ -4649,7 +4711,11 @@ async function baixarPdf(){
   document.getElementById("btn-pdf").textContent="Gerando...";
   document.getElementById("btn-pdf").disabled=true;
   try{
-    const res=await fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(analiseData)});
+    const _pdfPayload=Object.assign({}, analiseData, {
+      acoes: analiseData.acoes || (_clienteIdentificado && _clienteIdentificado.acoes) || [],
+      conta: (_clienteIdentificado && _clienteIdentificado.conta) || analiseData.conta || "",
+    });
+    const res=await fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_pdfPayload)});
     if(!res.ok) throw new Error(await res.text());
     const blob=await res.blob();
     const a=document.createElement("a");
@@ -8403,6 +8469,7 @@ def pdf_endpoint():
         d.get("recomendacoes",[]), d.get("alertas",[]),
         d.get("macro",{}), d.get("ref_contexto",""),
         d.get("checklist_servir"),
+        d.get("acoes", []), d.get("conta", ""),
     )
     nome_arq = f"{d.get('nome','cliente').replace(' ','-').lower()}_{d.get('data_ref','')}_analise.pdf"
     return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=nome_arq)
