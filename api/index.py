@@ -2494,8 +2494,10 @@ function renderInstToggle(){
   // Ordem: IDs definidos + qualquer outro
   var ids = _INST_ORDEM.filter(function(id){ return _gestoras[id]; });
   Object.keys(_gestoras).forEach(function(id){ if(ids.indexOf(id)<0) ids.push(id); });
-  // Adiciona "Levante (padrão)" que usa value="" no select
-  var itens = [{id:"levante_asset_hp", nome:"Levante HP", icon:"📊", cor:"#C9A96E", ref:"HP Portfolio"}];
+  // Auto-corrige a seleção ativa: precisa ser uma gestora cadastrada
+  if(ids.indexOf(_instAtiva) < 0) _instAtiva = ids[0] || "";
+  // Só as carteiras cadastradas (sem card fixo "Levante HP")
+  var itens = [];
   ids.forEach(function(id){
     var g = _gestoras[id];
     itens.push({id:id, nome:g.nome||id, icon:_INST_ICON[id]||"🏛️", cor:_INST_COR[id]||"#888", ref:g.referencia||""});
@@ -2519,10 +2521,7 @@ function selecionarInstituicao(id){
   _instAtiva = id;
   var sel = document.getElementById("gestora-sel");
   if(!sel) return;
-  // "levante_asset_hp" = Levante HP padrão (sem gestora no select)
-  if(id === "levante_asset_hp"){
-    sel.value = "";
-  } else if(_gestoras[id]){
+  if(_gestoras[id]){
     // garante que a option existe
     if(!sel.querySelector('option[value="'+id+'"]')){
       var opt = document.createElement("option");
@@ -2539,15 +2538,18 @@ function carregarGestoras(tentativa){
   tentativa = tentativa || 0;
   fetch("/api/hp/gestoras2").then(r=>r.json()).then(d=>{
     _gestoras = d || {};
-    // Popula select oculto
+    // Popula select oculto só com as gestoras cadastradas
     var sel = document.getElementById("gestora-sel");
     if(sel){
       var ids = Object.keys(_gestoras);
-      sel.innerHTML = '<option value="">Levante HP</option>' +
-        ids.map(function(id){ return '<option value="'+id+'">'+(d[id].nome||id)+'</option>'; }).join("");
+      sel.innerHTML = ids.map(function(id){ return '<option value="'+id+'">'+(d[id].nome||id)+'</option>'; }).join("");
     }
-    renderInstToggle();
-    atualizarModelo();
+    // Define a carteira ativa padrão (uma cadastrada) e sincroniza select + toggle
+    var idsOrd = _INST_ORDEM.filter(function(id){ return _gestoras[id]; });
+    Object.keys(_gestoras).forEach(function(id){ if(idsOrd.indexOf(id)<0) idsOrd.push(id); });
+    if(idsOrd.indexOf(_instAtiva) < 0) _instAtiva = idsOrd[0] || "";
+    if(_instAtiva){ selecionarInstituicao(_instAtiva); }
+    else { renderInstToggle(); atualizarModelo(); }
   }).catch(function(){
     if(tentativa < 4) setTimeout(function(){ carregarGestoras(tentativa+1); }, 4000);
   });
@@ -2727,9 +2729,8 @@ async function identificarCliente(file){
       _sugHint.style.display = "none";
     }
     if(d.ficha_salva?.objetivo) document.getElementById("objetivo").value = d.ficha_salva.objetivo || "";
-    if(d.ficha_salva?.gestora){
-      const _gs = document.getElementById("gestora-sel");
-      if(_gs && _gestoras[d.ficha_salva.gestora]){ _gs.value = d.ficha_salva.gestora; atualizarModelo(); }
+    if(d.ficha_salva?.gestora && _gestoras[d.ficha_salva.gestora]){
+      selecionarInstituicao(d.ficha_salva.gestora);
     }
 
     // ── Restaura checklist do modelo de servir
@@ -3317,9 +3318,8 @@ function carregarFicha(jsonStr){
   if(c.perfil) document.getElementById("perfil").value = c.perfil;
   document.getElementById("objetivo").value = c.objetivo || "";
   // Restaura a carteira de referência escolhida (se ainda existir cadastrada)
-  const gsel = document.getElementById("gestora-sel");
-  if(gsel && c.gestora && _gestoras[c.gestora]) gsel.value = c.gestora;
-  atualizarModelo();
+  if(c.gestora && _gestoras[c.gestora]) selecionarInstituicao(c.gestora);
+  else atualizarModelo();
 
   // Restaura checklist
   if(c.checklist){
