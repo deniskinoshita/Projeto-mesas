@@ -1,0 +1,3515 @@
+{
+ "_meta": {
+  "fonte_levante": "Levante — Stock Guide",
+  "fonte_levante_data": "2026-07-03",
+  "fonte_xp": "XP — Stock Guide Mesa RV",
+  "fonte_xp_data": "2026-05-21",
+  "total": 168
+ },
+ "acoes": {
+  "ITUB4": {
+   "nome": "Itaú",
+   "setor": "Bancos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 42.74,
+    "alvo": 50,
+    "upside": 0.16986429574169382,
+    "pl": 10.136988635,
+    "ev_ebitda": 0,
+    "pvp": 2.354110904,
+    "dy": 0.09419915301,
+    "div_ebitda": 0,
+    "beta": 1.1789498775,
+    "roe": 0.23206817625
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 3 V 0",
+    "ultimo": 39.67,
+    "alvo": 49.84119415283203,
+    "upside": 0.2563951135072353,
+    "pl_fwd": 8.410921825535764,
+    "ev_ebitda_fwd": null,
+    "dy": 0.07380535007683119
+   }
+  },
+  "BBAS3": {
+   "nome": "Banco do Brasil",
+   "setor": "Bancos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 19.98,
+    "alvo": 22,
+    "upside": 0.10110110110110115,
+    "pl": 8.0741534021,
+    "ev_ebitda": 0,
+    "pvp": 0.60065170584,
+    "dy": 0.024649370024,
+    "div_ebitda": 0,
+    "beta": 0.86922219094,
+    "roe": 0.092241368117
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 2 N 11 V 2",
+    "ultimo": 20.7,
+    "alvo": 25.207141876220703,
+    "upside": 0.21773632252273933,
+    "pl_fwd": 4.944828646636085,
+    "ev_ebitda_fwd": null,
+    "dy": 0.056712199455827644
+   }
+  },
+  "SANB11": {
+   "nome": "Santander",
+   "setor": "Bancos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 26.95,
+    "alvo": 32,
+    "upside": 0.18738404452690172,
+    "pl": 6.5861798175,
+    "ev_ebitda": 0,
+    "pvp": 1.0345587016,
+    "dy": 0.078491528183,
+    "div_ebitda": 0,
+    "beta": 1.0814494439,
+    "roe": 0.16352734981
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 4 N 9 V 1",
+    "ultimo": 27.45,
+    "alvo": 37.936363220214844,
+    "upside": 0.3820168750533641,
+    "pl_fwd": 5.904057672197046,
+    "ev_ebitda_fwd": null,
+    "dy": 0.08161045160479868
+   }
+  },
+  "ABCB4": {
+   "nome": "Banco ABC",
+   "setor": "Bancos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 23.79,
+    "alvo": 30,
+    "upside": 0.26103404791929385,
+    "pl": 5.6901219629,
+    "ev_ebitda": 0,
+    "pvp": 0.80552216081,
+    "dy": 0.12413793103,
+    "div_ebitda": 0,
+    "beta": 0.79677081879,
+    "roe": 0.1499996594
+   },
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": null,
+    "ultimo": 24.39,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": 5.250395895879384,
+    "ev_ebitda_fwd": null,
+    "dy": 0.07752863352388313
+   }
+  },
+  "BBDC3": {
+   "nome": "Bradesco",
+   "setor": "Bancos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 15.88,
+    "alvo": 23,
+    "upside": 0.4483627204030225,
+    "pl": 7.0637643835,
+    "ev_ebitda": 0,
+    "pvp": 0.96723526818,
+    "dy": 0.076188844175,
+    "div_ebitda": 0,
+    "beta": 1.3916627248,
+    "roe": 0.14120400192
+   },
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 15.49,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": 5.652573298099912,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "BPAC11": {
+   "nome": "BTG Pactual",
+   "setor": "Bancos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 55.84,
+    "alvo": 65,
+    "upside": 0.16404011461318047,
+    "pl": 12.316515193,
+    "ev_ebitda": 0,
+    "pvp": 2.8946962354,
+    "dy": 0.02948949156,
+    "div_ebitda": 0,
+    "beta": 1.5044452641,
+    "roe": 0.2483974726
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 4 V 0",
+    "ultimo": 54.2,
+    "alvo": 65.46666717529297,
+    "upside": 0.2078720881050362,
+    "pl_fwd": 10.034039782355348,
+    "ev_ebitda_fwd": 19.748935017634683,
+    "dy": 0.03463721706182579
+   }
+  },
+  "CXSE3": {
+   "nome": "Caixa Seguridade",
+   "setor": "Setor Financeiro (Ex-Bancos)",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 20.53,
+    "alvo": 19,
+    "upside": -0.07452508524111057,
+    "pl": 14.025079365,
+    "ev_ebitda": 12.725644623,
+    "pvp": 4.472114417,
+    "dy": 0.089260435646,
+    "div_ebitda": -0.23129579713,
+    "beta": 0.76466088155,
+    "roe": 0.31587697525
+   }
+  },
+  "ROXO34": {
+   "nome": "Nubank",
+   "setor": "B3",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 11.71,
+    "alvo": 15,
+    "upside": 0.2809564474807855,
+    "pl": 0,
+    "ev_ebitda": 0,
+    "pvp": 0,
+    "dy": 0,
+    "div_ebitda": 0,
+    "beta": 0.52247401834,
+    "roe": 0
+   }
+  },
+  "ITSA4": {
+   "nome": "Itaúsa",
+   "setor": "B3",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 13.6,
+    "alvo": 15,
+    "upside": 0.10294117647058831,
+    "pl": 8.9585632974,
+    "ev_ebitda": 8.1267333904,
+    "pvp": 1.6904776176,
+    "dy": 0.12016720972,
+    "div_ebitda": 0.21387952292,
+    "beta": 1.1815942712,
+    "roe": 0.18400314996
+   },
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 7 N 0 V 0",
+    "ultimo": 13,
+    "alvo": 16.983333587646484,
+    "upside": 0.30641027597280646,
+    "pl_fwd": 7.25444877521044,
+    "ev_ebitda_fwd": null,
+    "dy": 0.09218685529030356
+   }
+  },
+  "BBSE3": {
+   "nome": "BB Seguridade",
+   "setor": "B3",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 38.65,
+    "alvo": 42,
+    "upside": 0.08667529107373872,
+    "pl": 8.1618693805,
+    "ev_ebitda": 0,
+    "pvp": 5.9353475184,
+    "dy": 0.12426894199,
+    "div_ebitda": 0,
+    "beta": 0.2987723605,
+    "roe": 0.75648913381
+   },
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 10 V 3",
+    "ultimo": 34.71,
+    "alvo": 36.41666793823242,
+    "upside": 0.04916934423026276,
+    "pl_fwd": 7.911853837890711,
+    "ev_ebitda_fwd": 9.122670372096405,
+    "dy": 0.11514132974807133
+   }
+  },
+  "INBR32": {
+   "nome": "Inter",
+   "setor": "B3",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 28.4,
+    "alvo": 50,
+    "upside": 0.7605633802816902,
+    "pl": 0,
+    "ev_ebitda": 0,
+    "pvp": 0,
+    "dy": 0.015418444075,
+    "div_ebitda": 0,
+    "beta": 0,
+    "roe": 0
+   }
+  },
+  "CSUD3": {
+   "nome": "Csu Digital",
+   "setor": "B3",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 14.5,
+    "alvo": 22,
+    "upside": 0.5172413793103448,
+    "pl": 5.8897881385,
+    "ev_ebitda": 3.8321028229,
+    "pvp": 1.2539868447,
+    "dy": 0.125568308,
+    "div_ebitda": 0.31326368918,
+    "beta": 0.93527926852,
+    "roe": 0.20920234551
+   }
+  },
+  "PSSA3": {
+   "nome": "Porto",
+   "setor": "B3",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 54.19,
+    "alvo": 55,
+    "upside": 0.014947407270714086,
+    "pl": 9.4478641728,
+    "ev_ebitda": 6.0288865115,
+    "pvp": 2.2334707183,
+    "dy": 0.053216363441,
+    "div_ebitda": -3.6073225265,
+    "beta": 0.79038041771,
+    "roe": 0.25159538112
+   },
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 5 N 7 V 0",
+    "ultimo": 49.22,
+    "alvo": 54.900001525878906,
+    "upside": 0.11540027480452886,
+    "pl_fwd": 8.28618994143869,
+    "ev_ebitda_fwd": null,
+    "dy": 0.06503469449076085
+   }
+  },
+  "SMFT3": {
+   "nome": "SmartFit",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 20.15,
+    "alvo": 29,
+    "upside": 0.43920595533498763,
+    "pl": 17.519369453,
+    "ev_ebitda": 4.4880909724,
+    "pvp": 2.0872161772,
+    "dy": 0.044496643149,
+    "div_ebitda": 1.1178813822,
+    "beta": 1.7040931947,
+    "roe": 0.12059620915
+   }
+  },
+  "ASAI3": {
+   "nome": "Assaí",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 8.79,
+    "alvo": 11,
+    "upside": 0.25142207053469856,
+    "pl": 0,
+    "ev_ebitda": 0,
+    "pvp": 0,
+    "dy": 0.010179961961,
+    "div_ebitda": 2.0753543035,
+    "beta": 1.3522965492,
+    "roe": 0.12420156139
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 6 V 0",
+    "ultimo": 8.61,
+    "alvo": 11.699999809265137,
+    "upside": 0.3588849952688893,
+    "pl_fwd": 9.180754491898648,
+    "ev_ebitda_fwd": 5.2616325926162055,
+    "dy": 0.022527044646472736
+   }
+  },
+  "MGLU3": {
+   "nome": "Magazine Luiza",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 4.45,
+    "alvo": 11,
+    "upside": 1.4719101123595504,
+    "pl": 25.220021897,
+    "ev_ebitda": 2.2008339491,
+    "pvp": 0.30593312547,
+    "dy": 0.0092889229276,
+    "div_ebitda": 1.0983537057,
+    "beta": 2.9909450996,
+    "roe": 0.012074305389
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 2 N 10 V 4",
+    "ultimo": 6.73,
+    "alvo": 8.915872573852539,
+    "upside": 0.324795330438713,
+    "pl_fwd": 11.33530372158156,
+    "ev_ebitda_fwd": 3.8027711591620648,
+    "dy": 0.04903929907260337
+   }
+  },
+  "VIVA3": {
+   "nome": "Vivara",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 22.77,
+    "alvo": 30,
+    "upside": 0.31752305665349145,
+    "pl": 9.1460747405,
+    "ev_ebitda": 6.2372593414,
+    "pvp": 1.7663607695,
+    "dy": 0.025705937426,
+    "div_ebitda": 0.2297424083,
+    "beta": 1.2910406685,
+    "roe": 0.20745796299
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 13 N 2 V 0",
+    "ultimo": 22.66,
+    "alvo": 35.28571319580078,
+    "upside": 0.5571806352957096,
+    "pl_fwd": 7.520580867486426,
+    "ev_ebitda_fwd": 6.011810517082609,
+    "dy": 0.03585232979273823
+   }
+  },
+  "LREN3": {
+   "nome": "Lojas Renner",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 14.8,
+    "alvo": 18,
+    "upside": 0.21621621621621623,
+    "pl": 9.8581130976,
+    "ev_ebitda": 4.1706505751,
+    "pvp": 1.3939298909,
+    "dy": 0.046630793157,
+    "div_ebitda": -0.46680400778,
+    "beta": 1.6239952187,
+    "roe": 0.14480376664
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 5 V 0",
+    "ultimo": 14.7,
+    "alvo": 19.214284896850586,
+    "upside": 0.307094210670108,
+    "pl_fwd": 8.945233265720082,
+    "ev_ebitda_fwd": 4.954060333426417,
+    "dy": 0.06070763937759011
+   }
+  },
+  "CEAB3": {
+   "nome": "C&A",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 10.99,
+    "alvo": 20,
+    "upside": 0.8198362147406733,
+    "pl": 5.6823544486,
+    "ev_ebitda": 1.9715704818,
+    "pvp": 0.89741666196,
+    "dy": 0.025259061501,
+    "div_ebitda": 0.07513524218,
+    "beta": 2.0051640985,
+    "roe": 0.16788100473
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 1 V 0",
+    "ultimo": 11.15,
+    "alvo": 18.909090042114258,
+    "upside": 0.6958825149878258,
+    "pl_fwd": 6.260393115213263,
+    "ev_ebitda_fwd": 3.047687614161125,
+    "dy": 0.0521175884404584
+   }
+  },
+  "GMAT3": {
+   "nome": "Grupo Mateus",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 3.75,
+    "alvo": 6,
+    "upside": 0.6000000000000001,
+    "pl": 4.8924450691,
+    "ev_ebitda": 3.8694091245,
+    "pvp": 0.7887195756,
+    "dy": 0.015192725261,
+    "div_ebitda": 0.27318841898,
+    "beta": 1.352497645,
+    "roe": 0.15633584414
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 5 N 4 V 1",
+    "ultimo": 4.42,
+    "alvo": 6.5,
+    "upside": 0.47058823529411775,
+    "pl_fwd": 6.24733290732056,
+    "ev_ebitda_fwd": 5.587213373794321,
+    "dy": 0.02082141433054212
+   }
+  },
+  "AZZA3": {
+   "nome": "AZZAS",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 17.14,
+    "alvo": 27,
+    "upside": 0.5752625437572929,
+    "pl": 4.2054487627,
+    "ev_ebitda": 3.3108714536,
+    "pvp": 0.43246090202,
+    "dy": 0.060283732238,
+    "div_ebitda": 1.2796241287,
+    "beta": 1.3395843676,
+    "roe": 0.10525291115
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 7 V 1",
+    "ultimo": 19.6,
+    "alvo": 31.821428298950195,
+    "upside": 0.6235422601505201,
+    "pl_fwd": 5.546706683566868,
+    "ev_ebitda_fwd": 3.53431711429937,
+    "dy": 0.06739444053483462
+   }
+  },
+  "NATU3": {
+   "nome": "Natura",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 8.38,
+    "alvo": 10,
+    "upside": 0.19331742243436745,
+    "pl": -4.9580042105,
+    "ev_ebitda": 8.6865248083,
+    "pvp": 0.92402701524,
+    "dy": 0,
+    "div_ebitda": 2.2379766286,
+    "beta": 1.2878841572,
+    "roe": -0.16884556976
+   }
+  },
+  "SBFG3": {
+   "nome": "Grupo SBF",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 10.3,
+    "alvo": 16,
+    "upside": 0.5533980582524272,
+    "pl": 7.1189353381,
+    "ev_ebitda": 6.3869026929,
+    "pvp": 0.76811740283,
+    "dy": 0.044495993371,
+    "div_ebitda": 3.3915025771,
+    "beta": 2.0540082965,
+    "roe": 0.11172038842
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 9 N 1 V 0",
+    "ultimo": 10.86,
+    "alvo": 17.16666603088379,
+    "upside": 0.5807243122360763,
+    "pl_fwd": 5.032437442075996,
+    "ev_ebitda_fwd": 4.460912894038011,
+    "dy": 0.04098840696287828
+   }
+  },
+  "VULC3": {
+   "nome": "Vulcabras",
+   "setor": "Varejo",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 14.11,
+    "alvo": 24,
+    "upside": 0.7009213323883772,
+    "pl": 3.5098539482,
+    "ev_ebitda": 5.7060188155,
+    "pvp": 1.7686683951,
+    "dy": 0.2167875576,
+    "div_ebitda": 0.75123940428,
+    "beta": 0.84456030162,
+    "roe": 0.48356152582
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 0 V 0",
+    "ultimo": 15.22,
+    "alvo": 22.5,
+    "upside": 0.47831800262812085,
+    "pl_fwd": 7.490538820534578,
+    "ev_ebitda_fwd": 6.123935579558321,
+    "dy": 0.06996616671953115
+   }
+  },
+  "CYRE3": {
+   "nome": "Cyrela",
+   "setor": "Moradia",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 23.4,
+    "alvo": 35,
+    "upside": 0.49572649572649574,
+    "pl": 4.5529508487,
+    "ev_ebitda": 6.668444078,
+    "pvp": 0.96005114767,
+    "dy": 0.10515875211,
+    "div_ebitda": 2.0117441487,
+    "beta": 1.7641934163,
+    "roe": 0.21141407313
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 3 V 0",
+    "ultimo": 22.14,
+    "alvo": 36.77650451660156,
+    "upside": 0.6610887315538194,
+    "pl_fwd": 4.599832835820896,
+    "ev_ebitda_fwd": 5.29007346797142,
+    "dy": 0.07194377818618543
+   }
+  },
+  "CURY3": {
+   "nome": "Cury",
+   "setor": "Moradia",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 34.93,
+    "alvo": 43,
+    "upside": 0.2310334955625537,
+    "pl": 9.7173666601,
+    "ev_ebitda": 7.4769175171,
+    "pvp": 6.9663929503,
+    "dy": 0.14883445867,
+    "div_ebitda": -0.28431221841,
+    "beta": 1.1933290601,
+    "roe": 0.73690422548
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 2 V 0",
+    "ultimo": 31.3,
+    "alvo": 45.653846740722656,
+    "upside": 0.458589352738743,
+    "pl_fwd": 7.244657161784307,
+    "ev_ebitda_fwd": 5.537504142219909,
+    "dy": 0.0935985947388393
+   }
+  },
+  "MRVE3": {
+   "nome": "MRV",
+   "setor": "Moradia",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 5.43,
+    "alvo": 8,
+    "upside": 0.4732965009208103,
+    "pl": -4.0154320245,
+    "ev_ebitda": 15.421301631,
+    "pvp": 0.58607261738,
+    "dy": 0,
+    "div_ebitda": 10.496065607,
+    "beta": 2.01973692,
+    "roe": -0.11789462263
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 8 V 0",
+    "ultimo": 6.44,
+    "alvo": 10.664285659790039,
+    "upside": 0.6559449782282669,
+    "pl_fwd": 4.879977702679162,
+    "ev_ebitda_fwd": 4.468944400932538,
+    "dy": 0.018637704957045285
+   }
+  },
+  "PLPL3": {
+   "nome": "Plano & Plano",
+   "setor": "Moradia",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 8.58,
+    "alvo": 17,
+    "upside": 0.9813519813519813,
+    "pl": 5.1604265216,
+    "ev_ebitda": 3.7815350773,
+    "pvp": 1.635837199,
+    "dy": 0.032211102454,
+    "div_ebitda": 0.17455357492,
+    "beta": 1.7798416882,
+    "roe": 0.3797307341
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 0 V 0",
+    "ultimo": 10.41,
+    "alvo": 21.600000381469727,
+    "upside": 1.074927990535036,
+    "pl_fwd": 3.97361947578251,
+    "ev_ebitda_fwd": 2.948812352072719,
+    "dy": 0.08809058487086908
+   }
+  },
+  "IGTI11": {
+   "nome": "Iguatemi",
+   "setor": "Propriedades Comerciais",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 25.8,
+    "alvo": 32,
+    "upside": 0.24031007751937983,
+    "pl": 6.236407434,
+    "ev_ebitda": 4.4450958281,
+    "pvp": 0.91107999377,
+    "dy": 0.014717921593,
+    "div_ebitda": 1.3455117038,
+    "beta": 0.92667575872,
+    "roe": 0.15361410954
+   }
+  },
+  "MULT3": {
+   "nome": "Multiplan",
+   "setor": "Propriedades Comerciais",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 29.35,
+    "alvo": 31,
+    "upside": 0.05621805792163537,
+    "pl": 11.727306467,
+    "ev_ebitda": 8.919076012,
+    "pvp": 2.2228085097,
+    "dy": 0.04165947581,
+    "div_ebitda": 2.1270938187,
+    "beta": 0.9835500952,
+    "roe": 0.20017693877
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 3 V 0",
+    "ultimo": 30.11,
+    "alvo": 38,
+    "upside": 0.2620391896379941,
+    "pl_fwd": 11.71438154011269,
+    "ev_ebitda_fwd": 9.87860415459163,
+    "dy": 0.040572816658204724
+   }
+  },
+  "ALOS3": {
+   "nome": "Allos",
+   "setor": "Propriedades Comerciais",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 28.2,
+    "alvo": 36,
+    "upside": 0.27659574468085113,
+    "pl": 17.022275968,
+    "ev_ebitda": 5.603100458,
+    "pvp": 1.0857906809,
+    "dy": 0.12136301739,
+    "div_ebitda": -1.0062723567,
+    "beta": 1.2544026974,
+    "roe": 0.068573255381
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 3 V 0",
+    "ultimo": 28.66,
+    "alvo": 35.11538314819336,
+    "upside": 0.22524016567318061,
+    "pl_fwd": 13.580669641722432,
+    "ev_ebitda_fwd": 8.782004363129905,
+    "dy": 0.11806287481985919
+   }
+  },
+  "ALUP11": {
+   "nome": "Alupar",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 33.04,
+    "alvo": 35,
+    "upside": 0.05932203389830515,
+    "pl": 9.768920891,
+    "ev_ebitda": 7.5937957092,
+    "pvp": 1.172726491,
+    "dy": 0.034682080925,
+    "div_ebitda": 2.9326580447,
+    "beta": 0.58151849814,
+    "roe": 0.12679265022
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 2 V 0",
+    "ultimo": 32.5,
+    "alvo": 38.43269348144531,
+    "upside": 0.18254441481370187,
+    "pl_fwd": 11.811056513451309,
+    "ev_ebitda_fwd": 7.404124743187323,
+    "dy": 0.043401945181255515
+   }
+  },
+  "AURE3": {
+   "nome": "Auren Energia",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 12.01,
+    "alvo": 15,
+    "upside": 0.24895920066611166,
+    "pl": -9.6987155986,
+    "ev_ebitda": 10.769523678,
+    "pvp": 1.0533370021,
+    "dy": 0,
+    "div_ebitda": 6.4170210074,
+    "beta": 0,
+    "roe": -0.087609601075
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 2 N 10 V 1",
+    "ultimo": 12.6,
+    "alvo": 14.4975004196167,
+    "upside": 0.15059527139815065,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 10.0463888753328,
+    "dy": 0.005159642401021712
+   }
+  },
+  "CMIG4": {
+   "nome": "Cemig",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 11.03,
+    "alvo": 13,
+    "upside": 0.17860380779691765,
+    "pl": 6.5223728891,
+    "ev_ebitda": 6.5269500953,
+    "pvp": 1.0922789362,
+    "dy": 0.11591263831,
+    "div_ebitda": 2.1610258193,
+    "beta": 0.54172401161,
+    "roe": 0.17037662239
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 9 V 4",
+    "ultimo": 11.53,
+    "alvo": 12.568333625793457,
+    "upside": 0.09005495453542567,
+    "pl_fwd": 9.683557134444776,
+    "ev_ebitda_fwd": 7.493303983028983,
+    "dy": 0.06628518640361808
+   }
+  },
+  "CPLE3": {
+   "nome": "Copel",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 15.06,
+    "alvo": 18,
+    "upside": 0.19521912350597614,
+    "pl": 16.477135148,
+    "ev_ebitda": 9.3805474926,
+    "pvp": 1.876837219,
+    "dy": 0.092250119339,
+    "div_ebitda": 2.708090656,
+    "beta": 0.81597193827,
+    "roe": 0.10862784566
+   }
+  },
+  "AXIA3": {
+   "nome": "Eletrobras*",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 53.97,
+    "alvo": 70,
+    "upside": 0.2970168612191959,
+    "pl": 13.654640676,
+    "ev_ebitda": 14.097619999,
+    "pvp": 1.2651945912,
+    "dy": 0.089304114936,
+    "div_ebitda": 3.2253090137,
+    "beta": 0.97289953251,
+    "roe": 0.078624073786
+   }
+  },
+  "ENGI11": {
+   "nome": "Energisa",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 48.57,
+    "alvo": 60,
+    "upside": 0.23533045089561466,
+    "pl": 12.825040285,
+    "ev_ebitda": 6.9693153252,
+    "pvp": 1.2426410866,
+    "dy": 0.03519874449,
+    "div_ebitda": 3.8245368776,
+    "beta": 0.90727025189,
+    "roe": 0.12091107226
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 2 V 0",
+    "ultimo": 48.7,
+    "alvo": 64.38845825195312,
+    "upside": 0.32214493330499216,
+    "pl_fwd": 14.2333878300598,
+    "ev_ebitda_fwd": 6.765867603653119,
+    "dy": 0.03713886725357376
+   }
+  },
+  "EGIE3": {
+   "nome": "Engie",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 32.14,
+    "alvo": 35,
+    "upside": 0.08898568761667702,
+    "pl": 14.309790455,
+    "ev_ebitda": 7.9616956476,
+    "pvp": 2.6993226445,
+    "dy": 0.034567748491,
+    "div_ebitda": 3.142139739,
+    "beta": 0.58927984838,
+    "roe": 0.20204062153
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 9 V 6",
+    "ultimo": 32.36,
+    "alvo": 34.1845703125,
+    "upside": 0.05638350780284296,
+    "pl_fwd": 10.405567731991914,
+    "ev_ebitda_fwd": 8.242738688466762,
+    "dy": 0.05170235236728567
+   }
+  },
+  "EQTL3": {
+   "nome": "Equatorial",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 39.44,
+    "alvo": 48,
+    "upside": 0.21703853955375263,
+    "pl": 31.991972397,
+    "ev_ebitda": 8.6896339186,
+    "pvp": 1.9304742005,
+    "dy": 0.043906835825,
+    "div_ebitda": 4.0722024639,
+    "beta": 0.85518391022,
+    "roe": 0.081599705911
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 16 N 0 V 0",
+    "ultimo": 38.55,
+    "alvo": 49.18400192260742,
+    "upside": 0.2758495959171836,
+    "pl_fwd": 13.595109217036939,
+    "ev_ebitda_fwd": 8.02443106834385,
+    "dy": 0.023989146801437156
+   }
+  },
+  "ISAE4": {
+   "nome": "ISA CTEEP",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "VENDA",
+    "nota": null,
+    "ultimo": 27.65,
+    "alvo": 27,
+    "upside": -0.023508137432188048,
+    "pl": 7.7731521952,
+    "ev_ebitda": 8.4257196347,
+    "pvp": 0.85025981359,
+    "dy": 0.079663753767,
+    "div_ebitda": 3.6256442833,
+    "beta": 0.63191658784,
+    "roe": 0.11273407305
+   }
+  },
+  "CSMG3": {
+   "nome": "Copasa",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 62.11,
+    "alvo": 59,
+    "upside": -0.05007245210111089,
+    "pl": 17.376414248,
+    "ev_ebitda": 10.389302729,
+    "pvp": 2.6857632934,
+    "dy": 0.076004849979,
+    "div_ebitda": 2.3442261523,
+    "beta": 0.85274460958,
+    "roe": 0.15884455252
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 5 V 0",
+    "ultimo": 52.8,
+    "alvo": 51.84363555908203,
+    "upside": -0.01811296289617359,
+    "pl_fwd": 13.136970226184904,
+    "ev_ebitda_fwd": 7.21898053960449,
+    "dy": 0.031306818181818186
+   }
+  },
+  "SBSP3": {
+   "nome": "Sabesp*",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 30.37,
+    "alvo": 40,
+    "upside": 0.3170892327955219,
+    "pl": 12.262587132,
+    "ev_ebitda": 9.0300776505,
+    "pvp": 2.4493765893,
+    "dy": 0.029842354102,
+    "div_ebitda": 2.0993620903,
+    "beta": 0.98889734799,
+    "roe": 0.21232769427
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 15 N 2 V 1",
+    "ultimo": 29.15,
+    "alvo": 33.354427337646484,
+    "upside": 0.14423421398444214,
+    "pl_fwd": 12.68925937415565,
+    "ev_ebitda_fwd": 7.68299657138366,
+    "dy": 0.0383889644657374
+   }
+  },
+  "SAPR11": {
+   "nome": "Sanepar",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 37.04,
+    "alvo": 48,
+    "upside": 0.2958963282937366,
+    "pl": 9.1443378548,
+    "ev_ebitda": 4.9777552153,
+    "pvp": 0.88146482268,
+    "dy": 0.01460636716,
+    "div_ebitda": 0.71393176522,
+    "beta": 0.67493724999,
+    "roe": 0.098981119985
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 8 V 3",
+    "ultimo": 38.09,
+    "alvo": 41.43583297729492,
+    "upside": 0.08784019368062279,
+    "pl_fwd": 7.057619595944395,
+    "ev_ebitda_fwd": 4.166583814135176,
+    "dy": 0.05203093298891815
+   }
+  },
+  "CPFE3": {
+   "nome": "CPFL",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 45.69,
+    "alvo": 51,
+    "upside": 0.11621799080761663,
+    "pl": 9.1348704122,
+    "ev_ebitda": 5.9207670147,
+    "pvp": 2.1667411336,
+    "dy": 0.090703359358,
+    "div_ebitda": 1.9287777155,
+    "beta": 0.58870127434,
+    "roe": 0.24763114545
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 8 V 4",
+    "ultimo": 44.37,
+    "alvo": 50.94545364379883,
+    "upside": 0.1481959351768949,
+    "pl_fwd": 9.636590279505613,
+    "ev_ebitda_fwd": 5.970192214121262,
+    "dy": 0.07647853257654848
+   }
+  },
+  "TAEE11": {
+   "nome": "Taesa",
+   "setor": "Serviços Básicos",
+   "levante": {
+    "rating": "VENDA",
+    "nota": null,
+    "ultimo": 41.07,
+    "alvo": 32,
+    "upside": -0.2208424640857073,
+    "pl": 9.0213230291,
+    "ev_ebitda": 8.7545270181,
+    "pvp": 1.7776352367,
+    "dy": 0.09342242704,
+    "div_ebitda": 3.6469615772,
+    "beta": 0.60709993629,
+    "roe": 0.20558855246
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 6 V 8",
+    "ultimo": 38.56,
+    "alvo": 38.0363655090332,
+    "upside": -0.013579732649553922,
+    "pl_fwd": 10.41013026937232,
+    "ev_ebitda_fwd": 9.55785012681189,
+    "dy": 0.09986188613853518
+   }
+  },
+  "GOAU4": {
+   "nome": "Gerdau Metalúrgica",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 9.48,
+    "alvo": 10,
+    "upside": 0.05485232067510548,
+    "pl": 21.838242788,
+    "ev_ebitda": 6.9097312887,
+    "pvp": 0.66393655553,
+    "dy": 0.047364209402,
+    "div_ebitda": 1.0416575188,
+    "beta": 0.77834288207,
+    "roe": 0.030548966748
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 3 N 1 V 0",
+    "ultimo": 10.25,
+    "alvo": 11.633333206176758,
+    "upside": 0.13495933718797648,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0.036661994206148955
+   }
+  },
+  "VALE3": {
+   "nome": "Vale",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 78.84,
+    "alvo": 90,
+    "upside": 0.14155251141552516,
+    "pl": 21.569471725,
+    "ev_ebitda": 8.0114200485,
+    "pvp": 1.7583039183,
+    "dy": 0.099512326926,
+    "div_ebitda": 1.3771576469,
+    "beta": 0.70309829137,
+    "roe": 0.068393008956
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 6 N 9 V 0",
+    "ultimo": 82,
+    "alvo": 89.10416412353516,
+    "upside": 0.08663614784798979,
+    "pl_fwd": 8.373249264377073,
+    "ev_ebitda_fwd": 4.9986235468527775,
+    "dy": 0.061412671712924014
+   }
+  },
+  "GGBR4": {
+   "nome": "Gerdau",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 21.44,
+    "alvo": 28,
+    "upside": 0.3059701492537312,
+    "pl": 26.106384861,
+    "ev_ebitda": 6.1237876209,
+    "pvp": 0.79933111341,
+    "dy": 0.040500297796,
+    "div_ebitda": 1.0437144745,
+    "beta": 0.76914565492,
+    "roe": 0.03066154298
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 13 N 5 V 0",
+    "ultimo": 23.47,
+    "alvo": 25.299999237060547,
+    "upside": 0.07797184648745414,
+    "pl_fwd": 9.061400731933173,
+    "ev_ebitda_fwd": 4.495685215010721,
+    "dy": 0.04390833982241943
+   }
+  },
+  "CSNA3": {
+   "nome": "CSN Siderurgia",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 4.82,
+    "alvo": 6,
+    "upside": 0.24481327800829877,
+    "pl": -3.197870691,
+    "ev_ebitda": 5.4434744286,
+    "pvp": 0.49742347928,
+    "dy": 0,
+    "div_ebitda": 4.337203675,
+    "beta": 1.4129459555,
+    "roe": -0.082736501085
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 10 V 4",
+    "ultimo": 6.13,
+    "alvo": 8.33214282989502,
+    "upside": 0.35924026588825764,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 4.2773260153920125,
+    "dy": 0.025539867369197403
+   }
+  },
+  "CMIN3": {
+   "nome": "CSN Mineração",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 4.31,
+    "alvo": 5,
+    "upside": 0.16009280742459397,
+    "pl": 10.50211928,
+    "ev_ebitda": 3.8617622411,
+    "pvp": 3.3066534938,
+    "dy": 0.074329195707,
+    "div_ebitda": 0.043808242525,
+    "beta": 1.0976543905,
+    "roe": 0.2574055937
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 1 N 5 V 7",
+    "ultimo": 4.5,
+    "alvo": 5.3416666984558105,
+    "upside": 0.18703704410129118,
+    "pl_fwd": 12.075382464221088,
+    "ev_ebitda_fwd": 4.442999761227454,
+    "dy": 0.0725679012345679
+   }
+  },
+  "USIM5": {
+   "nome": "Usiminas",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 8.77,
+    "alvo": 8,
+    "upside": -0.08779931584948686,
+    "pl": -4.1399485614,
+    "ev_ebitda": -68.517171821,
+    "pvp": 0.52564787748,
+    "dy": 0,
+    "div_ebitda": 0,
+    "beta": 0.80615116827,
+    "roe": -0.093247651493
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 6 N 10 V 1",
+    "ultimo": 9.61,
+    "alvo": 8.558823585510254,
+    "upside": -0.10938360192401098,
+    "pl_fwd": 8.37108013937282,
+    "ev_ebitda_fwd": 4.951449524993085,
+    "dy": 0.025202435202794023
+   }
+  },
+  "BRAP4": {
+   "nome": "Bradespar",
+   "setor": "Metais & Mineração",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 22.43,
+    "alvo": 24,
+    "upside": 0.06999554168524291,
+    "pl": 0,
+    "ev_ebitda": 0,
+    "pvp": 0,
+    "dy": 0.14311486685,
+    "div_ebitda": -0.36118094883,
+    "beta": 0.89323358075,
+    "roe": 0.094854633499
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 2 N 2 V 1",
+    "ultimo": 23.03,
+    "alvo": 27.5625,
+    "upside": 0.19680851063829774,
+    "pl_fwd": 5.708724309539187,
+    "ev_ebitda_fwd": 6.137967574929559,
+    "dy": 0.07954558688234402
+   }
+  },
+  "SUZB3": {
+   "nome": "Suzano",
+   "setor": "Papel & Celulose",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 40.8,
+    "alvo": 47,
+    "upside": 0.15196078431372562,
+    "pl": 4.4337773344,
+    "ev_ebitda": 4.9916529587,
+    "pvp": 0.83569641937,
+    "dy": 0.021535527468,
+    "div_ebitda": 3.1410657132,
+    "beta": 0.429203358,
+    "roe": 0.26295464455
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 18 N 2 V 0",
+    "ultimo": 42.2,
+    "alvo": 66.43684387207031,
+    "upside": 0.5743327931770215,
+    "pl_fwd": 6.492196714586076,
+    "ev_ebitda_fwd": 5.154942137627596,
+    "dy": 0.034085090156343624
+   }
+  },
+  "KLBN11": {
+   "nome": "Klabin",
+   "setor": "Papel & Celulose",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 17.1,
+    "alvo": 20,
+    "upside": 0.16959064327485374,
+    "pl": 30.487163356,
+    "ev_ebitda": 6.3602481951,
+    "pvp": 2.3225614619,
+    "dy": 0.072859609194,
+    "div_ebitda": 3.0058785241,
+    "beta": 0.51757163417,
+    "roe": 0.054653167071
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 9 N 8 V 0",
+    "ultimo": 16.52,
+    "alvo": 23.062833786010742,
+    "upside": 0.3960553139231684,
+    "pl_fwd": 8.916876574307306,
+    "ev_ebitda_fwd": 6.652161972027753,
+    "dy": 0.07169853329993597
+   }
+  },
+  "RDOR3": {
+   "nome": "Rede D'Or",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 35.75,
+    "alvo": 51,
+    "upside": 0.4265734265734267,
+    "pl": 17.096426815,
+    "ev_ebitda": 7.1701293829,
+    "pvp": 3.9769690929,
+    "dy": 0.12077413428,
+    "div_ebitda": 0.58809892278,
+    "beta": 1.6347202339,
+    "roe": 0.19188162807
+   },
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 13 N 1 V 0",
+    "ultimo": 34.99,
+    "alvo": 49.621429443359375,
+    "upside": 0.4181603156147291,
+    "pl_fwd": 14.031309440768954,
+    "ev_ebitda_fwd": 7.002616772428798,
+    "dy": 0.04431238700931519
+   }
+  },
+  "HAPV3": {
+   "nome": "Hapvida",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 10.63,
+    "alvo": 11,
+    "upside": 0.03480714957666975,
+    "pl": -12.143267727,
+    "ev_ebitda": 6.0525426786,
+    "pvp": 0.1048736144,
+    "dy": 0,
+    "div_ebitda": 3.0027409914,
+    "beta": 1.3278731138,
+    "roe": -0.0088387003158
+   },
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 1 N 12 V 1",
+    "ultimo": 13.27,
+    "alvo": 14.178571701049805,
+    "upside": 0.06846810105876444,
+    "pl_fwd": 12.83189643993761,
+    "ev_ebitda_fwd": 4.917100948879603,
+    "dy": 0.007844445021900001
+   }
+  },
+  "FLRY3": {
+   "nome": "Fleury",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 15.72,
+    "alvo": 19,
+    "upside": 0.20865139949109412,
+    "pl": 13.497422348,
+    "ev_ebitda": 5.4420836023,
+    "pvp": 1.6489332768,
+    "dy": 0.094024678274,
+    "div_ebitda": 1.4730225444,
+    "beta": 0.84639978757,
+    "roe": 0.11672057851
+   },
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 5 N 4 V 2",
+    "ultimo": 15.8,
+    "alvo": 17.450000762939453,
+    "upside": 0.1044304280341426,
+    "pl_fwd": 11.828280829167133,
+    "ev_ebitda_fwd": 4.993616506160431,
+    "dy": 0.06386997429555265
+   }
+  },
+  "COGN3": {
+   "nome": "Cogna",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 2.31,
+    "alvo": 3.5,
+    "upside": 0.5151515151515151,
+    "pl": 6.855615122,
+    "ev_ebitda": 4.7369775992,
+    "pvp": 0.3389259428,
+    "dy": 0.044678472928,
+    "div_ebitda": 2.5401219009,
+    "beta": 2.1118168452,
+    "roe": 0.046551947361
+   },
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 9 N 5 V 0",
+    "ultimo": 2.54,
+    "alvo": 4.287412643432617,
+    "upside": 0.6879577336348885,
+    "pl_fwd": 5.338798782353794,
+    "ev_ebitda_fwd": 4.143726524382981,
+    "dy": 0.05286602105771261
+   }
+  },
+  "YDUQ3": {
+   "nome": "Yduqs",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 9.07,
+    "alvo": 15,
+    "upside": 0.6538037486218302,
+    "pl": 20.11392125,
+    "ev_ebitda": 4.1085533938,
+    "pvp": 0.79219211001,
+    "dy": 0.034410102573,
+    "div_ebitda": 2.6351803841,
+    "beta": 1.9271528445,
+    "roe": 0.038116526914
+   },
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 9 N 4 V 1",
+    "ultimo": 9.78,
+    "alvo": 17.08333396911621,
+    "upside": 0.7467621645313101,
+    "pl_fwd": 5.188002016194595,
+    "ev_ebitda_fwd": 3.6032819864605785,
+    "dy": 0.06407752156641516
+   }
+  },
+  "RADL3": {
+   "nome": "Raia Drogasil",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 17.07,
+    "alvo": 24,
+    "upside": 0.40597539543058003,
+    "pl": 23.087696025,
+    "ev_ebitda": 6.7747944148,
+    "pvp": 4.0661988126,
+    "dy": 0.026779408875,
+    "div_ebitda": 0.64186634075,
+    "beta": 1.1103411322,
+    "roe": 0.18699877061
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 12 N 3 V 2",
+    "ultimo": 19.13,
+    "alvo": 26.90888023376465,
+    "upside": 0.4066325265951203,
+    "pl_fwd": 17.49664464808228,
+    "ev_ebitda_fwd": 9.800488409585844,
+    "dy": 0.02374697822721328
+   }
+  },
+  "HYPE3": {
+   "nome": "Hypera",
+   "setor": "Saúde & Educação",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 20.99,
+    "alvo": 28,
+    "upside": 0.3339685564554551,
+    "pl": 8.0197037834,
+    "ev_ebitda": 7.4557785291,
+    "pvp": 1.0455682715,
+    "dy": 0.040402909091,
+    "div_ebitda": 2.2129384284,
+    "beta": 1.0327928907,
+    "roe": 0.12975660589
+   },
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 9 N 4 V 0",
+    "ultimo": 22.67,
+    "alvo": 29.490686416625977,
+    "upside": 0.30086839067604654,
+    "pl_fwd": 7.855965925310256,
+    "ev_ebitda_fwd": 7.152036732844614,
+    "dy": 0.05117266392535241
+   }
+  },
+  "CSAN3": {
+   "nome": "Cosan",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 3.78,
+    "alvo": 6,
+    "upside": 0.5873015873015874,
+    "pl": -1.0742675956,
+    "ev_ebitda": 18.072513077,
+    "pvp": 4.2400414378,
+    "dy": 0,
+    "div_ebitda": 9.7235739077,
+    "beta": 1.321074775,
+    "roe": -0.29937151178
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 3 N 4 V 0",
+    "ultimo": 4.32,
+    "alvo": 7.860000133514404,
+    "upside": 0.8194444753505565,
+    "pl_fwd": 4.837418430344556,
+    "ev_ebitda_fwd": 3.776895415739262,
+    "dy": 0.007316943380161771
+   }
+  },
+  "UGPA3": {
+   "nome": "Ultrapar",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 27.53,
+    "alvo": 27,
+    "upside": -0.019251725390483143,
+    "pl": 9.9931278264,
+    "ev_ebitda": 6.2480300279,
+    "pvp": 1.8191713858,
+    "dy": 0.07299270073,
+    "div_ebitda": 1.8980475154,
+    "beta": 1.1447433859,
+    "roe": 0.17981753957
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 8 N 9 V 0",
+    "ultimo": 29.02,
+    "alvo": 31.811763763427734,
+    "upside": 0.09620137020770958,
+    "pl_fwd": 10.681229419769712,
+    "ev_ebitda_fwd": 5.463799583035594,
+    "dy": 0.04814198689766075
+   }
+  },
+  "PETR4": {
+   "nome": "Petrobras",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 38.25,
+    "alvo": 50,
+    "upside": 0.30718954248366015,
+    "pl": 4.5824528792,
+    "ev_ebitda": 3.6775128031,
+    "pvp": 1.1073814225,
+    "dy": 0.092308225625,
+    "div_ebitda": 1.4036962284,
+    "beta": 0.72173863572,
+    "roe": 0.25601469238
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 5 V 0",
+    "ultimo": 44.6,
+    "alvo": 51.4571418762207,
+    "upside": 0.15374757570001574,
+    "pl_fwd": 4.494139966712648,
+    "ev_ebitda_fwd": 3.2561383831602435,
+    "dy": 0.10464623816641754
+   }
+  },
+  "VBBR3": {
+   "nome": "Vibra",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 30.38,
+    "alvo": 38,
+    "upside": 0.25082290980908506,
+    "pl": 12.052658323,
+    "ev_ebitda": 7.7293909393,
+    "pvp": 1.666562996,
+    "dy": 0.073486730496,
+    "div_ebitda": 2.5754824064,
+    "beta": 1.1387590376,
+    "roe": 0.13961955887
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 14 N 3 V 0",
+    "ultimo": 33.34,
+    "alvo": 36.22941207885742,
+    "upside": 0.08666502935985054,
+    "pl_fwd": 10.67677198975235,
+    "ev_ebitda_fwd": 6.985658113664752,
+    "dy": 0.04113292284071921
+   }
+  },
+  "RAIZ4": {
+   "nome": "Raízen",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "SOB REVISÃO",
+    "nota": null,
+    "ultimo": 0.39,
+    "alvo": null,
+    "upside": null,
+    "pl": -0.14907120289,
+    "ev_ebitda": 61.501981399,
+    "pvp": -0.4619452788,
+    "dy": 0,
+    "div_ebitda": 57.372118173,
+    "beta": 1.0812727488,
+    "roe": 0
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 2 N 5 V 1",
+    "ultimo": 0.42,
+    "alvo": 1.0242856740951538,
+    "upside": 1.4387754145122709,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 4.835079011146392,
+    "dy": 0.0006750592957489509
+   }
+  },
+  "BRAV3": {
+   "nome": "3R Petroleum",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "VENDA",
+    "nota": null,
+    "ultimo": 17.91,
+    "alvo": 18,
+    "upside": 0.005025125628140614,
+    "pl": 35.79125535,
+    "ev_ebitda": 3.6271589536,
+    "pvp": 0.72917921761,
+    "dy": 0.0068935989638,
+    "div_ebitda": 2.0344394419,
+    "beta": 0.82538993358,
+    "roe": 0.02059862924
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 4 V 0",
+    "ultimo": 19.75,
+    "alvo": 24.227272033691406,
+    "upside": 0.2266973181615901,
+    "pl_fwd": 5.293144557603091,
+    "ev_ebitda_fwd": 3.0791521823640595,
+    "dy": 0.048322227072117946
+   }
+  },
+  "PRIO3": {
+   "nome": "PRIO",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 52.96,
+    "alvo": 87,
+    "upside": 0.642749244712991,
+    "pl": 16.614148335,
+    "ev_ebitda": 7.0850720929,
+    "pvp": 1.605826216,
+    "dy": 0,
+    "div_ebitda": 2.5542333509,
+    "beta": 0.72202458352,
+    "roe": 0.097295553433
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 11 N 5 V 0",
+    "ultimo": 68.63,
+    "alvo": 68.21562194824219,
+    "upside": -0.006037855919536761,
+    "pl_fwd": 6.849285683149372,
+    "ev_ebitda_fwd": 4.235688070186348,
+    "dy": 0.10450899180066581
+   }
+  },
+  "BRKM5": {
+   "nome": "Braskem",
+   "setor": "Petróleo & Gás",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 6.24,
+    "alvo": 12,
+    "upside": 0.9230769230769229,
+    "pl": -0.54474119001,
+    "ev_ebitda": 19.981718253,
+    "pvp": -0.31612713188,
+    "dy": 0,
+    "div_ebitda": 18.227966102,
+    "beta": 1.3130098031,
+    "roe": 0
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 3 N 7 V 2",
+    "ultimo": 12.18,
+    "alvo": 11.741666793823242,
+    "upside": -0.035987947961966915,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 7.765212077038111,
+    "dy": 0
+   }
+  },
+  "SLCE3": {
+   "nome": "SLC Agrícola",
+   "setor": "Agronegócio",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 12.81,
+    "alvo": 20,
+    "upside": 0.5612802498048399,
+    "pl": 19.6271912,
+    "ev_ebitda": 5.9399170795,
+    "pvp": 1.1974308668,
+    "dy": 0.050183389474,
+    "div_ebitda": 2.8205644633,
+    "beta": 0.65275521623,
+    "roe": 0.052527310243
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 5 N 9 V 0",
+    "ultimo": 16.52,
+    "alvo": 19.518518447875977,
+    "upside": 0.18150838062203256,
+    "pl_fwd": 10.998163452708908,
+    "ev_ebitda_fwd": 6.468294838099536,
+    "dy": 0.03931377733247985
+   }
+  },
+  "SMTO3": {
+   "nome": "São Martinho",
+   "setor": "Agronegócio",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 15.52,
+    "alvo": 20,
+    "upside": 0.2886597938144331,
+    "pl": 6.0838522579,
+    "ev_ebitda": 4.9820602356,
+    "pvp": 0.68024060611,
+    "dy": 0.025489274093,
+    "div_ebitda": 2.9628007712,
+    "beta": 0.1229488116,
+    "roe": 0.11891380161
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 3 N 8 V 0",
+    "ultimo": 18.07,
+    "alvo": 21.700000762939453,
+    "upside": 0.20088548771109305,
+    "pl_fwd": 9.591724255748401,
+    "ev_ebitda_fwd": 3.9948086728176286,
+    "dy": 0.03519327773855187
+   }
+  },
+  "SOJA3": {
+   "nome": "Boa Safra",
+   "setor": "Agronegócio",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 6.13,
+    "alvo": 10,
+    "upside": 0.6313213703099512,
+    "pl": 35.056281556,
+    "ev_ebitda": 11.62378585,
+    "pvp": 0.64698578004,
+    "dy": 0.025722559945,
+    "div_ebitda": 5.6553511536,
+    "beta": 0.52247876191,
+    "roe": 0.065405566917
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 6 V 0",
+    "ultimo": 6.65,
+    "alvo": 9.997111320495605,
+    "upside": 0.5033250106008429,
+    "pl_fwd": 6.636142919956414,
+    "ev_ebitda_fwd": 6.324201699297405,
+    "dy": 0.07548756949845879
+   }
+  },
+  "KEPL3": {
+   "nome": "Kepler Weber",
+   "setor": "Agronegócio",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 6.55,
+    "alvo": 8,
+    "upside": 0.22137404580152675,
+    "pl": 7.6784034442,
+    "ev_ebitda": 5.1513418717,
+    "pvp": 1.4337622024,
+    "dy": 0.0527678,
+    "div_ebitda": -0.18663958474,
+    "beta": 1.3092925913,
+    "roe": 0.19634145613
+   }
+  },
+  "MDIA3": {
+   "nome": "Mdias Branco",
+   "setor": "Alimentos & Bebidas",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 17.8,
+    "alvo": 29,
+    "upside": 0.6292134831460674,
+    "pl": 8.5673449343,
+    "ev_ebitda": 4.7882765097,
+    "pvp": 0.71400462017,
+    "dy": 0.043904102145,
+    "div_ebitda": -0.45629002176,
+    "beta": 0.94546035678,
+    "roe": 0.085398221818
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 9 V 1",
+    "ultimo": 19.71,
+    "alvo": 25.5,
+    "upside": 0.29375951293759517,
+    "pl_fwd": 8.141676254927997,
+    "ev_ebitda_fwd": 4.927948033263806,
+    "dy": 0.04460617653290723
+   }
+  },
+  "ABEV3": {
+   "nome": "Ambev",
+   "setor": "Alimentos & Bebidas",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 16.29,
+    "alvo": 15,
+    "upside": -0.07918968692449346,
+    "pl": 16.325667484,
+    "ev_ebitda": 7.8312074913,
+    "pvp": 2.8190614119,
+    "dy": 0.067017804154,
+    "div_ebitda": -0.54353428696,
+    "beta": 0.43237319035,
+    "roe": 0.17251089164
+   },
+   "xp": {
+    "rating": "Venda",
+    "consenso": "C 2 N 11 V 5",
+    "ultimo": 16.22,
+    "alvo": 15.872221946716309,
+    "upside": -0.021441310313421114,
+    "pl_fwd": 15.429264950287195,
+    "ev_ebitda_fwd": 7.653770409887193,
+    "dy": 0.059625314757335686
+   }
+  },
+  "MBRF3": {
+   "nome": "Marfrig",
+   "setor": "Alimentos & Bebidas",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 16.78,
+    "alvo": 22,
+    "upside": 0.3110846245530392,
+    "pl": 50.321642523,
+    "ev_ebitda": 5.9634715542,
+    "pvp": 2.0583304632,
+    "dy": 0.12809941251,
+    "div_ebitda": 3.9077113981,
+    "beta": 0.90877279057,
+    "roe": 0.018121228668
+   }
+  },
+  "BEEF3": {
+   "nome": "Minerva",
+   "setor": "Alimentos & Bebidas",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 3.54,
+    "alvo": 5,
+    "upside": 0.41242937853107353,
+    "pl": 4.4648952854,
+    "ev_ebitda": 3.5714672257,
+    "pvp": 2.7732738302,
+    "dy": 0.038297315937,
+    "div_ebitda": 2.7497523474,
+    "beta": 0.81007168237,
+    "roe": 0
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 3 N 13 V 0",
+    "ultimo": 4.26,
+    "alvo": 6.33772087097168,
+    "upside": 0.4877279039839624,
+    "pl_fwd": 4.867164825928795,
+    "ev_ebitda_fwd": 3.7940911193293005,
+    "dy": 0.10151188099221126
+   }
+  },
+  "JBSS32": {
+   "nome": "JBS",
+   "setor": "Alimentos & Bebidas",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 63,
+    "alvo": 92,
+    "upside": 0.46031746031746024,
+    "pl": 6.0480827582,
+    "ev_ebitda": 4.3145839059,
+    "pvp": 1.4908924524,
+    "dy": 0.055799767816,
+    "div_ebitda": 2.4918233302,
+    "beta": 0,
+    "roe": 0.35490431588
+   }
+  },
+  "SIMH3": {
+   "nome": "Simpar",
+   "setor": "Aluguel de Carros & Logística",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 7.96,
+    "alvo": 11,
+    "upside": 0.38190954773869357,
+    "pl": -38.097022529,
+    "ev_ebitda": 3.9485572737,
+    "pvp": 0.79845666464,
+    "dy": 0.017233750805,
+    "div_ebitda": 3.3834710772,
+    "beta": 2.0482733229,
+    "roe": 0.0041728562023
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 6 N 4 V 0",
+    "ultimo": 9.42,
+    "alvo": 16.67331886291504,
+    "upside": 0.7699913867213417,
+    "pl_fwd": 9.057859155967357,
+    "ev_ebitda_fwd": 3.6793521707102017,
+    "dy": 0.008959090872115253
+   }
+  },
+  "RENT3": {
+   "nome": "Localiza",
+   "setor": "Aluguel de Carros & Logística",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 41.88,
+    "alvo": 54,
+    "upside": 0.28939828080229213,
+    "pl": 28.861766368,
+    "ev_ebitda": 7.1655755041,
+    "pvp": 1.755892332,
+    "dy": 0.027146541593,
+    "div_ebitda": 3.0141666224,
+    "beta": 1.4609369235,
+    "roe": 0.061087923703
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 14 N 3 V 0",
+    "ultimo": 44.47,
+    "alvo": 57.6916389465332,
+    "upside": 0.29731591964320225,
+    "pl_fwd": 10.155597593456553,
+    "ev_ebitda_fwd": 5.1229813927164445,
+    "dy": 0.05206988740095135
+   }
+  },
+  "MOVI3": {
+   "nome": "Movida",
+   "setor": "Aluguel de Carros & Logística",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 6.3,
+    "alvo": 13,
+    "upside": 1.0634920634920637,
+    "pl": -4.0143799208,
+    "ev_ebitda": 4.1842360699,
+    "pvp": 0.90069370355,
+    "dy": 0,
+    "div_ebitda": 3.6123960679,
+    "beta": 2.2196600529,
+    "roe": -0.20193844869
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 8 N 5 V 0",
+    "ultimo": 9.55,
+    "alvo": 14.631961822509766,
+    "upside": 0.5321425992156821,
+    "pl_fwd": 5.146154036733616,
+    "ev_ebitda_fwd": 3.540383042049456,
+    "dy": 0.04837174780846923
+   }
+  },
+  "VAMO3": {
+   "nome": "Vamos",
+   "setor": "Aluguel de Carros & Logística",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 6.48,
+    "alvo": 4,
+    "upside": -0.3827160493827161,
+    "pl": 11.176592489,
+    "ev_ebitda": 6.1794781194,
+    "pvp": 1.4068994666,
+    "dy": 0.032807496506,
+    "div_ebitda": 3.7766403579,
+    "beta": 1.5826515368,
+    "roe": 0.14214872777
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 9 N 5 V 0",
+    "ultimo": 3.41,
+    "alvo": 5.631162166595459,
+    "upside": 0.6513672042801932,
+    "pl_fwd": 6.6943211733734485,
+    "ev_ebitda_fwd": 3.9829469913471405,
+    "dy": 0.05217694183211426
+   }
+  },
+  "LEVE3": {
+   "nome": "Mahle Metal Leve",
+   "setor": "Bens de capital",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 32.75,
+    "alvo": 43,
+    "upside": 0.3129770992366412,
+    "pl": 6.6825475384,
+    "ev_ebitda": 5.1470026033,
+    "pvp": 4.1438671936,
+    "dy": 0.09441594749,
+    "div_ebitda": 0.94131913109,
+    "beta": 0.61579628016,
+    "roe": 0.67705601585
+   },
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 4 V 1",
+    "ultimo": 32.78,
+    "alvo": 36,
+    "upside": 0.09823062843197072,
+    "pl_fwd": 6.666832904103077,
+    "ev_ebitda_fwd": 4.809836981445309,
+    "dy": 0.11282811919238672
+   }
+  },
+  "EMBJ3": {
+   "nome": "Embraer",
+   "setor": "Bens de capital",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 84.83,
+    "alvo": 95,
+    "upside": 0.11988683248850651,
+    "pl": 36.603335965,
+    "ev_ebitda": 13.326478486,
+    "pvp": 3.5130834745,
+    "dy": 0.012116264679,
+    "div_ebitda": 0.61265899999,
+    "beta": 0.19040005898,
+    "roe": 0.087887622967
+   }
+  },
+  "RAPT4": {
+   "nome": "Randon",
+   "setor": "Bens de capital",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": "(2)",
+    "ultimo": 4.55,
+    "alvo": 8,
+    "upside": 0.7582417582417582,
+    "pl": -5.3171363785,
+    "ev_ebitda": 6.2136623667,
+    "pvp": 0.51043562666,
+    "dy": 0,
+    "div_ebitda": 3.9624286778,
+    "beta": 0.79995830706,
+    "roe": -0.025164003379
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 5 V 0",
+    "ultimo": 5,
+    "alvo": 8,
+    "upside": 0.6000000000000001,
+    "pl_fwd": 6.909148665819568,
+    "ev_ebitda_fwd": 4.893370669925006,
+    "dy": 0.030413793103448272
+   }
+  },
+  "POMO4": {
+   "nome": "Marcopolo",
+   "setor": "Bens de capital",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 5.96,
+    "alvo": 7,
+    "upside": 0.17449664429530198,
+    "pl": 5.9241282531,
+    "ev_ebitda": 5.6970491086,
+    "pvp": 1.8216855617,
+    "dy": 0.12805178792,
+    "div_ebitda": 0.99933953597,
+    "beta": 0.67993902479,
+    "roe": 0.3091063605
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 1 V 0",
+    "ultimo": 5.98,
+    "alvo": 9.130578994750977,
+    "upside": 0.5268526747075211,
+    "pl_fwd": 5.811662198391421,
+    "ev_ebitda_fwd": 5.074379285471466,
+    "dy": 0.0788099539973603
+   }
+  },
+  "WEGE3": {
+   "nome": "Weg",
+   "setor": "Bens de capital",
+   "levante": {
+    "rating": "COMPRA",
+    "nota": null,
+    "ultimo": 46.48,
+    "alvo": 50,
+    "upside": 0.07573149741824459,
+    "pl": 31.017054481,
+    "ev_ebitda": 21.620353213,
+    "pvp": 10.989576925,
+    "dy": 0.050988533535,
+    "div_ebitda": -0.368795539,
+    "beta": 0.56059769769,
+    "roe": 0.32525228432
+   },
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 6 N 9 V 2",
+    "ultimo": 42.58,
+    "alvo": 52.368751525878906,
+    "upside": 0.22989082963548402,
+    "pl_fwd": 26.23747252513758,
+    "ev_ebitda_fwd": 17.980749961958157,
+    "dy": 0.01694983884290828
+   }
+  },
+  "RAIL3": {
+   "nome": "Rumo",
+   "setor": "Infraestrutura",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 13.63,
+    "alvo": 28,
+    "upside": 1.054292002934703,
+    "pl": 24.297531916,
+    "ev_ebitda": 6.1208380991,
+    "pvp": 1.8203775673,
+    "dy": 0.0058155703712,
+    "div_ebitda": 2.488089725,
+    "beta": 0.8278034769,
+    "roe": 0.07333799526
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 4 V 1",
+    "ultimo": 15.02,
+    "alvo": 19.39285659790039,
+    "upside": 0.2911355924034882,
+    "pl_fwd": 13.330454298150165,
+    "ev_ebitda_fwd": 5.872370001895509,
+    "dy": 0.02611639142701175
+   }
+  },
+  "MOTV3": {
+   "nome": "Motiva",
+   "setor": "Infraestrutura",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 14.83,
+    "alvo": 17,
+    "upside": 0.1463250168577208,
+    "pl": 8.8688214908,
+    "ev_ebitda": 7.1509064321,
+    "pvp": 1.8255400964,
+    "dy": 0.028257189308,
+    "div_ebitda": 3.613620195,
+    "beta": 1.0010520515,
+    "roe": 0.23010455989
+   }
+  },
+  "VIVT3": {
+   "nome": "Telefonica Brasil",
+   "setor": "Telecom, Mídia & Tech",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 34.75,
+    "alvo": 38,
+    "upside": 0.09352517985611519,
+    "pl": 17.545959247,
+    "ev_ebitda": 4.8216924567,
+    "pvp": 1.5978040496,
+    "dy": 0.075595035972,
+    "div_ebitda": 0.42347283909,
+    "beta": 0.67990077143,
+    "roe": 0.092485294987
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 8 N 5 V 4",
+    "ultimo": 35.4,
+    "alvo": 40.2599983215332,
+    "upside": 0.13728808817890403,
+    "pl_fwd": 12.619338343153565,
+    "ev_ebitda_fwd": 4.449985963135039,
+    "dy": 0.07851029287616079
+   }
+  },
+  "TIMS3": {
+   "nome": "TIM Brasil",
+   "setor": "Telecom, Mídia & Tech",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": null,
+    "ultimo": 22.8,
+    "alvo": 26,
+    "upside": 0.14035087719298245,
+    "pl": 0,
+    "ev_ebitda": 0,
+    "pvp": 2.2301949712,
+    "dy": 0.070193243611,
+    "div_ebitda": 0,
+    "beta": 0.74838500464,
+    "roe": 0
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 5 N 9 V 1",
+    "ultimo": 22.5,
+    "alvo": 26.985713958740234,
+    "upside": 0.19936506483289929,
+    "pl_fwd": 11.009416824301145,
+    "ev_ebitda_fwd": 4.425235232903031,
+    "dy": 0.09153563218390805
+   }
+  },
+  "BMOB3": {
+   "nome": "Bemobi tech",
+   "setor": "Telecom, Mídia & Tech",
+   "levante": {
+    "rating": "NA",
+    "nota": null,
+    "ultimo": 23.93,
+    "alvo": null,
+    "upside": null,
+    "pl": 12.677516128,
+    "ev_ebitda": 7.6841108787,
+    "pvp": 2.1028907392,
+    "dy": 0.098489160634,
+    "div_ebitda": -1.3437773758,
+    "beta": 1.2687042035,
+    "roe": 0.1554768685
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 3 N 1 V 0",
+    "ultimo": 25.02,
+    "alvo": 30.450000762939453,
+    "upside": 0.217026409390066,
+    "pl_fwd": 11.782296478060049,
+    "ev_ebitda_fwd": 6.1962214796733,
+    "dy": 0.09124501165351244
+   }
+  },
+  "TOTS3": {
+   "nome": "Totvs",
+   "setor": "Telecom, Mídia & Tech",
+   "levante": {
+    "rating": "NEUTRO",
+    "nota": "(3)",
+    "ultimo": 30,
+    "alvo": 45,
+    "upside": 0.5,
+    "pl": 19.024851562,
+    "ev_ebitda": 13.617539258,
+    "pvp": 3.504351628,
+    "dy": 0.015887850467,
+    "div_ebitda": 2.2066919243,
+    "beta": 1.0055632508,
+    "roe": 0.18281161096
+   },
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 1 V 0",
+    "ultimo": 32.1,
+    "alvo": 51.58333206176758,
+    "upside": 0.6069573851017935,
+    "pl_fwd": 15.854701663418053,
+    "ev_ebitda_fwd": 10.844889677204167,
+    "dy": 0.027138850097277425
+   }
+  },
+  "JALL3": {
+   "nome": "JALLES MACHADO S",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 6 N 2 V 0",
+    "ultimo": 2.9,
+    "alvo": 4.574999809265137,
+    "upside": 0.5775861411259093,
+    "pl_fwd": 28.031256943930078,
+    "ev_ebitda_fwd": 2.8759056215747956,
+    "dy": 0.05970141366098561
+   }
+  },
+  "AGRO3": {
+   "nome": "BRASILAGRO",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 2 N 2 V 0",
+    "ultimo": 18.7,
+    "alvo": 24.5,
+    "upside": 0.31016042780748676,
+    "pl_fwd": 8.102898695089152,
+    "ev_ebitda_fwd": 6.86584225752019,
+    "dy": 0.061682750425143935
+   }
+  },
+  "AGXY3": {
+   "nome": "AGROGALAXY PARTI",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 1.86,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "TTEN3": {
+   "nome": "TRES TENTOS AGRO",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 0 V 0",
+    "ultimo": 16.15,
+    "alvo": 21.391666412353516,
+    "upside": 0.32456138776182764,
+    "pl_fwd": 8.923898684009957,
+    "ev_ebitda_fwd": 6.321095042099839,
+    "dy": 0.02700093709595151
+   }
+  },
+  "VITT3": {
+   "nome": "VITTIA FERTILIZA",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 2 N 1 V 0",
+    "ultimo": 3.56,
+    "alvo": 4.878787994384766,
+    "upside": 0.3704460658384172,
+    "pl_fwd": 4.444678306625209,
+    "ev_ebitda_fwd": 4.855693218212674,
+    "dy": 0.08643290714193463
+   }
+  },
+  "BRFS3": {
+   "nome": "BRF SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 2 N 7 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "CAML3": {
+   "nome": "CAMIL ALIMENTOS",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 5 N 1 V 1",
+    "ultimo": 5.76,
+    "alvo": 7.721428394317627,
+    "upside": 0.3405257629023659,
+    "pl_fwd": 6.5582180576095075,
+    "ev_ebitda_fwd": 5.195480929632808,
+    "dy": 0.05826947637292465
+   }
+  },
+  "JBSS3": {
+   "nome": "JBS",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 7 N 1 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "MRFG3": {
+   "nome": "MBRF GLOBAL FOOD",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 8 N 9 V 1",
+    "ultimo": null,
+    "alvo": 23.872222900390625,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "ANIM3": {
+   "nome": "ANIMA HOLDING SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 11 N 1 V 0",
+    "ultimo": 3.39,
+    "alvo": 6.572727203369141,
+    "upside": 0.9388575821147906,
+    "pl_fwd": 4.231562032205765,
+    "ev_ebitda_fwd": 3.828577031637076,
+    "dy": 0.0626815402524893
+   }
+  },
+  "CSED3": {
+   "nome": "CRUZEIRO DO SUL",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 5 N 0 V 1",
+    "ultimo": 4.32,
+    "alvo": 7.699999809265137,
+    "upside": 0.7824073632558186,
+    "pl_fwd": 4.226403778394183,
+    "ev_ebitda_fwd": 3.5222706060941675,
+    "dy": 0.16077320136228182
+   }
+  },
+  "SEER3": {
+   "nome": "SER EDUCACIONAL",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 6 N 2 V 0",
+    "ultimo": 12.29,
+    "alvo": 16.412500381469727,
+    "upside": 0.3354353443018492,
+    "pl_fwd": 5.24080972453681,
+    "ev_ebitda_fwd": 4.3341394383750265,
+    "dy": 0.08832586690110329
+   }
+  },
+  "CPLE6": {
+   "nome": "COMPANHIA-PREF B",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "ELET3": {
+   "nome": "AXIA ENERGIA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 16 N 0 V 0",
+    "ultimo": null,
+    "alvo": 65.05066680908203,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 6.425826766558315,
+    "dy": 0
+   }
+  },
+  "ELET6": {
+   "nome": "ELETROBRAS-PR B",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 6.425826766558315,
+    "dy": 0
+   }
+  },
+  "ENEV3": {
+   "nome": "ENEVA SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 11 N 0 V 0",
+    "ultimo": 25.21,
+    "alvo": 29.263635635375977,
+    "upside": 0.16079474951907868,
+    "pl_fwd": 49.08657540378232,
+    "ev_ebitda_fwd": 11.484089090708311,
+    "dy": 0.0010463827982874884
+   }
+  },
+  "LIGT3": {
+   "nome": "LIGHT SA",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 1 V 1",
+    "ultimo": 2.85,
+    "alvo": 5.150000095367432,
+    "upside": 0.8070175773219057,
+    "pl_fwd": 1.4415977053818874,
+    "ev_ebitda_fwd": 3.704240053893477,
+    "dy": 0.04412852053505411
+   }
+  },
+  "AESB3": {
+   "nome": "AUREN PARTICIPAC",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "TRPL4": {
+   "nome": "ISA ENERGIA BRAS",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 3 N 10 V 2",
+    "ultimo": null,
+    "alvo": 29.00214195251465,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "BBDC4": {
+   "nome": "BRADESCO SA-PREF",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 9 N 5 V 1",
+    "ultimo": 17.86,
+    "alvo": 23.076923370361328,
+    "upside": 0.29210097258462087,
+    "pl_fwd": 6.517427960236566,
+    "ev_ebitda_fwd": null,
+    "dy": 0.08438922569323776
+   }
+  },
+  "BMGB4": {
+   "nome": "BMG (BANCO)-PREF",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 2 N 1 V 0",
+    "ultimo": 5.21,
+    "alvo": 5.480035305023193,
+    "upside": 0.05183019290272428,
+    "pl_fwd": 5.18496911461908,
+    "ev_ebitda_fwd": null,
+    "dy": 0.08018031930931528
+   }
+  },
+  "BPAN4": {
+   "nome": "BANCO PAN SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 1 V 1",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "BRSR6": {
+   "nome": "BANRISUL-PREF B",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 3 V 4",
+    "ultimo": 14.79,
+    "alvo": 14.928571701049805,
+    "upside": 0.009369283370507464,
+    "pl_fwd": 4.720818887237907,
+    "ev_ebitda_fwd": null,
+    "dy": 0.08909406013693627
+   }
+  },
+  "CIEL3": {
+   "nome": "CIELO SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "IRBR3": {
+   "nome": "IRB BRASIL RESSE",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 4 N 3 V 0",
+    "ultimo": 53.38,
+    "alvo": 60.71428680419922,
+    "upside": 0.13739765463093323,
+    "pl_fwd": 7.132662636890625,
+    "ev_ebitda_fwd": null,
+    "dy": 0.051365112997391646
+   }
+  },
+  "QUAL3": {
+   "nome": "QUALICORP SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 2 N 5 V 2",
+    "ultimo": 1.86,
+    "alvo": 3.114285707473755,
+    "upside": 0.6743471545557822,
+    "pl_fwd": 3.8018638891064294,
+    "ev_ebitda_fwd": 2.525151900950134,
+    "dy": 0.026342026119556706
+   }
+  },
+  "DIRR3": {
+   "nome": "DIRECIONAL ENGEN",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 12 N 1 V 0",
+    "ultimo": 13.34,
+    "alvo": 19.79166603088379,
+    "upside": 0.48363313574841005,
+    "pl_fwd": 6.6944436967163625,
+    "ev_ebitda_fwd": 5.158615364636119,
+    "dy": 0.07302383291113064
+   }
+  },
+  "DXCO3": {
+   "nome": "DEXCO SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 9 N 1 V 0",
+    "ultimo": 4.99,
+    "alvo": 7.4277777671813965,
+    "upside": 0.4885326186736265,
+    "pl_fwd": 11.125452743798265,
+    "ev_ebitda_fwd": 5.535870094008442,
+    "dy": 0.01648277397707292
+   }
+  },
+  "EVEN3": {
+   "nome": "EVEN",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 6 V 1",
+    "ultimo": 5.75,
+    "alvo": 8.737500190734863,
+    "upside": 0.519565250562585,
+    "pl_fwd": 3.889605946567972,
+    "ev_ebitda_fwd": 4.986069758548161,
+    "dy": 0.10749092120606363
+   }
+  },
+  "EZTC3": {
+   "nome": "EZ TEC",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 7 N 4 V 2",
+    "ultimo": 13.16,
+    "alvo": 18.490243911743164,
+    "upside": 0.40503373189537717,
+    "pl_fwd": 6.4724482450619405,
+    "ev_ebitda_fwd": 8.507230679656844,
+    "dy": 0.06463391910934098
+   }
+  },
+  "GFSA3": {
+   "nome": "GAFISA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 1.16,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "LAVV3": {
+   "nome": "LAVVI EMPREENDIM",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 5 N 0 V 0",
+    "ultimo": 11.7,
+    "alvo": 22.200000762939453,
+    "upside": 0.8974359626443977,
+    "pl_fwd": 4.223622243276325,
+    "ev_ebitda_fwd": 4.842733492647688,
+    "dy": 0.11203556341487378
+   }
+  },
+  "LOGG3": {
+   "nome": "LOG COMMERCIAL P",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 5 N 4 V 0",
+    "ultimo": 25.4,
+    "alvo": 30.22857093811035,
+    "upside": 0.19010121803584057,
+    "pl_fwd": 8.698196436959265,
+    "ev_ebitda_fwd": 13.87448743532051,
+    "dy": 0.03786134491809214
+   }
+  },
+  "MELK3": {
+   "nome": "MELNICK EVEN DES",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 2 V 0",
+    "ultimo": 3.23,
+    "alvo": 4.599999904632568,
+    "upside": 0.42414857728562483,
+    "pl_fwd": 4.8431907620716395,
+    "ev_ebitda_fwd": 7.7523338474335715,
+    "dy": 0.10466412820421576
+   }
+  },
+  "TEND3": {
+   "nome": "CONST TENDA",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 13 N 0 V 0",
+    "ultimo": 31.14,
+    "alvo": 42.875,
+    "upside": 0.37684649967886963,
+    "pl_fwd": 5.56810108648515,
+    "ev_ebitda_fwd": 4.2962295498687855,
+    "dy": 0.05639959938677632
+   }
+  },
+  "TRIS3": {
+   "nome": "TRISUL SA",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 1 N 4 V 0",
+    "ultimo": 4.41,
+    "alvo": 7.684531211853027,
+    "upside": 0.7425240843204144,
+    "pl_fwd": 3.4320908139441273,
+    "ev_ebitda_fwd": 5.208603317047631,
+    "dy": 0.12119790444913596
+   }
+  },
+  "AURA33": {
+   "nome": "AURA MINERAL-BDR",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 6 N 0 V 0",
+    "ultimo": 125.58,
+    "alvo": 155.66000366210938,
+    "upside": 0.23952861651623958,
+    "pl_fwd": 2.611148067122019,
+    "ev_ebitda_fwd": 5.539893268027919,
+    "dy": 0.12663183004516051
+   }
+  },
+  "RANI3": {
+   "nome": "IRANI SA",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 4 N 1 V 0",
+    "ultimo": 7.96,
+    "alvo": 11.699999809265137,
+    "upside": 0.46984922226948944,
+    "pl_fwd": 7.873929801821468,
+    "ev_ebitda_fwd": 4.795774488554408,
+    "dy": 0.07404118292612488
+   }
+  },
+  "PETR3": {
+   "nome": "PETROBRAS",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 2 V 0",
+    "ultimo": 49.68,
+    "alvo": 58.57143020629883,
+    "upside": 0.17897403796897793,
+    "pl_fwd": 5.006028554849425,
+    "ev_ebitda_fwd": 3.2561383831602435,
+    "dy": 0.10251687427890993
+   }
+  },
+  "RECV3": {
+   "nome": "PETRORECONCAVO S",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 1 N 12 V 1",
+    "ultimo": 12.19,
+    "alvo": 14.152856826782227,
+    "upside": 0.1610218889895183,
+    "pl_fwd": 5.630933418286079,
+    "ev_ebitda_fwd": 3.2103446296016322,
+    "dy": 0.11236645828029382
+   }
+  },
+  "AALR3": {
+   "nome": "ES SAO DE IMAGEM",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 3.25,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "BLAU3": {
+   "nome": "BLAU FARMACEUTIC",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 4 N 7 V 0",
+    "ultimo": 10.76,
+    "alvo": 12.453845977783203,
+    "upside": 0.1574206299055021,
+    "pl_fwd": 8.057288932115714,
+    "ev_ebitda_fwd": 4.802071783181588,
+    "dy": 0.040376589895882296
+   }
+  },
+  "DASA3": {
+   "nome": "DIAGNOSTICOS AME",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 2 N 8 V 0",
+    "ultimo": 3.1,
+    "alvo": 4.400000095367432,
+    "upside": 0.4193548694733651,
+    "pl_fwd": 14.367142552738121,
+    "ev_ebitda_fwd": 4.758324401010374,
+    "dy": 0.014107032505252748
+   }
+  },
+  "MATD3": {
+   "nome": "HOSPITAL MATER D",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 5 N 3 V 0",
+    "ultimo": 5.26,
+    "alvo": 7.114285945892334,
+    "upside": 0.3525258452266795,
+    "pl_fwd": 8.94791042052298,
+    "ev_ebitda_fwd": 5.899562264694052,
+    "dy": 0.020628469035444255
+   }
+  },
+  "ODPV3": {
+   "nome": "ODONTOPREV",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 4 N 4 V 1",
+    "ultimo": null,
+    "alvo": 15.122221946716309,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "JHSF3": {
+   "nome": "JHSF PART",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 5 N 1 V 0",
+    "ultimo": 10.75,
+    "alvo": 10.760000228881836,
+    "upside": 0.000930253849473095,
+    "pl_fwd": 8.430739182692308,
+    "ev_ebitda_fwd": 8.284645528401171,
+    "dy": 0.0604366034037245
+   }
+  },
+  "ALLD3": {
+   "nome": "ALLIED TECNOLOGI",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 1 N 0 V 0",
+    "ultimo": 5.99,
+    "alvo": 11.5,
+    "upside": 0.9198664440734556,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 3.346328877488288,
+    "dy": 0
+   }
+  },
+  "CASH3": {
+   "nome": "MELIUZ SA-ON",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 2 N 1 V 0",
+    "ultimo": 4.09,
+    "alvo": 6.650000095367432,
+    "upside": 0.6259168937328685,
+    "pl_fwd": 6.473167182099327,
+    "ev_ebitda_fwd": 3.6866362797822405,
+    "dy": 0.021161790742770425
+   }
+  },
+  "ORVR3": {
+   "nome": "ORIZON VALORIZAC",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 9 N 0 V 0",
+    "ultimo": 79.2,
+    "alvo": 92.84889221191406,
+    "upside": 0.1723344976251775,
+    "pl_fwd": 23.42730533628755,
+    "ev_ebitda_fwd": 8.646152626251792,
+    "dy": 0.021001683501683504
+   }
+  },
+  "POSI3": {
+   "nome": "POSITIVO TECNOLO",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 2 N 2 V 0",
+    "ultimo": 4.17,
+    "alvo": 6.175000190734863,
+    "upside": 0.48081539346159796,
+    "pl_fwd": 3.300291103159682,
+    "ev_ebitda_fwd": 2.9252460197303085,
+    "dy": 0.0904288063801832
+   }
+  },
+  "AERI3": {
+   "nome": "AERIS INDUSTRIA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 2.28,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "AZUL4": {
+   "nome": "AZUL SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 0 N 1 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "CCRO3": {
+   "nome": "CCR SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 10 N 3 V 1",
+    "ultimo": null,
+    "alvo": 18.883333206176758,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "ECOR3": {
+   "nome": "ECORODOVIAS",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 4 V 0",
+    "ultimo": 7.92,
+    "alvo": 13.20769214630127,
+    "upside": 0.6676378972602612,
+    "pl_fwd": 8.637545023775896,
+    "ev_ebitda_fwd": 4.814878953053863,
+    "dy": 0.02802546538178722
+   }
+  },
+  "EMBR3": {
+   "nome": "EMBRAER",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 6 N 1 V 0",
+    "ultimo": null,
+    "alvo": 92.17285919189453,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "GOLL4": {
+   "nome": "GOL-PREF",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 0 V 1",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "HBSA3": {
+   "nome": "HIDROVIAS DO BRA",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 4 N 2 V 1",
+    "ultimo": 3.26,
+    "alvo": 4.5428571701049805,
+    "upside": 0.393514469357356,
+    "pl_fwd": 12.244351705281334,
+    "ev_ebitda_fwd": 6.3709283504279,
+    "dy": 0.01607785064522953
+   }
+  },
+  "JSLG3": {
+   "nome": "JSL SA",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 7 N 2 V 0",
+    "ultimo": 6.87,
+    "alvo": 12.244444847106934,
+    "upside": 0.7823063824027559,
+    "pl_fwd": 5.953048120530409,
+    "ev_ebitda_fwd": 3.1817755026473584,
+    "dy": 0.15871549911604121
+   }
+  },
+  "MILS3": {
+   "nome": "MILLS ESTRUTURAS",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 5 N 3 V 1",
+    "ultimo": 13.34,
+    "alvo": 15.712499618530273,
+    "upside": 0.17784854711621234,
+    "pl_fwd": 7.966639209225701,
+    "ev_ebitda_fwd": 4.025170235770298,
+    "dy": 0.10530740376937969
+   }
+  },
+  "MYPK3": {
+   "nome": "IOCHP-MAXION",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 6 N 3 V 1",
+    "ultimo": 9.04,
+    "alvo": 14.600000381469727,
+    "upside": 0.6150442899855895,
+    "pl_fwd": 4.527780496370199,
+    "ev_ebitda_fwd": 3.3434937936852758,
+    "dy": 0.0822538398942122
+   }
+  },
+  "PRNR3": {
+   "nome": "PRINER SERVICOS",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 3 N 0 V 0",
+    "ultimo": 19.09,
+    "alvo": 26.663806915283203,
+    "upside": 0.3967421118534942,
+    "pl_fwd": 6.951988279614902,
+    "ev_ebitda_fwd": 4.810238587969216,
+    "dy": 0.027407982755610148
+   }
+  },
+  "SEQL3": {
+   "nome": "SEQUOIA LOGISTIC",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 0 V 0",
+    "ultimo": 0.12,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "STBP3": {
+   "nome": "SANTOS BRP-ORD",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 0 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "TUPY3": {
+   "nome": "TUPY",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 1 N 7 V 1",
+    "ultimo": 13.4,
+    "alvo": 17.55555534362793,
+    "upside": 0.3101160704199948,
+    "pl_fwd": 7.533830504969562,
+    "ev_ebitda_fwd": 4.0715274952690805,
+    "dy": 0.04044919082747182
+   }
+  },
+  "AMER3": {
+   "nome": "AMERICANAS SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 5.22,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "CRFB3": {
+   "nome": "ATACADAO SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 0 N 1 V 0",
+    "ultimo": null,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "CVCB3": {
+   "nome": "CVC BRASIL OPERA",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 3 V 0",
+    "ultimo": 1.8,
+    "alvo": 2.7249999046325684,
+    "upside": 0.5138888359069824,
+    "pl_fwd": 14.97752414958396,
+    "ev_ebitda_fwd": 2.584442156408609,
+    "dy": 0
+   }
+  },
+  "DMVF3": {
+   "nome": "D1000 VAREJO FAR",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 1 N 0 V 0",
+    "ultimo": 5.86,
+    "alvo": 7,
+    "upside": 0.1945392491467577,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "ENJU3": {
+   "nome": "ENJOEI.COM.BR AT",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 1.08,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "GRND3": {
+   "nome": "GRENDENE SA",
+   "setor": null,
+   "xp": {
+    "rating": "Sob Revisão",
+    "consenso": "C 0 N 0 V 0",
+    "ultimo": 4.04,
+    "alvo": null,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "GUAR3": {
+   "nome": "RIACHUELO",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 10 N 1 V 0",
+    "ultimo": null,
+    "alvo": 14.05555534362793,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "LWSA3": {
+   "nome": "LWSA SA",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 10 N 2 V 0",
+    "ultimo": 3.75,
+    "alvo": 5.954545497894287,
+    "upside": 0.5878787994384767,
+    "pl_fwd": 12.033121050431532,
+    "ev_ebitda_fwd": 4.632778835630925,
+    "dy": 0.03988148148148148
+   }
+  },
+  "NTCO3": {
+   "nome": "NATURA &CO HOLDI",
+   "setor": null,
+   "xp": {
+    "rating": "Sem Cobertura Research XP",
+    "consenso": "C 1 N 3 V 0",
+    "ultimo": null,
+    "alvo": 18,
+    "upside": null,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": null,
+    "dy": 0
+   }
+  },
+  "PCAR3": {
+   "nome": "PAO ACUCAR",
+   "setor": null,
+   "xp": {
+    "rating": "Neutro",
+    "consenso": "C 0 N 6 V 5",
+    "ultimo": 2.17,
+    "alvo": 2.9200000762939453,
+    "upside": 0.3456221549741685,
+    "pl_fwd": null,
+    "ev_ebitda_fwd": 4.487458550260409,
+    "dy": 0
+   }
+  },
+  "PGMN3": {
+   "nome": "EMPREENDIMENTOS",
+   "setor": null,
+   "xp": {
+    "rating": "Compra",
+    "consenso": "C 6 N 1 V 1",
+    "ultimo": 4.72,
+    "alvo": 7.92476224899292,
+    "upside": 0.6789750527527374,
+    "pl_fwd": 8.488974641675854,
+    "ev_ebitda_fwd": 5.861624643012324,
+    "dy": null
+   }
+  }
+ }
+}

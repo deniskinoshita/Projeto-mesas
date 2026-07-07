@@ -773,6 +773,21 @@ def carregar_contexto():
         return {}
 
 
+# ── Stock Guide: posicionamento por ação (Levante = casa principal, XP = visão de mercado)
+_STOCK_GUIDE_CACHE = None
+def carregar_stock_guide():
+    """Guia de ações consolidado (Levante + XP). Levante é a casa principal da análise;
+    XP entra como 'como o mercado está vendo a ação'. Cacheado em memória."""
+    global _STOCK_GUIDE_CACHE
+    if _STOCK_GUIDE_CACHE is None:
+        try:
+            with open(os.path.join(ROOT, "stock_guide.json"), encoding="utf-8") as f:
+                _STOCK_GUIDE_CACHE = json.load(f)
+        except Exception:
+            _STOCK_GUIDE_CACHE = {"_meta": {}, "acoes": {}}
+    return _STOCK_GUIDE_CACHE
+
+
 def buscar_macro_bcb():
     try:
         import urllib.request
@@ -1920,6 +1935,12 @@ select option{background:#1A1A1A}
       <div id="hp-fiis-table"></div>
     </div>
 
+    <!-- Proteção de posições perto do preço-alvo -->
+    <div id="hp-protecoes-bloco" style="display:none;margin-bottom:12px">
+      <div style="font-size:11px;color:#E8A87C;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🛡 Proteção de posições — perto do preço-alvo</div>
+      <div id="hp-protecoes-lista"></div>
+    </div>
+
     <!-- Sugestões de produtos HP para fechar gaps -->
     <div id="hp-sugestoes" style="display:none">
       <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
@@ -2550,6 +2571,114 @@ function carregarGestoras(tentativa){
 }
 carregarGestoras();
 function onGestoraChange(){ atualizarModelo(); }
+
+// ── Stock Guide: posicionamento por ação (Levante = casa principal, XP = visão de mercado) ──
+var _STOCK_GUIDE = {_meta:{}, acoes:{}};
+function carregarStockGuide(tentativa){
+  tentativa = tentativa || 0;
+  fetch("/api/stock-guide").then(r=>r.json()).then(d=>{ _STOCK_GUIDE = d || {_meta:{},acoes:{}}; })
+    .catch(function(){ if(tentativa<3) setTimeout(function(){ carregarStockGuide(tentativa+1); }, 4000); });
+}
+carregarStockGuide();
+function _sgNorm(r){ r=(r||"").toUpperCase(); if(r.indexOf("COMPRA")>=0)return "COMPRA"; if(r.indexOf("VENDA")>=0)return "VENDA"; if(r.indexOf("NEUTRO")>=0)return "NEUTRO"; return ""; }
+function _sgCor(r){ var n=_sgNorm(r); return n==="COMPRA"?"#5DCAA5":n==="VENDA"?"#FF6B6B":n==="NEUTRO"?"#D4B483":"#888"; }
+function _sgBadge(r){ if(!r) return '<span style="color:#3A6A48">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
+function _sgUp(v){ if(v==null) return ""; var p=v*100; return ' <span style="color:'+(p>=0?"#5DCAA5":"#FF6B6B")+';font-size:10px">'+(p>=0?"+":"")+p.toFixed(0)+'%</span>'; }
+function _sgBrl(v){ return v!=null ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; }
+function _sgData(iso){ if(!iso) return "—"; var p=String(iso).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : iso; }
+function _sgRow(a){
+  var g = _STOCK_GUIDE.acoes[String(a.ticker||"").toUpperCase()] || null;
+  var lev = g && g.levante, xp = g && g.xp;
+  var posHtml;
+  if(lev){ posHtml=_sgBadge(lev.rating + (lev.nota?(" "+lev.nota):"")); }
+  else if(xp){ posHtml=_sgBadge(xp.rating)+' <span style="color:#4A7055;font-size:9px">(via XP)</span>'; }
+  else { posHtml='<span style="color:#3A6A48">sem cobertura</span>'; }
+  var alvoSrc = lev || xp;
+  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#3A6A48">—</span>';
+  var xpHtml;
+  if(xp){ xpHtml=_sgBadge(xp.rating); if(xp.consenso) xpHtml+=' <span style="color:#4A7055;font-size:9px">'+xp.consenso+'</span>'; xpHtml+=_sgUp(xp.upside); }
+  else { xpHtml='<span style="color:#3A6A48">—</span>'; }
+  var flag="";
+  if(lev && xp && _sgNorm(lev.rating) && _sgNorm(xp.rating) && _sgNorm(lev.rating)!==_sgNorm(xp.rating)){
+    flag=' <span title="Levante e XP divergem" style="color:#E8A87C">⚠</span>';
+  }
+  return {posHtml:posHtml+flag, alvoHtml:alvoHtml, xpHtml:xpHtml, nome:(g&&g.nome)||""};
+}
+
+// ── Proteção de posições perto do preço-alvo (upside restante <= 10%) ──
+var _PROT_LIMIAR = 0.10;
+var _PROT_STATUS = {
+  pendente:    {lbl:"Pendente",             cor:"#D4B483"},
+  recusada:    {lbl:"Cliente recusou",      cor:"#FF6B6B"},
+  estruturada: {lbl:"Estruturada aplicada", cor:"#5DCAA5"},
+  caixa:       {lbl:"Vendido p/ caixa",     cor:"#7DCFEF"},
+};
+var _protHist = [];
+function detectarProtecoes(acoes){
+  var out=[];
+  (acoes||[]).forEach(function(a){
+    var g=_STOCK_GUIDE.acoes[String(a.ticker||"").toUpperCase()]; if(!g) return;
+    var src=g.levante||g.xp; if(!src || src.upside==null) return;
+    if(src.upside <= _PROT_LIMIAR){
+      out.push({ticker:String(a.ticker||"").toUpperCase(), alvo:src.alvo, preco:src.ultimo,
+        upside:src.upside, fonte:(g.levante?"Levante":"XP"), rating:src.rating});
+    }
+  });
+  return out;
+}
+function processarProtecoes(acoes){
+  var bloco=document.getElementById("hp-protecoes-bloco"); if(!bloco) return;
+  var conta=_clienteIdentificado && _clienteIdentificado.conta;
+  var near=detectarProtecoes(acoes);
+  function carregar(){
+    if(!conta){ renderProtecoes(near.map(function(n){ return Object.assign({status:"pendente",data:"—",id:null},n); })); return; }
+    fetch("/api/protecoes?conta="+encodeURIComponent(conta)).then(r=>r.json())
+      .then(function(h){ _protHist=h||[]; renderProtecoes(_protHist); })
+      .catch(function(){ renderProtecoes(near.map(function(n){ return Object.assign({status:"pendente",data:"—",id:null},n); })); });
+  }
+  if(conta && near.length){
+    fetch("/api/protecoes",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({conta:conta, entradas:near})}).then(carregar).catch(carregar);
+  } else { carregar(); }
+}
+function setProtecaoStatus(id,status){
+  var conta=_clienteIdentificado && _clienteIdentificado.conta; if(!conta||!id) return;
+  fetch("/api/protecoes/status",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({conta:conta,id:id,status:status})}).then(function(){
+      _protHist.forEach(function(p){ if(p.id===id){ p.status=status; } });
+      renderProtecoes(_protHist);
+    }).catch(function(){});
+}
+function renderProtecoes(lista){
+  var bloco=document.getElementById("hp-protecoes-bloco");
+  var el=document.getElementById("hp-protecoes-lista");
+  if(!bloco||!el) return;
+  if(!lista || !lista.length){ bloco.style.display="none"; el.innerHTML=""; return; }
+  bloco.style.display="";
+  el.innerHTML = lista.map(function(p){
+    var st=_PROT_STATUS[p.status]||_PROT_STATUS.pendente;
+    var up=(p.upside!=null)?((p.upside*100>=0?"+":"")+(p.upside*100).toFixed(0)+"%"):"—";
+    var alvo=(p.alvo!=null)?("R$ "+Number(p.alvo).toLocaleString("pt-BR",{minimumFractionDigits:2})):"—";
+    var botoes = p.id ? Object.keys(_PROT_STATUS).map(function(k){
+        var on=(p.status===k); var c=_PROT_STATUS[k].cor;
+        return '<button onclick="setProtecaoStatus(\''+p.id+'\',\''+k+'\')" style="cursor:pointer;font-size:9px;padding:3px 8px;border-radius:6px;'
+          +'border:1px solid '+(on?c:"#1E2E28")+';background:'+(on?c+"22":"#081F18")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
+      }).join("") : '<span style="font-size:9px;color:#5A7A68">Identifique o cliente para salvar o histórico</span>';
+    return '<div style="border:1px solid #2A1E12;background:#140D07;border-radius:8px;padding:10px 12px;margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">'
+        +'<div><span style="color:#D4B483;font-weight:700;font-size:12px">'+p.ticker+'</span> '
+          +'<span style="color:'+_sgCor(p.rating)+';font-size:10px;font-weight:700">'+(p.rating||"")+'</span> '
+          +'<span style="color:#888;font-size:10px">· '+(p.fonte||"")+' · alvo '+alvo+' <span style="color:#E8A87C">('+up+' de upside)</span></span></div>'
+        +'<span style="font-size:9px;color:'+st.cor+';font-weight:700">'+st.lbl+(p.data&&p.data!=="—"?' · '+p.data:"")+'</span>'
+      +'</div>'
+      +'<div style="font-size:10px;color:#B8A488;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
+        +'<b style="color:#D4B483">(a)</b> operação estruturada (collar / put de proteção / fence) · '
+        +'<b style="color:#D4B483">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap">'+botoes+'</div>'
+    +'</div>';
+  }).join("")
+  + '<div style="font-size:9px;color:#2A5A3A;margin-top:2px;line-height:1.5">Gatilho: preço a ≤10% do alvo (casa principal Levante). As recomendações ficam salvas no histórico do cliente — se recusadas, é só revisitar aqui numa próxima análise.</div>';
+}
 
 function atualizarModelo(){
   const sel = document.getElementById("perfil");
@@ -3449,28 +3578,40 @@ function renderAnaliseHP(xp){
 
   // Renda Fixa — posição detalhada: removida a pedido (já há muita informação na análise)
 
-  // Ações
+  // Ações — com posicionamento Braúna (Levante) + visão de mercado (XP)
   if(xp.acoes && xp.acoes.length){
     document.getElementById("hp-acoes-bloco").style.display = "";
-    const SINAL = v => v > 0 ? `<span style="color:#5DCAA5">+${v.toFixed(2)}%</span>` : `<span style="color:#FF6B6B">${v.toFixed(2)}%</span>`;
+    var _sgMeta = _STOCK_GUIDE._meta || {};
     document.getElementById("hp-acoes-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:11px">
         <thead><tr style="background:#071E17">
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ticker</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Qtd.</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Saldo</th>
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ativo</th>
           <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Posição Braúna (Levante)</th>
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Alvo / Upside</th>
+          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Mercado (XP)</th>
         </tr></thead>
-        <tbody>${xp.acoes.map((a,i)=>`
+        <tbody>${xp.acoes.map((a,i)=>{ var sv=_sgRow(a); return `
           <tr style="background:${i%2?"#070707":"#071E17"}">
-            <td style="padding:6px 8px;color:#D4B483;font-weight:700">${a.ticker}</td>
-            <td style="padding:6px 8px;color:#888;text-align:right">${a.qtd||"—"}</td>
-            <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
-            <td style="padding:6px 8px;text-align:right">${(a.perc||0).toFixed(2)}%</td>
-          </tr>`).join("")}
+            <td style="padding:6px 8px">
+              <span style="color:#D4B483;font-weight:700">${a.ticker}</span>
+              ${sv.nome?`<span style="color:#4A7055;font-size:9px;display:block">${sv.nome}</span>`:""}
+              <span style="color:#666;font-size:9px">${a.qtd?("Qtd "+a.qtd+" · "):""}R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
+            </td>
+            <td style="padding:6px 8px;text-align:right;color:#5DCAA5">${(a.perc||0).toFixed(2)}%</td>
+            <td style="padding:6px 8px">${sv.posHtml}</td>
+            <td style="padding:6px 8px;color:#CCC">${sv.alvoHtml}</td>
+            <td style="padding:6px 8px">${sv.xpHtml}</td>
+          </tr>`}).join("")}
         </tbody>
-      </table>`;
+      </table>
+      <div style="font-size:9px;color:#2A5A3A;margin-top:6px;line-height:1.5">
+        <b style="color:#C9A96E">Levante</b> = casa principal do posicionamento (${_sgData(_sgMeta.fonte_levante_data)}) · <b style="color:#7DCFEF">XP</b> = como o mercado está vendo (${_sgData(_sgMeta.fonte_xp_data)}). O preço-alvo é referência; o preço vivo vem do XPerformance. <span style="color:#E8A87C">⚠</span> = Levante e XP divergem.
+      </div>`;
   }
+
+  // Proteção de posições perto do preço-alvo (usa as ações + o stock guide)
+  try{ processarProtecoes(xp.acoes || []); }catch(e){ console.error("[protecoes]",e); }
 
   // FIIs
   if(xp.fiis && xp.fiis.length){
@@ -5067,6 +5208,83 @@ def ficha_endpoint():
     return jsonify(result)
 
 
+# ── Proteção de posições perto do preço-alvo (histórico por cliente) ─────────────
+# Regra: quando uma ação que o cliente tem está a <=10% do preço-alvo (upside curto),
+# sugere-se proteção (estruturada ou venda p/ caixa). Cada sugestão fica no histórico
+# do cliente com status, para o assessor revisitar se o cliente recusar.
+_PROT_STATUS_VALIDOS = {"pendente", "recusada", "estruturada", "caixa"}
+
+@app.route("/api/protecoes", methods=["GET", "POST"])
+def protecoes_endpoint():
+    fichas = load_fichas()
+    if request.method == "GET":
+        conta = request.args.get("conta", "").strip()
+        ficha = fichas.get(f"conta:{conta}") or fichas.get(conta) or {}
+        return jsonify(ficha.get("protecoes", []))
+    # POST: registra sugestões detectadas (dedupe por ticker + alvo)
+    d = request.get_json() or {}
+    conta = str(d.get("conta", "")).strip()
+    if not conta:
+        return jsonify({"ok": False, "error": "conta obrigatória"}), 400
+    key = f"conta:{conta}"
+    ficha = fichas.get(key) or fichas.get(conta) or {"conta": conta}
+    prot = ficha.get("protecoes", [])
+
+    def _mesma(a, b):
+        try:
+            return a.get("ticker") == b.get("ticker") and \
+                   round(float(a.get("alvo") or 0), 2) == round(float(b.get("alvo") or 0), 2)
+        except Exception:
+            return a.get("ticker") == b.get("ticker")
+
+    hoje = datetime.now().strftime("%d/%m/%Y")
+    novos = 0
+    for e in (d.get("entradas", []) or []):
+        tk = str(e.get("ticker", "")).upper().strip()
+        if not tk:
+            continue
+        cand = {
+            "id": f"{tk}-{int(time.time()*1000)}-{novos}",
+            "ticker": tk, "data": hoje,
+            "alvo": e.get("alvo"), "preco": e.get("preco"), "upside": e.get("upside"),
+            "fonte": e.get("fonte", ""), "rating": e.get("rating", ""),
+            "status": "pendente", "status_em": hoje,
+        }
+        if any(_mesma(cand, x) for x in prot):
+            continue   # mesma recomendação (mesmo alvo) já registrada — não duplica
+        prot.append(cand)
+        novos += 1
+    ficha["protecoes"] = prot[-100:]
+    ficha.setdefault("conta", conta)
+    fichas[key] = ficha
+    save_fichas(fichas)
+    return jsonify({"ok": True, "novos": novos, "protecoes": ficha["protecoes"]})
+
+@app.route("/api/protecoes/status", methods=["POST"])
+def protecoes_status():
+    d = request.get_json() or {}
+    conta = str(d.get("conta", "")).strip()
+    pid = d.get("id", "")
+    status = d.get("status", "pendente")
+    if status not in _PROT_STATUS_VALIDOS:
+        return jsonify({"ok": False, "error": "status inválido"}), 400
+    fichas = load_fichas()
+    key = f"conta:{conta}"
+    ficha = fichas.get(key) or fichas.get(conta)
+    if not ficha:
+        return jsonify({"ok": False, "error": "ficha não encontrada"}), 404
+    achou = False
+    for p in ficha.get("protecoes", []):
+        if p.get("id") == pid:
+            p["status"] = status
+            p["status_em"] = datetime.now().strftime("%d/%m/%Y")
+            achou = True
+            break
+    fichas[key] = ficha
+    save_fichas(fichas)
+    return jsonify({"ok": achou})
+
+
 # Classes de maior risco/volatilidade — usadas p/ inferir o perfil pela carteira.
 _CLASSES_RISCO = ("acoes", "fiis", "multimercado", "internacional", "alternativos", "criptomoedas")
 
@@ -5784,6 +6002,11 @@ def hp_gestoras2():
     gestoras[gid] = {"id": gid, "nome": data.get("nome","").strip(), "referencia": data.get("referencia","").strip(), "perfis": perfis_data}
     _save(_HP_GESTORAS2_FILE, gestoras)
     return jsonify({"ok": True, "id": gid})
+
+@app.route("/api/stock-guide", methods=["GET"])
+def api_stock_guide():
+    """Guia de ações consolidado (Levante = casa principal, XP = visão de mercado)."""
+    return jsonify(carregar_stock_guide())
 
 @app.route("/api/hp/carteira-brauna", methods=["GET"])
 def hp_carteira_brauna_get():
