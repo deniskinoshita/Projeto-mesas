@@ -1908,12 +1908,6 @@ select option{background:#1A1A1A}
     </div>
     <div id="hp-desvios" style="margin-bottom:16px"></div>
 
-    <!-- Renda Fixa individual -->
-    <div id="hp-rf-bloco" style="display:none;margin-bottom:12px">
-      <div style="font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🏦 Renda Fixa — Posição Detalhada</div>
-      <div id="hp-rf-table"></div>
-    </div>
-
     <!-- Ações individuais -->
     <div id="hp-acoes-bloco" style="display:none;margin-bottom:12px">
       <div style="font-size:11px;color:#5DCAA5;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📈 Carteira de Ações</div>
@@ -3453,34 +3447,7 @@ function renderAnaliseHP(xp){
     </div>
   `).join("");
 
-  // Renda Fixa — posição detalhada (junto com o resto da análise)
-  if(xp.rf_ativos && xp.rf_ativos.length){
-    document.getElementById("hp-rf-bloco").style.display = "";
-    const RENT = v => v == null ? '<span style="color:#3A6A48">—</span>'
-      : (v >= 0 ? `<span style="color:#5DCAA5">+${Number(v).toFixed(2)}%</span>`
-                : `<span style="color:#FF6B6B">${Number(v).toFixed(2)}%</span>`);
-    document.getElementById("hp-rf-table").innerHTML = `
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:#071E17">
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ativo</th>
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Classe</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Saldo</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Rent. Mês</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Rent. 12M</th>
-        </tr></thead>
-        <tbody>${xp.rf_ativos.map((a,i)=>`
-          <tr style="background:${i%2?"#070707":"#071E17"}">
-            <td style="padding:6px 8px;color:#D4B483;font-weight:700;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(a.nome||"").replace(/"/g,"&quot;")}">${a.nome||"—"}</td>
-            <td style="padding:6px 8px;color:#888">${a.classe||"—"}</td>
-            <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
-            <td style="padding:6px 8px;color:#5DCAA5;text-align:right">${(a.perc||0).toFixed(2)}%</td>
-            <td style="padding:6px 8px;text-align:right">${RENT(a.rent_mes)}</td>
-            <td style="padding:6px 8px;text-align:right;color:#AAA">${a.rent_12m!=null?Number(a.rent_12m).toFixed(2)+"%":"—"}</td>
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
-  }
+  // Renda Fixa — posição detalhada: removida a pedido (já há muita informação na análise)
 
   // Ações
   if(xp.acoes && xp.acoes.length){
