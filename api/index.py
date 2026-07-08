@@ -10750,13 +10750,40 @@ function objRecalc(i){
   });
   var cell=document.getElementById("obj-recclasse-"+i);
   if(!cell) return;
-  if(!algum){ cell.textContent="—"; cell.style.color="#3A6A48"; return; }
-  var txt="R$ "+recTot.toLocaleString("pt-BR",{maximumFractionDigits:0});
-  if(okr!=null){
-    var dif=recTot-okr; var pct=okr?Math.round(recTot/okr*100):0;
-    var cor = Math.abs(dif) <= okr*0.02 ? "#5DCAA5" : (dif<0 ? "#E8A87C" : "#7DCFEF");
-    cell.style.color=cor; cell.innerHTML=txt+' <span style="font-size:9px;color:'+cor+'">('+pct+'% do OKR)</span>';
-  } else { cell.style.color="#888"; cell.textContent=txt; }
+  var valTxt="R$ "+recTot.toLocaleString("pt-BR",{maximumFractionDigits:0});
+  if(!algum || okr==null || okr<=0){
+    cell.innerHTML = algum ? valTxt : "—";
+    cell.style.color = "#888"; cell.dataset.falta = "";
+    objDestacarMaisLonge(); return;
+  }
+  var falta = 100 - (recTot/okr*100);   // quanto falta para bater 100% do OKR
+  if(falta > 0.5){
+    cell.dataset.falta = falta.toFixed(1);
+    cell.style.color="#E8A87C";
+    cell.innerHTML = valTxt+' <span style="font-size:9px;color:#E8A87C">· faltam '+falta.toFixed(0)+'% p/ 100%</span>';
+  } else {
+    cell.dataset.falta = "0";
+    cell.style.color="#5DCAA5";
+    cell.innerHTML = valTxt+' <span style="font-size:9px;color:#5DCAA5">· meta batida</span>';
+  }
+  objDestacarMaisLonge();
+}
+
+// Destaca a linha do assessor que está MAIS LONGE de bater 100% do OKR
+function objDestacarMaisLonge(){
+  var cells=document.querySelectorAll('[id^="obj-recclasse-"]');
+  var maxF=-1, maxCell=null;
+  cells.forEach(function(c){
+    var tr=c.closest("tr"); if(tr) tr.style.boxShadow="";
+    var f=parseFloat(c.dataset.falta);
+    if(!isNaN(f) && f>maxF){ maxF=f; maxCell=c; }
+  });
+  document.querySelectorAll(".obj-longe-tag").forEach(function(e){ e.remove(); });
+  if(maxCell && maxF>0.5){
+    var tr=maxCell.closest("tr");
+    if(tr) tr.style.boxShadow="inset 3px 0 0 #E8A87C";
+    maxCell.insertAdjacentHTML("beforeend",'<span class="obj-longe-tag" style="font-size:8px;color:#E8A87C;display:block;margin-top:2px">▲ mais longe do OKR</span>');
+  }
 }
 
 async function objSalvar(){
@@ -10771,14 +10798,18 @@ async function objSalvar(){
     });
     return {assessor:a.assessor, okr_mensal: okrEl&&okrEl.value!==""?parseFloat(okrEl.value):null, classes:classes};
   })};
-  st.textContent="Salvando..."; st.style.color="#AAA";
+  if(st){ st.textContent="Salvando..."; st.style.color="#AAA"; }
   try{
     var r=await fetch("/api/objetivos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-    var d=await r.json();
-    if(d.ok){ _objData=d.objetivos; st.textContent="✓ Objetivos salvos"; st.style.color="#5DCAA5"; }
-    else { st.textContent="Erro ao salvar"; st.style.color="#FF6B6B"; }
-  }catch(e){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; }
-  setTimeout(function(){ if(st) st.textContent=""; },3500);
+    var d=null; try{ d=await r.json(); }catch(_){}
+    if(r.ok && d && d.ok){
+      _objData=d.objetivos; objRender();   // re-renderiza com o que foi de fato salvo
+      if(st){ st.textContent="✓ Objetivos salvos às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); st.style.color="#5DCAA5"; }
+    } else {
+      if(st){ st.textContent="Erro ao salvar (HTTP "+r.status+")"; st.style.color="#FF6B6B"; }
+    }
+  }catch(e){ if(st){ st.textContent="Erro de conexão: "+e.message; st.style.color="#FF6B6B"; } }
+  setTimeout(function(){ if(st) st.textContent=""; },6000);
 }
 
 init();
