@@ -3798,13 +3798,26 @@ async function buscarUltimoXpPorCodigo(conta){
       carregarFicha(JSON.stringify(ficha));
     }
 
-    // Preenche composição do último XPerformance salvo
+    // Dados salvos que permitem analisar sem re-subir o PDF (posições + rentabilidade)
+    _clienteIdentificado = _clienteIdentificado || {};
+    _clienteIdentificado.conta = conta;
+    if(ficha){
+      _clienteIdentificado.acoes     = ficha.acoes     || [];
+      _clienteIdentificado.fiis      = ficha.fiis      || [];
+      _clienteIdentificado.rf_ativos = ficha.rf_ativos || [];
+      _clienteIdentificado.assessor  = ficha.assessor  || _clienteIdentificado.assessor || "";
+    }
+
+    // Preenche composição do último XPerformance salvo (foto mais recente)
     if(ultimo && ultimo.composicao){
-      _clienteIdentificado = _clienteIdentificado || {};
       _clienteIdentificado.composicao_atual = ultimo.composicao;
       _clienteIdentificado.patrimonio = ultimo.patrimonio || 0;
       _clienteIdentificado.conta = conta;
       _clienteIdentificado.data_ref = ultimo.data_ref || ultimo.salvo_em?.split(" ")[0] || "";
+      _clienteIdentificado.rent = ultimo.rent || {};
+      if(ultimo.acoes)     _clienteIdentificado.acoes     = ultimo.acoes;
+      if(ultimo.fiis)      _clienteIdentificado.fiis      = ultimo.fiis;
+      if(ultimo.rf_ativos) _clienteIdentificado.rf_ativos = ultimo.rf_ativos;
 
       const fmtBrl = v => "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
       const pat = ultimo.patrimonio||0;
@@ -4200,7 +4213,27 @@ async function analisar(){
 
   if(!assessor){alert("Digite seu nome como assessor.");return;}
 
-  if(!fileXP){alert("Selecione o PDF do relatório XP.");return;}
+  // Sem PDF novo? Se o cliente já foi carregado (pelo código/lista) e tem composição
+  // salva, analisamos pela última foto — sem precisar re-subir o XPerformance.
+  const _comp = _clienteIdentificado && _clienteIdentificado.composicao_atual;
+  const temSalvo = !!(_clienteIdentificado && _clienteIdentificado.conta && _comp &&
+                      Object.values(_comp).some(v => (+v||0) > 0));
+  if(!fileXP && !temSalvo){
+    alert("Selecione o PDF do relatório XP — ou digite o código de um cliente já salvo para usar os dados guardados.");
+    return;
+  }
+  const dadosSalvos = (!fileXP && temSalvo) ? JSON.stringify({
+    comp: _clienteIdentificado.composicao_atual || {},
+    caixa: _clienteIdentificado.caixa || 0,
+    rent: _clienteIdentificado.rent || {},
+    patrimonio: _clienteIdentificado.patrimonio || 0,
+    acoes: _clienteIdentificado.acoes || [],
+    fiis: _clienteIdentificado.fiis || [],
+    rf_ativos: _clienteIdentificado.rf_ativos || [],
+    data_ref: _clienteIdentificado.data_ref || "",
+    conta: _clienteIdentificado.conta || "",
+    assessor: assessor,
+  }) : "";
 
   document.getElementById("spinner").classList.add("show");
   document.getElementById("results").style.display="none";
@@ -4209,9 +4242,9 @@ async function analisar(){
   const fd=new FormData();
   fd.append("assessor",assessor);
   fd.append("nome",nome); fd.append("perfil",perfil); fd.append("objetivo",objetivo);
-  fd.append("pdf",fileXP);
   fd.append("checklist",JSON.stringify(checklist));
   fd.append("cross_sell",JSON.stringify(crossSell));
+  if(fileXP) fd.append("pdf",fileXP); else fd.append("dados_salvos",dadosSalvos);
 
   try{
     // Faz os dois requests em paralelo
@@ -4219,7 +4252,7 @@ async function analisar(){
     fd2.append("assessor", assessor);
     fd2.append("perfil", perfil);
     fd2.append("gestora", gestora);
-    fd2.append("pdf", fileXP);
+    if(fileXP) fd2.append("pdf", fileXP); else fd2.append("dados_salvos", dadosSalvos);
 
     const [res, resXP] = await Promise.all([
       fetch("/api/analyze", {method:"POST", body:fd}),
@@ -7175,15 +7208,24 @@ def analyze_xp():
     """Lê PDF XPerformance, compara com modelo HP e sugere produtos cadastrados."""
     pdf_file = request.files.get("pdf")
     assessor  = request.form.get("assessor", "Assessor")
-    if not pdf_file:
+    salvos_raw = request.form.get("dados_salvos", "")
+    if not pdf_file and not salvos_raw:
         return jsonify({"error": "PDF não enviado"}), 400
 
-    try:
-        dados = extrair_xperformance(pdf_file.read())
-    except Exception as e:
-        return jsonify({"error": f"Falha ao ler o PDF: {str(e)}"}), 400
+    if pdf_file:
+        try:
+            dados = extrair_xperformance(pdf_file.read())
+        except Exception as e:
+            return jsonify({"error": f"Falha ao ler o PDF: {str(e)}"}), 400
+    else:
+        # Sem PDF novo: usa os dados já salvos do cliente (última foto do XPerformance)
+        try: dados = json.loads(salvos_raw)
+        except Exception: dados = {}
+        if not isinstance(dados, dict): dados = {}
+        for _k, _v in {"comp": {}, "acoes": [], "fiis": [], "rf_ativos": [], "rent": {}, "caixa": 0, "patrimonio": 0}.items():
+            dados.setdefault(_k, _v)
 
-    comp = dados["comp"]
+    comp = dados.get("comp") or {}
 
     # Carteira de referência: gestora escolhida pelo assessor (se houver),
     # senão cai p/ o modelo Levante publicado (default).
@@ -8371,10 +8413,11 @@ def analyze():
     objetivo = request.form.get("objetivo","")
     data   = datetime.now().strftime("%d/%m/%Y")
     pdf    = request.files.get("pdf")
+    salvos_raw     = request.form.get("dados_salvos","")
     checklist_raw  = request.form.get("checklist","{}")
     crosssell_raw  = request.form.get("cross_sell","{}")
 
-    if not pdf:
+    if not pdf and not salvos_raw:
         return jsonify({"error":"PDF não enviado"}), 400
 
     try: checklist_input = json.loads(checklist_raw)
@@ -8387,8 +8430,14 @@ def analyze():
     carta_info  = _load("/tmp/brauna_carta.json", {})
     carta_texto = carta_info.get("texto","")
 
-    xp_parsed = extrair_xperformance(pdf.read())
-    comp      = xp_parsed.get("comp", {c: 0.0 for c in CATS})
+    # PDF novo → extrai; senão usa os dados já salvos do cliente (análise pela última foto)
+    if pdf:
+        xp_parsed = extrair_xperformance(pdf.read())
+    else:
+        try: xp_parsed = json.loads(salvos_raw)
+        except Exception: xp_parsed = {}
+    if not isinstance(xp_parsed, dict): xp_parsed = {}
+    comp      = xp_parsed.get("comp", {c: 0.0 for c in CATS}) or {c: 0.0 for c in CATS}
     caixa     = xp_parsed.get("caixa", 0.0)
     rent      = xp_parsed.get("rent", {})
     patrimonio= xp_parsed.get("patrimonio", 0.0)
