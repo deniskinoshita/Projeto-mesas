@@ -2058,8 +2058,13 @@ select option{background:#1A1A1A}
 
   <!-- Seletor de cliente salvo -->
   <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
-    <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700">📁 Clientes salvos — clique para carregar</p>
-    <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin:0;font-weight:700">📁 Clientes salvos — clique para carregar <span id="cs-contador" style="color:#3A6A48;font-weight:400"></span></p>
+      <input type="text" id="cs-busca" oninput="filtrarClientes()" placeholder="🔍 Buscar por número ou nome..."
+        style="flex:1;min-width:180px;max-width:280px;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:7px 12px;color:#F0F0F0;font-size:12px;outline:none">
+    </div>
+    <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px;max-height:360px;overflow-y:auto;padding-right:4px"></div>
+    <p id="cs-sem-resultado" style="display:none;font-size:11px;color:#3A6A48;margin-top:8px">Nenhum cliente encontrado para a busca.</p>
     <p id="xp-aviso-atualizar" style="display:none;font-size:11px;color:#E8A87C;margin-top:10px;line-height:1.5"></p>
   </div>
 
@@ -3869,7 +3874,8 @@ async function buscarClientesSalvos(){
       const selo = vencido
         ? `<span style="background:#2A1A0A;color:#E8A87C;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
         : `<span style="color:#3A6A48;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
-      return `<button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
+      const busca = ((c.nome||"")+" "+(c.conta||"")).toLowerCase();
+      return `<button class="cs-chip" data-busca="${busca}" onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
         style="padding:6px 12px;border-radius:20px;border:1px solid ${borda};background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
         onmouseover="this.style.borderColor='${nomeHover}'" onmouseout="this.style.borderColor='${borda}'">
         ${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""}${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}
@@ -3887,13 +3893,35 @@ async function buscarClientesSalvos(){
       const arr = grupos[k]||[];
       const lbl = PERFIL_LBL[k] || (k ? (k.charAt(0).toUpperCase()+k.slice(1)) : PERFIL_LBL._);
       const cor = PERFIL_COR[k] || PERFIL_COR._;
-      return `<div style="width:100%;margin-bottom:12px">
+      return `<div class="cs-grupo" style="width:100%;margin-bottom:12px">
         <div style="font-size:10px;color:${cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${lbl} <span style="color:#3A6A48;font-weight:400">(${arr.length})</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">${arr.map(_chip).join("")}</div>
       </div>`;
     }).join("");
+    const _cont = document.getElementById("cs-contador");
+    if(_cont) _cont.textContent = "("+lista.length+")";
+    const _busca = document.getElementById("cs-busca");
+    if(_busca && _busca.value.trim()) filtrarClientes();
     box.style.display="block";
   }catch(e){}
+}
+
+function filtrarClientes(){
+  const q = (document.getElementById("cs-busca")||{}).value || "";
+  const termo = q.trim().toLowerCase();
+  let visiveis = 0;
+  document.querySelectorAll("#clientes-salvos-lista .cs-chip").forEach(function(ch){
+    const ok = !termo || (ch.getAttribute("data-busca")||"").indexOf(termo) >= 0;
+    ch.style.display = ok ? "" : "none";
+    if(ok) visiveis++;
+  });
+  // Esconde grupos que ficaram sem nenhum chip visível
+  document.querySelectorAll("#clientes-salvos-lista .cs-grupo").forEach(function(g){
+    const algum = Array.from(g.querySelectorAll(".cs-chip")).some(ch=>ch.style.display!=="none");
+    g.style.display = algum ? "" : "none";
+  });
+  const sem = document.getElementById("cs-sem-resultado");
+  if(sem) sem.style.display = (visiveis===0 && termo) ? "block" : "none";
 }
 
 function carregarFicha(jsonStr){
