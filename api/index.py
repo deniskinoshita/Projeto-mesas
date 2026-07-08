@@ -11816,6 +11816,9 @@ textarea{resize:vertical}
       <button class="tab-btn" onclick="cbFiltrarPerfil('moderada',this)" style="padding:4px 12px;font-size:11px">Moderada</button>
       <button class="tab-btn" onclick="cbFiltrarPerfil('arrojada',this)" style="padding:4px 12px;font-size:11px">Arrojada</button>
     </div>
+    <div style="margin-top:18px">
+      <button class="tab-btn" id="cb-toggle-salvos" onclick="cbToggleSalvos(this)" style="padding:4px 12px;font-size:11px">👁 Mostrar já salvos</button>
+    </div>
   </div>
   <div id="cb-asset-allocation" style="margin-bottom:20px;background:#060C08;border:1px solid #1A2E1A;border-radius:8px;padding:12px 16px"></div>
   <div id="cb-categorias"></div>
@@ -13603,12 +13606,24 @@ init();
 var _cbData = null;
 var _cbPerfilFiltro = "todos";
 var _cbSalvarTimer = {};
+// Produtos já com motivo salvo ficam ocultos por padrão — o Head só vê o que falta.
+var _cbMostrarSalvos = false;
 
 function cbFiltrarPerfil(perfil, btn){
   _cbPerfilFiltro = perfil;
   document.querySelectorAll("#cb-filtro-perfil .tab-btn").forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
   cbRender();
+}
+
+function cbToggleSalvos(btn){
+  _cbMostrarSalvos = !_cbMostrarSalvos;
+  var b = btn || document.getElementById("cb-toggle-salvos");
+  if(b){
+    b.textContent = _cbMostrarSalvos ? "🙈 Ocultar já salvos" : "👁 Mostrar já salvos";
+    b.classList.toggle("active", _cbMostrarSalvos);
+  }
+  cbRenderCategorias();
 }
 
 function cbSalvarDataRef(){
@@ -13659,18 +13674,25 @@ function cbRenderCategorias(){
   if(!el) return;
   var cats = _cbData.categorias || [];
   var h = "";
+  var totPend = 0, totSalvos = 0;
   cats.forEach(function(cat){
     // Filtrar produtos pelo perfil selecionado
-    var prods = (cat.produtos||[]).filter(function(p){
+    var doPerfil = (cat.produtos||[]).filter(function(p){
       if(_cbPerfilFiltro==="todos") return true;
       return (p.perfis||[]).includes(_cbPerfilFiltro);
     });
+    var salvos    = doPerfil.filter(function(p){ return (p.motivo||"").trim().length > 0; });
+    var pendentes = doPerfil.filter(function(p){ return (p.motivo||"").trim().length === 0; });
+    totPend += pendentes.length; totSalvos += salvos.length;
+
+    // Por padrão o Head só vê o que ainda falta preencher
+    var prods = _cbMostrarSalvos ? doPerfil : pendentes;
     if(!prods.length) return;
 
     h += '<div style="margin-bottom:20px;background:#060C08;border:1px solid #1C3A20;border-radius:10px;overflow:hidden">';
     h += '<div style="background:#0A1A10;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">';
     h += '<span style="font-size:12px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px">'+cat.nome+'</span>';
-    h += '<span style="font-size:10px;color:#2A5A3A">'+prods.length+' produto(s)</span>';
+    h += '<span style="font-size:10px;color:#2A5A3A">'+pendentes.length+' pendente(s)'+(salvos.length?' · '+salvos.length+' com motivo':'')+'</span>';
     h += '</div>';
 
     prods.forEach(function(prod){
@@ -13721,7 +13743,18 @@ function cbRenderCategorias(){
     });
     h += '</div>';
   });
-  el.innerHTML = h || '<p style="color:#3A6A48;font-size:12px">Nenhum produto encontrado para o perfil selecionado.</p>';
+  if(!h){
+    if(totSalvos && !totPend){
+      h = '<div style="background:#071E17;border:1px solid #1C4A34;border-radius:10px;padding:18px;text-align:center">'
+        + '<div style="font-size:22px;margin-bottom:6px">✅</div>'
+        + '<p style="font-size:13px;color:#5DCAA5;font-weight:700;margin-bottom:4px">Tudo preenchido</p>'
+        + '<p style="font-size:11px;color:#3A6A48">Os '+totSalvos+' produto(s) deste filtro já têm motivo salvo. Use <b style="color:#C9A96E">👁 Mostrar já salvos</b> para revisar ou editar.</p>'
+        + '</div>';
+    } else {
+      h = '<p style="color:#3A6A48;font-size:12px">Nenhum produto encontrado para o perfil selecionado.</p>';
+    }
+  }
+  el.innerHTML = h;
 }
 
 function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
@@ -13757,6 +13790,10 @@ async function cbSalvarMotivo(catId, prodId, pKey){
           badge.style.borderColor = "#5DCAA533";
           badge.style.color = "#5DCAA5";
         }
+      }
+      // Motivo preenchido: some da lista (a menos que o Head esteja vendo os salvos)
+      if(motivo && !_cbMostrarSalvos){
+        setTimeout(function(){ cbRenderCategorias(); }, 900);
       }
     } else { st.textContent="Erro"; st.style.color="#FF6B6B"; }
   }catch(e){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; }
