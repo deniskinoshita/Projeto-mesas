@@ -2226,6 +2226,17 @@ select option{background:#1A1A1A}
     <!-- Alertas HP relevantes -->
     <div id="hp-alertas" style="margin-bottom:12px"></div>
 
+    <!-- Modal: material da Base de Conhecimento -->
+    <div id="material-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)fecharMaterial()">
+      <div style="background:#0A1A12;border:1px solid #1C4A34;border-radius:12px;max-width:820px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #1C3A28">
+          <span id="material-modal-titulo" style="font-size:13px;font-weight:700;color:#C9A96E">Material</span>
+          <button onclick="fecharMaterial()" style="background:none;border:1px solid #1C4A34;color:#9BB0A0;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer">✕ Fechar</button>
+        </div>
+        <div id="material-modal-corpo" style="padding:14px 16px;overflow:auto;white-space:pre-wrap;font-size:12px;line-height:1.6;color:#CFE0D5"></div>
+      </div>
+    </div>
+
     <!-- Desvios vs Modelo HP -->
     <div style="font-size:11px;color:#4A7055;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
       <span>Comparativo vs. <span id="hp-ref" style="color:#D4B483"></span></span>
@@ -3731,6 +3742,22 @@ function _diasDesdeXP(iso){
   if(isNaN(d.getTime())) return null;
   return Math.floor((Date.now()-d.getTime())/86400000);
 }
+function abrirMaterial(id, nomeEnc){
+  const nome = decodeURIComponent(nomeEnc||"");
+  const ov = document.getElementById("material-modal");
+  const tt = document.getElementById("material-modal-titulo");
+  const bd = document.getElementById("material-modal-corpo");
+  if(!ov||!tt||!bd) return;
+  tt.textContent = nome || "Material";
+  bd.textContent = "Carregando material...";
+  ov.style.display = "flex";
+  fetch("/api/hp/knowledge/texto?id="+encodeURIComponent(id))
+    .then(r=>r.json())
+    .then(d=>{ bd.textContent = (d && d.texto) ? d.texto : "Conteúdo não disponível para este documento."; })
+    .catch(()=>{ bd.textContent = "Erro ao carregar o material."; });
+}
+function fecharMaterial(){ const ov=document.getElementById("material-modal"); if(ov) ov.style.display="none"; }
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") fecharMaterial(); });
 async function buscarClientesSalvos(){
   const assessor = document.getElementById("assessor").value.trim();
   if(!assessor) return;
@@ -3887,6 +3914,7 @@ function renderAnaliseHP(xp){
                 <span style="font-size:10px;color:#2A5A3A;margin-left:auto">${a.data||""}</span>
               </div>
               <p style="font-size:11px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
+              ${(a.docs&&a.docs.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`+a.docs.map(dd=>`<button onclick="abrirMaterial('${dd.id}','${encodeURIComponent(dd.nome||"")}')" style="font-size:9px;padding:3px 9px;border-radius:8px;border:1px solid #5DCAA555;background:#0A200A;color:#5DCAA5;cursor:pointer">👁 Abrir: ${(dd.nome||"material").replace(/</g,"&lt;")}</button>`).join("")+`</div>`:""}
             </div>`;
           }).join("")}
         </div>
@@ -7118,8 +7146,34 @@ def analyze_xp():
     #    O índice já tem os tickers pré-extraídos — só lê o texto completo
     #    dos documentos que realmente mencionam um ticker da carteira.
     tickers_set = {tk.upper() for tk in tickers_carteira if tk and len(tk) >= 4}
-    # Coleta o material da casa por ticker (docs que citam o ativo + trecho de contexto)
-    material_por_ticker = {}   # tk -> [{nome, fonte, data, trecho}]
+
+    def _resumo_extrativo(texto, tk):
+        """Resumo do material sem IA: pega frases legíveis ao redor do ticker,
+        descartando as muito numéricas (tabelas). Usado quando a IA não está disponível."""
+        import re as _re_kb2
+        if not texto:
+            return ""
+        up = texto.upper()
+        i = up.find(tk)
+        if i < 0:
+            return ""
+        janela = texto[max(0, i-400):i+800]
+        partes = _re_kb2.split(r'(?<=[\.\!\?])\s+|\n+', janela)
+        boas = []
+        for s in partes:
+            s = " ".join(s.split())
+            if len(s) < 30:
+                continue
+            dig = sum(c.isdigit() for c in s)
+            if dig / max(len(s), 1) > 0.16:     # frase densa em números (tabela) — pula
+                continue
+            boas.append(s)
+            if len(boas) >= 3:
+                break
+        return " ".join(boas)[:460]
+
+    # Coleta o material da casa por ticker; docs cujo TÍTULO cita o ticker vêm primeiro
+    material_por_ticker = {}   # tk -> [{id, nome, fonte, data, primario, trecho, texto}]
     for doc in docs_publicados:
         doc_tickers = set(doc.get("tickers") or [])
         casa = tickers_set & doc_tickers if doc_tickers else tickers_set
@@ -7129,18 +7183,21 @@ def analyze_xp():
         if not texto_completo:
             continue
         texto_doc = texto_completo.upper()
+        nome_doc = doc.get("nome", "")
         for tk in (casa or tickers_set):
             if tk in texto_doc:
                 idx = texto_doc.find(tk)
                 trecho = texto_completo[max(0, idx-200):idx+600].replace("\n", " ").strip()
                 material_por_ticker.setdefault(tk, []).append({
-                    "nome": doc.get("nome", ""), "fonte": doc.get("fonte", "HP"),
-                    "data": doc.get("data", ""), "trecho": trecho,
+                    "id": doc["id"], "nome": nome_doc, "fonte": doc.get("fonte", "HP"),
+                    "data": doc.get("data", ""), "primario": (tk in nome_doc.upper()),
+                    "trecho": trecho, "texto": texto_completo,
                 })
-    for tk in material_por_ticker:                 # limita p/ não estourar o prompt
-        material_por_ticker[tk] = material_por_ticker[tk][:4]
+    for tk in material_por_ticker:                 # docs "sobre" o ticker primeiro; limita
+        material_por_ticker[tk].sort(key=lambda m: (not m["primario"]))
+        material_por_ticker[tk] = material_por_ticker[tk][:5]
 
-    # Consenso por ticker (resumo IA, até 5 linhas, ancorado nos docs da casa)
+    # Consenso por ticker (resumo IA, até 5 linhas, ancorado nos docs — prioriza os primários)
     consenso_por_ticker = {}
     if material_por_ticker and os.environ.get("ANTHROPIC_API_KEY"):
         try:
@@ -7148,7 +7205,7 @@ def analyze_xp():
             blocos_kb = []
             for tk, mats in material_por_ticker.items():
                 docs_lst = " | ".join(dict.fromkeys(m["nome"] for m in mats if m["nome"]))
-                trechos  = "\n".join(f"- ({m['nome']}): {m['trecho']}" for m in mats)
+                trechos  = "\n".join(f"- ({m['nome']}): {m['trecho']}" for m in mats[:3])
                 blocos_kb.append(f"TICKER {tk}\nDocumentos: {docs_lst}\nTrechos:\n{trechos}")
             material_txt = "\n\n".join(blocos_kb)
             _ai_kb = _anthropic_kb.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
@@ -7179,25 +7236,30 @@ def analyze_xp():
             app.logger.warning(f"Consenso KB (IA) falhou: {_e_kb}")
 
     for tk, mats in material_por_ticker.items():
-        fontes = ", ".join(dict.fromkeys(m["nome"] for m in mats if m["nome"]))
         data_kb = next((m["data"] for m in mats if m.get("data")), "")
         consenso = consenso_por_ticker.get(tk)
-        ponteiro = (f'<br><span style="color:#5DCAA5;font-size:10px">📚 Para se aprofundar, consulte na Base de '
-                    f'Conhecimento: {fontes}.</span>') if fontes else ""
-        if consenso:
-            mensagem = consenso + ponteiro
-        else:
-            mensagem = (f"Consenso da casa disponível para {tk}." + (ponteiro or
-                        " Consulte o material na Base de Conhecimento."))
+        if not consenso:                            # sem IA: resumo extrativo só do doc "sobre" o ticker
+            base = next((m for m in mats if m["primario"]), None)
+            if base:
+                consenso = _resumo_extrativo(base.get("texto", ""), tk)
+        if not consenso:                            # sem doc dedicado: não inventa, aponta p/ Abrir
+            consenso = "Citado em material da casa. Abra os documentos abaixo para ler o contexto completo."
+        docs_lst, _vis = [], set()
+        for m in mats:
+            if m["id"] in _vis:
+                continue
+            _vis.add(m["id"])
+            docs_lst.append({"id": m["id"], "nome": m["nome"]})
         alertas_relevantes.append({
             "id":       f"kb_consenso_{tk}",
             "produto":  tk,
             "classe":   "",
             "tipo":     "atencao",
-            "mensagem": mensagem,
+            "mensagem": consenso,
             "origem":   "📚 Consenso trimestral",
             "origem_tipo": "knowledge_base",
             "data":     data_kb,
+            "docs":     docs_lst[:5],
         })
 
     # 3. Alertas automáticos por concentração e desvios graves
