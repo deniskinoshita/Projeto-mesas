@@ -2060,6 +2060,7 @@ select option{background:#1A1A1A}
   <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
     <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:700">📁 Clientes salvos — clique para carregar</p>
     <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <p id="xp-aviso-atualizar" style="display:none;font-size:11px;color:#E8A87C;margin-top:10px;line-height:1.5"></p>
   </div>
 
   <!-- LINHA 1: Assessor + Código do cliente -->
@@ -3111,10 +3112,12 @@ async function identificarCliente(file){
 
   const fd = new FormData();
   fd.append("pdf", file);
+  fd.append("assessor", (document.getElementById("assessor")||{}).value || localStorage.getItem("brauna_nome") || "");
   try{
     const r = await fetch("/api/xp-identificar", {method:"POST", body:fd});
     const d = await r.json();
     _clienteIdentificado = d;
+    try{ buscarClientesSalvos(); }catch(e){}   // reflete o número recém-salvo na lista
 
     // ── PDF sem carteira (conta = "-" ou vazio, sem composição)
     const semDados = !d.conta || d.conta === "-" || d.conta === "";
@@ -3721,6 +3724,13 @@ async function buscarUltimoXpPorCodigo(conta){
   }
 }
 
+function _diasDesdeXP(iso){
+  if(!iso) return null;
+  const p=String(iso).split("-"); if(p.length!==3) return null;
+  const d=new Date(+p[0], +p[1]-1, +p[2]);
+  if(isNaN(d.getTime())) return null;
+  return Math.floor((Date.now()-d.getTime())/86400000);
+}
 async function buscarClientesSalvos(){
   const assessor = document.getElementById("assessor").value.trim();
   if(!assessor) return;
@@ -3730,18 +3740,36 @@ async function buscarClientesSalvos(){
     const box = document.getElementById("clientes-salvos-box");
     const ul  = document.getElementById("clientes-salvos-lista");
     if(!lista.length){ box.style.display="none"; return; }
-    ul.innerHTML = lista.map(c=>`
-      <button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
-        style="padding:6px 12px;border-radius:20px;border:1px solid #1C4A34;background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='#C9A96E'" onmouseout="this.style.borderColor='#1C4A34'">
-        ${c.nome}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""} <span style="color:#3A6A48;font-size:10px">${c.perfil}</span>${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}
-      </button>`).join("");
+    ul.innerHTML = lista.map(c=>{
+      const dias = _diasDesdeXP(c.data_ultimo_xp);
+      const vencido = (dias===null) || (dias>60);
+      const borda = vencido ? "#E8A87C55" : "#1C4A34";
+      const nomeHover = vencido ? "#E8A87C" : "#C9A96E";
+      const selo = vencido
+        ? `<span style="background:#2A1A0A;color:#E8A87C;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
+        : `<span style="color:#3A6A48;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
+      return `<button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
+        style="padding:6px 12px;border-radius:20px;border:1px solid ${borda};background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='${nomeHover}'" onmouseout="this.style.borderColor='${borda}'">
+        ${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""} <span style="color:#3A6A48;font-size:10px">${c.perfil||""}</span>${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}
+      </button>`;
+    }).join("");
     box.style.display="block";
   }catch(e){}
 }
 
 function carregarFicha(jsonStr){
   const c = JSON.parse(jsonStr);
+  const _av = document.getElementById("xp-aviso-atualizar");
+  if(_av){
+    const _d = _diasDesdeXP(c.data_ultimo_xp);
+    if(_d===null || _d>60){
+      _av.innerHTML = "🔄 O XPerformance de <b>"+(c.nome||("#"+(c.conta||"")))+"</b> "+
+        (_d===null ? "não tem registro de atualização recente" : ("está com <b>"+_d+" dias</b>"))+
+        ". Suba um relatório novo para atualizar a memória (a cada 60 dias).";
+      _av.style.display="block";
+    } else { _av.style.display="none"; }
+  }
   document.getElementById("nome").value = c.nome || "";
   const codEl = document.getElementById("codigo-cliente");
   if(codEl && !codEl.value && c.conta) codEl.value = c.conta;
@@ -5661,10 +5689,17 @@ def xp_identificar():
             if isinstance(v, dict) and v.get("conta") == conta:
                 ficha = v
                 break
-    # Se encontrou por nome mas sem chave por conta, indexar para próxima vez
-    if ficha and conta and not fichas.get(f"conta:{conta}"):
+    # Registra a data do último XPerformance (base do lembrete de 60 dias) e garante
+    # que o cliente entre na lista de salvos pelo número, mesmo sem ficha prévia.
+    assessor_logado = (request.form.get("assessor", "") or "").strip()
+    if conta:
+        _key = f"conta:{conta}"
+        ficha = fichas.get(_key) or ficha or {}
         ficha["conta"] = conta
-        fichas[f"conta:{conta}"] = ficha
+        if assessor_logado and not ficha.get("assessor"):
+            ficha["assessor"] = assessor_logado
+        ficha["data_ultimo_xp"] = datetime.now().strftime("%Y-%m-%d")
+        fichas[_key] = ficha
         save_fichas(fichas)
 
     # Busca histórico de carteiras salvas (por conta)
