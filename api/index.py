@@ -3793,10 +3793,17 @@ async function buscarUltimoXpPorCodigo(conta){
       fetch("/api/historico").then(r=>r.json()),
     ]);
     clearTimeout(_lblTimer);
-    const ficha = fichaRes && fichaRes.nome ? fichaRes : null;
-    const hist  = histRes && histRes[conta] ? histRes[conta] : null;
-    const entradas = Array.isArray(hist) ? hist : (hist?.entradas||[]);
-    const ultimo = entradas.length ? entradas[entradas.length-1] : null;
+    // Aceita ficha sem nome (clientes importados em lote têm só a conta)
+    const ficha = fichaRes && (fichaRes.nome || fichaRes.conta) ? fichaRes : null;
+    // Histórico pode estar na chave "conta" ou "conta:<n>" (importados em lote)
+    const hist  = (histRes && (histRes[conta] || histRes["conta:"+conta])) || null;
+    const entradas = Array.isArray(hist) ? hist : (hist && hist.entradas ? hist.entradas : []);
+    const _pd = s=>{ const p=String(s||"").split("/"); return p.length===3 ? new Date(+p[2],+p[1]-1,+p[0]).getTime() : 0; };
+    let ultimo = null;
+    if(entradas.length){
+      const ord = entradas.slice().sort((a,b)=>_pd(b.data||b.data_ref)-_pd(a.data||a.data_ref));
+      ultimo = _pd(ord[0].data||ord[0].data_ref) > 0 ? ord[0] : entradas[entradas.length-1];
+    }
 
     if(!ficha && !ultimo){
       if(lbl){ lbl.textContent="Cliente não encontrado no sistema"; lbl.style.color="#FF6B6B"; }
