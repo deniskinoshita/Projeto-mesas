@@ -233,6 +233,7 @@ _HP_GESTORES_FILE   = "/tmp/brauna_hp_gestores.json"
 _HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
 _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
 _HP_CARTEIRA_BRAUNA_FILE = "/tmp/brauna_hp_carteira_brauna.json"
+_OBJETIVOS_FILE       = "/tmp/brauna_objetivos_okr.json"
 _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
 _CLIENTS_FILE         = "/tmp/brauna_clients.json"
 _ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
@@ -786,6 +787,29 @@ def carregar_stock_guide():
         except Exception:
             _STOCK_GUIDE_CACHE = {"_meta": {}, "acoes": {}}
     return _STOCK_GUIDE_CACHE
+
+
+# ── Objetivos / OKR por assessor (volume financeiro por classe → receita via ROA) ─
+def _objetivos_seed():
+    """Lê o seed versionado no repo (objetivos_okr.json). Serve de base na 1ª carga."""
+    try:
+        with open(os.path.join(ROOT, "objetivos_okr.json"), encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {"_meta": {}, "assessores": []}
+
+def carregar_objetivos():
+    """Estado editável dos objetivos. Persistido no KV/tmp; se vazio, cai no seed do repo.
+    Mescla o seed para preservar metadados (ROA/labels) mesmo após edições."""
+    seed = _objetivos_seed()
+    salvo = _load(_OBJETIVOS_FILE, None)
+    if not salvo or not isinstance(salvo, dict) or not salvo.get("assessores"):
+        return seed
+    # Mantém sempre o _meta do seed (ROA/labels) e usa os assessores salvos
+    salvo["_meta"] = {**seed.get("_meta", {}), **salvo.get("_meta", {}),
+                      "roa": seed.get("_meta", {}).get("roa", {}),
+                      "labels": seed.get("_meta", {}).get("labels", {})}
+    return salvo
 
 
 def buscar_macro_bcb():
@@ -6073,6 +6097,40 @@ def hp_gestoras2():
 def api_stock_guide():
     """Guia de ações consolidado (Levante = casa principal, XP = visão de mercado)."""
     return jsonify(carregar_stock_guide())
+
+@app.route("/api/objetivos", methods=["GET", "POST"])
+def api_objetivos():
+    """Objetivos/OKR por assessor. As 5 classes guardam o volume financeiro (R$)
+    a operar no mês; a receita é derivada por volume × ROA (ROA fixo no _meta)."""
+    if request.method == "GET":
+        return jsonify(carregar_objetivos())
+    d = request.get_json() or {}
+    atual = carregar_objetivos()
+    _CLS = ("RF", "RV", "FII", "internacional", "estruturadas")
+    # Aceita lista de assessores editados; mescla por nome, preservando o restante
+    editados = {str(a.get("assessor", "")).strip(): a for a in (d.get("assessores", []) or [])}
+    for a in atual.get("assessores", []):
+        nome = str(a.get("assessor", "")).strip()
+        if nome not in editados:
+            continue
+        e = editados[nome]
+        if "okr_mensal" in e:
+            try:
+                a["okr_mensal"] = float(e["okr_mensal"]) if e["okr_mensal"] not in (None, "") else None
+            except Exception:
+                pass
+        cls_in = e.get("classes", {}) or {}
+        a.setdefault("classes", {})
+        for k in _CLS:
+            if k in cls_in:
+                v = cls_in[k]
+                try:
+                    a["classes"][k] = float(v) if v not in (None, "") else None
+                except Exception:
+                    a["classes"][k] = None
+    atual.setdefault("_meta", {})["atualizado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    _save(_OBJETIVOS_FILE, atual)
+    return jsonify({"ok": True, "objetivos": atual})
 
 @app.route("/api/hp/carteira-brauna", methods=["GET"])
 def hp_carteira_brauna_get():
@@ -11800,6 +11858,20 @@ textarea{resize:vertical}
   </div>
 </div>
 
+<!-- ══ 6a2. OBJETIVOS / OKR POR ASSESSOR ══════════════════════════════════════ -->
+<div class="card" style="border-color:#2A2A1A">
+  <div class="card-title" style="color:#C9A96E"><span>🎯</span> Objetivos / OKR por Assessor</div>
+  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.6">
+    Meta mensal por assessor. Preencha o <b style="color:#D4B483">volume financeiro (R$)</b> a operar no mês em cada classe — a receita é derivada por <b>volume × ROA</b> (ROA fixo: RF 0,40% · RV 0,50% · FII 1,00% · Intl 1,50% · Estrut 1,5625%). A soma das receitas por classe deve bater o OKR. Esses números guiam o rebalanceamento no XPerformance.
+  </p>
+  <div id="obj-status" style="font-size:11px;color:#5DCAA5;min-height:16px;margin-bottom:8px"></div>
+  <div id="obj-tabela" style="overflow-x:auto"><p style="color:#3A6A48;font-size:12px">Carregando...</p></div>
+  <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-sm" onclick="objSalvar()" style="background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">💾 Salvar objetivos</button>
+    <button class="btn btn-sm" onclick="carregarObjetivos()" style="font-size:11px">↺ Recarregar</button>
+  </div>
+</div>
+
 <!-- ══ 6b. CARTEIRA BRAÚNA — DESTAQUE DO MÊS ══════════════════════════════════ -->
 <div class="card" style="border-color:#2A1A3A">
   <div class="card-title" style="color:#C9A96E"><span>📋</span> Carteira Braúna — Destaque do Mês</div>
@@ -13800,8 +13872,96 @@ async function cbSalvarMotivo(catId, prodId, pKey){
   setTimeout(function(){st.textContent="";},3000);
 }
 
+// ── Objetivos / OKR por assessor ─────────────────────────────────────────────
+var _objData = null;
+var _OBJ_CLS = ["RF","RV","FII","internacional","estruturadas"];
+function _objBrl(v){ return (v==null||v==="")?"—":"R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}); }
+function _objNum(v){ v=(v==null)?"":String(v); return v; }
+
+async function carregarObjetivos(){
+  var tb=document.getElementById("obj-tabela"); if(!tb) return;
+  try{
+    var r=await fetch("/api/objetivos"); _objData=await r.json();
+    objRender();
+  }catch(e){ tb.innerHTML='<p style="color:#FF6B6B;font-size:12px">Erro ao carregar objetivos.</p>'; }
+}
+
+function objRender(){
+  var tb=document.getElementById("obj-tabela"); if(!tb||!_objData) return;
+  var roa=(_objData._meta||{}).roa||{}; var labels=(_objData._meta||{}).labels||{};
+  var ass=_objData.assessores||[];
+  var h='<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:820px">';
+  h+='<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34;background:#071E17">'
+    +'<th style="text-align:left;padding:6px 8px">Assessor</th>'
+    +'<th style="text-align:right;padding:6px 8px">Rec. mês</th>'
+    +'<th style="text-align:right;padding:6px 8px">OKR mensal</th>';
+  _OBJ_CLS.forEach(function(k){ h+='<th style="text-align:right;padding:6px 8px">'+(labels[k]||k)+'<br><span style="color:#2A5A3A;font-weight:400">vol. R$</span></th>'; });
+  h+='<th style="text-align:right;padding:6px 8px">Receita<br><span style="color:#2A5A3A;font-weight:400">das classes</span></th></tr></thead><tbody>';
+  ass.forEach(function(a,i){
+    var bg=i%2===0?"#060C08":"#081208";
+    h+='<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
+    h+='<td style="padding:5px 8px;color:#D4B483;font-weight:700">'+a.assessor+'</td>';
+    h+='<td style="padding:5px 8px;text-align:right;color:#888">'+_objBrl(a.receita_mes)+'</td>';
+    h+='<td style="padding:5px 8px;text-align:right"><input type="number" data-obj-okr="'+i+'" value="'+_objNum(a.okr_mensal)+'" placeholder="—" style="width:78px;text-align:right;background:#071E17;border:1px solid #1C4A34;border-radius:5px;padding:4px 6px;color:#F0F0F0;font-size:11px"></td>';
+    _OBJ_CLS.forEach(function(k){
+      var v=(a.classes||{})[k];
+      h+='<td style="padding:5px 8px;text-align:right"><input type="number" data-obj-cls="'+i+'" data-obj-k="'+k+'" value="'+_objNum(v)+'" placeholder="—" oninput="objRecalc('+i+')" style="width:92px;text-align:right;background:#071E17;border:1px solid #1C4A34;border-radius:5px;padding:4px 6px;color:#F0F0F0;font-size:11px"></td>';
+    });
+    h+='<td style="padding:5px 8px;text-align:right;font-weight:700" id="obj-recclasse-'+i+'">—</td>';
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  tb.innerHTML=h;
+  ass.forEach(function(_,i){ objRecalc(i); });
+}
+
+function objRecalc(i){
+  if(!_objData) return;
+  var roa=(_objData._meta||{}).roa||{};
+  var okrEl=document.querySelector('[data-obj-okr="'+i+'"]');
+  var okr=okrEl&&okrEl.value!==""?parseFloat(okrEl.value):null;
+  var recTot=0, algum=false;
+  _OBJ_CLS.forEach(function(k){
+    var el=document.querySelector('[data-obj-cls="'+i+'"][data-obj-k="'+k+'"]');
+    var vol=el&&el.value!==""?parseFloat(el.value):null;
+    if(vol!=null){ recTot+=vol*(roa[k]||0); algum=true; }
+  });
+  var cell=document.getElementById("obj-recclasse-"+i);
+  if(!cell) return;
+  if(!algum){ cell.textContent="—"; cell.style.color="#3A6A48"; return; }
+  var txt="R$ "+recTot.toLocaleString("pt-BR",{maximumFractionDigits:0});
+  if(okr!=null){
+    var dif=recTot-okr; var pct=okr?Math.round(recTot/okr*100):0;
+    var cor = Math.abs(dif) <= okr*0.02 ? "#5DCAA5" : (dif<0 ? "#E8A87C" : "#7DCFEF");
+    cell.style.color=cor; cell.innerHTML=txt+' <span style="font-size:9px;color:'+cor+'">('+pct+'% do OKR)</span>';
+  } else { cell.style.color="#888"; cell.textContent=txt; }
+}
+
+async function objSalvar(){
+  if(!_objData) return;
+  var st=document.getElementById("obj-status");
+  var payload={assessores:(_objData.assessores||[]).map(function(a,i){
+    var okrEl=document.querySelector('[data-obj-okr="'+i+'"]');
+    var classes={};
+    _OBJ_CLS.forEach(function(k){
+      var el=document.querySelector('[data-obj-cls="'+i+'"][data-obj-k="'+k+'"]');
+      classes[k]= el&&el.value!=="" ? parseFloat(el.value) : null;
+    });
+    return {assessor:a.assessor, okr_mensal: okrEl&&okrEl.value!==""?parseFloat(okrEl.value):null, classes:classes};
+  })};
+  st.textContent="Salvando..."; st.style.color="#AAA";
+  try{
+    var r=await fetch("/api/objetivos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    var d=await r.json();
+    if(d.ok){ _objData=d.objetivos; st.textContent="✓ Objetivos salvos"; st.style.color="#5DCAA5"; }
+    else { st.textContent="Erro ao salvar"; st.style.color="#FF6B6B"; }
+  }catch(e){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; }
+  setTimeout(function(){ if(st) st.textContent=""; },3500);
+}
+
 // Carregar na inicialização do painel Head
 carregarCarteiraBrauna();
+carregarObjetivos();
 
 init();
 </script>

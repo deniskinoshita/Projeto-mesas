@@ -1,0 +1,226 @@
+{
+ "_meta": {
+  "descricao": "Objetivos/OKR por assessor. As 5 classes guardam o VOLUME FINANCEIRO (R$) a operar no mês; a receita é derivada por volume x ROA.",
+  "roa": {
+   "RF": 0.004,
+   "RV": 0.005,
+   "FII": 0.01,
+   "internacional": 0.015,
+   "estruturadas": 0.015625
+  },
+  "labels": {
+   "RF": "Renda Fixa",
+   "RV": "Renda Variável",
+   "FII": "FII",
+   "internacional": "Internacional",
+   "estruturadas": "Estruturadas"
+  },
+  "atualizado_em": null
+ },
+ "assessores": [
+  {
+   "assessor": "Alex Alves dos Santos",
+   "receita_mes": 15195.76,
+   "okr_mensal": 14600,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Andre Guilherme Leite Figueiredo",
+   "receita_mes": 10467.27,
+   "okr_mensal": 8666,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Bruno Cesar Valentim Willi Cabral da Rocha",
+   "receita_mes": 59603.27,
+   "okr_mensal": null,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Bruno Seiji Ito",
+   "receita_mes": 3249.8,
+   "okr_mensal": 3333,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Carlos Fernando Victor Bolivar Moreira Neto",
+   "receita_mes": 5483.63,
+   "okr_mensal": 6020,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Carolina Custodio Siqueira",
+   "receita_mes": 7853.65,
+   "okr_mensal": 4583,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Denis Albertino dos Santos Kinoshita",
+   "receita_mes": 14539.19,
+   "okr_mensal": null,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Felipe Fraga",
+   "receita_mes": 23267.71,
+   "okr_mensal": 12500,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Felipe Pereira Gomes",
+   "receita_mes": 1900.09,
+   "okr_mensal": 2000,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Felipe Santos Nishio",
+   "receita_mes": 86635.53,
+   "okr_mensal": 30140,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Giuseppe Hilario Neto",
+   "receita_mes": 5690.23,
+   "okr_mensal": 2500,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Lucas Landroni Cozzi",
+   "receita_mes": 32116.17,
+   "okr_mensal": 7397,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Marcelo Ramos Dias",
+   "receita_mes": 26929.6,
+   "okr_mensal": 24735,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Matheus Escoza Milani",
+   "receita_mes": 897.21,
+   "okr_mensal": 2500,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Michael Ademilson Santos da Silva",
+   "receita_mes": 27593.12,
+   "okr_mensal": 16666,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Paulo Roberto Negreiros Sobrinho",
+   "receita_mes": 13170.5,
+   "okr_mensal": 8333,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  },
+  {
+   "assessor": "Tatiane Cristina da Silva Cecchetti",
+   "receita_mes": 10277.81,
+   "okr_mensal": 11666,
+   "classes": {
+    "RF": null,
+    "RV": null,
+    "FII": null,
+    "internacional": null,
+    "estruturadas": null
+   }
+  }
+ ]
+}
