@@ -3860,7 +3860,8 @@ async function buscarClientesSalvos(){
     const box = document.getElementById("clientes-salvos-box");
     const ul  = document.getElementById("clientes-salvos-lista");
     if(!lista.length){ box.style.display="none"; return; }
-    ul.innerHTML = lista.map(c=>{
+
+    function _chip(c){
       const dias = _diasDesdeXP(c.data_ultimo_xp);
       const vencido = (dias===null) || (dias>60);
       const borda = vencido ? "#E8A87C55" : "#1C4A34";
@@ -3871,8 +3872,25 @@ async function buscarClientesSalvos(){
       return `<button onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
         style="padding:6px 12px;border-radius:20px;border:1px solid ${borda};background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
         onmouseover="this.style.borderColor='${nomeHover}'" onmouseout="this.style.borderColor='${borda}'">
-        ${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""} <span style="color:#3A6A48;font-size:10px">${c.perfil||""}</span>${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}
+        ${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""}${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}
       </button>`;
+    }
+
+    // Agrupa por perfil do cliente
+    const PERFIL_ORDEM = ["super_conservadora","conservadora","moderada","arrojada","agressiva"];
+    const PERFIL_LBL = {super_conservadora:"Super Conservadora",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva",_:"Sem perfil definido"};
+    const PERFIL_COR = {super_conservadora:"#7DCFEF",conservadora:"#5DCAA5",moderada:"#C9A96E",arrojada:"#E8A87C",agressiva:"#FF6B6B",_:"#3A6A48"};
+    const grupos = {};
+    lista.forEach(c=>{ const k=(c.perfil||"").toLowerCase(); (grupos[k]=grupos[k]||[]).push(c); });
+    const ordem = PERFIL_ORDEM.filter(k=>grupos[k]).concat(Object.keys(grupos).filter(k=>PERFIL_ORDEM.indexOf(k)<0));
+    ul.innerHTML = ordem.map(k=>{
+      const arr = grupos[k]||[];
+      const lbl = PERFIL_LBL[k] || (k ? (k.charAt(0).toUpperCase()+k.slice(1)) : PERFIL_LBL._);
+      const cor = PERFIL_COR[k] || PERFIL_COR._;
+      return `<div style="width:100%;margin-bottom:12px">
+        <div style="font-size:10px;color:${cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${lbl} <span style="color:#3A6A48;font-weight:400">(${arr.length})</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${arr.map(_chip).join("")}</div>
+      </div>`;
     }).join("");
     box.style.display="block";
   }catch(e){}
