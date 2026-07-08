@@ -3888,6 +3888,23 @@ function fecharMaterial(){ const ov=document.getElementById("material-modal"); i
 document.addEventListener("keydown", e=>{ if(e.key==="Escape") fecharMaterial(); });
 var _clientesSalvos = [];
 var _csAutoTimer = null;
+function carregarClienteIdx(i){
+  var c=_clientesSalvos[i]; if(!c) return;
+  if(c.conta) buscarUltimoXpPorCodigo(c.conta);
+  else carregarFicha(JSON.stringify(c));
+}
+async function excluirClienteIdx(ev, i){
+  if(ev) ev.stopPropagation();
+  var c=_clientesSalvos[i]; if(!c) return;
+  var rot = c.nome || ("#"+(c.conta||""));
+  if(!confirm("Excluir o cliente "+rot+" da memória?\n\nRemove ficha, histórico e snapshots — não dá para desfazer.")) return;
+  try{
+    var r=await fetch("/api/ficha",{method:"DELETE",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({conta:c.conta||"", nome:c.nome||"", assessor:c.assessor||""})});
+    if(r.ok){ buscarClientesSalvos(); }
+    else{ alert("Não foi possível excluir (HTTP "+r.status+")."); }
+  }catch(e){ alert("Erro ao excluir: "+e.message); }
+}
 async function buscarClientesSalvos(){
   const assessor = document.getElementById("assessor").value.trim();
   if(!assessor) return;
@@ -3900,19 +3917,19 @@ async function buscarClientesSalvos(){
     if(!lista.length){ box.style.display="none"; return; }
 
     function _chip(c){
+      const idx = _clientesSalvos.indexOf(c);
       const dias = _diasDesdeXP(c.data_ultimo_xp);
       const vencido = (dias===null) || (dias>60);
       const borda = vencido ? "#E8A87C55" : "#1C4A34";
-      const nomeHover = vencido ? "#E8A87C" : "#C9A96E";
       const selo = vencido
         ? `<span style="background:#2A1A0A;color:#E8A87C;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
         : `<span style="color:#3A6A48;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
       const busca = ((c.nome||"")+" "+(c.conta||"")).toLowerCase();
-      return `<button class="cs-chip" data-busca="${busca}" onclick="carregarFicha(${JSON.stringify(JSON.stringify(c))})"
-        style="padding:6px 12px;border-radius:20px;border:1px solid ${borda};background:#111;color:#C9A96E;font-size:12px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='${nomeHover}'" onmouseout="this.style.borderColor='${borda}'">
-        ${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""}${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}
-      </button>`;
+      const info = `${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""}${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}`;
+      return `<span class="cs-chip" data-busca="${busca}" style="display:inline-flex;align-items:center;border:1px solid ${borda};border-radius:20px;background:#111;overflow:hidden">
+        <button onclick="carregarClienteIdx(${idx})" style="border:none;background:none;color:#C9A96E;font-size:12px;cursor:pointer;padding:6px 4px 6px 12px;white-space:nowrap">${info}</button>
+        <button onclick="excluirClienteIdx(event,${idx})" title="Excluir cliente" style="border:none;background:none;color:#7A4A4A;font-size:11px;cursor:pointer;padding:6px 10px 6px 6px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#7A4A4A'">🗑</button>
+      </span>`;
     }
 
     // Agrupa por perfil do cliente
@@ -5733,12 +5750,52 @@ def ficha_endpoint():
     fichas = load_fichas()
     if request.method == "DELETE":
         d = request.get_json() or {}
-        conta = d.get("conta","").strip()
+        conta = str(d.get("conta","")).strip()
+        nome  = str(d.get("nome","")).strip()
+        assessor = str(d.get("assessor","")).strip()
+        chaves = set()
+        if conta:
+            chaves.update([f"conta:{conta}", conta])
+        if assessor or nome:
+            chaves.add(f"{assessor}|{nome}".lower().strip())
         removidas = []
-        for k in [f"conta:{conta}", conta]:
-            if k in fichas:
+        # 1) Fichas — por chave conhecida ou qualquer ficha com essa conta
+        for k in list(fichas.keys()):
+            v = fichas.get(k)
+            if k in chaves or (conta and isinstance(v, dict) and str(v.get("conta","")).strip() == conta):
                 del fichas[k]; removidas.append(k)
         save_fichas(fichas)
+        # 2) Histórico de carteiras
+        try:
+            hist = load_hist()
+            for hk in list(hist.keys()):
+                hv = hist.get(hk)
+                if hk in chaves or (conta and (hk in (conta, f"conta:{conta}"))) \
+                   or (conta and isinstance(hv, dict) and str(hv.get("conta","")).strip() == conta):
+                    del hist[hk]
+            save_hist(hist)
+        except Exception:
+            pass
+        # 3) Snapshots de clientes (_CLIENTS_FILE)
+        try:
+            snaps = _load(_CLIENTS_FILE, {})
+            if isinstance(snaps, dict):
+                for ck in list(snaps.keys()):
+                    cv = snaps.get(ck)
+                    if (conta and (ck == conta or (isinstance(cv, dict) and str(cv.get("conta","")).strip() == conta))):
+                        del snaps[ck]
+                _save(_CLIENTS_FILE, snaps)
+        except Exception:
+            pass
+        # 4) Resumo do líder (_DATA_FILE) — por nome+assessor
+        try:
+            if nome or assessor:
+                lst = load_clientes()
+                lst2 = [c for c in lst if not (c.get("nome","")==nome and c.get("assessor","")==assessor)]
+                if len(lst2) != len(lst):
+                    save_clientes(lst2)
+        except Exception:
+            pass
         return jsonify({"ok": True, "removidas": removidas})
     if request.method == "POST":
         d = request.get_json()
