@@ -2085,13 +2085,24 @@ select option{background:#1A1A1A}
   <div style="margin-bottom:14px">
     <label>Relatório XPerformance (PDF)</label>
     <div class="upload-area" id="drop1" onclick="document.getElementById('pdf-xp').click()" style="cursor:pointer;padding:14px 10px">
-      <input type="file" id="pdf-xp" accept=".pdf"
+      <input type="file" id="pdf-xp" accept=".pdf,.zip"
         style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
         onchange="onXpFileChange(this)">
       <div class="icon" style="font-size:22px;margin-bottom:4px">📊</div>
       <p id="upload-hint-text" style="font-size:12px;margin:0">XPerformance — clique para identificar o cliente</p>
+      <p style="font-size:10px;color:#3A6A48;margin:3px 0 0">ou solte um <b style="color:#C9A96E">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
       <p class="fname" id="fname-xp" style="font-size:11px;margin:2px 0 0"></p>
     </div>
+    <!-- Progresso + resultado da importação em lote (ZIP) -->
+    <div id="xp-lote-progress" style="display:none;margin-top:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#3A6A48;margin-bottom:4px">
+        <span id="xp-lote-txt">Processando...</span><span id="xp-lote-pct">0%</span>
+      </div>
+      <div style="height:6px;background:#12281C;border-radius:3px;overflow:hidden">
+        <div id="xp-lote-bar" style="height:100%;width:0%;background:#5DCAA5;border-radius:3px;transition:width .3s"></div>
+      </div>
+    </div>
+    <div id="xp-lote-resultado" style="display:none;margin-top:10px"></div>
   </div>
 
   <!-- Preview dos dados extraídos do PDF -->
@@ -3102,12 +3113,94 @@ function onXpFileChange(input){
   if(!file) return;
   const fname = document.getElementById("fname-xp");
   const drop  = document.getElementById("drop1");
-  // Feedback imediato
-  if(fname) fname.textContent = "⏳ " + file.name;
   if(drop)  drop.style.borderColor = "#C9A96E";
-  // Identifica o cliente na Parte 1. A Parte 2 (Cross Sell + Modelo de Servir)
-  // só abre quando o assessor clicar em "Continuar para a Parte 2".
+  // ZIP → importa vários clientes de uma vez (não abre análise de um único)
+  if((file.name||"").toLowerCase().endsWith(".zip")){
+    if(fname) fname.textContent = "📦 " + file.name;
+    processarLoteXP(file);
+    input.value = "";
+    return;
+  }
+  // PDF único → identifica o cliente na Parte 1
+  if(fname) fname.textContent = "⏳ " + file.name;
   identificarCliente(file);
+}
+
+// Descompactador (fflate) sob demanda — só quando há um .zip
+function _carregarFflateXP(){
+  return new Promise(function(resolve, reject){
+    if(window.fflate) return resolve(window.fflate);
+    var s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js";
+    s.onload  = function(){ window.fflate ? resolve(window.fflate) : reject(new Error("descompactador não carregou")); };
+    s.onerror = function(){ reject(new Error("falha ao carregar o descompactador (verifique a conexão)")); };
+    document.head.appendChild(s);
+  });
+}
+
+async function processarLoteXP(file){
+  const progBox = document.getElementById("xp-lote-progress");
+  const bar = document.getElementById("xp-lote-bar");
+  const txt = document.getElementById("xp-lote-txt");
+  const pct = document.getElementById("xp-lote-pct");
+  const res = document.getElementById("xp-lote-resultado");
+  progBox.style.display="block"; res.style.display="none";
+  bar.style.background="#5DCAA5"; bar.style.width="4%"; pct.textContent="4%";
+  txt.textContent = "Abrindo "+file.name+"...";
+  const assessor = (document.getElementById("assessor")||{}).value || localStorage.getItem("brauna_nome") || "";
+  try{
+    const fflate = await _carregarFflateXP();
+    const buf = new Uint8Array(await file.arrayBuffer());
+    const entradas = fflate.unzipSync(buf);
+    let pdfs = [];
+    Object.keys(entradas).forEach(function(n){
+      if(n.toLowerCase().endsWith(".pdf") && n.indexOf("__MACOSX")!==0 && !n.endsWith("/")){
+        pdfs.push({name:n.split("/").pop(), blob:new Blob([entradas[n]], {type:"application/pdf"})});
+      }
+    });
+    if(!pdfs.length) throw new Error("Nenhum PDF encontrado no ZIP");
+    if(pdfs.length>50) pdfs = pdfs.slice(0,50);
+    let ok=0, clientes=[], erros=[];
+    for(let i=0;i<pdfs.length;i++){
+      const p = 5 + Math.round((i/pdfs.length)*90);
+      bar.style.width=p+"%"; pct.textContent=p+"%";
+      txt.textContent = "Processando "+(i+1)+"/"+pdfs.length+": "+pdfs[i].name;
+      const fd = new FormData();
+      fd.append("zip", pdfs[i].blob, pdfs[i].name);   // endpoint aceita PDF avulso
+      fd.append("assessor", assessor);
+      try{
+        const r = await fetch("/api/processar-zip-xp",{method:"POST",body:fd});
+        const d = await r.json();
+        if(d.erro) throw new Error(d.erro);
+        ok += (d.processados||0);
+        (d.clientes||[]).forEach(c=>clientes.push(c));
+        (d.erros||[]).forEach(e=>erros.push(e));
+      }catch(err){ erros.push({arquivo:pdfs[i].name, erro:err.message}); }
+    }
+    bar.style.width="100%"; pct.textContent="100%"; txt.textContent="Concluído!";
+    const fmtBrl = v => "R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+    const linhas = clientes.slice(0,25).map(c=>`
+      <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #10241A;font-size:11px">
+        <span style="color:#5DCAA5">✓</span>
+        <span style="flex:1;color:#CCC">${c.nome||("#"+c.conta)}</span>
+        <span style="color:#3A6A48">${c.data_ref||""}</span>
+        <span style="color:#C9A96E">${fmtBrl(c.patrimonio)}</span>
+      </div>`).join("");
+    const mais = clientes.length>25 ? `<div style="font-size:10px;color:#3A6A48;margin-top:4px">... e mais ${clientes.length-25} clientes</div>` : "";
+    const errosHtml = erros.length ? `<div style="margin-top:8px;padding:8px 10px;background:#1A0808;border-radius:8px">`+erros.slice(0,15).map(e=>`<div style="font-size:10px;color:#FF6B6B">⚠ ${e.arquivo||""}: ${e.erro||""}</div>`).join("")+`</div>` : "";
+    res.innerHTML = `
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="background:#0F2A1F;border:1px solid #1A4030;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#5DCAA5">${ok}</div><div style="font-size:9px;color:#3A6A48">clientes salvos</div></div>
+        <div style="background:#0A0A0A;border:1px solid #1A1A1A;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#888">${pdfs.length}</div><div style="font-size:9px;color:#3A6A48">PDFs no ZIP</div></div>
+        ${erros.length?`<div style="background:#1A0808;border:1px solid #3A1010;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#FF6B6B">${erros.length}</div><div style="font-size:9px;color:#FF4444">erros</div></div>`:""}
+      </div>
+      <div style="max-height:220px;overflow-y:auto">${linhas}${mais}</div>${errosHtml}
+      <p style="font-size:11px;color:#5DCAA5;margin-top:10px">✓ Clientes salvos na memória — role até <b>Clientes salvos</b> e clique para analisar.</p>`;
+    res.style.display="block";
+    try{ buscarClientesSalvos(); }catch(e){}
+  }catch(e){
+    bar.style.background="#FF6B6B"; txt.textContent="Erro: "+e.message; pct.textContent="";
+  }
 }
 
 // Upload do XPerformance: apenas clique (o div #drop1 dispara o input via onclick).
@@ -14517,6 +14610,7 @@ def processar_zip_xp():
     if not arq:
         return jsonify({"erro": "Nenhum arquivo enviado"}), 400
 
+    assessor_form = (request.form.get("assessor", "") or "").strip()
     nome_arq = arq.filename or ""
     dados_arq = arq.read()
 
@@ -14580,10 +14674,11 @@ def processar_zip_xp():
         ficha_upd = {
             **ficha,
             "conta":    conta,
-            "assessor": assessor or ficha.get("assessor",""),
+            "assessor": assessor_form or assessor or ficha.get("assessor",""),
             "acoes":    [{"ticker":a.get("ticker",""),"nome":a.get("nome",""),"saldo":a.get("saldo",0),"qtd":a.get("qtd",0),"perc":a.get("perc",0)} for a in xp.get("acoes",[])[:40]],
             "fiis":     [{"ticker":a.get("ticker",""),"nome":a.get("nome",""),"saldo":a.get("saldo",0),"qtd":a.get("qtd",0),"perc":a.get("perc",0)} for a in xp.get("fiis",[])[:30]],
             "rf_ativos":[{"nome":a.get("nome",""),"classe":a.get("classe",""),"saldo":a.get("saldo",0),"perc":a.get("perc",0),"rent_mes":a.get("rent_mes"),"rent_12m":a.get("rent_12m")} for a in xp.get("rf_ativos",[])[:60]],
+            "data_ultimo_xp": datetime.now().strftime("%Y-%m-%d"),
             "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
         }
         fichas[f"conta:{conta}"] = ficha_upd
