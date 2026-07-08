@@ -2060,7 +2060,7 @@ select option{background:#1A1A1A}
   <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">
       <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin:0;font-weight:700">📁 Clientes salvos — clique para carregar <span id="cs-contador" style="color:#3A6A48;font-weight:400"></span></p>
-      <input type="text" id="cs-busca" oninput="filtrarClientes()" placeholder="🔍 Buscar por número ou nome..."
+      <input type="text" id="cs-busca" oninput="filtrarClientes()" onkeydown="if(event.key==='Enter')buscarClientesEnter()" placeholder="🔍 Buscar (número/nome) — Enter para carregar"
         style="flex:1;min-width:180px;max-width:280px;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:7px 12px;color:#F0F0F0;font-size:12px;outline:none">
     </div>
     <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px;max-height:360px;overflow-y:auto;padding-right:4px"></div>
@@ -3879,12 +3879,15 @@ function abrirMaterial(id, nomeEnc){
 }
 function fecharMaterial(){ const ov=document.getElementById("material-modal"); if(ov) ov.style.display="none"; }
 document.addEventListener("keydown", e=>{ if(e.key==="Escape") fecharMaterial(); });
+var _clientesSalvos = [];
+var _csAutoTimer = null;
 async function buscarClientesSalvos(){
   const assessor = document.getElementById("assessor").value.trim();
   if(!assessor) return;
   try{
     const r = await fetch("/api/ficha?assessor="+encodeURIComponent(assessor.toLowerCase()));
     const lista = await r.json();
+    _clientesSalvos = Array.isArray(lista) ? lista : [];
     const box = document.getElementById("clientes-salvos-box");
     const ul  = document.getElementById("clientes-salvos-lista");
     if(!lista.length){ box.style.display="none"; return; }
@@ -3945,6 +3948,28 @@ function filtrarClientes(){
   });
   const sem = document.getElementById("cs-sem-resultado");
   if(sem) sem.style.display = (visiveis===0 && termo) ? "block" : "none";
+
+  // Se o texto bater EXATAMENTE com a conta de um cliente, já carrega os dados dele
+  clearTimeout(_csAutoTimer);
+  if(termo){
+    _csAutoTimer = setTimeout(function(){
+      const exato = (_clientesSalvos||[]).find(c=>String(c.conta||"").toLowerCase()===termo);
+      if(exato && exato.conta) buscarUltimoXpPorCodigo(exato.conta);
+    }, 450);
+  }
+}
+// Enter no campo de busca: carrega o cliente exato ou o único resultado filtrado
+function buscarClientesEnter(){
+  const q = ((document.getElementById("cs-busca")||{}).value||"").trim().toLowerCase();
+  if(!q) return;
+  clearTimeout(_csAutoTimer);
+  const lista = _clientesSalvos||[];
+  let alvo = lista.find(c=>String(c.conta||"").toLowerCase()===q);
+  if(!alvo){
+    const vis = lista.filter(c=>((c.nome||"")+" "+(c.conta||"")).toLowerCase().indexOf(q)>=0);
+    if(vis.length===1) alvo = vis[0];
+  }
+  if(alvo && alvo.conta) buscarUltimoXpPorCodigo(alvo.conta);
 }
 
 function carregarFicha(jsonStr){
