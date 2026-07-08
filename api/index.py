@@ -10015,87 +10015,6 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   <button class="btn-limpar" onclick="limparFiltros()">Limpar filtros</button>
 </div>
 
-<!-- Resumo Financeiro Assessores -->
-<div class="card" id="sec-resumo-financeiro">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-    <div>
-      <h2 style="margin:0 0 2px">📊 Resumo Financeiro dos Assessores</h2>
-      <span id="resumo-atualizado" style="font-size:11px;color:#2A5A3A"></span>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <label style="font-size:12px;color:#4A7055;cursor:pointer">
-        <input type="file" id="input-planilha-resumo" accept=".xlsx" style="display:none" onchange="importarPlanilha(this)">
-        <span class="btn-resumo" onclick="document.getElementById('input-planilha-resumo').click()">📥 Importar Excel</span>
-      </label>
-      <button class="btn-resumo btn-gold" onclick="abrirModalNovoAssessor()">+ Adicionar manualmente</button>
-    </div>
-  </div>
-  <div style="overflow-x:auto">
-    <table class="tabela-resumo" id="tabela-resumo">
-      <thead>
-        <tr>
-          <th>Assessor</th>
-          <th>Patrimônio</th>
-          <th>Receita/mês</th>
-          <th>OKR mensal</th>
-          <th>% OKR</th>
-          <th>RF %</th>
-          <th>RV %</th>
-          <th>FII %</th>
-          <th>Intl %</th>
-          <th>ROA anual</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody-resumo">
-        <tr><td colspan="11" style="text-align:center;color:#1E4A30;padding:24px">Carregando...</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div id="resumo-total-row" style="display:flex;gap:24px;flex-wrap:wrap;padding:10px 4px 0;border-top:1px solid #1A2A1A;margin-top:10px"></div>
-</div>
-
-<!-- Modal edição/adição de assessor -->
-<div id="modal-assessor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center">
-  <div style="background:#0D1A0F;border:1px solid #1A3A1A;border-radius:14px;padding:28px 32px;width:min(700px,96vw);max-height:90vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <h3 id="modal-titulo" style="margin:0;color:#C9A96E">Assessor</h3>
-      <button onclick="fecharModal()" style="background:none;border:none;color:#4A7055;font-size:22px;cursor:pointer">✕</button>
-    </div>
-    <input type="hidden" id="modal-idx">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div style="grid-column:1/-1"><label class="flabel">Nome do Assessor</label><input id="f-nome" class="finput" placeholder="Nome completo"></div>
-      <div><label class="flabel">Patrimônio (R$)</label><input id="f-patrimonio" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">Receita Total/mês (R$)</label><input id="f-receita" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">OKR Mensal (R$)</label><input id="f-okr-mensal" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">OKR Anual (R$)</label><input id="f-okr-anual" class="finput" type="number" placeholder="0"></div>
-      <div style="grid-column:1/-1"><div style="font-size:12px;color:#C9A96E;font-weight:700;margin:8px 0 4px;border-bottom:1px solid #1A3A1A;padding-bottom:4px">Por Classe — Saldo (R$) e % na carteira</div></div>
-      <div><label class="flabel">RF — Saldo (R$)</label><input id="f-rf-saldo" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">RF — % carteira</label><input id="f-rf-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
-      <div><label class="flabel">RF — Receita/mês (R$)</label><input id="f-rf-receita" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">RF — Vol. mensal (R$)</label><input id="f-rf-vol" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">RV — Saldo (R$)</label><input id="f-rv-saldo" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">RV — % carteira</label><input id="f-rv-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
-      <div><label class="flabel">RV — Receita/mês (R$)</label><input id="f-rv-receita" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">RV — Vol. mensal (R$)</label><input id="f-rv-vol" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">FII — Saldo (R$)</label><input id="f-fii-saldo" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">FII — % carteira</label><input id="f-fii-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
-      <div><label class="flabel">FII — Receita/mês (R$)</label><input id="f-fii-receita" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">FII — Vol. mensal (R$)</label><input id="f-fii-vol" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">Internacional — Saldo (R$)</label><input id="f-intl-saldo" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">Internacional — %</label><input id="f-intl-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
-      <div><label class="flabel">Internacional — Receita (R$)</label><input id="f-intl-receita" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">Internacional — Vol. mensal</label><input id="f-intl-vol" class="finput" type="number" placeholder="0"></div>
-      <div><label class="flabel">Estruturadas — % máx elegível</label><input id="f-estr-pct" class="finput" type="number" step="0.01" placeholder="0.00"></div>
-      <div><label class="flabel">Estruturadas — Receita (R$)</label><input id="f-estr-receita" class="finput" type="number" placeholder="0"></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
-      <button onclick="fecharModal()" style="padding:9px 20px;border:1px solid #2A3A2A;border-radius:8px;background:none;color:#4A7055;cursor:pointer">Cancelar</button>
-      <button onclick="salvarAssessor()" style="padding:9px 24px;border:none;border-radius:8px;background:#C9A96E;color:#071E17;font-weight:700;cursor:pointer">Salvar</button>
-    </div>
-  </div>
-</div>
-
 <!-- Ranking assessores -->
 <div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
@@ -10129,10 +10048,11 @@ function fmtR(v){ return v>0 ? "R$ "+Number(v).toLocaleString("pt-BR",{maximumFr
 function fmtPct(v){ return v>0 ? v.toFixed(1)+"%" : "—"; }
 
 function renderResumoFinanceiro(){
-  const lista = dadosFinanceiros.assessores||[];
-  document.getElementById("resumo-atualizado").textContent =
-    dadosFinanceiros.atualizado_em ? "Atualizado em "+dadosFinanceiros.atualizado_em+" · "+dadosFinanceiros.fonte : "";
   const tbody = document.getElementById("tbody-resumo");
+  if(!tbody) return;   // seção "Resumo Financeiro" removida — dados seguem alimentando o ranking
+  const lista = dadosFinanceiros.assessores||[];
+  const _at = document.getElementById("resumo-atualizado");
+  if(_at) _at.textContent = dadosFinanceiros.atualizado_em ? "Atualizado em "+dadosFinanceiros.atualizado_em+" · "+dadosFinanceiros.fonte : "";
   if(!lista.length){
     tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#1E4A30;padding:24px">Nenhum dado importado ainda. Use "Importar Excel" ou "Adicionar manualmente".</td></tr>';
     return;
