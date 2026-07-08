@@ -1496,7 +1496,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import cm
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image, Flowable
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_CENTER
     import matplotlib; matplotlib.use("Agg")
@@ -1752,7 +1752,43 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         canvas.saveState(); canvas.setFillColor(PRETO)
         canvas.rect(0,0,A4[0],A4[1],fill=1,stroke=0); canvas.restoreState()
 
-    doc.build(elems,onFirstPage=fundo,onLaterPages=fundo)
+    # Marcador invisível: registra em que página e altura o conteúdo terminou.
+    class _PosMarker(Flowable):
+        def __init__(self): Flowable.__init__(self); self.page=0; self.y=0
+        def wrap(self, aw, ah): return (0, 0)
+        def draw(self): pass
+        def drawOn(self, canvas, x, y, _sW=0): self.page=canvas.getPageNumber(); self.y=y
+    marcador=_PosMarker(); elems.append(marcador)
+
+    # Coleta estilos e espaçadores para eventual compactação
+    _estilos, _spacers = set(), []
+    for f in elems:
+        st=getattr(f,"style",None)
+        if st is not None and hasattr(st,"spaceAfter"): _estilos.add(st)
+        if isinstance(f,Spacer): _spacers.append(f)
+
+    frame_h=A4[1]-4*cm; topo=A4[1]-2*cm
+    doc.build(list(elems),onFirstPage=fundo,onLaterPages=fundo)
+
+    # Se a última página encerrou com <10% preenchida, compacta e refaz numa página cheia
+    try:
+        if marcador.page and marcador.page>1 and frame_h>0:
+            fill=(topo-marcador.y)/frame_h
+            if fill < 0.10:
+                for st in _estilos:
+                    if getattr(st,"spaceBefore",None) is not None: st.spaceBefore*=0.25
+                    if getattr(st,"spaceAfter",None)  is not None: st.spaceAfter*=0.25
+                    st.leading=max(getattr(st,"fontSize",9)+0.6, getattr(st,"leading",12)*0.82)
+                for s in _spacers:
+                    try: s.height*=0.2
+                    except Exception: pass
+                buf2=io.BytesIO()
+                doc2=SimpleDocTemplate(buf2,pagesize=A4,leftMargin=2*cm,rightMargin=2*cm,topMargin=1.3*cm,bottomMargin=1.3*cm)
+                doc2.build(list(elems),onFirstPage=fundo,onLaterPages=fundo)
+                buf2.seek(0); return buf2
+    except Exception:
+        pass
+
     buf.seek(0); return buf
 
 
