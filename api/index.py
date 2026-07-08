@@ -1339,31 +1339,148 @@ def _fmt_brl(v):
     except Exception:
         return "R$ 0,00"
 
-def _texto_olhar_mercado(desvios, caixa, modelo_lbl, perfil_lbl):
-    """Olhar de mercado sobre a alocação atual e suas fragilidades (data-driven)."""
+def _classe_slug(label):
+    import unicodedata
+    s = unicodedata.normalize("NFKD", str(label or "")).encode("ascii", "ignore").decode().lower()
+    if "acao" in s or "acoes" in s or s.strip() in ("rv",): return "acoes"
+    if "inflac" in s: return "inflacao"
+    if "pos" in s and "fix" in s: return "pos_fixado"
+    if "pre" in s and "fix" in s: return "pre_fixado"
+    if "internac" in s: return "internacional"
+    if "fii" in s: return "fiis"
+    if "multi" in s: return "multimercado"
+    if "alternativ" in s: return "alternativos"
+    if "cripto" in s: return "cripto"
+    return s
+
+# Conhecimento por classe: 'conc' = leitura quando há CONCENTRAÇÃO; 'papel' = função quando FALTA.
+_CLASSE_INSIGHT = {
+    "acoes": {
+        "conc": "Renda variável é a classe mais volátil da carteira e a que mais sofre em episódios de estresse. "
+                "Uma concentração desse porte expõe o cliente a quedas expressivas (drawdowns) e a decisões emocionais nas correções. "
+                "A tese em ações exige horizonte longo, gestão de risco ativa e, quando as posições se aproximam do preço-alvo, "
+                "avaliação de proteção (estruturadas) ou realização parcial — como detalhado no posicionamento por ação deste relatório.",
+        "papel": "renda variável para crescimento de longo prazo, capturando o prêmio de risco das empresas",
+    },
+    "inflacao": {
+        "conc": "Os títulos atrelados ao IPCA (NTN-B, CRIs e debêntures IPCA+) travam um juro real elevado — hoje acima de 6% a.a., "
+                "historicamente atrativo. Porém carregam marcação a mercado: quando a curva de juros abre (ruído fiscal, incerteza eleitoral), "
+                "o valor cai no curto prazo, mesmo com o carrego preservado até o vencimento. Concentração excessiva em inflação amplia a "
+                "volatilidade da renda fixa e a sensibilidade à trajetória fiscal do país.",
+        "papel": "inflação (IPCA+) para proteger o poder de compra e travar juro real elevado por prazos longos",
+    },
+    "pos_fixado": {
+        "conc": "O pós-fixado (Selic/CDI) é o porto seguro da carteira: baixa volatilidade e liquidez imediata. Com a Selic elevada remunera "
+                "bem hoje, mas essa atratividade diminui à medida que o ciclo de corte de juros avança, corroendo o retorno real de quem fica "
+                "100% em CDI. Excesso em pós-fixado costuma ser dinheiro parado que poderia estar travando juro real em inflação e pré-fixado.",
+        "papel": "pós-fixado (Selic/CDI) para liquidez, reserva de oportunidade e proteção em cenários de juro alto",
+    },
+    "pre_fixado": {
+        "conc": "O pré-fixado captura ganho de capital quando a curva de juros fecha, no início de um ciclo de queda. É uma aposta direcional: "
+                "remunera mais, mas sofre se os juros subirem ou o corte for adiado. Com a Selic próxima do pico há oportunidade, preferindo-se "
+                "prazos médios para equilibrar risco e retorno num ano de incerteza fiscal.",
+        "papel": "pré-fixado para capturar o início do ciclo de queda de juros (ganho de capital), em prazos médios",
+    },
+    "internacional": {
+        "conc": "A exposição internacional é o principal hedge cambial da carteira. Concentração aqui deve respeitar o perfil, mas raramente é o problema.",
+        "papel": "internacional como hedge cambial e diversificação geográfica — proteção contra o risco-Brasil e a volatilidade do real",
+    },
+    "fiis": {
+        "conc": "FIIs entregam renda mensal (isenta de IR para pessoa física) e diversificação real, mas são sensíveis ao juro real, pois competem com a NTN-B.",
+        "papel": "FIIs para renda mensal recorrente e diversificação imobiliária — atrativos como ponto de entrada em juro alto",
+    },
+    "multimercado": {
+        "conc": "Multimercados adicionam descorrelação, mas dependem da mão do gestor; concentração exige acompanhar consistência e drawdown.",
+        "papel": "multimercado para descorrelação e gestão ativa entre juros, câmbio e bolsa",
+    },
+    "alternativos": {
+        "conc": "Alternativos (private, infra, special situations) têm baixa liquidez; concentração precisa respeitar o horizonte do cliente.",
+        "papel": "alternativos para retornos descorrelacionados de longo prazo, respeitando a liquidez do perfil",
+    },
+    "cripto": {
+        "conc": "Cripto é ativo de altíssima volatilidade; qualquer concentração relevante é incompatível com perfis conservadores e moderados.",
+        "papel": "exposição marginal a cripto, apenas quando compatível com o perfil, como diversificador de altíssimo risco",
+    },
+}
+
+def _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl):
+    """Retorna blocos (tipo, texto) para o 'Olhar de Mercado' — análise completa da
+    alocação do cliente + conhecimento por classe + cenário macro/eleitoral 2026."""
     if not desvios:
-        return None
+        return []
     ordenados = sorted(desvios, key=lambda d: d.get("desvio", 0), reverse=True)
     maior = ordenados[0]
-    gaps = [d for d in ordenados if d.get("desvio", 0) <= -3][-3:]
-    partes = []
+    gaps = [d for d in ordenados if d.get("desvio", 0) <= -3]
+    gaps = sorted(gaps, key=lambda d: d.get("desvio", 0))[:4]
+    selic = f"{macro.get('selic_meta'):.2f}%" if macro and macro.get('selic_meta') else "patamar elevado"
+    ipca  = f"{macro.get('ipca_12m'):.2f}%" if macro and macro.get('ipca_12m') else "a inflação corrente"
+    blocos = []
+
+    # 1) Diagnóstico geral
+    blocos.append(("sub", "Diagnóstico da alocação atual"))
     if maior.get("desvio", 0) > 5:
-        partes.append(
-            f"A maior concentração está em <b>{maior['label']}</b>, com {maior['real']:.1f}% da carteira "
-            f"contra {maior['alvo']:.1f}% do modelo {modelo_lbl} — um excesso de {maior['desvio']:.1f} p.p. "
-            f"que concentra o risco em um único fator e reduz a diversificação."
-        )
+        blocos.append(("p",
+            f"A carteira está desenhada de forma desbalanceada em relação ao modelo {modelo_lbl} para o perfil {perfil_lbl}. "
+            f"A maior concentração está em <b>{maior['label']}</b>, que responde por {maior['real']:.1f}% do patrimônio contra "
+            f"{maior['alvo']:.1f}% do modelo — um excesso de {maior['desvio']:.1f} pontos percentuais. Concentrar tanto risco em "
+            f"um único indexador significa que o resultado da carteira passa a depender quase inteiramente do comportamento de um "
+            f"único fator, reduzindo a diversificação e ampliando a oscilação em momentos de estresse."))
     else:
-        partes.append("A alocação atual está relativamente próxima do modelo, sem uma concentração dominante.")
+        blocos.append(("p",
+            f"A carteira está relativamente próxima do modelo {modelo_lbl} para o perfil {perfil_lbl}, sem uma concentração dominante. "
+            f"Ainda assim, há ajustes de alocação que melhoram a relação risco/retorno, detalhados a seguir."))
+
+    # 2) Leitura da classe concentrada
+    ins_maior = _CLASSE_INSIGHT.get(_classe_slug(maior['label']))
+    if maior.get("desvio", 0) > 5 and ins_maior:
+        blocos.append(("sub", f"Concentração em {maior['label']}"))
+        blocos.append(("p", ins_maior["conc"]))
+
+    # 3) Classes ausentes / sub-alocadas
     if gaps:
-        lst = ", ".join(f"{g['label']} ({g['real']:.1f}% vs. {g['alvo']:.1f}%)" for g in gaps)
-        partes.append(
-            f"Faltam exposições relevantes para o perfil {perfil_lbl}: {lst}. "
-            f"A ausência dessas classes deixa a carteira menos protegida frente a diferentes cenários de juros, inflação e câmbio."
-        )
+        blocos.append(("sub", "Classes ausentes ou sub-alocadas"))
+        for g in gaps:
+            ins = _CLASSE_INSIGHT.get(_classe_slug(g['label']))
+            papel = ins["papel"] if ins else "diversificação da carteira"
+            blocos.append(("p",
+                f"<b>{g['label']}</b> ({g['real']:.1f}% vs. {g['alvo']:.1f}% do modelo): {papel}. "
+                f"A sub-alocação nessa classe reduz a proteção da carteira e deixa retorno/segurança na mesa."))
+
+    # 4) Cenário macro e eleições 2026
+    blocos.append(("sub", "Cenário 2026 — ano eleitoral, juros e câmbio"))
+    blocos.append(("p",
+        f"A eleição presidencial de outubro de 2026 tende a elevar o prêmio de risco e a volatilidade dos ativos brasileiros ao longo "
+        f"do ano. O mercado costuma antecipar a incerteza fiscal, pressionando a curva de juros e o câmbio muito antes do pleito. "
+        f"Nesse ambiente — com a Selic meta em {selic} e o IPCA acumulando {ipca} em 12 meses — a diversificação por indexador é a "
+        f"principal defesa: pós-fixado para liquidez, inflação (IPCA+) para travar juro real, pré-fixado para capturar o eventual início "
+        f"do ciclo de queda e internacional como hedge cambial. Carteiras concentradas em um único fator de risco são as mais vulneráveis "
+        f"a solavancos eleitorais e a mudanças de humor do investidor estrangeiro."))
+    blocos.append(("p",
+        "Na renda fixa, o juro real elevado é uma janela historicamente atrativa para travar IPCA+ em prazos longos, aceitando a "
+        "marcação a mercado no caminho. Na renda variável, o valuation descontado da bolsa brasileira convive com o risco eleitoral: "
+        "posições devem ter horizonte, gestão de risco e proteção perto dos alvos. E a exposição internacional deixa de ser opcional em "
+        "ano eleitoral — é o seguro cambial do patrimônio."))
+
+    # 5) Fragilidades
+    frags = []
+    if maior.get("desvio", 0) > 5:
+        frags.append(f"Concentração de {maior['real']:.1f}% em {maior['label']} — risco dependente de um único fator.")
+    if any(_classe_slug(g['label']) == "internacional" for g in gaps):
+        frags.append("Sem hedge cambial (internacional sub-alocado) — patrimônio 100% exposto ao risco-Brasil.")
+    if all(_classe_slug(g['label']) != "acoes" for g in gaps) and maior.get("desvio",0)<=5:
+        pass
+    divers = [g for g in gaps if _classe_slug(g['label']) in ("multimercado", "fiis", "alternativos")]
+    if divers:
+        frags.append("Ausência de diversificadores (multimercado/FIIs) — menor descorrelação em cenários adversos.")
     if caixa and caixa >= 5:
-        partes.append(f"Há ainda {caixa:.1f}% em caixa fora do modelo — capital ocioso que pode ser realocado.")
-    return " ".join(partes)
+        frags.append(f"{caixa:.1f}% em caixa fora do modelo — capital ocioso a ser realocado.")
+    if not frags:
+        frags.append("Ajustes pontuais de alocação para alinhar a carteira ao modelo e ao perfil.")
+    blocos.append(("sub", "Principais fragilidades"))
+    for f in frags:
+        blocos.append(("frag", "• " + f))
+
+    return blocos
 
 def _texto_racional_modelo(modelo_lbl, perfil_lbl):
     """Racional das recomendações: explora o modelo escolhido e seus benefícios."""
@@ -1409,6 +1526,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     s_crit=S("Sc",fontSize=9,leading=13,tc=VERM,fontName="Helvetica-Bold")
     s_warn=S("Sw",fontSize=9,leading=13,tc=AMARELO)
     s_ok=S("Sok",fontSize=9,leading=13,tc=VERDE)
+    s_olh_h=S("Oh",fontSize=9.5,leading=12,tc=DOURADO,fontName="Helvetica-Bold",spaceBefore=7,spaceAfter=2)
+    s_olh_b=S("Ob",fontSize=9,leading=14,tc=colors.HexColor("#DDDDDD"),spaceAfter=3)
+    s_frag2=S("Fr",fontSize=9,leading=13,tc=AMARELO)
 
     modelo_lbl = (modelo_nome or "").strip() or "Levante Asset"
 
@@ -1443,12 +1563,15 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     elems.append(tm); elems.append(Spacer(1,0.3*cm))
 
     # Olhar de mercado sobre a carteira atual e suas fragilidades (antes do checklist)
-    _olhar = _texto_olhar_mercado(desvios, caixa, modelo_lbl, perfil_lbl)
-    if _olhar:
+    _blocos = _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl)
+    if _blocos:
         elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
         elems.append(Paragraph("Olhar de Mercado — Carteira Atual e Fragilidades",s_sec))
-        elems.append(Paragraph(_olhar, s_body))
-        elems.append(Spacer(1,0.25*cm))
+        for _tipo,_txt in _blocos:
+            if _tipo=="sub":    elems.append(Paragraph(_txt, s_olh_h))
+            elif _tipo=="frag": elems.append(Paragraph(_txt, s_frag2))
+            else:               elems.append(Paragraph(_txt, s_olh_b))
+        elems.append(Spacer(1,0.3*cm))
 
     # Checklist Modelo de Servir no PDF
     if checklist_servir:
@@ -1544,7 +1667,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         for rec in recomendacoes:
             _falta = float(rec.get('falta_pp', 0) or 0)
             _valor = patrimonio * (_falta / 100.0)
-            elems.append(Paragraph(f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}% · {_fmt_brl(_valor)})",s_bold))
+            elems.append(Paragraph(
+                f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}%) &nbsp;&nbsp;"
+                f"<font size=14 color=\"#FFD966\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
             elems.append(Paragraph(rec["explicacao"],s_body))
             if rec.get("carta_insight"):
                 elems.append(Paragraph(f'Carta da gestao: "{rec["carta_insight"]}"',s_gest))
