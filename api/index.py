@@ -1333,7 +1333,49 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
     return recomendacoes, alertas
 
 
-def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomendacoes, alertas, macro, ref_contexto, checklist_servir=None, acoes=None, conta=""):
+def _fmt_brl(v):
+    try:
+        return f"R$ {float(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except Exception:
+        return "R$ 0,00"
+
+def _texto_olhar_mercado(desvios, caixa, modelo_lbl, perfil_lbl):
+    """Olhar de mercado sobre a alocação atual e suas fragilidades (data-driven)."""
+    if not desvios:
+        return None
+    ordenados = sorted(desvios, key=lambda d: d.get("desvio", 0), reverse=True)
+    maior = ordenados[0]
+    gaps = [d for d in ordenados if d.get("desvio", 0) <= -3][-3:]
+    partes = []
+    if maior.get("desvio", 0) > 5:
+        partes.append(
+            f"A maior concentração está em <b>{maior['label']}</b>, com {maior['real']:.1f}% da carteira "
+            f"contra {maior['alvo']:.1f}% do modelo {modelo_lbl} — um excesso de {maior['desvio']:.1f} p.p. "
+            f"que concentra o risco em um único fator e reduz a diversificação."
+        )
+    else:
+        partes.append("A alocação atual está relativamente próxima do modelo, sem uma concentração dominante.")
+    if gaps:
+        lst = ", ".join(f"{g['label']} ({g['real']:.1f}% vs. {g['alvo']:.1f}%)" for g in gaps)
+        partes.append(
+            f"Faltam exposições relevantes para o perfil {perfil_lbl}: {lst}. "
+            f"A ausência dessas classes deixa a carteira menos protegida frente a diferentes cenários de juros, inflação e câmbio."
+        )
+    if caixa and caixa >= 5:
+        partes.append(f"Há ainda {caixa:.1f}% em caixa fora do modelo — capital ocioso que pode ser realocado.")
+    return " ".join(partes)
+
+def _texto_racional_modelo(modelo_lbl, perfil_lbl):
+    """Racional das recomendações: explora o modelo escolhido e seus benefícios."""
+    return (
+        f"As recomendações a seguir seguem o modelo <b>{modelo_lbl}</b>, selecionado para o perfil {perfil_lbl}. "
+        f"Esse modelo distribui a carteira por indexador — pós-fixado, inflação (IPCA+), pré-fixado, internacional e "
+        f"diversificadores — buscando equilibrar proteção e retorno ao longo do ciclo econômico. O objetivo é aproximar "
+        f"a carteira atual desse modelo: corrigir as concentrações, preencher as lacunas e, com isso, melhorar a relação "
+        f"risco/retorno e a resiliência a diferentes cenários de mercado."
+    )
+
+def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomendacoes, alertas, macro, ref_contexto, checklist_servir=None, acoes=None, conta="", assessor="", modelo_nome=""):
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import cm
@@ -1368,19 +1410,26 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     s_warn=S("Sw",fontSize=9,leading=13,tc=AMARELO)
     s_ok=S("Sok",fontSize=9,leading=13,tc=VERDE)
 
+    modelo_lbl = (modelo_nome or "").strip() or "Levante Asset"
+
     elems=[]
     elems.append(Paragraph("BRAÚNA INVESTIMENTOS",s_title))
-    elems.append(Paragraph("Análise de Alocação por Indexador — Modelo Levante Asset",s_sub))
+    elems.append(Paragraph(f"Análise de Alocação por Indexador — Modelo {modelo_lbl}",s_sub))
     elems.append(HRFlowable(width="100%",thickness=1,color=DOURADO,spaceAfter=8))
 
     perfil_pt={"super_conservadora":"Super Conservadora","conservadora":"Conservadora","moderada":"Moderada","arrojada":"Arrojada","agressiva":"Agressiva"}
+    perfil_lbl = perfil_pt.get(perfil, perfil)
     pat_fmt=f"R$ {patrimonio:,.2f}".replace(",","X").replace(".",",").replace("X",".")
     selic_txt=f"{macro['selic_meta']:.2f}%" if macro.get('selic_meta') else "—"
     ipca_txt=f"{macro['ipca_12m']:.2f}%" if macro.get('ipca_12m') else "—"
 
+    _conta = str(conta or "").strip()
+    _nome  = str(nome or "").strip()
+    cliente_txt = (f"{_conta} — {_nome}" if (_conta and _nome) else (_conta or _nome or "—"))
+    assessor_txt = str(assessor or "").strip() or "—"
     meta=[
-        ["Cliente:",nome,"Assessor:","Denis Kinoshita"],
-        ["Perfil:",perfil_pt.get(perfil,perfil),"Data ref.:",data_ref],
+        ["Cliente:",cliente_txt,"Assessor:",assessor_txt],
+        ["Perfil:",perfil_lbl,"Data ref.:",data_ref],
         ["Patrimônio:",pat_fmt,"Caixa:",f"{caixa:.1f}% (excluído do modelo)"],
         ["Selic meta:",selic_txt,"IPCA 12M:",ipca_txt],
     ]
@@ -1392,6 +1441,14 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),("PADDING",(0,0),(-1,-1),4),
     ]))
     elems.append(tm); elems.append(Spacer(1,0.3*cm))
+
+    # Olhar de mercado sobre a carteira atual e suas fragilidades (antes do checklist)
+    _olhar = _texto_olhar_mercado(desvios, caixa, modelo_lbl, perfil_lbl)
+    if _olhar:
+        elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+        elems.append(Paragraph("Olhar de Mercado — Carteira Atual e Fragilidades",s_sec))
+        elems.append(Paragraph(_olhar, s_body))
+        elems.append(Spacer(1,0.25*cm))
 
     # Checklist Modelo de Servir no PDF
     if checklist_servir:
@@ -1444,7 +1501,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         ]))
         elems.append(tr); elems.append(Spacer(1,0.3*cm))
 
-    elems.append(Paragraph("Composição Atual vs. Modelo Levante Asset",s_sec))
+    elems.append(Paragraph(f"Composição Atual vs. Modelo {modelo_lbl}",s_sec))
     lbs=[d["label"] for d in desvios]; rea=[d["real"] for d in desvios]; alv=[d["alvo"] for d in desvios]
     x=np.arange(len(lbs)); w=0.35
     fig,ax=plt.subplots(figsize=(10,4))
@@ -1480,9 +1537,14 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
     if recomendacoes:
         elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+        elems.append(Paragraph(f"Por que estas recomendações — Modelo {modelo_lbl}",s_sec))
+        elems.append(Paragraph(_texto_racional_modelo(modelo_lbl, perfil_lbl), s_body))
+        elems.append(Spacer(1,0.25*cm))
         elems.append(Paragraph("Recomendações Fundamentadas",s_sec))
         for rec in recomendacoes:
-            elems.append(Paragraph(f"{rec['urgencia']} — {rec['classe']} (falta {rec['falta_pp']:.1f}%)",s_bold))
+            _falta = float(rec.get('falta_pp', 0) or 0)
+            _valor = patrimonio * (_falta / 100.0)
+            elems.append(Paragraph(f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}% · {_fmt_brl(_valor)})",s_bold))
             elems.append(Paragraph(rec["explicacao"],s_body))
             if rec.get("carta_insight"):
                 elems.append(Paragraph(f'Carta da gestao: "{rec["carta_insight"]}"',s_gest))
@@ -4735,9 +4797,14 @@ async function baixarPdf(){
   document.getElementById("btn-pdf").textContent="Gerando...";
   document.getElementById("btn-pdf").disabled=true;
   try{
+    var _gselPdf = document.getElementById("gestora-sel");
+    var _gidPdf = _gselPdf ? _gselPdf.value : "";
+    var _modeloNome = (_gidPdf && _gestoras[_gidPdf]) ? (_gestoras[_gidPdf].nome || _gidPdf) : "Levante Asset";
     const _pdfPayload=Object.assign({}, analiseData, {
       acoes: analiseData.acoes || (_clienteIdentificado && _clienteIdentificado.acoes) || [],
       conta: (_clienteIdentificado && _clienteIdentificado.conta) || analiseData.conta || "",
+      assessor: (document.getElementById("assessor")||{}).value || localStorage.getItem("brauna_nome") || analiseData.assessor || "",
+      modelo_nome: _modeloNome,
     });
     const res=await fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_pdfPayload)});
     if(!res.ok) throw new Error(await res.text());
@@ -8528,6 +8595,7 @@ def pdf_endpoint():
         d.get("macro",{}), d.get("ref_contexto",""),
         d.get("checklist_servir"),
         d.get("acoes", []), d.get("conta", ""),
+        d.get("assessor", ""), d.get("modelo_nome", ""),
     )
     nome_arq = f"{d.get('nome','cliente').replace(' ','-').lower()}_{d.get('data_ref','')}_analise.pdf"
     return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=nome_arq)
