@@ -2140,7 +2140,7 @@ select option{background:#1A1A1A}
         <span id="modelo-gestora-lbl" style="color:#C9A96E;margin-left:4px;font-weight:700"></span>
         <span id="carta-ativa-nome" style="color:#3A6A48;margin-left:6px;font-size:9px"></span>
       </div>
-      <div id="modelo-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:4px 16px"></div>
+      <div id="modelo-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 22px"></div>
     </div>
   </div>
 
@@ -3032,12 +3032,12 @@ function atualizarModelo(){
     .sort((a,b) => b[1]-a[1]);
   g.innerHTML = itens.map(([k,v])=>{
     const cor = COR_CLS[k]||"#3A6A48";
-    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
-      '<span style="font-size:11px;color:#888;min-width:110px;flex-shrink:0">'+(LABELS[k]||k)+'</span>'+
-      '<div style="flex:1;height:6px;background:#1A4030;border-radius:3px;overflow:hidden">'+
+    return '<div style="display:flex;align-items:center;gap:8px;min-width:0">' +
+      '<span style="font-size:11px;color:#9BB0A0;flex:0 0 auto;white-space:nowrap">'+(LABELS[k]||k)+'</span>'+
+      '<div style="flex:1 1 auto;min-width:24px;height:6px;background:#12281C;border-radius:3px;overflow:hidden">'+
         '<div style="width:'+Math.min(v,100)+'%;height:100%;background:'+cor+';border-radius:3px;transition:width .4s"></div>'+
       '</div>'+
-      '<span style="font-size:11px;font-weight:700;color:'+cor+';min-width:36px;text-align:right">'+v+'%</span>'+
+      '<span style="font-size:11px;font-weight:700;color:'+cor+';flex:0 0 auto;min-width:34px;text-align:right">'+v+'%</span>'+
     '</div>';
   }).join("");
 }
