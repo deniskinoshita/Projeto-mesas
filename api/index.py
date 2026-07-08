@@ -7554,6 +7554,65 @@ def analyze_xp():
         if ticker_ok or perfil_ok:
             calls_relevantes.append(call)
 
+    # ── Trocas / reenquadramento de ativos → somam aos "pontos para atenção" ────
+    #    Fontes: (1) stock guide Levante VENDA/NEUTRO, (2) calls de→para do Head,
+    #    (3) docs da Base que citam troca/redução do ativo que o cliente tem.
+    _guia_sg   = (carregar_stock_guide() or {}).get("acoes", {})
+    _acoes_cli = [str(a.get("ticker","")).upper() for a in dados.get("acoes", []) if a.get("ticker")]
+    _hoje_str  = datetime.now().strftime("%d/%m/%Y")
+    _troca_ids = set()
+    def _add_troca(t):
+        if t["id"] in _troca_ids:
+            return
+        _troca_ids.add(t["id"]); alertas_unicos.append(t)
+
+    for tk in _acoes_cli:
+        lev = (_guia_sg.get(tk) or {}).get("levante") or {}
+        rating = (lev.get("rating") or "").upper()
+        up = lev.get("upside")
+        motivo = None
+        if "VENDA" in rating:
+            motivo = f"A Levante classifica {tk} como VENDA"
+        elif "NEUTRO" in rating and isinstance(up, (int, float)) and up <= 0:
+            motivo = f"A Levante classifica {tk} como NEUTRO e o preço já atingiu/passou o alvo"
+        if motivo:
+            _add_troca({
+                "id": f"troca_sg_{tk}", "produto": tk, "classe": "", "tipo": "atencao",
+                "mensagem": f"Reenquadramento: {motivo} — avaliar troca ou redução da posição.",
+                "origem": "🔁 Troca sugerida", "origem_tipo": "auto", "data": _hoje_str,
+            })
+
+    for call in calls_hp:
+        ctk = str(call.get("ticker", "")).upper()
+        if not ctk or ctk not in _acoes_cli:
+            continue
+        acao = str(call.get("acao", "")).lower()
+        para = call.get("para") or call.get("substituto") or ""
+        if para or any(w in acao for w in ("troca", "substitu", "vender", "venda", "reduz")):
+            msg = f"Reenquadramento (Head): {call.get('acao','trocar')} {ctk}" + (f" → {para}" if para else "")
+            if call.get("motivo"):
+                msg += f". {call.get('motivo')}"
+            _add_troca({
+                "id": f"troca_call_{ctk}", "produto": ctk, "classe": "", "tipo": "atencao",
+                "mensagem": msg, "origem": "🔁 Troca — Head", "origem_tipo": "hp_manual",
+                "data": call.get("data", "") or _hoje_str,
+            })
+
+    _kw_troca = ("TROCA", "TROCAR", "SUBSTITU", "VENDER", "SAIR DE", "ZERAR", "REDUZIR", "REALIZAR")
+    for tk, mats in (material_por_ticker.items() if isinstance(material_por_ticker, dict) else []):
+        for m in mats:
+            texto_up = (m.get("texto") or "").upper()
+            i = texto_up.find(tk)
+            jan = texto_up[max(0, i-160):i+260] if i >= 0 else ""
+            if any(w in jan for w in _kw_troca):
+                _add_troca({
+                    "id": f"troca_kb_{tk}", "produto": tk, "classe": "", "tipo": "atencao",
+                    "mensagem": f"Reenquadramento: o material \"{m.get('nome','')}\" indica troca/redução em {tk}. Abra para ver o contexto.",
+                    "origem": "🔁 Troca — Base", "origem_tipo": "knowledge_base", "data": m.get("data", ""),
+                    "docs": [{"id": m["id"], "nome": m.get("nome", "")}],
+                })
+                break
+
     # ── Salva carteira do cliente no Redis ────────────────────────────────────
     conta_key = (dados.get("conta") or dados.get("assessor") or "sem_conta").strip().replace(" ","_")
     clientes = _load(_CLIENTS_FILE, {})
