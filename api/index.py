@@ -2455,6 +2455,8 @@ select option{background:#1A1A1A}
     if(nomeLogin){
       const el2 = document.getElementById("assessor");
       if(el2 && !el2.value) el2.value = nomeLogin;
+      // Mostra a lista de clientes salvos assim que o assessor loga
+      try{ buscarClientesSalvos(); }catch(e){}
     }
   }
 })();
@@ -3755,7 +3757,15 @@ function buscarPorCodigoCliente(codigo){
       const r = await fetch("/api/ficha?assessor="+encodeURIComponent(assessor.toLowerCase()));
       const lista = await r.json();
       const cod = codigo.trim().toLowerCase();
-      const match = lista.find(c=>(c.conta||"").toLowerCase()===cod || (c.nome||"").toLowerCase().includes(cod));
+      // Match exato pela conta → puxa TUDO (composição + posições + rentabilidade),
+      // pronto para analisar sem re-subir o PDF.
+      const exato = lista.find(c=>(c.conta||"").toLowerCase()===cod);
+      if(exato && exato.conta){
+        buscarUltimoXpPorCodigo(exato.conta);
+        return;
+      }
+      // Senão, tenta por nome (parcial) e carrega a ficha básica
+      const match = lista.find(c=>(c.nome||"").toLowerCase().includes(cod));
       if(match){
         carregarFicha(JSON.stringify(match));
         if(lbl){ lbl.textContent="✓ Cliente encontrado: "+match.nome; lbl.style.display="block"; }
