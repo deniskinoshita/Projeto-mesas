@@ -7083,29 +7083,87 @@ def analyze_xp():
     #    O índice já tem os tickers pré-extraídos — só lê o texto completo
     #    dos documentos que realmente mencionam um ticker da carteira.
     tickers_set = {tk.upper() for tk in tickers_carteira if tk and len(tk) >= 4}
+    # Coleta o material da casa por ticker (docs que citam o ativo + trecho de contexto)
+    material_por_ticker = {}   # tk -> [{nome, fonte, data, trecho}]
     for doc in docs_publicados:
-        # Compat: docs antigos podem não ter 'tickers' no índice — assume match p/ checar
         doc_tickers = set(doc.get("tickers") or [])
         casa = tickers_set & doc_tickers if doc_tickers else tickers_set
         if not casa and doc_tickers:
             continue
-        texto_completo = load_know_text(doc["id"])
+        texto_completo = load_know_text(doc["id"]) or ""
+        if not texto_completo:
+            continue
         texto_doc = texto_completo.upper()
         for tk in (casa or tickers_set):
             if tk in texto_doc:
                 idx = texto_doc.find(tk)
-                trecho = texto_completo[max(0, idx-80):idx+200].replace("\n"," ").strip()
-                alertas_relevantes.append({
-                    "id":       f"kb_{doc['id']}_{tk}",
-                    "produto":  tk,
-                    "classe":   "",
-                    "tipo":     "atencao",
-                    "mensagem": f"Mencionado em \"{doc.get('nome','')}\" ({doc.get('fonte','HP')}): ...{trecho}...",
-                    "origem":   doc.get("nome","Base de Conhecimento"),
-                    "origem_tipo": "knowledge_base",
-                    "data":     doc.get("data",""),
+                trecho = texto_completo[max(0, idx-200):idx+600].replace("\n", " ").strip()
+                material_por_ticker.setdefault(tk, []).append({
+                    "nome": doc.get("nome", ""), "fonte": doc.get("fonte", "HP"),
+                    "data": doc.get("data", ""), "trecho": trecho,
                 })
-                break  # um alerta por doc por ticker
+    for tk in material_por_ticker:                 # limita p/ não estourar o prompt
+        material_por_ticker[tk] = material_por_ticker[tk][:4]
+
+    # Consenso por ticker (resumo IA, até 5 linhas, ancorado nos docs da casa)
+    consenso_por_ticker = {}
+    if material_por_ticker and os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            import anthropic as _anthropic_kb, json as _json_kb
+            blocos_kb = []
+            for tk, mats in material_por_ticker.items():
+                docs_lst = " | ".join(dict.fromkeys(m["nome"] for m in mats if m["nome"]))
+                trechos  = "\n".join(f"- ({m['nome']}): {m['trecho']}" for m in mats)
+                blocos_kb.append(f"TICKER {tk}\nDocumentos: {docs_lst}\nTrechos:\n{trechos}")
+            material_txt = "\n\n".join(blocos_kb)
+            _ai_kb = _anthropic_kb.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+            _resp_kb = _ai_kb.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=1800,
+                messages=[{"role": "user", "content":
+                    "Você é analista de investimentos escrevendo para um assessor. Com base APENAS no material "
+                    "abaixo (relatórios da própria casa, incluindo análises de resultados dos últimos trimestres), "
+                    "escreva para cada ticker um CONSENSO em no máximo 5 linhas sobre a ação. Priorize LEITURA "
+                    "QUALITATIVA — tese, momento operacional, direção do resultado no último trimestre e principais "
+                    "riscos — usando o MÍNIMO de números (cite um número só se for essencial). NÃO invente dados fora "
+                    "do material. Português, tom profissional e direto.\n\n"
+                    f"MATERIAL:\n{material_txt}\n\n"
+                    'Responda APENAS com JSON (sem markdown): '
+                    '[{"ticker":"XXXX3","consenso":"texto de até 5 linhas"}]'
+                }]
+            )
+            _raw_kb = _resp_kb.content[0].text.strip()
+            if _raw_kb.startswith("```"):
+                _raw_kb = _raw_kb.split("```")[1]
+                if _raw_kb.lower().startswith("json"): _raw_kb = _raw_kb[4:]
+                _raw_kb = _raw_kb.strip()
+            for _it in _json_kb.loads(_raw_kb):
+                if isinstance(_it, dict) and _it.get("ticker"):
+                    consenso_por_ticker[str(_it["ticker"]).upper()] = (_it.get("consenso") or "").strip()
+        except Exception as _e_kb:
+            app.logger.warning(f"Consenso KB (IA) falhou: {_e_kb}")
+
+    for tk, mats in material_por_ticker.items():
+        fontes = ", ".join(dict.fromkeys(m["nome"] for m in mats if m["nome"]))
+        data_kb = next((m["data"] for m in mats if m.get("data")), "")
+        consenso = consenso_por_ticker.get(tk)
+        ponteiro = (f'<br><span style="color:#5DCAA5;font-size:10px">📚 Para se aprofundar, consulte na Base de '
+                    f'Conhecimento: {fontes}.</span>') if fontes else ""
+        if consenso:
+            mensagem = consenso + ponteiro
+        else:
+            mensagem = (f"Consenso da casa disponível para {tk}." + (ponteiro or
+                        " Consulte o material na Base de Conhecimento."))
+        alertas_relevantes.append({
+            "id":       f"kb_consenso_{tk}",
+            "produto":  tk,
+            "classe":   "",
+            "tipo":     "atencao",
+            "mensagem": mensagem,
+            "origem":   "📚 Consenso trimestral",
+            "origem_tipo": "knowledge_base",
+            "data":     data_kb,
+        })
 
     # 3. Alertas automáticos por concentração e desvios graves
     comp_atual = dados.get("comp", {})
