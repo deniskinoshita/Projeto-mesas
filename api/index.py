@@ -775,6 +775,144 @@ def carregar_contexto():
         return {}
 
 
+# ── SAA — alocação-alvo por perfil (régua do rebalanceamento; casa = Braúna) ──────
+_SAA_JSON_CACHE = None
+def _saa_json():
+    global _SAA_JSON_CACHE
+    if _SAA_JSON_CACHE is None:
+        try:
+            with open(os.path.join(ROOT, "saa_referencia.json"), encoding="utf-8") as f:
+                _SAA_JSON_CACHE = json.load(f)
+        except Exception:
+            _SAA_JSON_CACHE = {}
+    return _SAA_JSON_CACHE
+
+def saa_alvo(perfil, gestora="brauna"):
+    """Alocação-alvo (%) por classe para o perfil, da gestora (default Braúna = casa).
+    Prefere a fonte viva (Alocações de Referência editáveis no app); cai para
+    saa_referencia.json. Retorna {} se não houver alvo para o perfil."""
+    if not perfil:
+        return {}
+    # 1) fonte viva (gest2 editável) — só usa se tiver soma > 0
+    try:
+        viva = _load(_HP_GESTORAS2_FILE, {}).get(gestora, {}).get("perfis", {}).get(perfil)
+        if viva and any(float(v or 0) for v in viva.values()):
+            return {k: float(v or 0) for k, v in viva.items()}
+    except Exception:
+        pass
+    # 2) fallback: saa_referencia.json (bundlado no projeto)
+    try:
+        j = _saa_json().get("gestoras", {}).get(gestora, {}).get("perfis", {}).get(perfil)
+        if isinstance(j, dict):
+            return {k: float(v or 0) for k, v in j.items() if not str(k).startswith("_")}
+    except Exception:
+        pass
+    return {}
+
+
+# ── Prateleiras de produtos (cardápio p/ fechar gaps de alocação) ────────────────
+_PRAT_CACHE = {}
+def _prat(nome):
+    if nome not in _PRAT_CACHE:
+        try:
+            with open(os.path.join(ROOT, nome), encoding="utf-8") as f:
+                _PRAT_CACHE[nome] = json.load(f)
+        except Exception:
+            _PRAT_CACHE[nome] = {}
+    return _PRAT_CACHE[nome]
+
+def _fpct(v):
+    try:
+        return f"{float(v):.2f}%"
+    except Exception:
+        return "—"
+
+def _sug_rf(filtro, obs, n):
+    """Produtos de RF tradicional (suitability Geral) — isentos primeiro, depois por rating."""
+    xs = [p for p in _prat("rf_tradicional_br.json").get("produtos", [])
+          if (p.get("publico") or "").startswith("Investidor Geral") and filtro(p)]
+    xs.sort(key=lambda p: (not p.get("isento"), str(p.get("risco") or "99")))
+    out = []
+    for p in xs[:n]:
+        det = p.get("tax_max") or p.get("tax_min") or ""
+        if p.get("isento") and p.get("grossup_max"):
+            det = f"{det} · isento (≈{p['grossup_max']} bruto)"
+        out.append({"nome": p.get("ativo"), "detalhe": det, "fonte": "RF XP",
+                    "fgc": p.get("fgc"), "obs": obs})
+    return out
+
+def _sug_fund(classes, obs, n):
+    xs = [p for p in _prat("fundos_xp.json").get("fundos", [])
+          if (p.get("investidor") in (None, "", "Geral")) and p.get("xp_class") in classes
+          and isinstance(p.get("rent_12m"), (int, float))]
+    xs.sort(key=lambda p: -(p.get("rent_12m") or 0))
+    return [{"nome": p.get("nome"),
+             "detalhe": f"12m {_fpct(p.get('rent_12m'))} · adm {_fpct(p.get('taxa_adm'))}",
+             "fonte": "Fundo XP", "obs": obs} for p in xs[:n]]
+
+def _sug_intl(n):
+    xs = [p for p in _prat("rf_internacional.json").get("produtos", [])
+          if p.get("tipo") in ("treasury", "bond") and isinstance(p.get("rentab_aa"), (int, float))]
+    # Treasuries (soberano) primeiro — núcleo conservador; depois bonds por yield.
+    xs.sort(key=lambda p: (p.get("tipo") != "treasury", -(p.get("rentab_aa") or 0)))
+    return [{"nome": f"{p.get('ativo')} ({p.get('vencimento')})",
+             "detalhe": f"{_fpct(p.get('rentab_aa'))} a.a. USD · {p.get('rating') or ''}".strip(" ·"),
+             "fonte": "RF Intl", "obs": "15% anual (Lei 14.754)"} for p in xs[:n]]
+
+def _sug_cetip(filtro, obs, n):
+    xs = [f for f in _prat("fundos_cetipados.json").get("fundos", []) if filtro(f)]
+    xs.sort(key=lambda f: -(f.get("dy_aa") or 0))
+    return [{"nome": f.get("ticker"), "detalhe": f"DY {_fpct(f.get('dy_aa'))} · {f.get('categoria')}",
+             "fonte": "Cetipado", "obs": obs} for f in xs[:n]]
+
+def _sugerir_por_classe(cat, n=3):
+    """Retorna até n produtos da prateleira adequados para a classe subalocada."""
+    up = lambda s: (s or "").upper()
+    if cat == "pos_fixado":
+        return _sug_rf(lambda p: "CDI" in up(p.get("indexador")) and p.get("fgc"),
+                       "Carrego pós-fixado; com FGC. Comparar líquido (isento vence tributável).", n)
+    if cat == "inflacao":
+        r = _sug_rf(lambda p: "IPC" in up(p.get("indexador")), "Proteção inflacionária (IPCA+).", n)
+        return r or _sug_cetip(lambda f: f.get("exposicao", {}).get("IPCA", 0) >= 50,
+                               "FII Infra/imobiliário IPCA — atenção à liquidez.", n)
+    if cat == "pre_fixado":
+        return _sug_rf(lambda p: "PRÉ" in up(p.get("indexador")) or "PREF" in up(p.get("indexador")),
+                       "Prefixado tático; aceita marcação a mercado.", n)
+    if cat == "acoes":
+        return _sug_fund(["Renda Variável Long Only", "Renda Variável Long Biased"],
+                         "Ações via fundo; IR 15% no resgate, sem come-cotas.", n)
+    if cat == "fiis":
+        return _sug_cetip(lambda f: "FII" in up(f.get("exposicao", {}) and "") or f.get("categoria") in ("Fundos Imobiliários", "FII Infra"),
+                          "FII — renda; rendimento isento PF (requisitos).", n) \
+               or _sug_fund(["Fundo Listado"], "FII/listados via fundo.", n)
+    if cat == "multimercado":
+        return _sug_fund(["Macro Alta Vol", "Macro Média Vol", "Multiestratégia", "Macro Baixa Vol"],
+                         "Multimercado; come-cotas semestral. Precisa justificar risco vs CDI.", n)
+    if cat == "internacional":
+        return _sug_intl(n) or _sug_fund(["Internacional Ações Hedgeado", "Internacional Renda Fixa"],
+                                         "Internacionalização; 15% anual no exterior.", n)
+    if cat == "alternativos":
+        return _sug_fund(["Alternativo Ilíquido", "Multiestratégia"],
+                         "Alternativos; prêmio de iliquidez — checar prazo/suitability.", n)
+    return []
+
+def sugestoes_realocacao(comp, perfil, max_classes=3, por_classe=3):
+    """Para as classes mais subalocadas vs SAA Braúna, sugere produtos da prateleira
+    (suitability Geral) com nota de tributação. Retorna [] se não houver SAA p/ o perfil."""
+    alvo = saa_alvo(perfil)
+    if not alvo:
+        return []
+    gaps = [(cat, alvo.get(cat, 0) - comp.get(cat, 0)) for cat in CATS]
+    gaps = sorted([g for g in gaps if g[1] >= 5], key=lambda x: -x[1])
+    out = []
+    for cat, gap in gaps[:max_classes]:
+        prods = _sugerir_por_classe(cat, por_classe)
+        if prods:
+            out.append({"classe": cat, "label": LABELS.get(cat, cat),
+                        "gap_pct": round(gap, 1), "produtos": prods})
+    return out
+
+
 # ── Stock Guide: posicionamento por ação (Levante = casa principal, XP = visão de mercado)
 _STOCK_GUIDE_CACHE = None
 def carregar_stock_guide():
@@ -3543,6 +3681,29 @@ function mostrarPreviewPDF(d){
       +'</div>';
   }
 
+  // ── Sugestões de realocação (produto p/ fechar o gap) ───────────
+  var sugs = d.sugestoes_realocacao || [];
+  var sugestoesHtml = "";
+  if(sugs.length){
+    sugestoesHtml = '<div style="margin-top:14px;border-top:1px solid #2A2418;padding-top:12px">'
+      +'<p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💡 Sugestões para fechar o gap</p>'
+      + sugs.map(function(s){
+          var prods = (s.produtos||[]).map(function(p){
+            var fgc = p.fgc===true ? ' <span style="color:#5DCAA5;font-size:9px">FGC</span>'
+                    : (p.fgc===false ? ' <span style="color:#8A6A2A;font-size:9px">s/FGC</span>' : '');
+            return '<div style="margin:3px 0 5px 12px">'
+              +'<div style="font-size:11px;color:#DDD">• '+(p.nome||'')+' <span style="color:#8BCFEF">'+(p.detalhe||'')+'</span> <span style="color:#4A7055;font-size:9px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
+              +'<div style="font-size:10px;color:#5A7A6A;margin-left:12px;line-height:1.35">'+(p.obs||'')+'</div>'
+              +'</div>';
+          }).join("");
+          return '<div style="margin-bottom:10px">'
+            +'<div style="font-size:11px;color:#C9A96E;font-weight:700">'+s.label+' — faltam '+s.gap_pct+'% vs alvo Braúna</div>'
+            + prods +'</div>';
+        }).join("")
+      +'<div style="font-size:9px;color:#3A5A48;margin-top:2px;line-height:1.4">Prateleira XP (investidor geral). Confirmar preço, disponibilidade e suitability. DY/taxa não são promessa — comparar sempre no líquido.</div>'
+      +'</div>';
+  }
+
   // ── Posições individuais ────────────────────────────────────────
   function tblAtivos(titulo, items, cols){
     if(!items || !items.length) return "";
@@ -3616,7 +3777,8 @@ function mostrarPreviewPDF(d){
         ${barras}
       </div>
     </div>
-    ${alertasHtml}`;
+    ${alertasHtml}
+    ${sugestoesHtml}`;
     // Posições detalhadas (RF/Ações/FIIs) NÃO entram no preview de identificação —
     // ficam na análise (card "Análise Head de Produtos"). Após os diagnósticos,
     // o fluxo segue direto para o "Perfil do cliente".
@@ -5492,6 +5654,50 @@ def _pilar_html_inicial(p):
   </div>
 </div>'''
 
+_FGC_INSTR = ("CDB", "RDB", "LCI", "LCA", "LCD")  # instrumentos com cobertura do FGC
+def _fgc_emissor(nome):
+    """Retorna o emissor normalizado se o ativo for RF bancária elegível ao FGC; senão None.
+    Deriva do próprio nome do XPerformance (ex.: 'CDB Banco BBC (Grupo Simpar) - JUN/2028')."""
+    if not nome:
+        return None
+    u = nome.upper()
+    instr = next((k for k in _FGC_INSTR if re.search(r"\b" + k + r"\b", u) or u.replace(" ", "").startswith(k)), None)
+    if not instr:
+        return None
+    # texto após o instrumento, antes do sufixo de vencimento (" - MES/ANO" ou data)
+    resto = u.split(instr, 1)[1] if instr in u else u
+    resto = re.sub(r"\([^)]*\)", " ", resto)  # remove "(Grupo Simpar)" etc. para agrupar o mesmo emissor
+    resto = re.split(r"\s[-–]\s|\b(?:JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)[/ ]?20\d\d|\d{2}/\d{2}/20\d\d", resto)[0]
+    resto = re.sub(r"[^A-ZÀ-Ú0-9 &]", " ", resto)
+    palavras = [p for p in resto.split() if p not in ("S", "A", "SA", "CFI", "FINANCEIRA", "BANCO", "S.A", "DE", "DO", "DA", "CONSIGNADO")]
+    emissor = " ".join(palavras[:2]).strip()
+    return emissor or instr
+
+def alertas_fgc(rf_ativos):
+    """Exposição FGC ATUAL por emissor (soma de saldo dos ativos elegíveis). Alerta > R$ 250k.
+    Projeção futura não é feita: o XPerformance não traz a taxa contratada (só rentabilidade)."""
+    LIM = 250000.0
+    por_emissor = {}
+    for a in rf_ativos:
+        emis = _fgc_emissor(a.get("nome", ""))
+        if emis and (a.get("saldo") or 0) > 0:
+            por_emissor[emis] = por_emissor.get(emis, 0.0) + float(a["saldo"])
+    def _brl(v):
+        return "R$ " + f"{v:,.0f}".replace(",", ".")
+    out = []
+    for emis, total in sorted(por_emissor.items(), key=lambda x: -x[1]):
+        if total > LIM:
+            out.append({
+                "tipo": "fgc", "nivel": "alto", "classe": "pos_fixado",
+                "msg": f"FGC: exposição de {_brl(total)} em {emis.title()} — acima do limite de R$ 250 mil. Excedente de {_brl(total-LIM)} é risco direto do emissor, sem garantia do FGC.",
+            })
+        elif total >= 225000:
+            out.append({
+                "tipo": "fgc", "nivel": "medio", "classe": "pos_fixado",
+                "msg": f"FGC: exposição de {_brl(total)} em {emis.title()} — próximo do limite de R$ 250 mil. Evitar novos aportes neste emissor.",
+            })
+    return out
+
 def gerar_diagnosticos(xp_parsed, perfil=""):
     """Gera diagnósticos automáticos a partir dos ativos individuais do XPerformance."""
     rf_ativos  = xp_parsed.get("rf_ativos", [])
@@ -5499,6 +5705,9 @@ def gerar_diagnosticos(xp_parsed, perfil=""):
     fiis_list  = xp_parsed.get("fiis", [])
     comp       = xp_parsed.get("comp", {})
     alertas    = []
+
+    # Exposição ao FGC por emissor (atual)
+    alertas.extend(alertas_fgc(rf_ativos))
 
     # Concentração em ativo único de RF > 8%
     for ativo in rf_ativos:
@@ -5539,18 +5748,42 @@ def gerar_diagnosticos(xp_parsed, perfil=""):
                 "ativo": ativo["ticker"], "classe": "acoes",
             })
 
-    # Desvios vs. modelo do perfil (se perfil fornecido)
-    if perfil and perfil in HP_PORTFOLIOS_DEFAULT.get("perfis", {}):
-        modelo_alvo = HP_PORTFOLIOS_DEFAULT["perfis"][perfil]
+    # Gap vs SAA da casa (Braúna) por classe — régua do rebalanceamento.
+    # Fallback para o modelo antigo (HP_PORTFOLIOS_DEFAULT) se não houver SAA p/ o perfil.
+    alvo = saa_alvo(perfil)
+    if alvo:
+        fonte_alvo = f"alvo Braúna {perfil.replace('_',' ').title()}"
+    elif perfil and perfil in HP_PORTFOLIOS_DEFAULT.get("perfis", {}):
+        alvo = HP_PORTFOLIOS_DEFAULT["perfis"][perfil]
+        fonte_alvo = f"modelo {perfil.replace('_',' ').title()}"
+    else:
+        alvo = {}
+        fonte_alvo = ""
+    if alvo:
         for cat in CATS:
-            desvio = comp.get(cat, 0) - modelo_alvo.get(cat, 0)
-            if abs(desvio) >= 5:
-                direcao = "acima" if desvio > 0 else "abaixo"
+            gap = comp.get(cat, 0) - alvo.get(cat, 0)
+            if abs(gap) >= 5:
+                direcao = "acima" if gap > 0 else "abaixo"
                 alertas.append({
-                    "tipo": "desvio_modelo", "nivel": "alto" if abs(desvio) >= 10 else "medio",
-                    "msg": f"{LABELS.get(cat, cat)}: {comp.get(cat,0):.1f}% ({desvio:+.1f}% {direcao} do modelo {perfil.replace('_',' ').title()})",
+                    "tipo": "gap_saa", "nivel": "alto" if abs(gap) >= 10 else "medio",
+                    "msg": f"{LABELS.get(cat, cat)}: {comp.get(cat,0):.1f}% ({gap:+.1f}% {direcao} do {fonte_alvo})",
                     "classe": cat,
                 })
+
+    # Subalocação internacional — proteção cambial / risco Brasil (zonas críticas).
+    # Acima de 5% o gap vs SAA já cobre; aqui reforça a faixa de subproteção.
+    if perfil:
+        intl = comp.get("internacional", 0)
+        if intl <= 0:
+            alertas.append({
+                "tipo": "subalocacao_intl", "nivel": "alto", "classe": "internacional",
+                "msg": "Internacional 0%: cliente 100% exposto ao Brasil e ao real. Avaliar posição mínima em dólar usando liquidez excedente ou vencimentos próximos.",
+            })
+        elif intl < 5:
+            alertas.append({
+                "tipo": "subalocacao_intl", "nivel": "medio", "classe": "internacional",
+                "msg": f"Internacional {intl:.1f}% (abaixo de 5%): pode estar subprotegido contra risco Brasil, câmbio e inflação importada — mesmo em perfil conservador.",
+            })
 
     # Diversificação mínima
     classes_com_posicao = sum(1 for v in comp.values() if v >= 1.0)
@@ -6259,6 +6492,7 @@ def xp_identificar():
     # Diagnósticos automáticos via função centralizada
     ficha_perfil = ficha.get("perfil", "")
     diag = gerar_diagnosticos(xp, perfil=ficha_perfil)
+    sugestoes = sugestoes_realocacao(xp.get("comp", {}), ficha_perfil)
 
     return jsonify({
         "conta": conta,
@@ -6279,6 +6513,7 @@ def xp_identificar():
         "fiis":       diag["fiis"],
         "alertas":    diag["alertas"],
         "diagnostico": diag,
+        "sugestoes_realocacao": sugestoes,
     })
 
 
@@ -6638,6 +6873,14 @@ def hp_cenario():
     # Inclui fontes publicadas da base de conhecimento
     docs_pub = [d for d in _load(_HP_KNOW_FILE, []) if d.get("publicado")]
     cenario["fontes"] = [{"nome": d.get("nome",""), "tipo": d.get("tipo",""), "fonte": d.get("fonte",""), "data": d.get("data","")} for d in docs_pub]
+    # Material rico da carta (contexto_mercado.json) — Visão dos Gestores, alertas e posicionamento
+    ctx = carregar_contexto()
+    cenario["visao_gestores"]        = ctx.get("visao_gestores", [])
+    cenario["alertas_especiais"]     = ctx.get("alertas_especiais", [])
+    cenario["posicionamento_carta"]  = ctx.get("posicionamento_levante", {})
+    cenario["tese_central"]          = ctx.get("tese_central", "")
+    cenario["carta_ref"]             = ctx.get("referencia", "")
+    cenario["gestor_principal"]      = ctx.get("gestor_principal", "")
     return jsonify(cenario)
 
 @app.route("/api/hp/produtos", methods=["GET","POST"])
@@ -12578,6 +12821,16 @@ textarea{resize:vertical}
 /* Viés indicator */
 .vies-pos{color:#5DCAA5}.vies-neg{color:#FF6B6B}.vies-neu{color:#4A7055}
 @media(max-width:640px){.prod-grid-3,.prod-grid-2{grid-template-columns:1fr}}
+/* ── Abas de topo do Head ── */
+.head-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:0;z-index:20;background:#071E17;padding:10px 0}
+.head-nav button{flex:1;min-width:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:11px 14px;border-radius:10px;border:1px solid #2A2A18;background:#0F0F0A;color:#4A7055;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
+.head-nav button:hover{border-color:#D4B483;color:#D4B483}
+.head-nav button.active{background:#D4B483;color:#071E17;border-color:#D4B483}
+.head-nav button .ht-sub{font-size:9.5px;font-weight:600;opacity:.7;text-transform:none;letter-spacing:0}
+.head-nav button.active .ht-sub{opacity:.85}
+.head-tabpanel{display:none;animation:fadeIn .2s ease}
+.head-tabpanel.active{display:block}
+@media(max-width:640px){.head-nav button{min-width:100%}}
 </style>
 </head>
 <body>
@@ -12606,6 +12859,15 @@ textarea{resize:vertical}
 <!-- ── Status da publicação ── -->
 <div id="status-pub" class="info-box" style="margin-bottom:18px;display:none"></div>
 
+<!-- ══ ABAS DE TOPO ══════════════════════════════════════════════════════════ -->
+<div class="head-nav" id="head-nav">
+  <button class="active" data-ht="cenario" onclick="headTab('cenario',this)">🌐 Cenário Macro<span class="ht-sub">Carta da gestora · base de tudo</span></button>
+  <button data-ht="recom" onclick="headTab('recom',this)">⭐ Recomendações do Mês<span class="ht-sub">Alocações · produtos · calls · carteira</span></button>
+  <button data-ht="base" onclick="headTab('base',this)">📚 Base de Conhecimento<span class="ht-sub">Uploads · acervo de cartas</span></button>
+</div>
+
+<div class="head-tabpanel active" id="ht-cenario">
+
 <!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>🌐</span> Cenário Macro</div>
@@ -12628,33 +12890,35 @@ textarea{resize:vertical}
   </div>
 </div>
 
-<!-- ══ 2. UPLOAD RÁPIDO ═══════════════════════════════════════════════════════ -->
-<div class="card" style="border-color:#3A3A20">
-  <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
-      <span style="font-size:11px;color:#2A5A3A">Carteiras recomendadas, produtos e material sobre ativos → <b style="color:#D4B483">Base de Conhecimento</b></span>
-    </div>
-    <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
+<!-- ══ VISÃO DOS GESTORES (material da carta) ═════════════════════════════════ -->
+<div class="card" style="border-color:#1A2E3A">
+  <div class="card-title" style="color:#8BCFEF"><span>🧭</span> Visão dos Gestores — Consenso da Carta</div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <span style="font-size:11px;color:#2A5A3A">Extraído da carta atual. Embasa os textos acima e chega ao assessor no sistema dele.</span>
+    <span id="vg-ref" style="font-size:10px;color:#8BCFEF;background:#0A1A24;border:1px solid #1A2E3A;border-radius:10px;padding:3px 10px;margin-left:auto"></span>
   </div>
-  <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
-    style="border:2px dashed #2A4A2A;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
-    onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
-    <div style="font-size:26px;margin-bottom:8px">📂</div>
-    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
-    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Carteiras recomendadas Levante / XP, relatórios, material sobre ativos</div>
+
+  <!-- Tese central -->
+  <div id="vg-tese" style="display:none;background:#060C10;border:1px solid #1A2E3A;border-left:3px solid #8BCFEF;border-radius:8px;padding:12px 14px;margin-bottom:16px">
+    <div style="font-size:10px;color:#5A7A8A;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:5px">Tese central</div>
+    <div id="vg-tese-txt" style="font-size:12px;color:#CFE3EF;line-height:1.55"></div>
   </div>
-  <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
-    <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Arquivos selecionados — <span id="pdf-rapido-contador">0</span></div>
-    <div id="pdf-rapido-lista"></div>
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1A2A1A;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">📤 Subir para a Memória</button>
-      <button class="btn-ghost" onclick="document.getElementById('pdf-rapido').click()" style="font-size:11px;padding:6px 14px">+ Adicionar mais</button>
-      <span id="rapido-upload-st" style="font-size:11px;color:#5DCAA5;margin-left:auto"></span>
-    </div>
-  </div>
+
+  <!-- Alertas de convergência -->
+  <div id="vg-alertas" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px"></div>
+
+  <!-- Cards por gestor -->
+  <div id="vg-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+
+  <!-- Posicionamento da carta -->
+  <div id="vg-posic" style="display:none;margin-top:16px;background:#060C08;border:1px solid #1A2E1A;border-radius:8px;padding:14px 16px"></div>
+
+  <div id="vg-vazio" style="font-size:11px;color:#2A5A3A;text-align:center;padding:18px;display:none">Nenhuma carta processada ainda — suba a carta no topo para popular a visão dos gestores.</div>
 </div>
+
+</div><!-- /ht-cenario -->
+
+<div class="head-tabpanel" id="ht-recom">
 
 <!-- ══ 3. ALOCAÇÕES DE REFERÊNCIA ════════════════════════════════════════════ -->
 <div class="card">
@@ -12997,6 +13261,38 @@ textarea{resize:vertical}
   <div id="cb-categorias"></div>
 </div>
 
+</div><!-- /ht-recom -->
+
+<div class="head-tabpanel" id="ht-base">
+
+<!-- ══ UPLOAD RÁPIDO ═══════════════════════════════════════════════════════════ -->
+<div class="card" style="border-color:#3A3A20">
+  <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
+      <span style="font-size:11px;color:#2A5A3A">Carteiras recomendadas, produtos e material sobre ativos → <b style="color:#D4B483">Base de Conhecimento</b></span>
+    </div>
+    <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
+  </div>
+  <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
+    style="border:2px dashed #2A4A2A;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
+    onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
+    <div style="font-size:26px;margin-bottom:8px">📂</div>
+    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
+    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Carteiras recomendadas Levante / XP, relatórios, material sobre ativos</div>
+  </div>
+  <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
+    <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Arquivos selecionados — <span id="pdf-rapido-contador">0</span></div>
+    <div id="pdf-rapido-lista"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1A2A1A;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">📤 Subir para a Memória</button>
+      <button class="btn-ghost" onclick="document.getElementById('pdf-rapido').click()" style="font-size:11px;padding:6px 14px">+ Adicionar mais</button>
+      <span id="rapido-upload-st" style="font-size:11px;color:#5DCAA5;margin-left:auto"></span>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 6. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
 <div class="card" style="border-color:#2A2A18">
   <div class="card-title"><span>📚</span> Base de Conhecimento — Cartas de Gestores</div>
@@ -13070,6 +13366,8 @@ textarea{resize:vertical}
 .know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 </style>
 
+</div><!-- /ht-base -->
+
 <!-- ══ PUBLICAR ══════════════════════════════════════════════════════════════ -->
 <div class="publish-bar" id="publish-bar">
   <!-- Barra de progresso (oculta por padrão) -->
@@ -13099,6 +13397,25 @@ textarea{resize:vertical}
   }
 })();
 function sair(){ localStorage.removeItem("brauna_role"); window.location.replace("/"); }
+
+// ── Abas de topo ──────────────────────────────────────────────────────────────
+function headTab(name, btn){
+  document.querySelectorAll('.head-tabpanel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById('ht-'+name);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll('#head-nav button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else { const b=document.querySelector('#head-nav button[data-ht="'+name+'"]'); if(b) b.classList.add('active'); }
+  try{ localStorage.setItem('brauna_head_tab', name); }catch(_){}
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+// Restaura a última aba aberta
+(function(){
+  try{
+    const t = localStorage.getItem('brauna_head_tab');
+    if(t && document.getElementById('ht-'+t)) headTab(t);
+  }catch(_){}
+})();
 
 // ── Publicar pendente ─────────────────────────────────────────────────────────
 function marcarPendente(){
@@ -13170,10 +13487,12 @@ const TIPOS_IN = ["ETF","BDR","Ação","Fundo","COE","Outro"];
 // ── Portfólio Modelo — renderizar tabela ──────────────────────────────────────
 function renderPortoTable(data){
   _portfolios = data;
-  document.getElementById("porto-ref").value = data.referencia || "";
-  document.getElementById("porto-badge").textContent = data.referencia || "";
-
   const tbody = document.getElementById("porto-body");
+  // A tabela de Portfólios Modelo pode não estar presente nesta página —
+  // guarda para não abortar o restante do init (carregarCenario etc.).
+  if(!tbody) return;
+  const refEl = document.getElementById("porto-ref");   if(refEl)   refEl.value = data.referencia || "";
+  const badge = document.getElementById("porto-badge"); if(badge)   badge.textContent = data.referencia || "";
   tbody.innerHTML = "";
 
   CLASSES.forEach(cls=>{
@@ -13246,6 +13565,72 @@ function carregarCenario(data){
   document.getElementById("cenario-brasil").value = data.brasil || "";
   document.getElementById("cenario-pos").value    = data.posicionamento || "";
   document.getElementById("cenario-ref").value    = data.referencia || "";
+  renderVisaoGestores(data);
+}
+
+// ── Visão dos Gestores (material da carta) ────────────────────────────────────
+function _esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function renderVisaoGestores(data){
+  const gestores = data.visao_gestores || [];
+  const alertas  = data.alertas_especiais || [];
+  const posic    = data.posicionamento_carta || {};
+  const cards = document.getElementById("vg-cards");
+  const elAl  = document.getElementById("vg-alertas");
+  const elPos = document.getElementById("vg-posic");
+  const elVaz = document.getElementById("vg-vazio");
+  const elRef = document.getElementById("vg-ref");
+  const elTe  = document.getElementById("vg-tese");
+  if(!cards) return;
+
+  // Referência da carta
+  const ref = [data.gestor_principal, data.carta_ref].filter(Boolean).join("  ·  ");
+  if(elRef) elRef.textContent = ref ? "📩 " + ref : "";
+
+  // Tese central
+  if(elTe){
+    if(data.tese_central){ document.getElementById("vg-tese-txt").textContent = data.tese_central; elTe.style.display=""; }
+    else elTe.style.display="none";
+  }
+
+  // Alertas de convergência (⚠️ risco / ✅ oportunidade)
+  if(elAl){
+    elAl.innerHTML = alertas.map(a=>{
+      const ok = String(a).trim().startsWith("✅");
+      const cor = ok ? "#5DCAA5" : "#E8A87C";
+      const bg  = ok ? "#081A12" : "#1A140A";
+      const bd  = ok ? "#1A3A28" : "#3A2E14";
+      return `<div style="font-size:11.5px;color:${cor};background:${bg};border:1px solid ${bd};border-radius:7px;padding:8px 11px;line-height:1.45">${_esc(a)}</div>`;
+    }).join("");
+  }
+
+  // Cards por gestor
+  cards.innerHTML = gestores.map(g=>`
+    <div style="background:#060C10;border:1px solid #1A2E3A;border-radius:9px;padding:13px 14px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <span style="font-size:12.5px;font-weight:700;color:#CFE3EF">${_esc(g.gestor)}</span>
+      </div>
+      <div style="font-size:10px;color:#8BCFEF;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:7px">${_esc(g.tema)}</div>
+      <div style="font-size:11.5px;color:#AAB8C2;line-height:1.5;margin-bottom:8px">${_esc(g.mensagem)}</div>
+      ${g.implicacao_alocacao ? `<div style="font-size:11px;color:#D4B483;line-height:1.45;border-top:1px solid #14222C;padding-top:7px"><b style="color:#C9A96E">→ Alocação:</b> ${_esc(g.implicacao_alocacao)}</div>` : ""}
+      ${g.fonte ? `<div style="font-size:9.5px;color:#3A5A6A;margin-top:7px">${_esc(g.fonte)}</div>` : ""}
+    </div>`).join("");
+
+  // Posicionamento da carta
+  if(elPos){
+    const rac = Array.isArray(posic.racionais) ? posic.racionais : [];
+    if(posic.mudanca_junho || rac.length){
+      elPos.style.display="";
+      elPos.innerHTML = `
+        <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:7px">📌 Posicionamento da carta — o que mudou</div>
+        ${posic.mudanca_junho ? `<div style="font-size:12px;color:#CFE3D6;line-height:1.5;margin-bottom:${rac.length?"10px":"0"}">${_esc(posic.mudanca_junho)}</div>` : ""}
+        ${rac.length ? `<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">${rac.map(r=>`<li style="font-size:11px;color:#8FB8A0;line-height:1.4">${_esc(r)}</li>`).join("")}</ul>` : ""}`;
+    } else elPos.style.display="none";
+  }
+
+  // Estado vazio
+  const vazio = !gestores.length && !alertas.length && !data.tese_central;
+  if(elVaz) elVaz.style.display = vazio ? "" : "none";
+  cards.style.display = gestores.length ? "grid" : "none";
 }
 
 function coletarCenario(){
