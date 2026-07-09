@@ -2027,12 +2027,16 @@ select option{background:#1A1A1A}
 </style>
 </head>
 <body>
+<style>@keyframes mktscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}</style>
 <header>
-  <div>
+  <div style="flex-shrink:0">
     <h1>BRAÚNA INVESTIMENTOS</h1>
-    <p>Análise de Alocação por Indexador · Modelo Levante Asset</p>
+    <p>Análise de Alocação por Indexador</p>
   </div>
-  <nav style="display:flex;gap:8px;align-items:center" id="nav-assessor">
+  <div id="mkt-ticker" style="flex:1;min-width:0;overflow:hidden;white-space:nowrap;margin:0 8px" title="Últimas do mercado">
+    <div id="mkt-ticker-inner" style="display:inline-block;white-space:nowrap;will-change:transform;font-size:12px;color:#C9A96E"></div>
+  </div>
+  <nav style="display:flex;gap:8px;align-items:center;flex-shrink:0" id="nav-assessor">
     <!-- Sino de notificações -->
     <div style="position:relative;cursor:pointer" id="notif-btn" onclick="toggleNotifPanel()" title="Alertas do Head de Produtos">
       <span style="font-size:20px">🔔</span>
@@ -2970,6 +2974,21 @@ function carregarStockGuide(tentativa){
     .catch(function(){ if(tentativa<3) setTimeout(function(){ carregarStockGuide(tentativa+1); }, 4000); });
 }
 carregarStockGuide();
+
+// Ticker de mercado no topo (índices/câmbio + macro), rodando continuamente
+function carregarTickerMercado(){
+  fetch("/api/mercado-ticker").then(r=>r.json()).then(d=>{
+    var itens=(d&&d.itens)||[]; var inner=document.getElementById("mkt-ticker-inner");
+    if(!inner||!itens.length) return;
+    var sep=' <span style="color:#3A6A48;margin:0 16px">•</span> ';
+    var seq=itens.join(sep);
+    inner.innerHTML=seq+sep+seq;   // duplicado para loop contínuo
+    var dur=Math.max(24, itens.length*7);
+    inner.style.animation="mktscroll "+dur+"s linear infinite";
+  }).catch(function(){});
+}
+carregarTickerMercado();
+setInterval(carregarTickerMercado, 600000);
 
 // Retornos por classe (cadastrados pela liderança) — base do comparativo de rentabilidade
 var _retornosClasse = {classes:{}, _meta:{}, atualizado_em:""};
@@ -5874,6 +5893,50 @@ def clientes_resumo():
     lista.sort(key=lambda c: (c.get("perfil", ""), (c.get("nome", "") or c.get("conta", "")).lower()))
     return jsonify({"total": len(lista), "clientes": lista,
                     "desenquadrados": sum(1 for c in lista if c["desenquadrado"])})
+
+@app.route("/api/mercado-ticker", methods=["GET"])
+def mercado_ticker():
+    """Últimas do mercado para o ticker do topo: índices/câmbio (Yahoo Finance)
+    + macro (BCB). Cacheado em memória por 10 min."""
+    import time as _t, urllib.request as _ur, json as _j
+    cache = mercado_ticker.__dict__.setdefault("_cache", {"ts": 0, "itens": []})
+    if cache["itens"] and (_t.time() - cache["ts"] < 600):
+        return jsonify({"itens": cache["itens"]})
+
+    itens = []
+    HEAD = {"User-Agent": "Mozilla/5.0 (compatible; Brauna/1.0)", "Accept": "application/json"}
+    ativos = [("^BVSP","Ibovespa","idx"),("USDBRL=X","Dólar","brl"),
+              ("^GSPC","S&P 500","idx"),("BTC-USD","Bitcoin","usd")]
+    def _milhar(v):
+        return f"{v:,.0f}".replace(",", ".")
+    for sym, nome, tipo in ativos:
+        try:
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?range=1d&interval=1d"
+            with _ur.urlopen(_ur.Request(url, headers=HEAD), timeout=5) as r:
+                raw = _j.loads(r.read().decode("utf-8"))
+            meta = raw["chart"]["result"][0]["meta"]
+            prc  = meta.get("regularMarketPrice") or meta.get("chartPreviousClose")
+            prev = meta.get("previousClose") or meta.get("chartPreviousClose") or prc
+            if not prc:
+                continue
+            var  = round((prc/prev - 1)*100, 2) if prev else 0.0
+            seta = "▲" if var >= 0 else "▼"
+            if tipo == "brl":  val = f"R$ {prc:.2f}".replace(".", ",")
+            elif tipo == "usd": val = f"US$ {_milhar(prc)}"
+            else:               val = _milhar(prc)
+            var_txt = f"{abs(var):.2f}".replace(".", ",")
+            itens.append(f"{nome} {val} {seta} {var_txt}%")
+        except Exception:
+            continue
+    try:
+        m = buscar_macro_bcb()
+        if m.get("selic_meta"): itens.append(f"Selic {m['selic_meta']:.2f}%".replace(".", ","))
+        if m.get("ipca_12m"):   itens.append(f"IPCA 12M {m['ipca_12m']:.2f}%".replace(".", ","))
+    except Exception:
+        pass
+    if itens:
+        cache["itens"] = itens; cache["ts"] = _t.time()
+    return jsonify({"itens": itens or cache["itens"]})
 
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
