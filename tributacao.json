@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "titulo": "Módulo de Tributação Líquida — base para comparar produtos pelo retorno no bolso do cliente",
+    "principio": "Nunca comparar taxa bruta/DY/retorno nominal. Comparar SEMPRE retorno líquido ajustado por prazo, liquidez e risco.",
+    "pergunta_central": "Quanto sobra no bolso do cliente depois de imposto, prazo, risco e liquidez?",
+    "formulas": {
+      "retorno_liquido": "liquido = bruto * (1 - aliquota_ir)",
+      "gross_up": "equivalente_bruto = taxa_isenta / (1 - aliquota_ir)",
+      "obs": "IR incide sobre o RENDIMENTO, não sobre o principal."
+    }
+  },
+  "ir_regressiva_rf": {
+    "aplica_a": ["CDB", "RDB", "Tesouro Direto", "debêntures comuns", "letras financeiras", "fundos RF tributáveis", "fundos multimercado tributáveis", "fundos cambiais", "compromissadas"],
+    "faixas": [
+      {"ate_dias": 180, "aliquota": 0.225},
+      {"de_dias": 181, "ate_dias": 360, "aliquota": 0.20},
+      {"de_dias": 361, "ate_dias": 720, "aliquota": 0.175},
+      {"acima_dias": 720, "aliquota": 0.15}
+    ],
+    "regra": "Quanto maior o prazo, menor a alíquota. Mesma taxa bruta gera líquidos muito diferentes por prazo."
+  },
+  "iof_curto_prazo": {
+    "regra": "Regressivo sobre o rendimento em resgates com menos de 30 dias; zera no 30º dia.",
+    "uso": "Dinheiro usável em <30 dias deve ficar em produto de liquidez imediata. Nunca comparar aplicação de 10 dias com 2 anos pela taxa bruta."
+  },
+  "come_cotas": {
+    "descricao": "Antecipação semestral de IR (últimos dias úteis de maio e novembro) em certos fundos abertos.",
+    "sujeitos": ["fundos RF", "fundos DI", "multimercado", "cambiais", "crédito privado abertos", "exclusivos (conforme lei)"],
+    "aliquotas": {"longo_prazo": 0.15, "curto_prazo": 0.20},
+    "no_resgate": "Recolhe diferença entre o antecipado e a alíquota final por prazo (tabela regressiva).",
+    "impacto": "Reduz juros compostos por antecipar imposto. Considerar ao comparar com previdência/FII/fechado/isento.",
+    "nao_sujeitos": ["fundos de ações", "FIIs", "Fiagros", "ETFs", "previdência", "FIPs", "FIDCs fechados (conforme estrutura)"]
+  },
+  "fundos_acoes": {"ir": 0.15, "base": "ganho no resgate", "come_cotas": false, "obs": "Sem come-cotas pode ser mais eficiente no longo prazo; vantagem fiscal não compensa estratégia ruim."},
+  "fii": {
+    "rendimento_pf": "isento se: negociado em bolsa/mercado organizado, >50 cotistas e cotista PF <10% das cotas/rendimentos",
+    "ganho_capital": 0.20,
+    "obs": "DY isento NÃO se compara direto com cupom tributável sem gross-up. Tem risco de mercado/vacância/crédito/marcação."
+  },
+  "fiagro": {
+    "rendimento_pf": "isento se: cotas admitidas à negociação em bolsa/balcão organizado e >=50 cotistas (limite ~10% por PF)",
+    "ganho_capital": "tributado (regra geral)",
+    "riscos": ["crédito agro", "safra", "clima", "garantias", "liquidez", "concentração", "inadimplência", "regulatório"]
+  },
+  "isentos_pf": {
+    "produtos": ["LCI", "LCA", "CRI", "CRA", "debênture incentivada de infraestrutura", "poupança"],
+    "fgc": {"tem": ["LCI", "LCA"], "nao_tem": ["CRI", "CRA", "debênture incentivada"]},
+    "regra": "Isenção muda a comparação (usar gross-up), mas isenção ≠ ausência de risco. Aprovar pelo risco.",
+    "exemplo": "LCI 90% CDI a 720+ dias (IR 15%) ≡ 90%/(1-0.15) = 105,88% CDI bruto equivalente."
+  },
+  "previdencia": {
+    "pgbl": {"deduz": "até 12% da renda bruta tributável", "condicao": "declaração completa", "ir_resgate": "sobre o valor TOTAL"},
+    "vgbl": {"deduz": false, "ir_resgate": "somente sobre os RENDIMENTOS", "uso": "declaração simplificada / já usou 12% / sucessão"},
+    "regime_regressivo": [
+      {"ate_anos": 2, "aliquota": 0.35},
+      {"de_anos": 2, "ate_anos": 4, "aliquota": 0.30},
+      {"de_anos": 4, "ate_anos": 6, "aliquota": 0.25},
+      {"de_anos": 6, "ate_anos": 8, "aliquota": 0.20},
+      {"de_anos": 8, "ate_anos": 10, "aliquota": 0.15},
+      {"acima_anos": 10, "aliquota": 0.10}
+    ],
+    "regime_regressivo_obs": "Alíquota conta o prazo de CADA aporte, não a abertura do plano. Ideal p/ >10 anos (10%).",
+    "regime_progressivo_2026": {"faixas_aliquota": [0, 0.075, 0.15, 0.225, 0.275], "obs": "Segue tabela mensal IRPF; retenção na fonte + ajuste na declaração."},
+    "lei_14803_2024": "Escolha do regime (progressivo/regressivo) pode ser feita no momento do benefício ou do 1º resgate — não mais só na contratação. Revisar antes do 1º resgate.",
+    "regra": "Previdência ruim não se justifica pelo benefício fiscal: taxa alta/gestão fraca destroem o diferimento."
+  },
+  "exterior": {
+    "lei": "Lei 14.754/2023 + IN RFB 2.180/2024, a partir de 01/01/2024",
+    "aliquota": 0.15,
+    "apuracao": "ANUAL na Declaração de Ajuste (DAA), alíquota única 15% sobre o lucro CONSOLIDADO de aplicações financeiras no exterior.",
+    "abrange": ["dividendos", "juros", "cupons de bonds/treasuries", "ganho de capital", "rendimentos de aplicações financeiras", "lucros de controladas estrangeiras (offshore) quando aplicável"],
+    "fim_isencao_35k": "A isenção de ganho de capital para vendas <= R$ 35 mil/mês NÃO se aplica mais a aplicações financeiras no exterior.",
+    "compensacao_prejuizo": "Prejuízos realizados no exterior compensam ganhos de outras aplicações no exterior (e lucros de controladas); excedente carrega para anos seguintes. Controlar por ativo/ano.",
+    "conversao": "Tudo apurado em REAIS: custo pela PTAX de compra na data da compra, venda pela PTAX na data da venda — a variação cambial fica embutida no resultado.",
+    "cambio_conta": "Conta corrente NÃO remunerada no exterior: variação cambial ISENTA, mas saldo em 31/12 deve ser declarado em Bens e Direitos (PTAX compra do último dia). Conta remunerada / com aplicação automática: apurar rendimento.",
+    "imposto_exterior": "Imposto retido na fonte no exterior (ex.: dividendos EUA) pode ser compensado no Brasil dentro dos limites (reciprocidade), convertido pela PTAX de compra do dia do pagamento — não elimina a obrigação de declarar no Brasil.",
+    "informe": "Priorizar o informe Mycapital/XP (já traz valores calculados p/ o IRPF); conferir ativos, posição 31/12, rendimentos, imposto pago. Não substituir contador em casos complexos.",
+    "regra": "Rendimento em dólar NÃO é isenção. Ganho apurado em reais. Nunca usar a regra dos 35k como vigente para aplicações financeiras no exterior."
+  },
+  "checklist": [
+    "Tributado ou isento?",
+    "IR sobre rendimento ou valor total?",
+    "Qual alíquota / tem tabela regressiva?",
+    "Tem come-cotas? Tem IOF?",
+    "Isenção depende de requisitos (FII/Fiagro/incentivada)?",
+    "Tem IR no ganho de capital?",
+    "Tem diferimento fiscal (previdência)?",
+    "Cliente declara completo ou simplificado? Tem renda tributável? Já usa 12% do PGBL?",
+    "O prazo permite menor alíquota?",
+    "O benefício fiscal compensa risco, liquidez e taxas?",
+    "A comparação foi feita no LÍQUIDO e ajustada por risco/prazo/liquidez?"
+  ],
+  "fontes": ["Receita Federal (tabela regressiva RF/fundos LP, dedução previdência 12%, come-cotas 15%)", "B3 (isenção FII >50 cotistas/<10%; Fiagro)", "CVM (Fiagro PF)", "SUSEP / Lei 14.803/2024"]
+}

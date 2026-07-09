@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "titulo": "Módulo FGC — alerta de estouro atual E futuro (principal + juros projetados)",
+    "principio": "Estar dentro do limite hoje não basta. Projetar exposição até o vencimento (principal + juros) por conglomerado e sinalizar estouro futuro.",
+    "frase_central": "O bom alocador sabe se o cliente vai ultrapassar o limite no futuro e quanto ainda pode aportar ou deve reduzir.",
+    "conexao": "CDI_estimado / IPCA_estimado vêm do snapshot de curva (snapshot-curvas-juros); custo de saída usa tributacao.json."
+  },
+  "limites": {
+    "por_conglomerado": 250000,
+    "global_cpf_cnpj": 1000000,
+    "janela_global_anos": 4,
+    "regra_conglomerado": "Limite é por INSTITUIÇÃO ou CONGLOMERADO financeiro (somar emissores do mesmo grupo)."
+  },
+  "elegibilidade": {
+    "tem_fgc": ["CDB", "RDB", "LCI", "LCA", "LC", "poupança", "letra de câmbio"],
+    "sem_fgc": ["CRI", "CRA", "debênture", "debênture incentivada", "Tesouro Direto", "fundos", "FII", "Fiagro", "ações"],
+    "obs": "Tesouro Direto não tem FGC mas é risco soberano (não alertar como desprotegido da mesma forma)."
+  },
+  "projecao_valor_vencimento": {
+    "convencao": "juros compostos em dias úteis: ^(dias_uteis_ate_vencimento / 252)",
+    "prefixado": "valor_atual * (1 + taxa_aa) ^ (du/252)",
+    "pct_cdi": "valor_atual * (1 + CDI_estimado * pct_cdi) ^ (du/252)",
+    "cdi_mais_spread": "valor_atual * (1 + CDI_estimado + spread) ^ (du/252)",
+    "ipca_mais_real": "valor_atual * (1 + IPCA_estimado + taxa_real) ^ (du/252)",
+    "juros_periodicos_sem_reinvest": "valor_projetado_fgc = principal + juros_acumulados_nao_pagos",
+    "juros_periodicos_com_reinvest_mesmo_emissor": "principal + juros_acumulados + juros_reinvestidos_projetados",
+    "sem_dados": "NÃO inventar. status = 'DADOS INSUFICIENTES' / 'Projeção incompleta — dados insuficientes.'"
+  },
+  "formulas": {
+    "exposicao_atual": "soma(valor_atual dos produtos com FGC no mesmo conglomerado)",
+    "exposicao_projetada": "soma(valor_projetado_no_vencimento dos produtos com FGC no mesmo conglomerado)",
+    "margem_atual": "250000 - exposicao_atual",
+    "margem_futura": "250000 - exposicao_projetada",
+    "excesso_atual": "max(0, exposicao_atual - 250000)",
+    "excesso_futuro": "max(0, exposicao_projetada - 250000)",
+    "aporte_maximo_hoje": "max(0, 250000 - exposicao_projetada)",
+    "valor_a_retirar_hoje": "max(0, exposicao_atual - 250000)",
+    "valor_a_reduzir_venc": "max(0, exposicao_projetada - 250000)",
+    "valor_minimo_a_reduzir": "max(excesso_atual, excesso_futuro)",
+    "limite_global_disponivel": "1000000 - valor_fgc_recebido_ultimos_4_anos"
+  },
+  "status": {
+    "OK": "exposicao_atual e exposicao_projetada < 250000",
+    "ATENCAO": "exposicao_projetada > 225000 OU margem_futura < 10% do limite (25000)",
+    "ESTOURO_FUTURO": "exposicao_atual <= 250000 E exposicao_projetada > 250000",
+    "ESTOURO_ATUAL": "exposicao_atual > 250000",
+    "SEM_FGC": "produto não elegível ao FGC",
+    "DADOS_INSUFICIENTES": "faltam dados para projetar"
+  },
+  "campos_base": ["cliente", "cpf_cnpj", "instituicao_emissora", "conglomerado", "produto", "tipo_produto", "possui_FGC", "data_aplicacao", "data_vencimento", "prazo_dias", "taxa_bruta", "indexador", "valor_aplicado", "valor_atual", "juros_acumulados", "juros_projetados_ate_vencimento", "valor_projetado_no_vencimento", "exposicao_atual_por_conglomerado", "exposicao_projetada_por_conglomerado", "limite_FGC_por_conglomerado", "margem_atual_FGC", "margem_futura_FGC", "excesso_atual_FGC", "excesso_futuro_FGC", "aporte_maximo_hoje", "valor_a_retirar_hoje", "status_FGC", "alerta", "acao_recomendada"],
+  "ressalvas_resgate": ["liquidez", "carência", "marcação a mercado", "IR", "IOF", "spread de venda", "perda de taxa contratada", "custo de oportunidade de realocação"],
+  "alerta_padrao_estouro": "Há exposição acima do limite de cobertura do FGC. O valor excedente não conta com a garantia ordinária do FGC e deve ser tratado como risco direto do emissor/conglomerado. Antes de qualquer resgate ou realocação, avaliar liquidez, carência, tributação, marcação a mercado e custo de oportunidade.",
+  "saida_esperada": {
+    "tabela_por_conglomerado": ["Cliente", "Conglomerado", "Valor atual", "Valor projetado", "Limite FGC", "Margem atual", "Margem futura", "Excesso atual", "Excesso futuro", "Aporte máximo", "Valor a reduzir", "Status"],
+    "tabela_por_produto": ["Cliente", "Produto", "Emissor", "Conglomerado", "Valor atual", "Valor projetado", "Tem FGC?", "Vencimento", "Taxa", "Status", "Alerta"],
+    "resumo_executivo": ["dentro do limite", "próximos do limite", "já ultrapassaram", "ultrapassarão até o vencimento", "excedente atual total", "excedente futuro total", "total a reduzir/realocar", "conglomerados mais concentrados", "produtos sem FGC relevantes", "próximas ações"]
+  }
+}

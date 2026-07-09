@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "titulo": "Base de Fundos Cetipados — Renda, Diversificação e Estratégias Estruturadas",
+    "descricao": "Fundos cujas cotas são registradas/negociadas no balcão organizado da B3 (herança Cetip). 'Cetipado' é característica operacional/de negociação, NÃO classe regulatória. Podem ser FII, Fiagro, FIDC, FIP, FI-Infra, etc.",
+    "nota_uso": "DY NUNCA é promessa de retorno. Sempre citar risco de liquidez (balcão). Menor volatilidade aparente ≠ menor risco. Sempre avaliar suitability.",
+    "total_fundos": 26,
+    "dy_medio_aa": 11.97,
+    "taxa_adm_media_aa": 1.22,
+    "distribuicao_indexador_media": {"CDI": 48.0, "IPCA": 44.2, "FIIs": 4.6, "FIIs_Equity": 2.2, "Pre": 0.9},
+    "categorias": {
+      "Fundos Imobiliários": {"qtd": 9, "dy_medio_aa": 12.41, "taxa_adm_media_aa": 1.26},
+      "Hedge Funds":        {"qtd": 4, "dy_medio_aa": 12.26, "taxa_adm_media_aa": 1.20},
+      "Fiagros":            {"qtd": 7, "dy_medio_aa": 10.83, "taxa_adm_media_aa": 1.13},
+      "FII Infra":          {"qtd": 6, "dy_medio_aa": 12.45, "taxa_adm_media_aa": 1.31}
+    }
+  },
+  "classificacao_funcao": {
+    "nucleo_cdi": {
+      "tese": "Carrego pós-fixado em juros elevados; menor duration e menor sensibilidade à abertura de juros reais.",
+      "tickers": ["AVBI11", "AZPR11", "CPAC11", "KJNT11", "PAAG11", "AZQI11", "VICA11", "AZQA11", "JGPT11", "XPAG11"]
+    },
+    "nucleo_ipca": {
+      "tese": "Proteção inflacionária e renda real; aceita maior sensibilidade à curva de juros reais.",
+      "tickers": ["TGRI11", "TGRE11", "XPHB11", "CYHF11", "PIER11", "RBRJ11", "NFIP11", "VGIE11"]
+    },
+    "nucleo_hibrido": {
+      "tese": "Combina carrego, inflação e diversificação em estrutura flexível.",
+      "tickers": ["MARF11", "RZDS11", "MCCE11", "XPHF11", "IMOV11", "JGPI11"]
+    },
+    "nucleo_tatico": {
+      "tese": "Prêmio adicional via FIIs/Equity; aceita mais volatilidade e risco de marcação.",
+      "tickers": ["VGPR11", "CPHF11", "IMOV11", "XPHF11"]
+    }
+  },
+  "riscos_chave": [
+    "Liquidez (principal): negociação em balcão depende de contraparte e secundário — pode faltar comprador na saída.",
+    "Crédito: CRIs/CRAs/debêntures/FIDCs — avaliar devedores, garantias, ratings, covenants, subordinação, concentração.",
+    "Mercado: juros, inflação, spreads, FIIs/equity, curva NTN-B/DI.",
+    "Marcação: patrimônio varia mesmo sem cotação diária em tela — ausência de volatilidade visível não elimina risco.",
+    "Concentração: poucos ativos/devedores/projetos ou setor único.",
+    "Duration: fundos IPCA (infra/crédito longo) sofrem mais na abertura de juros reais.",
+    "Regulatório: Fiagro, FII Infra, crédito privado e tratamento tributário específico.",
+    "Governança: gestor, administrador, custodiante, auditor, partes relacionadas, transparência."
+  ],
+  "linguagem_cliente": {
+    "o_que_e": "Fundos cetipados são negociados no balcão organizado da B3. Dão acesso a crédito, imobiliário, agro e infraestrutura, mas não funcionam como CDB ou fundo DI. O principal cuidado é a liquidez: pode não ser fácil vender a cota antes do prazo. Entram só na parte da carteira que não será usada no curto prazo.",
+    "sobre_risco": "Ser cetipado não torna o investimento automaticamente seguro. A segurança depende da qualidade dos ativos, estrutura, garantias, gestor e adequação ao perfil.",
+    "sobre_dy": "O rendimento apresentado é referência/histórico, não promessa. Antes de investir olhamos carteira, riscos, liquidez, prazo e consistência dos pagamentos."
+  },
+  "fundos": [
+    {"categoria": "Fundos Imobiliários", "ticker": "TGRI11", "exposicao": {"IPCA": 100}, "dy_aa": 12.31, "taxa_adm_aa": 1.5, "funcao": "nucleo_ipca", "leitura": "Fundo 100% IPCA. Perfil de proteção inflacionária e renda real."},
+    {"categoria": "Fundos Imobiliários", "ticker": "AVBI11", "exposicao": {"CDI": 100}, "dy_aa": 13.20, "taxa_adm_aa": 1.1, "funcao": "nucleo_cdi", "leitura": "Fundo 100% CDI. Perfil de carrego pós-fixado."},
+    {"categoria": "Fundos Imobiliários", "ticker": "MARF11", "exposicao": {"CDI": 66.7, "IPCA": 23.2, "FIIs": 10.1}, "dy_aa": 12.00, "taxa_adm_aa": 1.2, "funcao": "nucleo_hibrido", "leitura": "Fundo híbrido com predominância CDI, exposição complementar a IPCA e FIIs."},
+    {"categoria": "Fundos Imobiliários", "ticker": "RZDS11", "exposicao": {"IPCA": 55.4, "CDI": 44.6}, "dy_aa": 14.40, "taxa_adm_aa": 1.25, "funcao": "nucleo_hibrido", "leitura": "Fundo híbrido entre IPCA e CDI. Um dos maiores DYs da base."},
+    {"categoria": "Fundos Imobiliários", "ticker": "MCCE11", "exposicao": {"IPCA": 65, "CDI": 35}, "dy_aa": 11.50, "taxa_adm_aa": 1.0, "funcao": "nucleo_hibrido", "leitura": "Fundo com predominância IPCA e parcela CDI. Taxa competitiva."},
+    {"categoria": "Fundos Imobiliários", "ticker": "TGRE11", "exposicao": {"IPCA": 100}, "dy_aa": 12.31, "taxa_adm_aa": 1.5, "funcao": "nucleo_ipca", "leitura": "Fundo 100% IPCA. Perfil de proteção inflacionária."},
+    {"categoria": "Fundos Imobiliários", "ticker": "VGPR11", "exposicao": {"FIIs/Equity": 57.8, "IPCA": 21.4, "CDI": 20.8}, "dy_aa": 10.90, "taxa_adm_aa": 1.3, "funcao": "nucleo_tatico", "leitura": "Fundo com alta exposição a FIIs/Equity. Mais tático e com maior risco de mercado."},
+    {"categoria": "Fundos Imobiliários", "ticker": "AZPR11", "exposicao": {"CDI": 100}, "dy_aa": 11.80, "taxa_adm_aa": 1.2, "funcao": "nucleo_cdi", "leitura": "Fundo 100% CDI. Perfil de carrego pós-fixado."},
+    {"categoria": "Fundos Imobiliários", "ticker": "XPHB11", "exposicao": {"IPCA": 89.4, "CDI": 10.6}, "dy_aa": 13.23, "taxa_adm_aa": 1.25, "funcao": "nucleo_ipca", "leitura": "Fundo majoritariamente IPCA, com DY elevado dentro da base."},
+    {"categoria": "Hedge Funds", "ticker": "XPHF11", "exposicao": {"IPCA": 59.3, "FIIs": 25.3, "CDI": 15.4}, "dy_aa": 11.14, "taxa_adm_aa": 1.15, "funcao": "nucleo_hibrido", "leitura": "Fundo híbrido, com IPCA dominante e exposição relevante a FIIs."},
+    {"categoria": "Hedge Funds", "ticker": "CYHF11", "exposicao": {"IPCA": 87.5, "FIIs": 10.3, "CDI": 2.2}, "dy_aa": 12.40, "taxa_adm_aa": 1.25, "funcao": "nucleo_ipca", "leitura": "Fundo fortemente indexado ao IPCA, com pequena exposição a FIIs e CDI."},
+    {"categoria": "Hedge Funds", "ticker": "IMOV11", "exposicao": {"IPCA": 47.5, "CDI": 27.3, "FIIs": 25.3}, "dy_aa": 12.81, "taxa_adm_aa": 1.5, "funcao": "nucleo_tatico", "leitura": "Fundo equilibrado entre IPCA, CDI e FIIs. Perfil híbrido e tático."},
+    {"categoria": "Hedge Funds", "ticker": "CPHF11", "exposicao": {"FIIs": 49.9, "IPCA": 40.2, "CDI": 9.9}, "dy_aa": 12.68, "taxa_adm_aa": 0.88, "funcao": "nucleo_tatico", "leitura": "Fundo com maior exposição a FIIs dentro do grupo. Menor taxa de administração da base."},
+    {"categoria": "Fiagros", "ticker": "AZQA11", "exposicao": {"CDI": 87.2, "Pré": 12.8}, "dy_aa": 10.17, "taxa_adm_aa": 1.2, "funcao": "nucleo_cdi", "leitura": "Fiagro predominantemente CDI, com pequena parcela prefixada."},
+    {"categoria": "Fiagros", "ticker": "CPAC11", "exposicao": {"CDI": 100}, "dy_aa": 8.65, "taxa_adm_aa": 1.0, "funcao": "nucleo_cdi", "leitura": "Fiagro 100% CDI. Menor DY da base analisada."},
+    {"categoria": "Fiagros", "ticker": "JGPT11", "exposicao": {"CDI": 89.3, "Pré": 7.7, "IPCA": 3}, "dy_aa": 12.16, "taxa_adm_aa": 1.28, "funcao": "nucleo_cdi", "leitura": "Fiagro majoritariamente CDI, com pequena parcela pré e IPCA."},
+    {"categoria": "Fiagros", "ticker": "VICA11", "exposicao": {"CDI": 98, "IPCA": 2}, "dy_aa": 10.00, "taxa_adm_aa": 1.1, "funcao": "nucleo_cdi", "leitura": "Fiagro quase integralmente CDI."},
+    {"categoria": "Fiagros", "ticker": "KJNT11", "exposicao": {"CDI": 100}, "dy_aa": 11.63, "taxa_adm_aa": 1.15, "funcao": "nucleo_cdi", "leitura": "Fiagro 100% CDI, com DY intermediário."},
+    {"categoria": "Fiagros", "ticker": "PAAG11", "exposicao": {"CDI": 100}, "dy_aa": 12.69, "taxa_adm_aa": 1.15, "funcao": "nucleo_cdi", "leitura": "Fiagro 100% CDI. Maior DY do grupo de Fiagros."},
+    {"categoria": "Fiagros", "ticker": "XPAG11", "exposicao": {"CDI": 80, "IPCA": 20}, "dy_aa": 10.51, "taxa_adm_aa": 1.0, "funcao": "nucleo_cdi", "leitura": "Fiagro com predominância CDI e parcela IPCA."},
+    {"categoria": "FII Infra", "ticker": "AZQI11", "exposicao": {"CDI": 100}, "dy_aa": 15.79, "taxa_adm_aa": 1.25, "funcao": "nucleo_cdi", "leitura": "FII Infra 100% CDI. Maior DY de toda a base."},
+    {"categoria": "FII Infra", "ticker": "JGPI11", "exposicao": {"IPCA": 58, "CDI": 39, "Pré": 3}, "dy_aa": 9.17, "taxa_adm_aa": 1.2, "funcao": "nucleo_hibrido", "leitura": "FII Infra híbrido, com predominância IPCA. Menor DY do grupo."},
+    {"categoria": "FII Infra", "ticker": "PIER11", "exposicao": {"IPCA": 100}, "dy_aa": 12.00, "taxa_adm_aa": 1.5, "funcao": "nucleo_ipca", "leitura": "FII Infra 100% IPCA. Perfil de proteção inflacionária."},
+    {"categoria": "FII Infra", "ticker": "VGIE11", "exposicao": {"IPCA": 79, "CDI": 21}, "dy_aa": 13.33, "taxa_adm_aa": 1.5, "funcao": "nucleo_ipca", "leitura": "FII Infra majoritariamente IPCA, com DY elevado."},
+    {"categoria": "FII Infra", "ticker": "RBRJ11", "exposicao": {"IPCA": 98.5, "CDI": 1.5}, "dy_aa": 12.40, "taxa_adm_aa": 1.1, "funcao": "nucleo_ipca", "leitura": "FII Infra quase integralmente IPCA, com taxa competitiva."},
+    {"categoria": "FII Infra", "ticker": "NFIP11", "exposicao": {"IPCA": 100}, "dy_aa": 12.00, "taxa_adm_aa": 1.3, "funcao": "nucleo_ipca", "leitura": "FII Infra 100% IPCA, voltado à proteção inflacionária."}
+  ]
+}

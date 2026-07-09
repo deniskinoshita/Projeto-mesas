@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "titulo": "SAA — Alocação Estratégica de Referência por perfil (régua de rebalanceamento)",
+    "uso": "Alvo por classe/perfil contra o qual se mede o gap da carteira do cliente. Casa principal = Braúna. Manter em sincronia com a aba 'Alocações de Referência' do sistema.",
+    "perfis": ["super_conservadora", "conservadora", "moderada", "arrojada", "agressiva"],
+    "classes": ["pos_fixado", "inflacao", "pre_fixado", "acoes", "fiis", "multimercado", "internacional", "alternativos", "cripto"],
+    "obs_brauna": "Braúna (Julho/07) adotou os números da Levante para Conservadora/Moderada/Arrojada. Super Conservadora e Agressiva estão VAZIAS (incompletas) — precisam ser definidas pela casa."
+  },
+  "gestoras": {
+    "brauna": {
+      "nome": "Braúna", "ref": "Julho/2026", "casa_principal": true,
+      "nota_completude": "Super Conservadora e Agressiva espelhadas da Levante (decisão Denis, jul/2026) — replicar na aba Alocações de Referência do app.",
+      "perfis": {
+        "super_conservadora": {"pos_fixado": 84, "inflacao": 11, "pre_fixado": 5},
+        "conservadora": {"pos_fixado": 70, "inflacao": 16, "pre_fixado": 7, "multimercado": 3, "internacional": 4},
+        "moderada": {"pos_fixado": 44, "inflacao": 23, "pre_fixado": 10, "acoes": 5, "fiis": 1.5, "multimercado": 6, "internacional": 9, "alternativos": 1, "cripto": 0.5},
+        "arrojada": {"pos_fixado": 28, "inflacao": 28, "pre_fixado": 12, "acoes": 8, "fiis": 2.5, "multimercado": 9.5, "internacional": 10.2, "alternativos": 1, "cripto": 0.8},
+        "agressiva": {"pos_fixado": 13, "inflacao": 31, "pre_fixado": 13, "acoes": 14, "fiis": 3.5, "multimercado": 10.5, "internacional": 13, "alternativos": 1, "cripto": 1}
+      }
+    },
+    "levante": {
+      "nome": "Levante Asset", "ref": "Junho/2026", "casa_principal": false,
+      "perfis": {
+        "super_conservadora": {"pos_fixado": 84, "inflacao": 11, "pre_fixado": 5},
+        "conservadora": {"pos_fixado": 70, "inflacao": 16, "pre_fixado": 7, "multimercado": 3, "internacional": 4},
+        "moderada": {"pos_fixado": 44, "inflacao": 23, "pre_fixado": 10, "acoes": 5, "fiis": 1.5, "multimercado": 6, "internacional": 9, "alternativos": 1, "cripto": 0.5},
+        "arrojada": {"pos_fixado": 28, "inflacao": 28, "pre_fixado": 12, "acoes": 8, "fiis": 2.5, "multimercado": 9.5, "internacional": 10.2, "alternativos": 1, "cripto": 0.8},
+        "agressiva": {"pos_fixado": 13, "inflacao": 31, "pre_fixado": 13, "acoes": 14, "fiis": 3.5, "multimercado": 10.5, "internacional": 13, "alternativos": 1, "cripto": 1}
+      }
+    },
+    "xp": {
+      "nome": "XP", "ref": "Junho/2026", "casa_principal": false,
+      "perfis": {
+        "super_conservadora": {"pos_fixado": 72.5, "inflacao": 12.5, "pre_fixado": 5, "fiis": 2.5, "multimercado": 2.5, "internacional": 5},
+        "conservadora": {"pos_fixado": 72.5, "inflacao": 12.5, "pre_fixado": 5, "fiis": 2.5, "multimercado": 2.5, "internacional": 5},
+        "moderada": {"pos_fixado": 35.5, "inflacao": 22.5, "pre_fixado": 10, "acoes": 5, "fiis": 4, "multimercado": 14, "internacional": 6, "alternativos": 3},
+        "arrojada": {"pos_fixado": 16, "inflacao": 27.5, "pre_fixado": 7.5, "acoes": 15, "fiis": 9.5, "multimercado": 10, "internacional": 7.5, "alternativos": 7},
+        "agressiva": {"pos_fixado": 16, "inflacao": 27.5, "pre_fixado": 7.5, "acoes": 15, "fiis": 9.5, "multimercado": 10, "internacional": 7.5, "alternativos": 7}
+      }
+    }
+  }
+}
