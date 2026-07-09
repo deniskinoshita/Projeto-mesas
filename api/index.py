@@ -2099,20 +2099,8 @@ select option{background:#1A1A1A}
 <div class="card">
   <h2>Dados do cliente</h2>
 
-  <!-- Seletor de cliente salvo -->
-  <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-      <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin:0;font-weight:700">📁 Clientes salvos — clique para carregar <span id="cs-contador" style="color:#3A6A48;font-weight:400"></span></p>
-      <input type="text" id="cs-busca" oninput="filtrarClientes()" onkeydown="if(event.key==='Enter')buscarClientesEnter()" placeholder="🔍 Buscar (número/nome) — Enter para carregar"
-        style="flex:1;min-width:180px;max-width:280px;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:7px 12px;color:#F0F0F0;font-size:12px;outline:none">
-    </div>
-    <div id="clientes-salvos-lista" style="display:flex;flex-wrap:wrap;gap:6px;max-height:360px;overflow-y:auto;padding-right:4px"></div>
-    <p id="cs-sem-resultado" style="display:none;font-size:11px;color:#3A6A48;margin-top:8px">Nenhum cliente encontrado para a busca.</p>
-    <p id="xp-aviso-atualizar" style="display:none;font-size:11px;color:#E8A87C;margin-top:10px;line-height:1.5"></p>
-  </div>
-
-  <!-- LINHA 1: Assessor + Código do cliente -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+  <!-- LINHA 1: Assessor (em cima) + Código do cliente ao lado (o código busca no sistema) -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
     <div>
       <label>Assessor</label>
       <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#1A1A1A;cursor:default;color:#C9A96E;display:none">
@@ -2121,12 +2109,19 @@ select option{background:#1A1A1A}
       </select>
     </div>
     <div>
-      <label>Código do cliente</label>
+      <label>Código do cliente <span style="font-size:10px;color:#3A6A48;font-weight:400">— busca no sistema</span></label>
       <input type="text" id="codigo-cliente" placeholder="Ex: 7712906 — Enter para carregar" oninput="buscarPorCodigoCliente(this.value)" onkeydown="if(event.key==='Enter')buscarUltimoXpPorCodigo(this.value)" autocomplete="off"
         style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#E8D5A3;font-size:13px;outline:none;box-sizing:border-box">
       <input type="text" id="nome" placeholder="" style="display:none">
       <p id="cliente-encontrado-label" style="display:none;font-size:11px;color:#5DCAA5;margin-top:4px;font-weight:700"></p>
     </div>
+  </div>
+
+  <!-- Clientes salvos: resumo por perfil (expansível) + desenquadrados -->
+  <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
+    <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px;font-weight:700">📁 Clientes salvos <span id="cs-contador" style="color:#3A6A48;font-weight:400"></span></p>
+    <div id="clientes-salvos-lista"></div>
+    <p id="xp-aviso-atualizar" style="display:none;font-size:11px;color:#E8A87C;margin-top:10px;line-height:1.5"></p>
   </div>
 
   <!-- LINHA 2: Upload XPerformance -->
@@ -4016,12 +4011,18 @@ async function buscarClientesSalvos(){
   const assessor = document.getElementById("assessor").value.trim();
   if(!assessor) return;
   try{
-    const r = await fetch("/api/ficha?assessor="+encodeURIComponent(assessor.toLowerCase()));
-    const lista = await r.json();
-    _clientesSalvos = Array.isArray(lista) ? lista : [];
+    const r = await fetch("/api/clientes-resumo?assessor="+encodeURIComponent(assessor.toLowerCase()));
+    const d = await r.json();
+    _clientesSalvos = (d && Array.isArray(d.clientes)) ? d.clientes : [];
     const box = document.getElementById("clientes-salvos-box");
     const ul  = document.getElementById("clientes-salvos-lista");
-    if(!lista.length){ box.style.display="none"; return; }
+    if(!_clientesSalvos.length){ if(box) box.style.display="none"; return; }
+    const _cont = document.getElementById("cs-contador");
+    if(_cont) _cont.textContent = "("+_clientesSalvos.length+")";
+
+    const PERFIL_LBL = {super_conservadora:"Super Conservadora",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva",_:"Sem perfil"};
+    const PERFIL_COR = {super_conservadora:"#7DCFEF",conservadora:"#5DCAA5",moderada:"#C9A96E",arrojada:"#E8A87C",agressiva:"#FF6B6B",_:"#3A6A48"};
+    const PERFIL_ORDEM = ["super_conservadora","conservadora","moderada","arrojada","agressiva"];
 
     function _chip(c){
       const idx = _clientesSalvos.indexOf(c);
@@ -4031,36 +4032,51 @@ async function buscarClientesSalvos(){
       const selo = vencido
         ? `<span style="background:#2A1A0A;color:#E8A87C;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
         : `<span style="color:#3A6A48;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
-      const busca = ((c.nome||"")+" "+(c.conta||"")).toLowerCase();
-      const info = `${c.nome||""}${c.conta ? ` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>` : ""}${c.gestora_nome ? ` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>` : ""}${selo}`;
-      return `<span class="cs-chip" data-busca="${busca}" style="display:inline-flex;align-items:center;border:1px solid ${borda};border-radius:20px;background:#111;overflow:hidden">
+      const detTag = c.desenquadrado ? `<span style="color:#E8A87C;font-size:9px;margin-left:5px">→ parece ${PERFIL_LBL[c.perfil_detectado]||c.perfil_detectado||"outro"}</span>` : "";
+      const info = `${c.nome||("#"+(c.conta||""))}${(c.nome&&c.conta)?` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>`:""}${c.gestora_nome?` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>`:""}${selo}${detTag}`;
+      return `<span class="cs-chip" style="display:inline-flex;align-items:center;border:1px solid ${borda};border-radius:20px;background:#111;overflow:hidden">
         <button onclick="carregarClienteIdx(${idx})" style="border:none;background:none;color:#C9A96E;font-size:12px;cursor:pointer;padding:6px 4px 6px 12px;white-space:nowrap">${info}</button>
         <button onclick="excluirClienteIdx(event,${idx})" title="Excluir cliente" style="border:none;background:none;color:#7A4A4A;font-size:11px;cursor:pointer;padding:6px 10px 6px 6px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#7A4A4A'">🗑</button>
       </span>`;
     }
 
-    // Agrupa por perfil do cliente
-    const PERFIL_ORDEM = ["super_conservadora","conservadora","moderada","arrojada","agressiva"];
-    const PERFIL_LBL = {super_conservadora:"Super Conservadora",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva",_:"Sem perfil definido"};
-    const PERFIL_COR = {super_conservadora:"#7DCFEF",conservadora:"#5DCAA5",moderada:"#C9A96E",arrojada:"#E8A87C",agressiva:"#FF6B6B",_:"#3A6A48"};
     const grupos = {};
-    lista.forEach(c=>{ const k=(c.perfil||"").toLowerCase(); (grupos[k]=grupos[k]||[]).push(c); });
+    _clientesSalvos.forEach(function(c){ const k=(c.perfil||"").toLowerCase()||"_"; (grupos[k]=grupos[k]||[]).push(c); });
     const ordem = PERFIL_ORDEM.filter(k=>grupos[k]).concat(Object.keys(grupos).filter(k=>PERFIL_ORDEM.indexOf(k)<0));
-    ul.innerHTML = ordem.map(k=>{
-      const arr = grupos[k]||[];
-      const lbl = PERFIL_LBL[k] || (k ? (k.charAt(0).toUpperCase()+k.slice(1)) : PERFIL_LBL._);
-      const cor = PERFIL_COR[k] || PERFIL_COR._;
-      return `<div class="cs-grupo" style="width:100%;margin-bottom:12px">
-        <div style="font-size:10px;color:${cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${lbl} <span style="color:#3A6A48;font-weight:400">(${arr.length})</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">${arr.map(_chip).join("")}</div>
+    const desenq = _clientesSalvos.filter(function(c){ return c.desenquadrado; });
+
+    let h = "";
+    ordem.forEach(function(k){
+      const arr = grupos[k]||[]; const lbl=PERFIL_LBL[k]||PERFIL_LBL._; const cor=PERFIL_COR[k]||PERFIL_COR._; const gid="csg-"+k;
+      h += `<div style="margin-bottom:6px">
+        <div onclick="csToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#0A1A10;border:1px solid #12281C;border-radius:8px">
+          <span id="${gid}-ar" style="color:#3A6A48;font-size:11px">▸</span>
+          <span style="font-size:11px;color:${cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1">${lbl}</span>
+          <span style="font-size:13px;color:${cor};font-weight:700">${arr.length}</span>
+        </div>
+        <div id="${gid}" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 4px 4px">${arr.map(_chip).join("")}</div>
       </div>`;
-    }).join("");
-    const _cont = document.getElementById("cs-contador");
-    if(_cont) _cont.textContent = "("+lista.length+")";
-    const _busca = document.getElementById("cs-busca");
-    if(_busca && _busca.value.trim()) filtrarClientes();
-    box.style.display="block";
+    });
+    if(desenq.length){
+      h += `<div style="margin-top:10px;border-top:1px solid #12281C;padding-top:10px">
+        <div onclick="csToggle('csg-desenq')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#1A0E08;border:1px solid #3A1E10;border-radius:8px">
+          <span id="csg-desenq-ar" style="color:#7A4A2A;font-size:11px">▸</span>
+          <span style="font-size:11px;color:#E8A87C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1">⚠ Desenquadrados do perfil</span>
+          <span style="font-size:13px;color:#E8A87C;font-weight:700">${desenq.length}</span>
+        </div>
+        <div id="csg-desenq" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 4px 4px">${desenq.map(_chip).join("")}</div>
+      </div>`;
+    }
+    ul.innerHTML = h;
+    if(box) box.style.display="block";
   }catch(e){}
+}
+function csToggle(id){
+  var el=document.getElementById(id); var ar=document.getElementById(id+"-ar");
+  if(!el) return;
+  var open=(el.style.display==="none" || !el.style.display);
+  el.style.display = open ? "flex" : "none";
+  if(ar) ar.textContent = open ? "▾" : "▸";
 }
 
 function filtrarClientes(){
@@ -5820,6 +5836,44 @@ def verificar_token_reset():
 def reset_senha_page():
     return render_template_string(HTML_RESET_SENHA)
 
+
+@app.route("/api/clientes-resumo", methods=["GET"])
+def clientes_resumo():
+    """Resumo dos clientes salvos de um assessor: por perfil (com contagem) e
+    quais estão DESENQUADRADOS (perfil detectado pela carteira ≠ perfil atribuído)."""
+    assessor = request.args.get("assessor", "").lower().strip()
+    fichas = load_fichas()
+    hist   = load_hist()
+    lista, seen = [], set()
+    for k, v in fichas.items():
+        if not isinstance(v, dict):
+            continue
+        if not (k.startswith(assessor + "|") or v.get("assessor", "").lower() == assessor):
+            continue
+        conta = str(v.get("conta", "")).strip()
+        dedup = conta or k
+        if dedup in seen:
+            continue
+        seen.add(dedup)
+        perfil = (v.get("perfil", "") or "").lower().strip()
+        # Última composição salva (histórico) — entradas mais recentes primeiro
+        comp = {}
+        hentry = hist.get(f"conta:{conta}") or hist.get(conta) or hist.get(k)
+        if hentry:
+            ents = hentry.get("entradas") if isinstance(hentry, dict) else hentry
+            if ents:
+                comp = ents[0].get("composicao") or ents[-1].get("composicao") or {}
+        perfil_det = _sugerir_perfil_por_composicao(comp) if comp else ""
+        desenq = bool(perfil and perfil_det and perfil_det != perfil)
+        lista.append({
+            "conta": conta, "nome": v.get("nome", ""), "perfil": perfil,
+            "gestora_nome": v.get("gestora_nome", ""), "data_ultimo_xp": v.get("data_ultimo_xp", ""),
+            "assessor": v.get("assessor", ""),
+            "perfil_detectado": perfil_det, "desenquadrado": desenq,
+        })
+    lista.sort(key=lambda c: (c.get("perfil", ""), (c.get("nome", "") or c.get("conta", "")).lower()))
+    return jsonify({"total": len(lista), "clientes": lista,
+                    "desenquadrados": sum(1 for c in lista if c["desenquadrado"])})
 
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
