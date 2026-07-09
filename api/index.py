@@ -1284,25 +1284,28 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
         produtos = rc.get("produtos_sugeridos", [])
         ctx_gestor = rc.get("contexto_gestor", "")
 
+        # Urgência pelo TAMANHO DO GAP (falta): <5pp = baixa · 5–10pp = média · >10pp = urgente
+        _gap = abs(f.get("desvio", 0))
+        if _gap > 10:
+            urgencia = "🔴 URGENTE"
+        elif _gap >= 5:
+            urgencia = "🟡 MÉDIA"
+        else:
+            urgencia = "🟢 BAIXA"
+
         if cat == "inflacao":
             macro_txt = f"IPCA 12M em {ipca:.1f}%" if ipca else "IPCA elevado"
-            urgencia = "🔴 URGENTE"
             explicacao = f"{macro_txt} — cliente sem proteção inflacionária ({f['real']:.1f}% vs. alvo {f['alvo']:.1f}%). {ctx_gestor}"
         elif cat == "pre_fixado":
             macro_txt = f"Selic em {selic:.2f}%" if selic else "Selic elevada"
-            urgencia = "🟡 MÉDIA"
             explicacao = f"{macro_txt} próxima do pico. Pré-fixado de médio prazo pode capturar ganho de capital com início de ciclo de queda. {ctx_gestor}"
         elif cat == "internacional":
-            urgencia = "🟡 MÉDIA"
             explicacao = f"Diversificação cambial ausente ({f['real']:.1f}% vs. alvo {f['alvo']:.1f}%). SPX e Ibiuna destacam internacional como hedge. {ctx_gestor}"
         elif cat == "multimercado":
-            urgencia = "🟡 MÉDIA"
             explicacao = f"Ausência de diversificador macro. {ctx_gestor}"
         elif cat == "acoes":
-            urgencia = "🟢 BAIXA"
             explicacao = f"Renda variável abaixo do modelo. Cautela: Verde e Absolute neutros/negativos para bolsa Brasil. {ctx_gestor}"
         else:
-            urgencia = "🟡 MÉDIA"
             explicacao = f"{f['label']} abaixo do modelo em {abs(f['desvio']):.1f}%. {ctx_gestor}"
 
         carta_insight = next((c["trecho"] for c in carta_insights if f['label'].lower() in c["classe"].lower()), "")
@@ -1331,6 +1334,8 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
     if comp:
         recomendacoes, alertas = aplicar_compliance(recomendacoes, alertas, comp, perfil)
 
+    # Ordena por maior gap primeiro (urgente no topo)
+    recomendacoes.sort(key=lambda r: -float(r.get("falta_pp", 0) or 0))
     return recomendacoes, alertas
 
 
