@@ -234,6 +234,7 @@ _HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
 _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
 _HP_CARTEIRA_BRAUNA_FILE = "/tmp/brauna_hp_carteira_brauna.json"
 _OBJETIVOS_FILE       = "/tmp/brauna_objetivos_okr.json"
+_RETORNOS_FILE        = "/tmp/brauna_retornos_classe.json"
 _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
 _CLIENTS_FILE         = "/tmp/brauna_clients.json"
 _ASSESSORES_FILE      = "/tmp/brauna_assessores_dados.json"
@@ -1638,6 +1639,48 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#081F18"); plt.close(fig); ib.seek(0)
     elems.append(Image(ib,width=15*cm,height=6*cm)); elems.append(Spacer(1,0.3*cm))
 
+    # Rentabilidade — Cliente vs. Carteira Recomendada vs. CDI (linha)
+    try:
+        _rc = (carregar_retornos() or {}).get("classes", {})
+        _pers = [("mes","Mês"),("ano","Ano"),("12m","12M"),("24m","24M")]
+        _port = (rent.get("portfolio") or {}); _cdi = (rent.get("cdi") or {})
+        def _rec_pdf(pk):
+            sw = sr = 0.0
+            for dd_ in desvios:
+                alvo = float(dd_.get("alvo", 0) or 0)
+                rr = (_rc.get(dd_.get("cat") or dd_.get("cls")) or {}).get(pk)
+                if alvo > 0 and rr is not None:
+                    sw += alvo; sr += alvo * float(rr)
+            return (sr/sw) if sw > 0 else None
+        _cli_vals = [_port.get(pk) for pk,_ in _pers]
+        _cdi_vals = [_cdi.get(pk)  for pk,_ in _pers]
+        _rec_vals = [_rec_pdf(pk)  for pk,_ in _pers]
+        if any(v is not None for v in _cli_vals):
+            elems.append(Paragraph("Rentabilidade — Cliente vs. Carteira Recomendada vs. CDI",s_sec))
+            figr,axr=plt.subplots(figsize=(10,3.8))
+            figr.patch.set_facecolor("#081F18"); axr.set_facecolor("#1A1A1A")
+            _xs=list(range(len(_pers)))
+            def _lin(vals,cor,lbl,dash=False):
+                xy=[(x,float(v)) for x,v in zip(_xs,vals) if v is not None]
+                if xy:
+                    axr.plot([p[0] for p in xy],[p[1] for p in xy],marker="o",color=cor,linewidth=2,
+                             label=lbl,linestyle="--" if dash else "-")
+            _lin(_cli_vals,"#C9A96E","Cliente")
+            _lin(_rec_vals,"#5DCAA5","Recomendada")
+            _lin(_cdi_vals,"#7DCFEF","CDI",dash=True)
+            axr.set_xticks(_xs); axr.set_xticklabels([p[1] for p in _pers],color="white",fontsize=9)
+            axr.tick_params(colors="white"); axr.spines[:].set_color("#2C2C2C")
+            axr.yaxis.grid(True,color="#1C4A34"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
+            axr.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="upper left")
+            figr.tight_layout(pad=1)
+            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#081F18"); plt.close(figr); ibr.seek(0)
+            elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.15*cm))
+            if not any(v is not None for v in _rec_vals):
+                elems.append(Paragraph("Carteira recomendada indisponível — cadastre os retornos por classe na página do Líder.",s_gest))
+            elems.append(Spacer(1,0.3*cm))
+    except Exception:
+        pass
+
     elems.append(Paragraph("Desvios por Indexador",s_sec))
     dd=[["Indexador","Atual (%)","Modelo (%)","Desvio (%)"]]
     for d in desvios: dd.append([d["label"],f'{d["real"]:.2f}',f'{d["alvo"]:.2f}',f'{d["desvio"]:+.2f}'])
@@ -2317,6 +2360,19 @@ select option{background:#1A1A1A}
     <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Comparativo de alocação"></canvas></div>
   </div>
 
+  <!-- Rentabilidade: Cliente x Recomendada x CDI -->
+  <div class="card" id="card-rent-comp" style="display:none">
+    <h2>Rentabilidade — Cliente × Carteira Recomendada × CDI</h2>
+    <p style="font-size:11px;color:#3A6A48;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo — os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
+    <div style="display:flex;gap:16px;margin-bottom:8px;font-size:11px;flex-wrap:wrap">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#C9A96E;display:inline-block"></span>Cliente</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5DCAA5;display:inline-block"></span>Recomendada</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#7DCFEF;display:inline-block"></span>CDI</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chart-rent" role="img" aria-label="Comparativo de rentabilidade"></canvas></div>
+    <p id="rent-comp-nota" style="font-size:10px;color:#2A5A3A;margin-top:6px"></p>
+  </div>
+
   <!-- Diversificação por Classe de Ativos -->
   <div class="card" id="card-classes">
     <h2>Diversificação por Classe de Ativos</h2>
@@ -2919,6 +2975,57 @@ function carregarStockGuide(tentativa){
     .catch(function(){ if(tentativa<3) setTimeout(function(){ carregarStockGuide(tentativa+1); }, 4000); });
 }
 carregarStockGuide();
+
+// Retornos por classe (cadastrados pela liderança) — base do comparativo de rentabilidade
+var _retornosClasse = {classes:{}, _meta:{}, atualizado_em:""};
+function carregarRetornosClasse(){
+  fetch("/api/retornos-classe").then(r=>r.json()).then(d=>{ _retornosClasse = d || {classes:{},_meta:{}}; }).catch(function(){});
+}
+carregarRetornosClasse();
+
+function renderChartRent(){
+  var card=document.getElementById("card-rent-comp");
+  var cv=document.getElementById("chart-rent");
+  if(!card||!cv||!analiseData||typeof Chart==="undefined") return;
+  var rent=analiseData.rent||{}; var port=rent.portfolio||{}, cdi=rent.cdi||{};
+  var desvios=(analiseData._xp&&analiseData._xp.desvios)||analiseData.desvios||[];
+  var retCls=(_retornosClasse&&_retornosClasse.classes)||{};
+  var PER=[["mes","Mês"],["ano","Ano"],["12m","12M"],["24m","24M"]];
+  function recomendada(pk){
+    var somaW=0, somaR=0;
+    desvios.forEach(function(d){
+      var alvo=+d.alvo||0; var rr=(retCls[d.cls]||{})[pk];
+      if(alvo>0 && rr!=null && rr!==""){ somaW+=alvo; somaR+=alvo*parseFloat(rr); }
+    });
+    return somaW>0 ? somaR/somaW : null;
+  }
+  var labels=[], dCli=[], dRec=[], dCdi=[], temRec=false, temCli=false;
+  PER.forEach(function(p){
+    var cli=(port[p[0]]!=null)?parseFloat(port[p[0]]):null;
+    var cd=(cdi[p[0]]!=null)?parseFloat(cdi[p[0]]):null;
+    var rec=recomendada(p[0]);
+    labels.push(p[1]); dCli.push(cli); dRec.push(rec); dCdi.push(cd);
+    if(rec!=null) temRec=true; if(cli!=null) temCli=true;
+  });
+  if(!temCli){ card.style.display="none"; return; }
+  card.style.display="";
+  var nota=document.getElementById("rent-comp-nota");
+  if(nota) nota.textContent = temRec
+    ? ("Carteira recomendada estimada com os retornos por classe cadastrados"+(_retornosClasse.atualizado_em?(" ("+_retornosClasse.atualizado_em+")"):"")+".")
+    : "Cadastre os retornos por classe na página do Líder para exibir a carteira recomendada.";
+  if(window._chartRentInst) window._chartRentInst.destroy();
+  window._chartRentInst=new Chart(cv,{
+    type:"line",
+    data:{labels:labels,datasets:[
+      {label:"Cliente",     data:dCli, borderColor:"#C9A96E", backgroundColor:"#C9A96E", tension:0.3, pointRadius:4, pointHoverRadius:6, borderWidth:2, spanGaps:true, fill:false},
+      {label:"Recomendada", data:dRec, borderColor:"#5DCAA5", backgroundColor:"#5DCAA5", tension:0.3, pointRadius:4, pointHoverRadius:6, borderWidth:2, spanGaps:true, fill:false},
+      {label:"CDI",         data:dCdi, borderColor:"#7DCFEF", backgroundColor:"#7DCFEF", tension:0.3, pointRadius:3, pointHoverRadius:5, borderWidth:2, borderDash:[5,4], spanGaps:true, fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+(ctx.parsed.y!=null?ctx.parsed.y.toFixed(2)+"%":"—");}}}},
+      scales:{y:{ticks:{color:"#7A9A88",callback:function(v){return v+"%";}},grid:{color:"#12281C"}},x:{ticks:{color:"#9BB0A0"},grid:{display:false}}}}
+  });
+}
 function _sgNorm(r){ r=(r||"").toUpperCase(); if(r.indexOf("COMPRA")>=0)return "COMPRA"; if(r.indexOf("VENDA")>=0)return "VENDA"; if(r.indexOf("NEUTRO")>=0)return "NEUTRO"; return ""; }
 function _sgCor(r){ var n=_sgNorm(r); return n==="COMPRA"?"#5DCAA5":n==="VENDA"?"#FF6B6B":n==="NEUTRO"?"#D4B483":"#888"; }
 function _sgBadge(r){ if(!r) return '<span style="color:#3A6A48">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
@@ -4327,6 +4434,7 @@ async function analisar(){
 
     try{ renderizar(analiseData); }catch(e){ console.error("[renderizar]",e); alert("Erro em renderizar: "+e.message); }
     try{ if(analiseData._xp) renderAnaliseHP(analiseData._xp); }catch(e){ console.error("[renderAnaliseHP]",e); alert("Erro em renderAnaliseHP: "+e.message); }
+    try{ renderChartRent(); }catch(e){ console.error("[renderChartRent]",e); }
 
     // Log de atividade
     const _nomeLog = localStorage.getItem("brauna_nome") || document.getElementById("assessor")?.value || "Assessor";
@@ -6659,6 +6767,48 @@ def hp_gestoras2():
 def api_stock_guide():
     """Guia de ações consolidado (Levante = casa principal, XP = visão de mercado)."""
     return jsonify(carregar_stock_guide())
+
+# ── Retornos por classe (líder cadastra) → base do comparativo de rentabilidade ─
+_RET_CLASSES = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional","alternativos","criptomoedas"]
+_RET_PERIODOS = ["mes","ano","12m","24m"]
+_RET_LABELS = {"pos_fixado":"Pós Fixado","inflacao":"Inflação","pre_fixado":"Pré Fixado","acoes":"Ações",
+               "fiis":"FIIs","multimercado":"Multimercado","internacional":"Internacional",
+               "alternativos":"Alternativos","criptomoedas":"Criptomoedas"}
+
+def carregar_retornos():
+    salvo = _load(_RETORNOS_FILE, None)
+    base = {"classes": {c: {p: None for p in _RET_PERIODOS} for c in _RET_CLASSES}, "atualizado_em": ""}
+    if isinstance(salvo, dict) and isinstance(salvo.get("classes"), dict):
+        for c in _RET_CLASSES:
+            row = salvo["classes"].get(c) or {}
+            for p in _RET_PERIODOS:
+                if p in row:
+                    base["classes"][c][p] = row[p]
+        base["atualizado_em"] = salvo.get("atualizado_em","")
+    base["_meta"] = {"classes": _RET_CLASSES, "periodos": _RET_PERIODOS, "labels": _RET_LABELS}
+    return base
+
+@app.route("/api/retornos-classe", methods=["GET", "POST"])
+def api_retornos_classe():
+    """Retorno (%) por classe e período, cadastrado pelo líder. Base do comparativo
+    de rentabilidade da carteira recomendada (ponderado pela alocação do modelo)."""
+    if request.method == "GET":
+        return jsonify(carregar_retornos())
+    d = request.get_json() or {}
+    atual = carregar_retornos()
+    cls_in = d.get("classes", {}) or {}
+    for c in _RET_CLASSES:
+        row = cls_in.get(c) or {}
+        for p in _RET_PERIODOS:
+            if p in row:
+                v = row[p]
+                try:
+                    atual["classes"][c][p] = float(v) if v not in (None, "") else None
+                except Exception:
+                    atual["classes"][c][p] = None
+    atual["atualizado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    _save(_RETORNOS_FILE, {"classes": atual["classes"], "atualizado_em": atual["atualizado_em"]})
+    return jsonify({"ok": True, "retornos": atual})
 
 @app.route("/api/objetivos", methods=["GET", "POST"])
 def api_objetivos():
@@ -10041,6 +10191,18 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   </div>
 </div>
 
+<!-- Retornos por classe (base do comparativo de rentabilidade) -->
+<div style="background:#0B1410;border:1px solid #1C3A24;border-radius:12px;padding:18px 20px;margin-bottom:18px">
+  <div style="font-size:15px;font-weight:700;color:#C9A96E;margin-bottom:6px">📈 Retornos por Classe (para o comparativo de rentabilidade)</div>
+  <p style="font-size:12px;color:#3A6A48;margin-bottom:14px;line-height:1.6">Informe a <b style="color:#D4B483">rentabilidade (%) de cada classe</b> por período. Esses números são ponderados pela alocação da carteira recomendada de cada cliente para montar o gráfico <b>Cliente × Recomendada × CDI</b> na análise. Atualize mensalmente.</p>
+  <div id="ret-status" style="font-size:12px;color:#5DCAA5;min-height:16px;margin-bottom:8px"></div>
+  <div id="ret-tabela" style="overflow-x:auto"><p style="color:#3A6A48;font-size:12px">Carregando...</p></div>
+  <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+    <button onclick="retSalvar()" style="background:#C9A96E;color:#071E17;font-weight:700;border:1px solid #C9A96E;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">💾 Salvar retornos</button>
+    <button onclick="carregarRetornos()" style="background:none;border:1px solid #1C4A34;color:#5DCAA5;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">↺ Recarregar</button>
+  </div>
+</div>
+
 <!-- Alertas de Mercado -->
 <div class="card-alertas" id="sec-alertas" style="display:none">
   <h2>📡 Alertas de Mercado</h2>
@@ -10869,8 +11031,58 @@ async function objSalvar(){
   setTimeout(function(){ if(st) st.textContent=""; },6000);
 }
 
+// ── Retornos por classe (base do comparativo de rentabilidade) ───────────────
+var _retData = null;
+var _RET_PER = [["mes","Mês"],["ano","Ano"],["12m","12M"],["24m","24M"]];
+async function carregarRetornos(){
+  var tb=document.getElementById("ret-tabela"); if(!tb) return;
+  try{ var r=await fetch("/api/retornos-classe"); _retData=await r.json(); retRender(); }
+  catch(e){ tb.innerHTML='<p style="color:#FF6B6B;font-size:12px">Erro ao carregar retornos.</p>'; }
+}
+function retRender(){
+  var tb=document.getElementById("ret-tabela"); if(!tb||!_retData) return;
+  var meta=_retData._meta||{}; var classes=meta.classes||[]; var labels=meta.labels||{};
+  var cls=_retData.classes||{};
+  var h='<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:520px">';
+  h+='<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34;background:#071E17"><th style="text-align:left;padding:6px 8px">Classe</th>';
+  _RET_PER.forEach(function(p){ h+='<th style="text-align:right;padding:6px 8px">'+p[1]+' (%)</th>'; });
+  h+='</tr></thead><tbody>';
+  classes.forEach(function(c,i){
+    var bg=i%2===0?"#060C08":"#081208";
+    h+='<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F"><td style="padding:5px 8px;color:#D4B483;font-weight:700">'+(labels[c]||c)+'</td>';
+    _RET_PER.forEach(function(p){
+      var v=(cls[c]||{})[p[0]];
+      h+='<td style="padding:5px 8px;text-align:right"><input type="number" step="0.01" data-ret-c="'+c+'" data-ret-p="'+p[0]+'" value="'+(v==null?"":v)+'" placeholder="—" style="width:82px;text-align:right;background:#071E17;border:1px solid #1C4A34;border-radius:5px;padding:4px 6px;color:#F0F0F0;font-size:11px"></td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  tb.innerHTML=h;
+  var stEl=document.getElementById("ret-status");
+  if(stEl && _retData.atualizado_em) stEl.textContent="Atualizado em "+_retData.atualizado_em;
+}
+async function retSalvar(){
+  if(!_retData) return;
+  var st=document.getElementById("ret-status");
+  var classes={};
+  document.querySelectorAll('[data-ret-c]').forEach(function(el){
+    var c=el.getAttribute("data-ret-c"), p=el.getAttribute("data-ret-p");
+    classes[c]=classes[c]||{};
+    classes[c][p]= el.value!=="" ? parseFloat(el.value) : null;
+  });
+  if(st){ st.textContent="Salvando..."; st.style.color="#AAA"; }
+  try{
+    var r=await fetch("/api/retornos-classe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({classes:classes})});
+    var d=null; try{ d=await r.json(); }catch(_){}
+    if(r.ok && d && d.ok){ _retData=d.retornos; retRender(); if(st){ st.textContent="✓ Retornos salvos às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); st.style.color="#5DCAA5"; } }
+    else if(st){ st.textContent="Erro ao salvar (HTTP "+r.status+")"; st.style.color="#FF6B6B"; }
+  }catch(e){ if(st){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; } }
+  setTimeout(function(){ if(st) st.textContent=""; },6000);
+}
+
 init();
 carregarObjetivos();
+carregarRetornos();
 </script>
 </body></html>"""
 
