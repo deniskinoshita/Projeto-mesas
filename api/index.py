@@ -11110,15 +11110,22 @@ function renderRisco(filtroAssessor, filtroPerfil, filtroStatus){
   // que expande ao clicar, evitando uma lista única muito extensa.
   const grupos = {};
   riscos.forEach(function(c){
-    let a = (c.assessor||"").trim();
-    if(!a || /^\d+$/.test(a)) a = "— Sem assessor —";
-    (grupos[a] = grupos[a] || []).push(c);
+    const a = (c.assessor||"").trim();
+    const semAssessor = !a || /^\d+$/.test(a);
+    const nk = semAssessor ? "__sem__" : normAssessorKey(a);
+    if(!grupos[nk]) grupos[nk] = {display: semAssessor ? "— Sem assessor —" : a, lista:[], seen:{}};
+    const g = grupos[nk];
+    if(!semAssessor && a.length > g.display.length) g.display = a; // variante mais completa
+    const ck = clienteKey(c, c.nome);
+    if(g.seen[ck]) return; // não conta o mesmo cliente 2x ao unificar assessores parecidos
+    g.seen[ck] = true;
+    g.lista.push(c);
   });
-  const nomes = Object.keys(grupos).sort(function(x,y){ return grupos[y].length - grupos[x].length; });
+  const chaves = Object.keys(grupos).sort(function(x,y){ return grupos[y].lista.length - grupos[x].lista.length; });
 
   let html = "";
-  nomes.forEach(function(a, gi){
-    const lista = grupos[a];
+  chaves.forEach(function(chave, gi){
+    const lista = grupos[chave].lista;
     const patTotal = lista.reduce(function(s,c){ return s + (c.patrimonio||0); }, 0);
     const gid = "risco-grp-"+gi;
     const linhas = lista.map(function(c){
@@ -11139,7 +11146,7 @@ function renderRisco(filtroAssessor, filtroPerfil, filtroStatus){
     }).join("");
     html += '<div class="risco-grupo">'
       + '<div class="risco-grupo-head" onclick="toggleRiscoGrupo(\''+gid+'\')">'
-      +   '<span class="risco-grupo-nome">'+a+'</span>'
+      +   '<span class="risco-grupo-nome">'+grupos[chave].display+'</span>'
       +   '<span class="risco-grupo-count">'+lista.length+' em risco</span>'
       +   '<span class="risco-grupo-pat">'+fmtPat(patTotal)+'</span>'
       +   '<span class="risco-grupo-chev" id="chev-'+gid+'">▾</span>'
@@ -11160,8 +11167,8 @@ function toggleRiscoGrupo(gid){
 }
 
 function verDetalhesCliente(assessor, nome){
-  // Encontra o assessor no ranking e abre o card dele
-  const idx = rankingOrder ? rankingOrder.findIndex(a=>a.nome===assessor) : -1;
+  // Encontra o assessor no ranking (por chave unificada) e abre o card dele
+  const idx = rankingOrder ? rankingOrder.findIndex(a=>normAssessorKey(a.nome)===normAssessorKey(assessor)) : -1;
   if(idx>=0){
     const detalhe = document.getElementById("detalhe-"+idx);
     if(detalhe && !detalhe.classList.contains("aberto")) toggleAssessor(idx);
@@ -11225,11 +11232,15 @@ function toggleAlerta(i){
 }
 
 function popularFiltroAssessor(){
-  // Combina assessores de clientes + da planilha financeira; exclui códigos de conta (numéricos)
+  // Combina assessores de clientes + planilha; exclui códigos numéricos e unifica nomes parecidos
   const soAssessor = a => a && !/^\d+$/.test(String(a).trim());
-  const fromClientes = clientesData.map(c=>c.assessor).filter(soAssessor);
-  const fromPlanilha = (dadosFinanceiros.assessores||[]).map(a=>a.nome).filter(soAssessor);
-  const assessores = [...new Set([...fromClientes,...fromPlanilha])].sort();
+  const todos = [...clientesData.map(c=>c.assessor), ...(dadosFinanceiros.assessores||[]).map(a=>a.nome)].filter(soAssessor);
+  const porChave = {};
+  todos.forEach(function(n){
+    const k = normAssessorKey(n);
+    if(!porChave[k] || String(n).length > porChave[k].length) porChave[k] = n; // variante mais completa
+  });
+  const assessores = Object.values(porChave).sort();
   const sel = document.getElementById("filtro-assessor");
   assessores.forEach(function(a){
     const op = document.createElement("option");
@@ -11255,8 +11266,25 @@ function aplicarFiltros(){
 
 let rankingOrder = null;
 
+// Chave de unificação do assessor: primeiro nome + último sobrenome (sem acento/caixa).
+// Assim "Carolina Custodio Siqueira" e "Carolina Siqueira" caem no mesmo grupo.
+function normAssessorKey(nome){
+  const s = (nome||"").toString().toLowerCase()
+              .replace(/[áàâãä]/g,"a").replace(/[éèêë]/g,"e").replace(/[íìîï]/g,"i")
+              .replace(/[óòôõö]/g,"o").replace(/[úùûü]/g,"u").replace(/ç/g,"c")
+              .trim().replace(/\s+/g," ");
+  if(!s) return "";
+  const p = s.split(" ").filter(Boolean);
+  return p.length<=1 ? (p[0]||"") : (p[0]+"|"+p[p.length-1]);
+}
+// Chave para identificar um cliente de forma única (evita contar o mesmo 2x ao unificar)
+function clienteKey(reg, fallback){
+  return (reg.conta || reg.nome || fallback || "").toString().trim().toLowerCase();
+}
+
 function buildPorAssessor(filtroAssessor, filtroPerfil, filtroStatus){
   const porAssessor = {};
+  const faKey = filtroAssessor ? normAssessorKey(filtroAssessor) : "";
   Object.entries(historico).forEach(function(entry){
     const key = entry[0]; const reg = entry[1];
     const assessor = (reg.assessor || key.split("|")[0] || "").trim();
@@ -11266,16 +11294,23 @@ function buildPorAssessor(filtroAssessor, filtroPerfil, filtroStatus){
     const perfil = reg.perfil || "";
     const ult = reg.entradas && reg.entradas[0];
     const status = ult && ult.status || "saudavel";
-    if(filtroAssessor && assessor !== filtroAssessor) return;
+    const nk = normAssessorKey(assessor);
+    if(faKey && nk !== faKey) return;
     if(filtroPerfil && perfil && perfil !== filtroPerfil) return;
     if(filtroStatus){
-      const stMap = {saudavel:"saudavel",atencao:"atencao",critico:"critico"};
       const stNorm = status==="critico"?"critico":status==="atencao"?"atencao":"saudavel";
       if(filtroStatus !== stNorm) return;
     }
-    if(!porAssessor[assessor]) porAssessor[assessor] = {nome:assessor, clientes:[], totalRel:0};
-    porAssessor[assessor].clientes.push(Object.assign({key:key},reg));
-    porAssessor[assessor].totalRel += (reg.entradas&&reg.entradas.length||0);
+    if(!porAssessor[nk]) porAssessor[nk] = {nome:assessor, clientes:[], totalRel:0, _seen:{}};
+    const grp = porAssessor[nk];
+    // Nome de exibição = variante mais completa (mais longa) entre as encontradas
+    if(assessor.length > grp.nome.length) grp.nome = assessor;
+    // Dedup de cliente ao unificar variantes do mesmo assessor: não conta o mesmo 2x
+    const ck = clienteKey(reg, key);
+    if(grp._seen[ck]) return;
+    grp._seen[ck] = true;
+    grp.clientes.push(Object.assign({key:key},reg));
+    grp.totalRel += (reg.entradas&&reg.entradas.length||0);
   });
   return porAssessor;
 }
@@ -11289,11 +11324,13 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
 
   const porAssessor = buildPorAssessor(filtroAssessor||"", filtroPerfil||"", filtroStatus||"");
 
-  // Incluir assessores da planilha que ainda não têm análises
+  // Incluir assessores da planilha que ainda não têm análises (mesma unificação de nome)
   if(!filtroStatus && !filtroPerfil){
     (dadosFinanceiros.assessores||[]).forEach(function(a){
-      if(filtroAssessor && a.nome !== filtroAssessor) return;
-      if(!porAssessor[a.nome]) porAssessor[a.nome] = {nome:a.nome, clientes:[], totalRel:0};
+      if(!a.nome || /^\d+$/.test(String(a.nome).trim())) return;
+      if(filtroAssessor && normAssessorKey(a.nome) !== normAssessorKey(filtroAssessor)) return;
+      const nk = normAssessorKey(a.nome);
+      if(!porAssessor[nk]) porAssessor[nk] = {nome:a.nome, clientes:[], totalRel:0, _seen:{}};
     });
   }
 
@@ -11306,23 +11343,27 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
   rankingOrder = ranking;
   const maxRel = ranking[0].totalRel || 1;
 
-  // Contar PPTXs por assessor a partir de activity (se disponível)
+  // Contar PPTXs por assessor a partir de activity (chave unificada de nome)
   const pptxPorAssessor = {};
   if(activityData && activityData.length){
     activityData.forEach(function(ev){
       if(ev.acao==="pptx_gerado" && ev.nome){
-        pptxPorAssessor[ev.nome] = (pptxPorAssessor[ev.nome]||0)+1;
+        const k = normAssessorKey(ev.nome);
+        pptxPorAssessor[k] = (pptxPorAssessor[k]||0)+1;
       }
     });
   }
 
-  // Função para buscar dados financeiros por nome (match aproximado)
+  // Função para buscar dados financeiros por nome (exato → chave unificada → primeiro nome)
   function findFinanc(nome){
     if(assessoresDados[nome]) return assessoresDados[nome];
-    // Tentar match por primeiro nome
-    const primeiro = nome.split(" ")[0].toLowerCase();
+    const nk = normAssessorKey(nome);
     for(var k in assessoresDados){
-      if(k.toLowerCase().startsWith(primeiro)) return assessoresDados[k];
+      if(normAssessorKey(k) === nk) return assessoresDados[k];
+    }
+    const primeiro = nome.split(" ")[0].toLowerCase();
+    for(var k2 in assessoresDados){
+      if(k2.toLowerCase().startsWith(primeiro)) return assessoresDados[k2];
     }
     return null;
   }
@@ -11354,7 +11395,7 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
     const analisesMes = a.clientes.reduce(function(s,c){
       return s + (c.entradas||[]).filter(function(e){return e.data&&e.data.startsWith(mesAtual);}).length;
     },0);
-    const pptxGerados = pptxPorAssessor[a.nome]||0;
+    const pptxGerados = pptxPorAssessor[normAssessorKey(a.nome)]||0;
     const clientesComScoreAlto = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].score_servir>=4;}).length;
     const pctScore = a.clientes.length>0 ? Math.round(clientesComScoreAlto/a.clientes.length*100) : 0;
     const clientesComRentOk = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].rent12_pct_cdi>=80;}).length;
