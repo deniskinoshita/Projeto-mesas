@@ -896,6 +896,8 @@ def _sug_rf(filtro, obs, n):
     xs = [p for p in _prat("rf_tradicional_br.json").get("produtos", [])
           if (p.get("publico") or "").startswith("Investidor Geral") and filtro(p)]
     xs.sort(key=lambda p: (not p.get("isento"), str(p.get("risco") or "99")))
+    _vistos = set()   # dedup por ativo (mesmo papel com tickers diferentes)
+    xs = [p for p in xs if not (p.get("ativo") in _vistos or _vistos.add(p.get("ativo")))]
     out = []
     for p in xs[:n]:
         det = p.get("tax_max") or p.get("tax_min") or ""
@@ -2678,6 +2680,7 @@ select option{background:#1A1A1A}
     </div>
     <div id="plano-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"></div>
     <div id="plano-valores" style="margin-top:8px"></div>
+    <div id="plano-troca" style="margin-top:14px"></div>
   </div>
 
   <!-- Tabs -->
@@ -5099,6 +5102,43 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   } else { pv.innerHTML=""; }
 }
 
+// Plano de Troca — para cada classe subalocada: fonte do recurso (venda) + produtos concretos (compra)
+function renderPlanoTroca(sugs){
+  const el=document.getElementById("plano-troca");
+  if(!el) return;
+  sugs=(sugs||[]).filter(s=>Array.isArray(s.produtos_prateleira)&&s.produtos_prateleira.length);
+  if(!sugs.length){ el.innerHTML=""; return; }
+  const PRIO={alta:["#FF6B6B","🔴 Alta"],media:["#FFD966","🟡 Média"],baixa:["#5DCAA5","🟢 Baixa"]};
+  const fmt=v=>"R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+  let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca — venda → compra</p>';
+  sugs.forEach(function(s){
+    const pr=PRIO[s.prioridade]||PRIO.media;
+    const fonte=(s.fonte_recurso&&s.fonte_recurso.length)
+      ? s.fonte_recurso.map(f=>`${f.label} (+${f.excesso_pp}pp)`).join(" · ")
+      : (s.fonte_txt||"aporte novo / caixa");
+    const prods=s.produtos_prateleira.map(function(p){
+      const fgc=p.fgc?'<span style="font-size:9px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
+      return `<div style="padding:7px 10px;background:#0A0F0B;border:1px solid #1A2E1A;border-left:3px solid #5DCAA5;border-radius:0 6px 6px 0;margin-bottom:5px">
+        <div style="font-size:12px;font-weight:700;color:#F0F0F0">${p.nome||"—"}${fgc}
+          <span style="font-size:10px;color:#3A6A48;font-weight:400;margin-left:6px">${p.fonte||""}</span></div>
+        <div style="font-size:11px;color:#C9A96E">${p.detalhe||""}</div>
+        ${p.obs?`<div style="font-size:10px;color:#6A7A6A;margin-top:2px">${p.obs}</div>`:""}
+      </div>`;
+    }).join("");
+    h+=`<div style="border:1px solid #1C3A24;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#0B1410">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:800;color:#F0F0F0">${s.label_classe}</span>
+        <span style="font-size:10px;font-weight:700;color:${pr[0]}">${pr[1]}</span>
+        <span style="font-size:11px;color:#8B9FE8">falta ${Math.abs(s.gap_pp).toFixed(1)}pp ≈ ${fmt(s.gap_valor)}</span>
+      </div>
+      <div style="font-size:11px;color:#FF6B6B;margin-bottom:8px">▼ Fonte do recurso (reduzir): <b>${fonte}</b></div>
+      <div style="font-size:10px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">▲ Comprar</div>
+      ${prods}
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
 function renderPosicaoConsolidada(data){
   var el = document.getElementById("posicao-consolidada-list");
   if(!el) return;
@@ -5267,6 +5307,7 @@ function renderizar(data){
   // Diversificação por classe e plano de ação
   try{ renderClassesAtivos(desvios, patrimonio); }catch(e){ console.error("[renderClassesAtivos]",e); }
   try{ renderPlanoAcao(desvios, data.perfil||"", patrimonio, data.objetivo||""); }catch(e){ console.error("[renderPlanoAcao]",e); }
+  try{ renderPlanoTroca((data._xp&&data._xp.sugestoes_por_classe)||data.sugestoes_por_classe||[]); }catch(e){ console.error("[renderPlanoTroca]",e); }
 
   // Carteira atual do cliente — exibe no Plano de Ação e ao lado dos Desvios
   const _compAtual = (_clienteIdentificado && _clienteIdentificado.composicao_atual) || data.composicao_atual || data.composicao || {};
@@ -8472,6 +8513,41 @@ def analyze_xp():
     _ord2 = {"urgente": 0, "atencao": 1, "info": 2}
     alertas_final.sort(key=lambda a: _ord2.get(a.get("tipo","info"), 2))
 
+    # ── Plano de Troca (venda→compra) para a UI: por classe subalocada, produtos das
+    #    prateleiras completas (compra) + fonte do recurso das classes sobrealocadas (venda).
+    _patr = float(dados.get("patrimonio", 0) or 0)
+    _fontes = sorted(
+        [{"classe": d["cls"], "label": LABELS.get(d["cls"], d["cls"]), "excesso_pp": round(d["desvio"], 1)}
+         for d in desvios if d["desvio"] >= 2.0],
+        key=lambda x: -x["excesso_pp"])
+    _fonte_txt = " · ".join(f"{f['label']} (+{f['excesso_pp']:.0f}pp)" for f in _fontes[:3]) or "aporte novo / caixa"
+    _ORDEM_PF = ["super_conservadora", "conservadora", "moderada", "arrojada", "agressiva"]
+    _idx_pf = _ORDEM_PF.index(perfil_form) if perfil_form in _ORDEM_PF else 2
+    sugestoes_por_classe = []
+    for d in desvios:
+        if d["desvio"] >= -0.5:
+            continue
+        cls = d["cls"]; gap_pp = d["desvio"]
+        prioridade = "alta" if abs(gap_pp) >= 8 else ("media" if abs(gap_pp) >= 3 else "baixa")
+        prods_head = []
+        for p in (hp_prods.get(cls, []) if isinstance(hp_prods, dict) else []):
+            perfis_prod = [x.lower().replace(" ", "_") for x in (p.get("perfis") or [])]
+            if not perfis_prod or any(pf in _ORDEM_PF and _ORDEM_PF.index(pf) <= _idx_pf for pf in perfis_prod):
+                prods_head.append({"nome": p.get("nome") or p.get("titulo", "—"),
+                                   "detalhe": p.get("taxa") or p.get("rentabilidade", ""),
+                                   "fonte": "Head Braúna", "obs": p.get("descricao", "")})
+        try: prods_prat = _sugerir_por_classe(cls, 3)
+        except Exception: prods_prat = []
+        sugestoes_por_classe.append({
+            "classe": cls, "label_classe": LABELS.get(cls, cls),
+            "gap_pp": round(gap_pp, 2), "gap_valor": round(_patr * abs(gap_pp) / 100.0, 2),
+            "prioridade": prioridade,
+            "produtos": prods_head, "produtos_prateleira": prods_prat,
+            "fonte_recurso": _fontes[:3], "fonte_txt": _fonte_txt,
+        })
+    _ordp = {"alta": 0, "media": 1, "baixa": 2}
+    sugestoes_por_classe.sort(key=lambda x: (_ordp.get(x["prioridade"], 9), x["gap_pp"]))
+
     resultado = {
         "conta":       dados["conta"],
         "assessor":    dados["assessor"] or assessor,
@@ -8489,6 +8565,7 @@ def analyze_xp():
         "acoes":       dados["acoes"],
         "fiis":        dados["fiis"],
         "sugestoes_produtos": sugestoes_prods,
+        "sugestoes_por_classe": sugestoes_por_classe,
         "cenario_macro": {
             "global":        cenario.get("global",""),
             "brasil":        cenario.get("brasil",""),
@@ -8693,6 +8770,16 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
                 _asses_gap_por_cls[_cls] = 50.0 - _pct
 
     # ── PARTE A: Sugestões por classe ─────────────────────────────────────────
+    # Fonte de recurso (lado da VENDA da troca): classes sobrealocadas, maior excesso primeiro
+    fontes_recurso = []
+    for dev in desvios:
+        gp = float(dev.get("desvio", dev.get("desvio_pp", 0)) or 0)
+        if gp >= 2.0:
+            fc = dev.get("cls") or dev.get("classe", "")
+            fontes_recurso.append({"classe": fc, "label": LABELS_CLS.get(fc, fc), "excesso_pp": round(gp, 1)})
+    fontes_recurso.sort(key=lambda x: -x["excesso_pp"])
+    fonte_txt = " · ".join(f"{f['label']} (+{f['excesso_pp']:.0f}pp)" for f in fontes_recurso[:3]) or "aporte novo / caixa"
+
     sugestoes_por_classe = []
     for dev in desvios:
         cls = dev.get("cls") or dev.get("classe", "")
@@ -8746,6 +8833,13 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
                 "taxa":      p.get("taxa") or p.get("rentabilidade", ""),
             })
 
+        # Produtos das prateleiras completas (RF 375 / fundos 865 / intl / cetipados),
+        # já casados por função/suitability/isento/FGC pelo despachante existente.
+        try:
+            produtos_prateleira = _sugerir_por_classe(cls, 3)
+        except Exception:
+            produtos_prateleira = []
+
         sugestoes_por_classe.append({
             "classe":       cls,
             "label_classe": LABELS_CLS.get(cls, cls),
@@ -8754,6 +8848,9 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
             "prioridade":   prioridade,
             "motivo":       motivo,
             "produtos":     produtos_formatados,
+            "produtos_prateleira": produtos_prateleira,   # cardápio completo (compra)
+            "fonte_recurso": fontes_recurso[:3],           # de onde sai o recurso (venda)
+            "fonte_txt":     fonte_txt,
         })
 
     # Ordenar: alta > media > baixa
