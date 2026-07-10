@@ -233,6 +233,7 @@ _HP_GESTORES_FILE   = "/tmp/brauna_hp_gestores.json"
 _HP_GESTORAS2_FILE  = "/tmp/brauna_hp_gestoras2.json"
 _HP_ESTRUTURADAS_FILE = "/tmp/brauna_hp_estruturadas.json"
 _HP_CARTEIRA_BRAUNA_FILE = "/tmp/brauna_hp_carteira_brauna.json"
+_HP_CARTEIRAS_REC_FILE   = "/tmp/brauna_hp_carteiras_rec.json"
 _OBJETIVOS_FILE       = "/tmp/brauna_objetivos_okr.json"
 _RETORNOS_FILE        = "/tmp/brauna_retornos_classe.json"
 _ADMIN_ACTIVITY_FILE  = "/tmp/brauna_admin_activity.json"
@@ -578,6 +579,69 @@ def _extrair_tickers(texto: str):
     achados = set(_re_kb.findall(r"\b[A-Z]{4}\d{1,2}\b", (texto or "").upper()))
     return sorted(achados)
 
+# ── Carteiras recomendadas (upload no Head) ──────────────────────────────────────
+_FUND_STOP = {"FIC", "FIM", "FIRF", "FI", "FIF", "ADVISORY", "XP", "SEG", "SEGUROS",
+              "PREV", "MASTER", "RL", "CP", "DE", "DA", "DO", "FUNDO", "II", "III",
+              "ICATU", "SA", "S.A", "CIC", "MULTIMERCADO", "ACOES", "AÇÕES"}
+def _norm_nome(s):
+    """Chave normalizada de um nome de fundo: tokens significativos em maiúsculo."""
+    u = re.sub(r"[^A-ZÀ-Ú0-9 ]", " ", (s or "").upper())
+    toks = [t for t in u.split() if t not in _FUND_STOP and len(t) > 1]
+    return " ".join(toks)
+
+def _parse_carteira_rec(texto, nome=""):
+    """Extrai itens recomendados de um PDF de carteira/research: tickers (RV/FII) e
+    nomes de fundos; detecta o tipo. Não inventa — só o que o texto traz."""
+    up = (texto or "").upper()
+    tickers = _extrair_tickers(texto)
+    fii   = [t for t in tickers if t.endswith("11")]
+    acoes = [t for t in tickers if t[-1] in "3456" and not t.endswith("11")]
+    nomes = []
+    for ln in (texto or "").split("\n"):
+        s = ln.strip()
+        if 6 < len(s) < 80 and re.search(r"\b(FIC|FIM|FIRF|Advisory|Prev|Master|Multimercado|Crédito|Cr[eé]dito)\b", s) \
+           and not re.match(r"^[\d%R\$]", s):
+            nomes.append(s)
+    nomes = list(dict.fromkeys(nomes))[:80]
+    if len(fii) >= 4:
+        tipo = "fii"
+    elif len(acoes) >= 4:
+        tipo = "acoes"
+    elif re.search(r"CDB|NTN|DEB[EÊ]NTURE|INDEXADOR|VENCIMENTO|TESOURO|LCI|LCA|CRI|CRA", up):
+        tipo = "rf"
+    elif nomes:
+        tipo = "fundos"
+    elif re.search(r"ALOCA[ÇC][ÃA]O|CLASSE DE ATIVO|CARTEIRA RECOMENDADA", up):
+        tipo = "alocacao"
+    else:
+        tipo = "outro"
+    return {"tipo": tipo, "tickers": tickers, "fii": fii, "acoes": acoes, "nomes": nomes}
+
+def _recomendados():
+    """(tickers:set, nomes:set) recomendados de todas as carteiras salvas (cacheado leve)."""
+    tks, nomes = set(), set()
+    for c in _load(_HP_CARTEIRAS_REC_FILE, []):
+        for t in c.get("tickers", []):
+            tks.add(t.upper())
+        for nm in c.get("nomes", []):
+            k = _norm_nome(nm)
+            if k:
+                nomes.add(k)
+    return tks, nomes
+
+def _eh_recomendado(nome_produto, tks, nomes):
+    u = (nome_produto or "").upper()
+    if any(t in u for t in tks):
+        return True
+    key = _norm_nome(nome_produto).split()
+    if len(key) >= 2:
+        alvo = key[:2]
+        for n in nomes:
+            nt = n.split()
+            if len(nt) >= 2 and nt[:2] == alvo:
+                return True
+    return False
+
 def load_know_index():
     """Metadados de todos os docs. Usa SET de ids + chave de meta por doc (atômico,
     sem corrida de leitura-modificação-gravação). Cai p/ /tmp em dev local."""
@@ -902,11 +966,16 @@ def sugestoes_realocacao(comp, perfil, max_classes=3, por_classe=3):
     alvo = saa_alvo(perfil)
     if not alvo:
         return []
+    tks, nomes = _recomendados()
     gaps = [(cat, alvo.get(cat, 0) - comp.get(cat, 0)) for cat in CATS]
     gaps = sorted([g for g in gaps if g[1] >= 5], key=lambda x: -x[1])
     out = []
     for cat, gap in gaps[:max_classes]:
-        prods = _sugerir_por_classe(cat, por_classe)
+        cand = _sugerir_por_classe(cat, max(por_classe * 3, 8))
+        for p in cand:
+            p["recomendado"] = _eh_recomendado(p.get("nome"), tks, nomes)
+        cand.sort(key=lambda p: not p.get("recomendado"))  # recomendados primeiro (ordenação estável)
+        prods = cand[:por_classe]
         if prods:
             out.append({"classe": cat, "label": LABELS.get(cat, cat),
                         "gap_pct": round(gap, 1), "produtos": prods})
@@ -1013,6 +1082,65 @@ def extrair_composicao(pdf_bytes):
         fator = 100.0 / total
         comp = {k: round(v * fator, 2) for k, v in comp.items()}
     return comp, caixa, rent, patrimonio
+
+
+def _parse_ret_classe(texto):
+    """Extrai o retorno realizado por classe (Mês/Ano/12M/24M) + saldo bruto da
+    tabela 'ESTRATÉGIA: COMPOSIÇÃO' do XPerformance. Base do comparativo Cliente ×
+    Recomendada. Retorna {cls: {saldo, mes, ano, "12m", "24m"}}."""
+    MAP = [
+        (r"p.s\s*fix", "pos_fixado"), (r"pr.\s*fix", "pre_fixado"),
+        (r"infla", "inflacao"), (r"renda\s*vari.vel\s*brasil", "acoes"),
+        (r"fundos?\s*listad", "fiis"), (r"multimercad", "multimercado"),
+        (r"renda\s*fixa\s*global", "internacional"), (r"internacion", "internacional"),
+        (r"alternativ", "alternativos"), (r"cripto", "criptomoedas"),
+    ]
+    def _cls(n):
+        n = n.lower()
+        for pat, c in MAP:
+            if re.search(pat, n):
+                return c
+        return None
+    def _num(s):
+        s = s.strip().replace("%", "")
+        if s in ("-", "", "–", "—"):
+            return None
+        try:
+            return float(s.replace(".", "").replace(",", "."))
+        except Exception:
+            return None
+    # nome (pct%) R$ saldo  <mes> <ano> <12m> <24m>  — .match tolera lixo antes (ex.: "% total investido")
+    linha = re.compile(r"(.*?)\((\d[\d,]*)%\)\s+R\$\s*([\d\.]+,\d{2})\s+(.+)")
+    out = {}
+    for l in texto.splitlines():
+        m = linha.match(l.strip())
+        if not m:
+            continue
+        nome, _pct, saldo_s, resto = m.groups()
+        cls = _cls(nome)
+        if not cls:
+            continue
+        try:
+            saldo = float(saldo_s.replace(".", "").replace(",", "."))
+        except Exception:
+            continue
+        vals = {}
+        for per, tk in zip(["mes", "ano", "12m", "24m"], resto.split()[:4]):
+            vals[per] = _num(tk)
+        if cls in out:
+            # mesma classe em 2 linhas (ex.: Renda Fixa Global + Internacional): pondera por saldo
+            prev = out[cls]
+            ns = prev["saldo"] + saldo
+            for per in ["mes", "ano", "12m", "24m"]:
+                a, b = prev.get(per), vals.get(per)
+                if a is not None and b is not None:
+                    prev[per] = (a * prev["saldo"] + b * saldo) / ns if ns else a
+                elif b is not None:
+                    prev[per] = b
+            prev["saldo"] = ns
+        else:
+            out[cls] = {"saldo": saldo, **vals}
+    return out
 
 
 def extrair_xperformance(pdf_bytes):
@@ -1242,6 +1370,7 @@ def extrair_xperformance(pdf_bytes):
         "acoes":     acoes,
         "fiis":      fiis_list,
         "rf_ativos": rf_ativos,
+        "ret_classe": _parse_ret_classe(texto),
         "texto_completo": texto[:1500],
     }
 
@@ -3168,8 +3297,8 @@ function renderChartRent(){
   card.style.display="";
   var nota=document.getElementById("rent-comp-nota");
   if(nota) nota.textContent = temRec
-    ? ("Carteira recomendada estimada com os retornos por classe cadastrados"+(_retornosClasse.atualizado_em?(" ("+_retornosClasse.atualizado_em+")"):"")+".")
-    : "Cadastre os retornos por classe na página do Líder para exibir a carteira recomendada.";
+    ? ("Recomendada = retorno médio da casa por classe"+(_retornosClasse._n_clientes?(" ("+_retornosClasse._n_clientes+" carteiras)"):"")+", ponderado pela alocação-alvo deste cliente. Liderança pode sobrescrever na página do Líder. Rentabilidade passada não garante futuro.")
+    : "Sem retornos por classe ainda — importe carteiras (XPerformance) ou cadastre na página do Líder para exibir a carteira recomendada.";
   if(window._chartRentInst) window._chartRentInst.destroy();
   window._chartRentInst=new Chart(cv,{
     type:"line",
@@ -3691,8 +3820,9 @@ function mostrarPreviewPDF(d){
           var prods = (s.produtos||[]).map(function(p){
             var fgc = p.fgc===true ? ' <span style="color:#5DCAA5;font-size:9px">FGC</span>'
                     : (p.fgc===false ? ' <span style="color:#8A6A2A;font-size:9px">s/FGC</span>' : '');
+            var rec = p.recomendado ? '<span style="color:#C9A96E;font-size:9px;font-weight:700">⭐ Recomendado XP</span> ' : '';
             return '<div style="margin:3px 0 5px 12px">'
-              +'<div style="font-size:11px;color:#DDD">• '+(p.nome||'')+' <span style="color:#8BCFEF">'+(p.detalhe||'')+'</span> <span style="color:#4A7055;font-size:9px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
+              +'<div style="font-size:11px;color:#DDD">• '+rec+(p.nome||'')+' <span style="color:#8BCFEF">'+(p.detalhe||'')+'</span> <span style="color:#4A7055;font-size:9px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
               +'<div style="font-size:10px;color:#5A7A6A;margin-left:12px;line-height:1.35">'+(p.obs||'')+'</div>'
               +'</div>';
           }).join("");
@@ -5105,34 +5235,9 @@ function renderizar(data){
   // Score Modelo de Servir como métrica
   if(checklist_servir){
     const scoreColor=score_servir>=5?"ok":score_servir>=3?"":"danger";
-    const pendentes_list = checklist_servir.filter(p=>p.status==="pendente");
     const barColor = score_servir>=5?"#5DCAA5":score_servir>=3?"#FFD966":"#FF6B6B";
     const bordaColor = pendentes_criticos>0?"#FF4444":score_servir>=5?"#2A5040":"#1C4A34";
     const bgColor = pendentes_criticos>0?"#2A1010":score_servir>=5?"#0A2A18":"#0B2A1F";
-
-    let insightsHtml = "";
-    if(pendentes_list.length > 0){
-      insightsHtml = `<div style="margin-top:14px;border-top:1px solid #1C4A34;padding-top:12px">
-        <div style="font-size:10px;color:#FF6B6B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
-          ⚠ Insights — o que fazer para completar o modelo
-        </div>`;
-      pendentes_list.forEach(p=>{
-        const imp_cor = p.importancia.startsWith("CRÍTICA")?"#FF6B6B":p.importancia==="ALTA"?"#FFD966":"#888";
-        insightsHtml += `<div style="margin-bottom:10px;padding:10px 12px;background:#081F18;border-left:3px solid ${imp_cor};border-radius:0 6px 6px 0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:16px">${p.icone}</span>
-            <span style="font-size:12px;font-weight:700;color:#F0F0F0">${p.nome}</span>
-            <span style="font-size:10px;padding:2px 7px;background:${imp_cor}22;color:${imp_cor};border-radius:10px;font-weight:700">${p.importancia}</span>
-          </div>
-          <div style="font-size:11px;color:#888;margin-bottom:4px">${p.impacto_falta}</div>
-          <div style="font-size:11px;color:#C9A96E;font-weight:600">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:6px;padding:6px 8px;background:#1A2E1A;border:1px solid #C9A96E33;border-radius:5px;font-size:10px;color:#C9A96E">★ 1ª DIRETRIZ BRAÚNA — Provocar o cliente sobre o Financial Planning.</div>`:""}
-        </div>`;
-      });
-      insightsHtml += `</div>`;
-    } else {
-      insightsHtml = `<div style="margin-top:10px;font-size:12px;color:#5DCAA5">✓ Todos os pilares completos — cliente no modelo ideal.</div>`;
-    }
 
     html+=`<div class="metric" style="grid-column:span 4;background:${bgColor};border:1px solid ${bordaColor}">
       <div class="lbl">Modelo de Servir</div>
@@ -5146,7 +5251,6 @@ function renderizar(data){
         </div>
       </div>
       <div style="font-size:11px;color:#888;margin-top:6px">${pendentes_criticos>0?`🔴 ${pendentes_criticos} crítico(s) pendente(s) `:''}${pendentes_altos>0?`🟡 ${pendentes_altos} importante(s) pendente(s)`:score_servir>=6?'✓ Todos completos':''}</div>
-      ${insightsHtml}
     </div>`;
   }
   m.innerHTML=html;
@@ -7153,12 +7257,71 @@ def carregar_retornos():
     base["_meta"] = {"classes": _RET_CLASSES, "periodos": _RET_PERIODOS, "labels": _RET_LABELS}
     return base
 
+def agregar_retornos_classe():
+    """Média ponderada por saldo do retorno realizado de cada classe, entre os
+    snapshots mais recentes de todos os clientes salvos. Fonte 'auto' (média da casa)
+    do comparativo de rentabilidade, extraída dos XPerformance importados."""
+    hist = load_hist()
+    acc = {c: {p: [0.0, 0.0] for p in _RET_PERIODOS} for c in _RET_CLASSES}
+    n_cli = 0
+    for reg in (hist.values() if isinstance(hist, dict) else []):
+        if not isinstance(reg, dict):
+            continue
+        ents = reg.get("entradas") or []
+        rc = (ents[0] or {}).get("ret_classe") if ents and isinstance(ents[0], dict) else None
+        if not rc or not isinstance(rc, dict):
+            continue
+        contou = False
+        for cls, dd in rc.items():
+            if cls not in acc or not isinstance(dd, dict):
+                continue
+            saldo = dd.get("saldo") or 0
+            if saldo <= 0:
+                continue
+            for p in _RET_PERIODOS:
+                v = dd.get(p)
+                if v is None:
+                    continue
+                acc[cls][p][0] += saldo
+                acc[cls][p][1] += saldo * v
+                contou = True
+        if contou:
+            n_cli += 1
+    out = {c: {p: (round(acc[c][p][1] / acc[c][p][0], 2) if acc[c][p][0] > 0 else None)
+               for p in _RET_PERIODOS} for c in _RET_CLASSES}
+    return {"classes": out, "n_clientes": n_cli}
+
+
+def _retornos_payload():
+    """Monta o payload do comparativo: valores EFETIVOS (override manual da liderança
+    quando houver, senão a média da casa) + as duas camadas separadas para a UI."""
+    manual = carregar_retornos()
+    auto = agregar_retornos_classe()
+    man_cls = manual.get("classes", {})
+    aut_cls = auto.get("classes", {})
+    efetivo = {}
+    for c in _RET_CLASSES:
+        efetivo[c] = {}
+        for p in _RET_PERIODOS:
+            mv = (man_cls.get(c) or {}).get(p)
+            av = (aut_cls.get(c) or {}).get(p)
+            efetivo[c][p] = mv if mv is not None else av
+    return {
+        "classes": efetivo,      # merged — o gráfico Cliente × Recomendada × CDI lê isto
+        "_manual": man_cls,      # override da liderança (valor dos inputs no Líder)
+        "_auto": aut_cls,        # média realizada da casa (placeholder / fallback)
+        "_n_clientes": auto.get("n_clientes", 0),
+        "_meta": manual.get("_meta", {"classes": _RET_CLASSES, "periodos": _RET_PERIODOS, "labels": _RET_LABELS}),
+        "atualizado_em": manual.get("atualizado_em", ""),
+    }
+
+
 @app.route("/api/retornos-classe", methods=["GET", "POST"])
 def api_retornos_classe():
-    """Retorno (%) por classe e período, cadastrado pelo líder. Base do comparativo
-    de rentabilidade da carteira recomendada (ponderado pela alocação do modelo)."""
+    """Retorno (%) por classe e período. Fonte automática = média da casa extraída
+    dos XPerformance; a liderança pode sobrescrever qualquer célula (override manual)."""
     if request.method == "GET":
-        return jsonify(carregar_retornos())
+        return jsonify(_retornos_payload())
     d = request.get_json() or {}
     atual = carregar_retornos()
     cls_in = d.get("classes", {}) or {}
@@ -7173,7 +7336,7 @@ def api_retornos_classe():
                     atual["classes"][c][p] = None
     atual["atualizado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
     _save(_RETORNOS_FILE, {"classes": atual["classes"], "atualizado_em": atual["atualizado_em"]})
-    return jsonify({"ok": True, "retornos": atual})
+    return jsonify({"ok": True, "retornos": _retornos_payload()})
 
 @app.route("/api/objetivos", methods=["GET", "POST"])
 def api_objetivos():
@@ -7570,6 +7733,46 @@ CARTA:
         })
 
     return jsonify(resultado)
+
+@app.route("/api/hp/carteiras-rec", methods=["GET"])
+def hp_carteiras_rec():
+    """Lista as carteiras recomendadas (Research XP) subidas pelo Head."""
+    return jsonify(_load(_HP_CARTEIRAS_REC_FILE, []))
+
+@app.route("/api/hp/carteira-rec-upload", methods=["POST"])
+def hp_carteira_rec_upload():
+    """Recebe PDF de carteira recomendada, extrai tickers/fundos e salva.
+    O motor de sugestão passa a marcar '⭐ Recomendado XP' nesses ativos."""
+    pdf_file = request.files.get("pdf")
+    if not pdf_file:
+        return jsonify({"error": "PDF não enviado"}), 400
+    try:
+        import pdfplumber, io
+        with pdfplumber.open(io.BytesIO(pdf_file.read())) as pdf:
+            texto = "\n".join(p.extract_text() or "" for p in pdf.pages).strip()
+        if len(texto) < 50:
+            return jsonify({"error": "PDF sem texto extraível (pode ser PDF de imagem ou protegido)"}), 400
+    except Exception:
+        return jsonify({"error": "PDF inválido ou protegido por senha. Exporte novamente como PDF."}), 400
+    nome = request.form.get("nome", (pdf_file.filename or "Carteira Recomendada")).replace(".pdf", "").strip()
+    ref  = request.form.get("referencia", "").strip()
+    parsed = _parse_carteira_rec(texto, nome)
+    if not (parsed["tickers"] or parsed["nomes"]):
+        return jsonify({"error": "Não encontrei ativos/fundos recomendados no texto (tickers ou nomes de fundos)."}), 400
+    carts = [c for c in _load(_HP_CARTEIRAS_REC_FILE, []) if c.get("nome") != nome]  # substitui mesmo nome
+    item = {"id": str(uuid.uuid4())[:8], "nome": nome, "referencia": ref, "tipo": parsed["tipo"],
+            "tickers": parsed["tickers"], "fii": parsed["fii"], "acoes": parsed["acoes"],
+            "nomes": parsed["nomes"], "qtd": len(parsed["tickers"]) + len(parsed["nomes"]),
+            "data": datetime.now().strftime("%d/%m/%Y %H:%M")}
+    carts.append(item)
+    _save(_HP_CARTEIRAS_REC_FILE, carts)
+    return jsonify({"ok": True, "item": item})
+
+@app.route("/api/hp/carteira-rec-delete", methods=["POST"])
+def hp_carteira_rec_delete():
+    cid = (request.get_json() or {}).get("id", "")
+    _save(_HP_CARTEIRAS_REC_FILE, [c for c in _load(_HP_CARTEIRAS_REC_FILE, []) if c.get("id") != cid])
+    return jsonify({"ok": True})
 
 @app.route("/api/hp/knowledge/apply", methods=["POST"])
 def hp_knowledge_apply():
@@ -9210,6 +9413,8 @@ def analyze():
              "rent_mes": a.get("rent_mes"), "rent_12m": a.get("rent_12m")}
             for a in xp_parsed.get("rf_ativos",[])[:30]
         ],
+        # Retorno realizado por classe (base da carteira recomendada = média da casa)
+        "ret_classe": xp_parsed.get("ret_classe", {}),
     }
     reg_hist = hist.get(fkey, {"assessor": assessor, "nome": nome, "perfil": perfil, "objetivo": objetivo, "entradas": []})
     reg_hist["perfil"]   = perfil
@@ -10378,6 +10583,14 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .btn-ver{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #3A1010;color:#FF6B6B;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
 .btn-ver:hover{background:#2A1010;border-color:#FF6B6B}
 .risco-ok{padding:12px 16px;color:#5DCAA5;font-size:13px;background:#0A2018;border-radius:8px;border:1px solid #0A3020}
+.risco-grupo{margin-bottom:8px;border:1px solid #2A1010;border-radius:8px;overflow:hidden;background:#140808}
+.risco-grupo-head{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;user-select:none}
+.risco-grupo-head:hover{background:#1A0A0A}
+.risco-grupo-nome{font-size:13px;font-weight:700;color:#F0F0F0;flex:1;min-width:120px}
+.risco-grupo-count{font-size:11px;color:#FF6B6B;background:#2A1010;padding:2px 9px;border-radius:10px;font-weight:700;white-space:nowrap}
+.risco-grupo-pat{font-size:11px;color:#8B9FE8;white-space:nowrap}
+.risco-grupo-chev{font-size:14px;color:#8A5A5A;transition:transform .2s;width:16px;text-align:center}
+.risco-grupo-body{padding:2px 10px 10px}
 /* Card alertas */
 .card-alertas{background:#0D0A14;border:1px solid #2A1E3A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
 .card-alertas h2{font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
@@ -10556,17 +10769,8 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   </div>
 </div>
 
-<!-- Retornos por classe (base do comparativo de rentabilidade) -->
-<div style="background:#0B1410;border:1px solid #1C3A24;border-radius:12px;padding:18px 20px;margin-bottom:18px">
-  <div style="font-size:15px;font-weight:700;color:#C9A96E;margin-bottom:6px">📈 Retornos por Classe (para o comparativo de rentabilidade)</div>
-  <p style="font-size:12px;color:#3A6A48;margin-bottom:14px;line-height:1.6">Informe a <b style="color:#D4B483">rentabilidade (%) de cada classe</b> por período. Esses números são ponderados pela alocação da carteira recomendada de cada cliente para montar o gráfico <b>Cliente × Recomendada × CDI</b> na análise. Atualize mensalmente.</p>
-  <div id="ret-status" style="font-size:12px;color:#5DCAA5;min-height:16px;margin-bottom:8px"></div>
-  <div id="ret-tabela" style="overflow-x:auto"><p style="color:#3A6A48;font-size:12px">Carregando...</p></div>
-  <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-    <button onclick="retSalvar()" style="background:#C9A96E;color:#071E17;font-weight:700;border:1px solid #C9A96E;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">💾 Salvar retornos</button>
-    <button onclick="carregarRetornos()" style="background:none;border:1px solid #1C4A34;color:#5DCAA5;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">↺ Recarregar</button>
-  </div>
-</div>
+<!-- Retornos por classe: removido — agora é a média realizada da casa, auto dos XPerformance
+     (agregada em /api/retornos-classe). Override manual movível p/ a página do Head se necessário. -->
 
 <!-- Alertas de Mercado -->
 <div class="card-alertas" id="sec-alertas" style="display:none">
@@ -10902,23 +11106,57 @@ function renderRisco(filtroAssessor, filtroPerfil, filtroStatus){
     cont.innerHTML = '<div class="risco-ok">Nenhum alerta critico com os filtros atuais</div>';
     return;
   }
-  cont.innerHTML = riscos.map(c=>{
-    const hist = historico[(c.assessor+"|"+c.nome).toLowerCase()]||null;
-    const ult = hist && hist.entradas && hist.entradas[0];
-    const motivos = [];
-    if(ult && ult.status==="critico") motivos.push("Status critico");
-    if(ult && ult.rent12_pct_cdi < 70) motivos.push("Rent. 12M abaixo de 70% CDI (" + (ult.rent12_pct_cdi||0) + "%)");
-    const motivoStr = motivos.join(" · ")||"Desvio detectado";
-    const chaveHist = Object.keys(historico).find(k=>k.startsWith(c.assessor+"|"+c.nome)||k.endsWith("|"+c.nome));
-    const assessorIdx = rankingOrder ? rankingOrder.findIndex(a=>a.nome===c.assessor) : -1;
-    return '<div class="risco-item">'
-      +'<div class="risco-nome">'+c.nome+'</div>'
-      +'<span class="risco-assessor">'+c.assessor+'</span>'
-      +'<span class="risco-pat">'+fmtPat(c.patrimonio)+'</span>'
-      +'<span class="risco-motivo">'+motivoStr+'</span>'
-      +'<button class="btn-ver" onclick="verDetalhesCliente(\''+c.assessor+'\',\''+c.nome+'\')">Ver detalhes</button>'
-      +'</div>';
-  }).join("");
+  // Agrupa os clientes em risco por assessor — cada assessor é uma linha recolhida
+  // que expande ao clicar, evitando uma lista única muito extensa.
+  const grupos = {};
+  riscos.forEach(function(c){
+    let a = (c.assessor||"").trim();
+    if(!a || /^\d+$/.test(a)) a = "— Sem assessor —";
+    (grupos[a] = grupos[a] || []).push(c);
+  });
+  const nomes = Object.keys(grupos).sort(function(x,y){ return grupos[y].length - grupos[x].length; });
+
+  let html = "";
+  nomes.forEach(function(a, gi){
+    const lista = grupos[a];
+    const patTotal = lista.reduce(function(s,c){ return s + (c.patrimonio||0); }, 0);
+    const gid = "risco-grp-"+gi;
+    const linhas = lista.map(function(c){
+      const hist = historico[(c.assessor+"|"+c.nome).toLowerCase()]||null;
+      const ult = hist && hist.entradas && hist.entradas[0];
+      const motivos = [];
+      if(ult && ult.status==="critico") motivos.push("Status critico");
+      if(ult && ult.rent12_pct_cdi < 70) motivos.push("Rent. 12M abaixo de 70% CDI (" + (ult.rent12_pct_cdi||0) + "%)");
+      const motivoStr = motivos.join(" · ")||"Desvio detectado";
+      const cA = String(c.assessor||"").replace(/'/g,"\\'");
+      const cN = String(c.nome||"").replace(/'/g,"\\'");
+      return '<div class="risco-item">'
+        +'<div class="risco-nome">'+c.nome+'</div>'
+        +'<span class="risco-pat">'+fmtPat(c.patrimonio)+'</span>'
+        +'<span class="risco-motivo">'+motivoStr+'</span>'
+        +'<button class="btn-ver" onclick="verDetalhesCliente(\''+cA+'\',\''+cN+'\')">Ver detalhes</button>'
+        +'</div>';
+    }).join("");
+    html += '<div class="risco-grupo">'
+      + '<div class="risco-grupo-head" onclick="toggleRiscoGrupo(\''+gid+'\')">'
+      +   '<span class="risco-grupo-nome">'+a+'</span>'
+      +   '<span class="risco-grupo-count">'+lista.length+' em risco</span>'
+      +   '<span class="risco-grupo-pat">'+fmtPat(patTotal)+'</span>'
+      +   '<span class="risco-grupo-chev" id="chev-'+gid+'">▾</span>'
+      + '</div>'
+      + '<div class="risco-grupo-body" id="'+gid+'" style="display:none">'+linhas+'</div>'
+      + '</div>';
+  });
+  cont.innerHTML = html;
+}
+
+function toggleRiscoGrupo(gid){
+  const b = document.getElementById(gid);
+  const ch = document.getElementById("chev-"+gid);
+  if(!b) return;
+  const aberto = b.style.display !== "none";
+  b.style.display = aberto ? "none" : "";
+  if(ch) ch.style.transform = aberto ? "" : "rotate(180deg)";
 }
 
 function verDetalhesCliente(assessor, nome){
@@ -10987,9 +11225,10 @@ function toggleAlerta(i){
 }
 
 function popularFiltroAssessor(){
-  // Combina assessores de clientes + da planilha financeira
-  const fromClientes = clientesData.map(c=>c.assessor).filter(Boolean);
-  const fromPlanilha = (dadosFinanceiros.assessores||[]).map(a=>a.nome).filter(Boolean);
+  // Combina assessores de clientes + da planilha financeira; exclui códigos de conta (numéricos)
+  const soAssessor = a => a && !/^\d+$/.test(String(a).trim());
+  const fromClientes = clientesData.map(c=>c.assessor).filter(soAssessor);
+  const fromPlanilha = (dadosFinanceiros.assessores||[]).map(a=>a.nome).filter(soAssessor);
   const assessores = [...new Set([...fromClientes,...fromPlanilha])].sort();
   const sel = document.getElementById("filtro-assessor");
   assessores.forEach(function(a){
@@ -11020,7 +11259,10 @@ function buildPorAssessor(filtroAssessor, filtroPerfil, filtroStatus){
   const porAssessor = {};
   Object.entries(historico).forEach(function(entry){
     const key = entry[0]; const reg = entry[1];
-    const assessor = reg.assessor || key.split("|")[0];
+    const assessor = (reg.assessor || key.split("|")[0] || "").trim();
+    // O ranking lista só assessores (dos líderes). Registros cujo "assessor" é na
+    // verdade um código de conta de cliente (numérico) não entram como linha própria.
+    if(!assessor || /^\d+$/.test(assessor)) return;
     const perfil = reg.perfil || "";
     const ult = reg.entradas && reg.entradas[0];
     const status = ult && ult.status || "saudavel";
@@ -11396,58 +11638,12 @@ async function objSalvar(){
   setTimeout(function(){ if(st) st.textContent=""; },6000);
 }
 
-// ── Retornos por classe (base do comparativo de rentabilidade) ───────────────
-var _retData = null;
-var _RET_PER = [["mes","Mês"],["ano","Ano"],["12m","12M"],["24m","24M"]];
-async function carregarRetornos(){
-  var tb=document.getElementById("ret-tabela"); if(!tb) return;
-  try{ var r=await fetch("/api/retornos-classe"); _retData=await r.json(); retRender(); }
-  catch(e){ tb.innerHTML='<p style="color:#FF6B6B;font-size:12px">Erro ao carregar retornos.</p>'; }
-}
-function retRender(){
-  var tb=document.getElementById("ret-tabela"); if(!tb||!_retData) return;
-  var meta=_retData._meta||{}; var classes=meta.classes||[]; var labels=meta.labels||{};
-  var cls=_retData.classes||{};
-  var h='<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:520px">';
-  h+='<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34;background:#071E17"><th style="text-align:left;padding:6px 8px">Classe</th>';
-  _RET_PER.forEach(function(p){ h+='<th style="text-align:right;padding:6px 8px">'+p[1]+' (%)</th>'; });
-  h+='</tr></thead><tbody>';
-  classes.forEach(function(c,i){
-    var bg=i%2===0?"#060C08":"#081208";
-    h+='<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F"><td style="padding:5px 8px;color:#D4B483;font-weight:700">'+(labels[c]||c)+'</td>';
-    _RET_PER.forEach(function(p){
-      var v=(cls[c]||{})[p[0]];
-      h+='<td style="padding:5px 8px;text-align:right"><input type="number" step="0.01" data-ret-c="'+c+'" data-ret-p="'+p[0]+'" value="'+(v==null?"":v)+'" placeholder="—" style="width:82px;text-align:right;background:#071E17;border:1px solid #1C4A34;border-radius:5px;padding:4px 6px;color:#F0F0F0;font-size:11px"></td>';
-    });
-    h+='</tr>';
-  });
-  h+='</tbody></table>';
-  tb.innerHTML=h;
-  var stEl=document.getElementById("ret-status");
-  if(stEl && _retData.atualizado_em) stEl.textContent="Atualizado em "+_retData.atualizado_em;
-}
-async function retSalvar(){
-  if(!_retData) return;
-  var st=document.getElementById("ret-status");
-  var classes={};
-  document.querySelectorAll('[data-ret-c]').forEach(function(el){
-    var c=el.getAttribute("data-ret-c"), p=el.getAttribute("data-ret-p");
-    classes[c]=classes[c]||{};
-    classes[c][p]= el.value!=="" ? parseFloat(el.value) : null;
-  });
-  if(st){ st.textContent="Salvando..."; st.style.color="#AAA"; }
-  try{
-    var r=await fetch("/api/retornos-classe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({classes:classes})});
-    var d=null; try{ d=await r.json(); }catch(_){}
-    if(r.ok && d && d.ok){ _retData=d.retornos; retRender(); if(st){ st.textContent="✓ Retornos salvos às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); st.style.color="#5DCAA5"; } }
-    else if(st){ st.textContent="Erro ao salvar (HTTP "+r.status+")"; st.style.color="#FF6B6B"; }
-  }catch(e){ if(st){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; } }
-  setTimeout(function(){ if(st) st.textContent=""; },6000);
-}
+// Retornos por classe: a tela manual foi removida do Líder. A carteira recomendada
+// agora é a média realizada da casa, agregada automaticamente em /api/retornos-classe
+// a partir dos XPerformance importados. (Override manual pode voltar na página do Head.)
 
 init();
 carregarObjetivos();
-carregarRetornos();
 </script>
 </body></html>"""
 
@@ -12920,6 +13116,18 @@ textarea{resize:vertical}
 
 <div class="head-tabpanel" id="ht-recom">
 
+<!-- ══ CARTEIRAS RECOMENDADAS (Research XP) ════════════════════════════════════ -->
+<div class="card" style="border-color:#2A2418">
+  <div class="card-title" style="color:#C9A96E"><span>⭐</span> Carteiras Recomendadas — Research XP</div>
+  <div style="background:#0C0A06;border:1px solid #2A2418;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span style="font-size:11px;color:#8A7A5A;flex:1;line-height:1.5">Suba os PDFs das carteiras recomendadas (RF, Fundos, FIIs, Alocação). O sistema extrai os ativos e passa a marcar <b style="color:#C9A96E">⭐ Recomendado XP</b> nas sugestões que o assessor recebe na análise do cliente.</span>
+    <input type="file" id="cartrec-input" accept=".pdf" style="display:none" onchange="uploadCarteiraRec(this)">
+    <button class="btn btn-sm" onclick="document.getElementById('cartrec-input').click()" style="white-space:nowrap">📂 Subir carteira (PDF)</button>
+    <span id="cartrec-st" style="font-size:11px;min-width:110px"></span>
+  </div>
+  <div id="cartrec-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+</div>
+
 <!-- ══ 3. ALOCAÇÕES DE REFERÊNCIA ════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📐</span> Alocações de Referência — Carteiras por Gestora</div>
@@ -13416,6 +13624,42 @@ function headTab(name, btn){
     if(t && document.getElementById('ht-'+t)) headTab(t);
   }catch(_){}
 })();
+
+// ── Carteiras Recomendadas (Research XP) ──────────────────────────────────────
+async function uploadCarteiraRec(input){
+  const file = input.files[0]; if(!file) return; input.value="";
+  const st = document.getElementById("cartrec-st");
+  if(file.size > 4.3*1024*1024){ st.innerHTML='<span style="color:#FF6B6B">Máx 4,3 MB</span>'; return; }
+  st.innerHTML='<span style="color:#D4B483">⏳ Processando...</span>';
+  try{
+    const fd=new FormData(); fd.append("pdf",file); fd.append("nome",file.name.replace(/\.pdf$/i,""));
+    const r=await fetch("/api/hp/carteira-rec-upload",{method:"POST",body:fd});
+    const d=await r.json();
+    if(d.ok){ st.innerHTML='<span style="color:#5DCAA5">✅ '+d.item.qtd+' ativos ('+d.item.tipo+')</span>'; carregarCarteirasRec(); setTimeout(()=>st.textContent="",5000); }
+    else st.innerHTML='<span style="color:#FF6B6B">'+(d.error||"erro")+'</span>';
+  }catch(e){ st.innerHTML='<span style="color:#FF6B6B">'+e.message+'</span>'; }
+}
+async function carregarCarteirasRec(){
+  try{
+    const carts = await (await fetch("/api/hp/carteiras-rec")).json();
+    const box = document.getElementById("cartrec-lista"); if(!box) return;
+    if(!carts.length){ box.innerHTML='<div style="font-size:11px;color:#3A5A48;text-align:center;padding:12px">Nenhuma carteira recomendada subida ainda.</div>'; return; }
+    const TIPOS={rf:"Renda Fixa",fundos:"Fundos",fii:"FIIs",acoes:"Ações",alocacao:"Alocação",outro:"Outro"};
+    box.innerHTML=carts.map(function(c){
+      var amostra=(c.tickers||[]).slice(0,6).join(", ")+((c.tickers||[]).length>6?"…":"");
+      return '<div style="background:#0C0A06;border:1px solid #2A2418;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'
+        +'<div style="flex:1"><div style="font-size:12px;color:#DDD;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#C9A96E;background:#1A1608;border:1px solid #2A2418;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span></div>'
+        +'<div style="font-size:10px;color:#5A7A6A">'+c.qtd+' ativos'+(c.referencia?" · "+c.referencia:"")+' · '+c.data+(amostra?" · "+amostra:"")+'</div></div>'
+        +'<button onclick="deleteCarteiraRec(\''+c.id+'\')" style="background:none;border:none;color:#3A2A2A;cursor:pointer;font-size:14px" title="Remover">🗑</button></div>';
+    }).join("");
+  }catch(e){}
+}
+async function deleteCarteiraRec(id){
+  if(!confirm("Remover esta carteira recomendada?")) return;
+  await fetch("/api/hp/carteira-rec-delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:id})});
+  carregarCarteirasRec();
+}
+carregarCarteirasRec();
 
 // ── Publicar pendente ─────────────────────────────────────────────────────────
 function marcarPendente(){
