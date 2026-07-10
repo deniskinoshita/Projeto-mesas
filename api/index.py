@@ -2441,6 +2441,13 @@ select option{background:#1A1A1A}
   <p id="msg-admin-data" style="font-size:10px;color:#3A6A48;margin-top:4px"></p>
 </div>
 
+<!-- Calls do Head — proativo: para cada call ativa, os clientes DESTE assessor -->
+<div id="calls-assessor-card" class="card" style="display:none">
+  <h2 style="display:flex;align-items:center;gap:8px">📣 Calls do Head <span id="calls-assessor-cont" style="font-size:11px;color:#3A6A48;font-weight:400"></span></h2>
+  <p style="font-size:11px;color:#7A8A80;margin:-4px 0 12px;line-height:1.5">Recomendações de renda variável publicadas pela mesa. Para cada ativo, seus clientes que já o possuem ou têm perfil compatível com a operação.</p>
+  <div id="calls-assessor-lista"></div>
+</div>
+
 <div class="card">
   <h2>Dados do cliente</h2>
 
@@ -2962,6 +2969,79 @@ document.addEventListener("click", function(e){
 // Carrega notificações ao abrir a página e refresca a cada 5 min
 carregarNotificacoes();
 setInterval(carregarNotificacoes, 5*60*1000);
+
+// ── Calls do Head cruzadas com a carteira do assessor ────────────────────────
+let _callsAssessor = [];
+function _nomeAssessorAtual(){
+  const el = document.getElementById("assessor");
+  return ((el && el.value) ? el.value : (localStorage.getItem("brauna_nome")||"")).trim();
+}
+async function carregarCallsAssessor(){
+  const nome = _nomeAssessorAtual();
+  if(!nome){ return; }
+  try{
+    const d = await fetch("/api/assessor/calls-clientes?assessor="+encodeURIComponent(nome)).then(r=>r.json());
+    _callsAssessor = (d && Array.isArray(d.calls)) ? d.calls : [];
+    renderCallsAssessor();
+  }catch(e){}
+}
+function renderCallsAssessor(){
+  const card  = document.getElementById("calls-assessor-card");
+  const lista = document.getElementById("calls-assessor-lista");
+  const cont  = document.getElementById("calls-assessor-cont");
+  if(!card || !lista) return;
+  if(!_callsAssessor.length){ card.style.display="none"; return; }
+  card.style.display = "block";
+  if(cont) cont.textContent = "("+_callsAssessor.length+" ativa"+(_callsAssessor.length>1?"s":"")+")";
+  const DIR = {
+    compra:{lbl:"COMPRA",cor:"#5DCAA5",bg:"#0E2A1E"},
+    venda: {lbl:"VENDA", cor:"#FF6B6B",bg:"#2A1010"},
+    neutro:{lbl:"NEUTRO",cor:"#C9A96E",bg:"#2A230E"}
+  };
+  lista.innerHTML = _callsAssessor.map(function(c,i){
+    const dir = DIR[(c.direcao||"compra").toLowerCase()] || DIR.compra;
+    const n = c.n_clientes||0;
+    const badgeCor = n>0 ? "#5DCAA5" : "#3A6A48";
+    const badgeBg  = n>0 ? "#0E2A1E" : "#0A160F";
+    const up = (typeof c.upside==="number" && c.upside) ? `<span style="color:#5DCAA5;font-size:11px;margin-left:6px">▲ ${c.upside}%</span>` : "";
+    const perfis = (c.perfis||[]).map(p=>`<span style="background:#12281C;color:#8FBFA5;border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px">${p}</span>`).join("");
+    const gid = "callcli-"+i;
+    const chips = (c.clientes||[]).map(function(m){
+      const cor = m.detem ? "#5DCAA5" : "#C9A96E";
+      const bg  = m.detem ? "#0E2A1E" : "#111";
+      const tag = m.detem ? "já detém" : ("perfil "+(m.perfil||"compatível"));
+      const rot = m.nome || ("#"+(m.conta||""));
+      return `<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #1C4A34;border-radius:16px;background:${bg};color:${cor};padding:3px 10px;font-size:11px;margin:3px 4px 0 0">${rot} <span style="color:#5A6A60;font-size:9px">· ${tag}</span></span>`;
+    }).join("");
+    const resumo = n>0 ? `<span style="color:#5A6A60;font-size:11px;margin-left:6px">${c.n_detem||0} detêm · ${c.n_compat||0} por perfil</span>` : "";
+    const clientesBlock = n>0
+      ? `<div id="${gid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #12281C">${resumo}<div style="margin-top:6px">${chips}</div></div>`
+      : `<div id="${gid}" style="display:none;margin-top:10px;color:#5A6A60;font-size:12px;padding-top:10px;border-top:1px solid #12281C">Nenhum cliente com este ativo ou perfil compatível ainda — oportunidade de prospecção.</div>`;
+    return `<div style="background:#081F18;border:1px solid #12281C;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+      <div onclick="callAssessorToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="background:${dir.bg};color:${dir.cor};border:1px solid ${dir.cor}44;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700">${dir.lbl}</span>
+        <span style="color:#E8D5A3;font-weight:700;font-size:15px;letter-spacing:.5px">${c.ticker||""}</span>
+        ${up}
+        <span style="flex:1"></span>
+        <span style="background:${badgeBg};color:${badgeCor};border:1px solid ${badgeCor}55;border-radius:14px;padding:3px 11px;font-size:11px;font-weight:700">${n} cliente${n===1?"":"s"} para este ativo</span>
+        <span id="${gid}-ar" style="color:#3A6A48;font-size:11px">▸</span>
+      </div>
+      ${perfis?`<div style="margin-top:6px;font-size:11px;color:#7A8A80">Perfis-alvo: ${perfis}</div>`:""}
+      ${c.tese?`<div style="color:#9AAAA0;font-size:12px;margin-top:6px;line-height:1.5">${c.tese}</div>`:""}
+      ${clientesBlock}
+    </div>`;
+  }).join("");
+}
+function callAssessorToggle(gid){
+  const el = document.getElementById(gid);
+  const ar = document.getElementById(gid+"-ar");
+  if(!el) return;
+  const abrir = (el.style.display==="none");
+  el.style.display = abrir ? "block" : "none";
+  if(ar) ar.textContent = abrir ? "▾" : "▸";
+}
+carregarCallsAssessor();
+setInterval(carregarCallsAssessor, 5*60*1000);
 
 const MODELOS={conservadora:{pos_fixado:70,inflacao:16,pre_fixado:7,acoes:0,fiis:0,multimercado:3,internacional:4,alternativos:0,criptomoedas:0},moderada:{pos_fixado:44,inflacao:23,pre_fixado:10,acoes:5,fiis:1.5,multimercado:6,internacional:9,alternativos:1,criptomoedas:0.5},arrojada:{pos_fixado:28,inflacao:28,pre_fixado:12,acoes:8,fiis:2.5,multimercado:9.5,internacional:10.25,alternativos:1,criptomoedas:0.75},agressiva:{pos_fixado:13,inflacao:31,pre_fixado:13,acoes:14,fiis:3.5,multimercado:10.5,internacional:13,alternativos:1,criptomoedas:1}};
 const LABELS={pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
@@ -4455,6 +4535,7 @@ async function buscarClientesSalvos(){
     }
     ul.innerHTML = h;
     if(box) box.style.display="block";
+    try{ carregarCallsAssessor(); }catch(e){}
   }catch(e){}
 }
 function csToggle(id){
@@ -7212,13 +7293,8 @@ def hp_calls():
     calls.insert(0, novo)
     calls = calls[:200]
     _save(_HP_CALLS_FILE, calls)
-    # Dispara notificações para assessores com clientes que possuem o ativo
-    afetados = _disparar_notificacoes_ativo(
-        novo["ticker"],
-        "call",
-        f"Head de Produtos: {novo['direcao'].upper()} {novo['ticker']} — {(novo['tese'] or '')[:120] or 'Ver detalhes na área de Produtos'}",
-        novo["id"],
-    )
+    # Notifica cada assessor que tenha clientes com o ativo OU perfil compatível
+    afetados = _notificar_call_nova(novo)
     return jsonify({"ok": True, "call": novo, "assessores_notificados": list(afetados.keys())})
 
 def _disparar_notificacoes_ativo(ticker_ou_nome: str, tipo: str, mensagem: str, item_id: str):
@@ -7313,6 +7389,170 @@ def minhas_notificacoes():
         if primeiro and key.lower().startswith(primeiro):
             return jsonify(notif[key])
     return jsonify([])
+
+# ── Calls do Head × carteira do assessor (proativo) ──────────────────────────
+# Régua de risco dos perfis: uma call de RV mirando "arrojada/agressiva" também
+# é compatível com clientes de perfil igual ou MAIS agressivo (nunca menos).
+_PERFIL_RANK = {
+    "super_conservadora": 0, "super conservadora": 0,
+    "conservadora": 1, "moderada": 2, "arrojada": 3, "agressiva": 4,
+}
+
+def _norm_assessor_key(nome):
+    """Espelha o normAssessorKey do front: 'primeiro|ultimo' sem acento, minúsculo."""
+    import unicodedata
+    s = unicodedata.normalize("NFKD", str(nome or "")).encode("ascii", "ignore").decode().lower().strip()
+    s = " ".join(s.split())
+    if not s:
+        return ""
+    p = [x for x in s.split(" ") if x]
+    return p[0] if len(p) <= 1 else p[0] + "|" + p[-1]
+
+def _perfil_rank(perfil):
+    p = str(perfil or "").lower().strip()
+    if p in _PERFIL_RANK:
+        return _PERFIL_RANK[p]
+    for k, v in _PERFIL_RANK.items():
+        if k and k in p:
+            return v
+    return None
+
+def _perfil_compativel_call(perfil_cliente, call_perfis):
+    """Cliente é compatível se o perfil dele alcança (>=) o perfil-alvo menos
+    agressivo da call. Sem perfis-alvo definidos, a call vale para todos."""
+    if not call_perfis:
+        return True
+    ranks = [_perfil_rank(p) for p in call_perfis]
+    ranks = [r for r in ranks if r is not None]
+    pr = _perfil_rank(perfil_cliente)
+    if pr is None or not ranks:
+        # Fallback textual quando não dá para ranquear
+        pc = str(perfil_cliente or "").lower()
+        return any(str(p or "").lower() in pc for p in call_perfis if p)
+    return pr >= min(ranks)
+
+def _coletar_clientes_assessor(assessor_nome):
+    """Todos os clientes do assessor (dedup por conta), com perfil e os tickers
+    (ações+FIIs) da última carteira salva no histórico."""
+    ass_key = _norm_assessor_key(assessor_nome)
+    ass_low = (assessor_nome or "").lower().strip()
+    fichas  = load_fichas()
+    hist    = load_hist()
+    clientes, seen = [], set()
+    for k, v in fichas.items():
+        if not isinstance(v, dict):
+            continue
+        v_ass = str(v.get("assessor", "") or "")
+        if not (_norm_assessor_key(v_ass) == ass_key
+                or k.startswith(ass_low + "|")
+                or v_ass.lower().strip() == ass_low):
+            continue
+        conta = str(v.get("conta", "")).strip()
+        dedup = conta or k
+        if dedup in seen:
+            continue
+        seen.add(dedup)
+        perfil = (v.get("perfil", "") or "").lower().strip()
+
+        # Posições da carteira mais recente que tenha ações/FIIs
+        hentry = None
+        if conta:
+            hentry = hist.get(f"conta:{conta}") or hist.get(conta)
+        if hentry is None:
+            hentry = hist.get(k)
+        ents = hentry.get("entradas") if isinstance(hentry, dict) else hentry
+        tickers = set()
+        if isinstance(ents, list):
+            for e in reversed(ents):
+                if not isinstance(e, dict):
+                    continue
+                pos = (e.get("acoes") or []) + (e.get("fiis") or [])
+                if pos:
+                    for a in pos:
+                        t = str((a or {}).get("ticker", "")).upper().strip()
+                        if t:
+                            tickers.add(t)
+                    break
+        clientes.append({"conta": conta, "nome": v.get("nome", ""),
+                         "perfil": perfil, "tickers": tickers})
+    return clientes
+
+def _match_call_clientes(call, clientes):
+    """Clientes que (a) detêm o ticker da call ou (b) têm perfil compatível.
+    Detentores primeiro."""
+    tk = str(call.get("ticker", "")).upper().strip()
+    perfis = call.get("perfis") or []
+    detem, compat = [], []
+    for c in clientes:
+        tem = bool(tk) and tk in c["tickers"]
+        comp = _perfil_compativel_call(c["perfil"], perfis)
+        if not (tem or comp):
+            continue
+        item = {"conta": c["conta"], "nome": c["nome"], "perfil": c["perfil"],
+                "detem": tem, "perfil_compativel": comp}
+        (detem if tem else compat).append(item)
+    return detem + compat
+
+def _notificar_call_nova(call):
+    """Cria uma notificação por assessor cujos clientes casam com a call nova."""
+    fichas = load_fichas()
+    assessores = {}  # chave normalizada → nome de exibição
+    for v in fichas.values():
+        if isinstance(v, dict) and str(v.get("assessor", "") or "").strip():
+            nome = str(v.get("assessor")).strip()
+            assessores.setdefault(_norm_assessor_key(nome), nome)
+
+    notif = _load(_NOTIF_FILE, {})
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+    direc = str(call.get("direcao", "") or "").upper()
+    afetados = {}
+    for ass_nome in assessores.values():
+        matched = _match_call_clientes(call, _coletar_clientes_assessor(ass_nome))
+        if not matched:
+            continue
+        n = len(matched)
+        n_detem = sum(1 for m in matched if m["detem"])
+        nomes = [(m["nome"] or ("#" + (m["conta"] or ""))) for m in matched][:12]
+        msg = (f"Nova call do Head: {direc} {call.get('ticker','')} — "
+               f"você tem {n} cliente{'s' if n != 1 else ''} para este ativo"
+               + (f" ({n_detem} já detêm)" if n_detem else ""))
+        notif.setdefault(ass_nome, [])
+        notif[ass_nome].insert(0, {
+            "id":                call.get("id"),
+            "tipo":              "call",
+            "ticker":            call.get("ticker", ""),
+            "mensagem":          msg,
+            "clientes_afetados": nomes,
+            "data":              agora,
+            "lido":              False,
+        })
+        notif[ass_nome] = notif[ass_nome][:50]
+        afetados[ass_nome] = nomes
+    _save(_NOTIF_FILE, notif)
+    return afetados
+
+@app.route("/api/assessor/calls-clientes", methods=["GET"])
+def assessor_calls_clientes():
+    """Para o assessor logado: calls ativas do Head + para cada uma os clientes
+    dele que já detêm o ticker OU têm perfil compatível com a operação."""
+    assessor = (request.args.get("assessor", "") or "").strip()
+    if not assessor:
+        return jsonify({"assessor": "", "total_clientes": 0, "calls": []})
+    calls = [c for c in _load(_HP_CALLS_FILE, []) if c.get("ativo", True)]
+    clientes = _coletar_clientes_assessor(assessor)
+    out = []
+    for call in calls:
+        matched = _match_call_clientes(call, clientes)
+        out.append({
+            **call,
+            "clientes":  matched,
+            "n_clientes": len(matched),
+            "n_detem":   sum(1 for m in matched if m["detem"]),
+            "n_compat":  sum(1 for m in matched if m["perfil_compativel"] and not m["detem"]),
+        })
+    # Mais clientes primeiro; empate mantém a ordem de publicação (mais nova no topo)
+    out.sort(key=lambda c: c["n_clientes"], reverse=True)
+    return jsonify({"assessor": assessor, "total_clientes": len(clientes), "calls": out})
 
 @app.route("/api/hp/gestoras2", methods=["GET","POST"])
 def hp_gestoras2():
