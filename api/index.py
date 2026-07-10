@@ -966,6 +966,37 @@ def _sug_cetip(filtro, obs, n, excluir=None):
     return [{"nome": f.get("ticker"), "detalhe": f"DY {_fpct(f.get('dy_aa'))} · {f.get('categoria')}",
              "fonte": "Cetipado", "obs": obs} for f in xs[:n]]
 
+def _travas_institucionais(cls, gap_valor, auc, prods_prat):
+    """Tetos do Controle Institucional de Alocação XP (vigência ago/2026) — NUNCA exceder.
+    Retorna a lista de avisos aplicáveis à sugestão desta classe. Ver memória
+    'limites-alocacao-institucional-xp'. AUC aqui = patrimônio da carteira (proxy;
+    o AUC oficial soma todas as marcas XP + OPIN)."""
+    import re as _re
+    travas = []
+    if not auc or auc <= 0:
+        return travas
+    def _brl(v): return f"R$ {v:,.0f}".replace(",", ".")
+    top   = (prods_prat or [{}])[0]
+    nome  = (top.get("nome") or "").upper()
+    is_tesouro = any(w in nome for w in ("NTN", "TESOURO", "LTN", "LFT"))
+    is_credito = cls in ("pos_fixado", "pre_fixado") or (cls == "inflacao" and not is_tesouro)
+    is_banco   = bool(top.get("fgc"))
+    # 1) Crédito privado — máx 5% do AUC por emissor
+    if is_credito:
+        lim = 0.05 * auc
+        if gap_valor > lim:
+            n = int(gap_valor // lim) + (1 if gap_valor % lim else 0)
+            travas.append(f"Crédito privado: máx 5% do AUC ({_brl(lim)}) por emissor — dividir em ~{n} emissores.")
+    # 2) NTN-B com vencimento ≥ 2040 — máx 15% do AUC
+    if is_tesouro and "NTN" in nome:
+        m = _re.search(r"(20\d{2})", nome)
+        if m and int(m.group(1)) >= 2040:
+            travas.append(f"NTN-B ≥2040: concentração máx 15% do AUC ({_brl(0.15*auc)}).")
+    # 3) Emissão bancária high yield — máx R$ 180k por emissor
+    if is_banco and gap_valor > 180000:
+        travas.append("Emissão bancária high yield: máx R$ 180k por emissor — checar rating e dividir.")
+    return travas
+
 def _sugerir_por_classe(cat, n=3, excluir=None):
     """Retorna até n produtos da prateleira adequados para a classe subalocada.
     `excluir` = conjunto de nomes/tickers (UPPER) que o cliente já tem, para não repetir."""
@@ -5161,6 +5192,7 @@ function renderPlanoTroca(sugs){
         ${p.obs?`<div style="font-size:10px;color:#6A7A6A;margin-top:2px">${p.obs}</div>`:""}
       </div>`;
     }).join("");
+    const travas=(s.travas||[]).map(t=>`<div style="font-size:10px;color:#FFD966;background:#211B00;border:1px solid #4A3A00;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
     h+=`<div style="border:1px solid #1C3A24;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#0B1410">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
         <span style="font-size:13px;font-weight:800;color:#F0F0F0">${s.label_classe}</span>
@@ -5168,10 +5200,12 @@ function renderPlanoTroca(sugs){
         <span style="font-size:11px;color:#8B9FE8">falta ${Math.abs(s.gap_pp).toFixed(1)}pp ≈ ${fmt(s.gap_valor)}</span>
       </div>
       <div style="font-size:11px;color:#FF6B6B;margin-bottom:8px">▼ Fonte do recurso (reduzir): <b>${fonte}</b></div>
-      <div style="font-size:10px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">▲ Comprar</div>
+      ${travas}
+      <div style="font-size:10px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:5px 0 5px">▲ Comprar</div>
       ${prods}
     </div>`;
   });
+  h+=`<div style="font-size:10px;color:#6A7A6A;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy — o oficial soma todas as marcas XP + OPIN.</div>`;
   el.innerHTML=h;
 }
 
@@ -8590,12 +8624,15 @@ def analyze_xp():
                                    "fonte": "Head Braúna", "obs": p.get("descricao", "")})
         try: prods_prat = _sugerir_por_classe(cls, 3, _held)
         except Exception: prods_prat = []
+        try: travas = _travas_institucionais(cls, gap_valor, _patr, prods_prat)
+        except Exception: travas = []
         sugestoes_por_classe.append({
             "classe": cls, "label_classe": LABELS.get(cls, cls),
             "gap_pp": round(gap_pp, 2), "gap_valor": gap_valor,
             "prioridade": prioridade,
             "produtos": prods_head, "produtos_prateleira": prods_prat,
             "fonte_recurso": _fontes[:3], "fonte_txt": _fonte_txt,
+            "travas": travas,
         })
     _ordp = {"alta": 0, "media": 1, "baixa": 2}
     sugestoes_por_classe.sort(key=lambda x: (_ordp.get(x["prioridade"], 9), x["gap_pp"]))
