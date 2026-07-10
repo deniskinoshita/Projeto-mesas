@@ -1556,22 +1556,22 @@ def aplicar_compliance(recomendacoes, alertas, comp, perfil):
     for cat, pct in comp.items():
         if cat == "alternativos" and pct > 15:
             compliance_alertas.append(
-                f"🚫 COMPLIANCE: Alternativos em {pct:.1f}% — limite XP é 15%. Realocação obrigatória.")
+                f"⚠️ Alerta de suitability: Alternativos em {pct:.1f}% — para o perfil {perfil.title()}, a exposição a ativos ilíquidos merece reavaliação (liquidez e prazo de resgate).")
         if cat == "acoes" and perfil not in ("arrojada", "agressiva") and pct > 30:
             compliance_alertas.append(
-                f"🚫 COMPLIANCE: Renda Variável em {pct:.1f}% para perfil {perfil.title()} — limite XP é 30%.")
+                f"⚠️ Alerta de suitability: a exposição em Renda Variável ({pct:.1f}%) é elevada para o perfil {perfil.title()} informado e merece reavaliação.")
 
     # Regra: diversificação mínima
     classes_com_posicao = sum(1 for v in comp.values() if v >= 1.0)
     if classes_com_posicao < 3:
         compliance_alertas.append(
-            "🚫 COMPLIANCE: Carteira com menos de 3 classes de ativos — mínimo de diversificação XP não atingido.")
+            "⚠️ Diversificação: a carteira concentra-se em menos de 3 classes de ativos — a diversificação pode ser ampliada.")
 
     # Regra: liquidez mínima (pós fixado + caixa)
     liquidez = comp.get("pos_fixado", 0)
     if liquidez < 10:
         compliance_alertas.append(
-            f"⚠️ COMPLIANCE: Liquidez diária em {liquidez:.1f}% — mínimo recomendado é 10% (Pós Fixado/Caixa).")
+            f"⚠️ Liquidez: parcela pós-fixada em {liquidez:.1f}% — avaliar a reserva efetivamente disponível em D+0/D+1 (nem todo pós-fixado tem liquidez diária).")
 
     # Injeta alertas de compliance NO INÍCIO da lista de alertas
     alertas = compliance_alertas + alertas
@@ -1623,11 +1623,11 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
         # Urgência pelo TAMANHO DO GAP (falta): <5pp = baixa · 5–10pp = média · >10pp = urgente
         _gap = abs(f.get("desvio", 0))
         if _gap > 10:
-            urgencia = "🔴 URGENTE"
+            urgencia = "Prioridade alta"
         elif _gap >= 5:
-            urgencia = "🟡 MÉDIA"
+            urgencia = "Prioridade moderada"
         else:
-            urgencia = "🟢 BAIXA"
+            urgencia = "Prioridade complementar"
 
         if cat == "inflacao":
             macro_txt = f"IPCA 12M em {ipca:.1f}%" if ipca else "IPCA elevado"
@@ -1786,22 +1786,23 @@ def _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl):
             papel = ins["papel"] if ins else "diversificação da carteira"
             blocos.append(("p",
                 f"<b>{g['label']}</b> ({g['real']:.1f}% vs. {g['alvo']:.1f}% do modelo): {papel}. "
-                f"A sub-alocação nessa classe reduz a proteção da carteira e deixa retorno/segurança na mesa."))
+                f"A sub-alocação nessa classe reduz a diversificação e a capacidade de reposicionamento da carteira."))
 
     # 4) Cenário macro e eleições 2026
     blocos.append(("sub", "Cenário 2026 — ano eleitoral, juros e câmbio"))
+    _macro_txt = (f"Com a Selic meta em {selic} e o IPCA acumulando {ipca} em 12 meses, "
+                  if (macro and macro.get('selic_meta') and macro.get('ipca_12m')) else "")
     blocos.append(("p",
-        f"A eleição presidencial de outubro de 2026 tende a elevar o prêmio de risco e a volatilidade dos ativos brasileiros ao longo "
-        f"do ano. O mercado costuma antecipar a incerteza fiscal, pressionando a curva de juros e o câmbio muito antes do pleito. "
-        f"Nesse ambiente — com a Selic meta em {selic} e o IPCA acumulando {ipca} em 12 meses — a diversificação por indexador é a "
-        f"principal defesa: pós-fixado para liquidez, inflação (IPCA+) para travar juro real, pré-fixado para capturar o eventual início "
-        f"do ciclo de queda e internacional como hedge cambial. Carteiras concentradas em um único fator de risco são as mais vulneráveis "
-        f"a solavancos eleitorais e a mudanças de humor do investidor estrangeiro."))
+        f"O processo eleitoral de 2026 pode aumentar a volatilidade dos ativos locais e do câmbio ao longo do ano, à medida que o "
+        f"mercado antecipa a incerteza fiscal. {_macro_txt}a diversificação por indexador tende a ajudar: pós-fixado para liquidez, "
+        f"inflação (IPCA+) para proteção do poder de compra, pré-fixado para capturar um eventual início de ciclo de queda de juros e "
+        f"internacional para reduzir a dependência exclusiva do mercado brasileiro. Carteiras concentradas em um único fator de risco "
+        f"tendem a ser mais sensíveis a oscilações de cenário."))
     blocos.append(("p",
-        "Na renda fixa, o juro real elevado é uma janela historicamente atrativa para travar IPCA+ em prazos longos, aceitando a "
-        "marcação a mercado no caminho. Na renda variável, o valuation descontado da bolsa brasileira convive com o risco eleitoral: "
-        "posições devem ter horizonte, gestão de risco e proteção perto dos alvos. E a exposição internacional deixa de ser opcional em "
-        "ano eleitoral — é o seguro cambial do patrimônio."))
+        "Na renda fixa, o juro real elevado costuma ser uma janela atrativa para posições em IPCA+, considerando a marcação a mercado "
+        "no caminho. Na renda variável, o valuation descontado da bolsa local convive com o risco eleitoral, o que reforça a importância "
+        "de horizonte, gestão de risco e proteção perto dos alvos. A diversificação internacional pode contribuir para reduzir a "
+        "dependência exclusiva do mercado brasileiro e a exposição ao real."))
 
     # 5) Fragilidades
     frags = []
@@ -1838,7 +1839,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import cm
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image, Flowable
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image, Flowable, PageBreak
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_CENTER
     import matplotlib; matplotlib.use("Agg")
@@ -1882,9 +1883,6 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     perfil_pt={"super_conservadora":"Super Conservadora","conservadora":"Conservadora","moderada":"Moderada","arrojada":"Arrojada","agressiva":"Agressiva"}
     perfil_lbl = perfil_pt.get(perfil, perfil)
     pat_fmt=f"R$ {patrimonio:,.2f}".replace(",","X").replace(".",",").replace("X",".")
-    selic_txt=f"{macro['selic_meta']:.2f}%" if macro.get('selic_meta') else "—"
-    ipca_txt=f"{macro['ipca_12m']:.2f}%" if macro.get('ipca_12m') else "—"
-
     _conta = str(conta or "").strip()
     _nome  = str(nome or "").strip()
     cliente_txt = (f"{_conta} — {_nome}" if (_conta and _nome) else (_conta or _nome or "—"))
@@ -1893,8 +1891,10 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         ["Cliente:",cliente_txt,"Assessor:",assessor_txt],
         ["Perfil:",perfil_lbl,"Data ref.:",data_ref],
         ["Patrimônio:",pat_fmt,"Caixa:",f"{caixa:.1f}% (excluído do modelo)"],
-        ["Selic meta:",selic_txt,"IPCA 12M:",ipca_txt],
     ]
+    # Só mostra a linha macro quando houver dado real (nunca "—")
+    if macro.get('selic_meta') and macro.get('ipca_12m'):
+        meta.append(["Selic meta:",f"{macro['selic_meta']:.2f}%","IPCA 12M:",f"{macro['ipca_12m']:.2f}%"])
     tm=Table(meta,colWidths=[2.6*cm,7*cm,2.6*cm,5*cm])
     tm.setStyle(TableStyle([
         ("FONTSIZE",(0,0),(-1,-1),8),("TEXTCOLOR",(0,0),(-1,-1),BRANCO),
@@ -1915,45 +1915,27 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             else:               elems.append(Paragraph(_txt, s_olh_b))
         elems.append(Spacer(1,0.3*cm))
 
-    # Checklist Modelo de Servir no PDF
-    if checklist_servir:
-        elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-        elems.append(Paragraph("Checklist — Modelo de Servir Braúna",s_sec))
-
-        pendentes = [p for p in checklist_servir if p["status"] == "pendente"]
-        concluidos = [p for p in checklist_servir if p["status"] == "ok"]
-        score = len(concluidos)
-        total = len(checklist_servir)
-
-        score_txt = f"Atendimento: {score}/{total} pilares completos"
-        score_style = s_ok if score >= 5 else (s_warn if score >= 3 else s_crit)
-        elems.append(Paragraph(score_txt, score_style))
-        elems.append(Spacer(1,0.15*cm))
-
-        if pendentes:
-            elems.append(Paragraph("O QUE ESTÁ FALTANDO (ação necessária do assessor):", S("hd",fontSize=9,tc=VERM,fontName="Helvetica-Bold")))
-            elems.append(Spacer(1,0.1*cm))
-            for p in pendentes:
-                tag = "🔴 CRÍTICO" if p["importancia"].startswith("CRÍTICA") else ("🟡 IMPORTANTE" if p["importancia"].startswith("ALTA") else "⚪ MÉDIO")
-                elems.append(Paragraph(f"{p['icone']} {p['nome']} — {tag}", S("ph",fontSize=9,tc=VERM if "CRÍTICO" in tag else AMARELO,fontName="Helvetica-Bold")))
-                elems.append(Paragraph(p["impacto_falta"], s_body))
-                elems.append(Paragraph(f"Ação: {p['acao']}", s_gest))
-                if p.get("diretriz"):
-                    elems.append(Paragraph("★ 1ª DIRETRIZ BRAÚNA — QUALIDADE: Provocar o cliente sobre Financial Planning é obrigatório.", S("dir",fontSize=8,tc=DOURADO,fontName="Helvetica-Bold")))
-                elems.append(Spacer(1,0.15*cm))
-
-        if concluidos:
-            elems.append(Paragraph("Pilares concluídos: " + " | ".join([f"{p['icone']} {p['nome']}" for p in concluidos]), s_ok))
-
-        elems.append(Spacer(1,0.2*cm))
+    # Próximas etapas do planejamento (versão do cliente — sem conteúdo interno do assessor)
+    elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+    elems.append(Paragraph("Próximas etapas do planejamento",s_sec))
+    for _i,_e in enumerate([
+        "Consolidar o patrimônio total, inclusive posições fora da XP.",
+        "Mapear objetivos, prazos e necessidade de liquidez.",
+        "Validar a capacidade de risco e eventuais restrições.",
+        "Elaborar a proposta detalhada de transição da carteira.",
+        "Executar a realocação de forma gradual e acompanhada.",
+    ],1):
+        elems.append(Paragraph(f"{_i}. {_e}", s_body))
+    elems.append(Spacer(1,0.25*cm))
 
     if rent.get("portfolio") and rent.get("cdi"):
         p,c=rent["portfolio"],rent["cdi"]
-        rd=[["Período","Portfólio","CDI","% do CDI"],
-            ["Mês",f'{p["mes"]:.2f}%',f'{c["mes"]:.2f}%',f'{round(p["mes"]/c["mes"]*100,1)}%'],
-            ["Ano",f'{p["ano"]:.2f}%',f'{c["ano"]:.2f}%',f'{round(p["ano"]/c["ano"]*100,1)}%'],
-            ["12M",f'{p["12m"]:.2f}%',f'{c["12m"]:.2f}%',f'{round(p["12m"]/c["12m"]*100,1)}%'],
-            ["24M",f'{p["24m"]:.2f}%',f'{c["24m"]:.2f}%',f'{round(p["24m"]/c["24m"]*100,1)}%']]
+        def _dpp(a,b): return f'{a-b:+.2f} p.p.'
+        rd=[["Período","Carteira","CDI","Diferença (p.p.)"],
+            ["Mês",f'{p["mes"]:.2f}%',f'{c["mes"]:.2f}%',_dpp(p["mes"],c["mes"])],
+            ["Ano",f'{p["ano"]:.2f}%',f'{c["ano"]:.2f}%',_dpp(p["ano"],c["ano"])],
+            ["12M",f'{p["12m"]:.2f}%',f'{c["12m"]:.2f}%',_dpp(p["12m"],c["12m"])],
+            ["24M",f'{p["24m"]:.2f}%',f'{c["24m"]:.2f}%',_dpp(p["24m"],c["24m"])]]
         elems.append(Paragraph("Rentabilidade vs. CDI",s_sec))
         tr=Table(rd,colWidths=[3*cm,4*cm,4*cm,4*cm])
         tr.setStyle(TableStyle([
@@ -1967,18 +1949,28 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         elems.append(tr); elems.append(Spacer(1,0.3*cm))
 
     elems.append(Paragraph(f"Composição Atual vs. Modelo {modelo_lbl}",s_sec))
-    lbs=[d["label"] for d in desvios]; rea=[d["real"] for d in desvios]; alv=[d["alvo"] for d in desvios]
-    x=np.arange(len(lbs)); w=0.35
-    fig,ax=plt.subplots(figsize=(10,4))
+    # Barras horizontais; remove classes zeradas em ambos (atual e modelo)
+    _dv=[d for d in desvios if (d.get("real") or 0)>0 or (d.get("alvo") or 0)>0]
+    lbs=[d["label"] for d in _dv]; rea=[d["real"] for d in _dv]; alv=[d["alvo"] for d in _dv]
+    y=np.arange(len(lbs)); h=0.38
+    fig,ax=plt.subplots(figsize=(10,max(2.4,0.62*len(lbs)+1)))
     fig.patch.set_facecolor("#081F18"); ax.set_facecolor("#1A1A1A")
-    ax.bar(x-w/2,rea,w,color="#C9A96E",zorder=3,linewidth=0)
-    ax.bar(x+w/2,alv,w,color="#2A5A3A",zorder=3,linewidth=0)
-    ax.set_xticks(x); ax.set_xticklabels(lbs,rotation=28,ha="right",color="white",fontsize=8)
+    b1=ax.barh(y+h/2,rea,h,color="#C9A96E",zorder=3,label="Atual")
+    b2=ax.barh(y-h/2,alv,h,color="#2A5A3A",zorder=3,label="Modelo")
+    ax.set_yticks(y); ax.set_yticklabels(lbs,color="white",fontsize=9); ax.invert_yaxis()
     ax.tick_params(colors="white"); ax.spines[:].set_color("#2C2C2C")
-    ax.yaxis.grid(True,color="#1C4A34",zorder=0); ax.set_axisbelow(True); ax.set_ylabel("%",color="white")
+    ax.xaxis.grid(True,color="#1C4A34",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="white")
+    _mx=max(rea+alv+[1])
+    for bars in (b1,b2):
+        for r in bars:
+            wv=r.get_width()
+            if wv>0: ax.text(wv+_mx*0.01,r.get_y()+r.get_height()/2,f"{wv:.0f}%",va="center",color="white",fontsize=7.5)
+    ax.set_xlim(0,_mx*1.13)
+    ax.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="lower right")
     fig.tight_layout(pad=1)
     ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#081F18"); plt.close(fig); ib.seek(0)
-    elems.append(Image(ib,width=15*cm,height=6*cm)); elems.append(Spacer(1,0.3*cm))
+    _hh=max(3.2,0.72*len(lbs)+1.2)
+    elems.append(Image(ib,width=15*cm,height=_hh*cm)); elems.append(Spacer(1,0.3*cm))
 
     # Rentabilidade — Cliente vs. Carteira Recomendada vs. CDI (linha)
     try:
@@ -1996,29 +1988,29 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         _cli_vals = [_port.get(pk) for pk,_ in _pers]
         _cdi_vals = [_cdi.get(pk)  for pk,_ in _pers]
         _rec_vals = [_rec_pdf(pk)  for pk,_ in _pers]
+        _tem_rec = any(v is not None for v in _rec_vals)
         if any(v is not None for v in _cli_vals):
-            elems.append(Paragraph("Rentabilidade — Cliente vs. Carteira Recomendada vs. CDI",s_sec))
+            _titulo = ("Rentabilidade — Carteira vs. Carteira-Modelo vs. CDI" if _tem_rec
+                       else "Rentabilidade da Carteira vs. CDI")
+            elems.append(Paragraph(_titulo,s_sec))
             figr,axr=plt.subplots(figsize=(10,3.8))
             figr.patch.set_facecolor("#081F18"); axr.set_facecolor("#1A1A1A")
-            _xs=list(range(len(_pers)))
-            def _lin(vals,cor,lbl,dash=False):
-                xy=[(x,float(v)) for x,v in zip(_xs,vals) if v is not None]
-                if xy:
-                    axr.plot([p[0] for p in xy],[p[1] for p in xy],marker="o",color=cor,linewidth=2,
-                             label=lbl,linestyle="--" if dash else "-")
-            _lin(_cli_vals,"#C9A96E","Cliente")
-            _lin(_rec_vals,"#5DCAA5","Recomendada")
-            _lin(_cdi_vals,"#7DCFEF","CDI",dash=True)
+            _xs=np.arange(len(_pers))
+            _series=[(_cli_vals,"#C9A96E","Carteira")]
+            if _tem_rec: _series.append((_rec_vals,"#5DCAA5","Carteira-Modelo"))
+            _series.append((_cdi_vals,"#7DCFEF","CDI"))
+            _n=len(_series); _bw=0.8/_n
+            for _k,(vals,cor,lbl) in enumerate(_series):
+                _vv=[float(v) if v is not None else 0.0 for v in vals]
+                axr.bar(_xs+(_k-(_n-1)/2)*_bw,_vv,_bw,color=cor,label=lbl,zorder=3)
+            axr.axhline(0,color="#3A3A3A",linewidth=0.8)
             axr.set_xticks(_xs); axr.set_xticklabels([p[1] for p in _pers],color="white",fontsize=9)
             axr.tick_params(colors="white"); axr.spines[:].set_color("#2C2C2C")
             axr.yaxis.grid(True,color="#1C4A34"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
-            axr.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="upper left")
+            axr.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="best")
             figr.tight_layout(pad=1)
             ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#081F18"); plt.close(figr); ibr.seek(0)
-            elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.15*cm))
-            if not any(v is not None for v in _rec_vals):
-                elems.append(Paragraph("Carteira recomendada indisponível — cadastre os retornos por classe na página do Líder.",s_gest))
-            elems.append(Spacer(1,0.3*cm))
+            elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.3*cm))
     except Exception:
         pass
 
@@ -2031,8 +2023,10 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
          ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
          ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold")]
     for i,d in enumerate(desvios,1):
-        if d["desvio"]<-1.5: est.append(("TEXTCOLOR",(3,i),(3,i),VERM))
-        elif d["desvio"]>1.5: est.append(("TEXTCOLOR",(3,i),(3,i),VERDE))
+        _ad=abs(d["desvio"])
+        if _ad>=10:   est.append(("TEXTCOLOR",(3,i),(3,i),VERM))     # desvio grande (qualquer direção)
+        elif _ad>=1.5:est.append(("TEXTCOLOR",(3,i),(3,i),AMARELO))  # desvio moderado
+        else:         est.append(("TEXTCOLOR",(3,i),(3,i),VERDE))    # dentro da faixa
     td.setStyle(TableStyle(est))
     elems.append(td); elems.append(Spacer(1,0.3*cm))
 
@@ -2055,11 +2049,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                 f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}%) &nbsp;&nbsp;"
                 f"<font size=14 color=\"#FFD966\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
             elems.append(Paragraph(rec["explicacao"],s_body))
-            if rec.get("carta_insight"):
-                elems.append(Paragraph(f'Carta da gestao: "{rec["carta_insight"]}"',s_gest))
             if rec.get("produtos"):
                 prods=", ".join(rec["produtos"])
-                elems.append(Paragraph(f"Produtos sugeridos: {prods}",s_sug))
+                elems.append(Paragraph(f"Produtos sugeridos: {prods} (sujeitos a disponibilidade, suitability e análise no líquido).",s_sug))
             elems.append(Spacer(1,0.15*cm))
 
     # ── Posicionamento das ações + proteção de posições (Stock Guide Levante + XP)
@@ -2071,37 +2063,46 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             if "VENDA" in r:  return VERM
             if "NEUTRO" in r: return AMARELO
             return colors.HexColor("#AAAAAA")
-        def _pct(v):
-            return (("+" if v*100>=0 else "")+f"{v*100:.0f}%") if v is not None else "—"
+        def _up(v):
+            if v is None: return "—"
+            pv=v*100
+            return (f"+{pv:.0f}%" if pv>=0 else f"queda de {abs(pv):.0f}%")
         def _brl(v):
             return ("R$ "+f"{v:,.2f}".replace(",","X").replace(".",",").replace("X",".")) if v is not None else "—"
-        linhas_pos=[["Ativo","% Cart.","Posição (Levante)","Alvo / Upside","Mercado (XP)"]]
-        estilo_extra=[]; prot_itens=[]
-        for i,a in enumerate(acoes,1):
+        linhas_pos=[["Ativo","% Cart.","Visão (Levante)","Preço-alvo","Upside","Consenso (XP)"]]
+        estilo_extra=[]; prot_itens=[]; i=0
+        for a in acoes:
+            _peso=float(a.get("perc",0) or 0)
+            if _peso < 0.1:   # remove posições irrelevantes (0,0%)
+                continue
+            i+=1
             tk=str(a.get("ticker","")).upper()
             g=guia.get(tk) or {}
             lev=g.get("levante"); xp=g.get("xp"); src=lev or xp
-            pos_txt=(lev.get("rating") if lev else ((xp.get("rating","")+" (via XP)") if xp else "sem cobertura"))
-            alvo_txt=(_brl(src.get("alvo"))+" ("+_pct(src.get("upside"))+")") if (src and src.get("alvo") is not None) else "—"
-            xp_txt=((xp.get("rating","")+((" "+xp.get("consenso")) if xp.get("consenso") else "")+" "+_pct(xp.get("upside"))) if xp else "—")
-            linhas_pos.append([tk, f'{float(a.get("perc",0) or 0):.1f}%', pos_txt, alvo_txt, xp_txt])
+            visao_txt=(lev.get("rating") if lev else ((xp.get("rating","")+" (via XP)") if xp else "sem cobertura"))
+            alvo_txt=_brl(src.get("alvo")) if (src and src.get("alvo") is not None) else "—"
+            up_txt=_up(src.get("upside")) if src else "—"
+            cons_txt=((xp.get("consenso") or xp.get("rating","") or "—") if xp else "—")
+            linhas_pos.append([tk, f'{_peso:.1f}%', visao_txt, alvo_txt, up_txt, cons_txt])
             estilo_extra.append(("TEXTCOLOR",(2,i),(2,i),_rt(lev.get("rating") if lev else (xp.get("rating") if xp else ""))))
             if src and src.get("upside") is not None and src.get("upside")<=0.10:
                 prot_itens.append({"ticker":tk,"rating":(lev.get("rating") if lev else xp.get("rating")),
                     "fonte":("Levante" if lev else "XP"),"alvo":src.get("alvo"),"upside":src.get("upside")})
-        elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-        elems.append(Paragraph("Posicionamento das Ações — Levante (casa principal) + XP (mercado)",s_sec))
-        tp=Table(linhas_pos,colWidths=[2.5*cm,1.7*cm,4.2*cm,3.7*cm,4.4*cm])
-        est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
-                 ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
-                 ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
-                 ("ALIGN",(1,0),(1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),3),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
-                 ("TEXTCOLOR",(0,1),(0,-1),DOURADO)]
-        est_pos+=estilo_extra
-        tp.setStyle(TableStyle(est_pos))
-        elems.append(tp); elems.append(Spacer(1,0.15*cm))
-        elems.append(Paragraph("Levante = posicionamento Braúna. XP = como o mercado ve. Preco-alvo e referencia; o preco vivo vem do XPerformance.",s_gest))
-        elems.append(Spacer(1,0.3*cm))
+        if len(linhas_pos) > 1:
+            elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+            elems.append(Paragraph("Posicionamento das Ações — Levante (casa principal) + XP (visão de mercado)",s_sec))
+            tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm])
+            est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
+                     ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
+                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+                     ("ALIGN",(1,0),(1,-1),"CENTER"),("ALIGN",(3,0),(4,-1),"CENTER"),
+                     ("PADDING",(0,0),(-1,-1),3),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
+                     ("TEXTCOLOR",(0,1),(0,-1),DOURADO),("VALIGN",(0,0),(-1,-1),"MIDDLE")]
+            est_pos+=estilo_extra
+            tp.setStyle(TableStyle(est_pos))
+            elems.append(tp); elems.append(Spacer(1,0.15*cm))
+            elems.append(Paragraph("A visão Levante é uma das referências externas desta análise e não substitui a avaliação individual do assessor. O preço-alvo é referência; o preço vigente vem do XPerformance.",s_gest))
+            elems.append(Spacer(1,0.3*cm))
 
         if prot_itens:
             status_por_ticker={}
@@ -2115,22 +2116,64 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                     pass
             STATUS_LBL={"pendente":"Pendente","recusada":"Cliente recusou","estruturada":"Estruturada aplicada","caixa":"Vendido p/ caixa"}
             elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-            elems.append(Paragraph("Protecao de Posicoes — perto do preco-alvo",s_sec))
-            elems.append(Paragraph("Acoes a 10% ou menos do preco-alvo. Proteger o ganho: (a) operacao estruturada (collar / put de protecao / fence) ou (b) realizar a posicao e alocar em caixa (pos-fixado).",s_body))
+            elems.append(Paragraph("Proteção de posições — perto do preço-alvo",s_sec))
+            elems.append(Paragraph("Ações a 10% ou menos do preço-alvo. Formas de proteger o ganho: (a) operação estruturada (collar, put de proteção ou fence) — que envolve custo, prazo e limitação de ganho, exigindo suitability; ou (b) realizar parte da posição e alocar em caixa (pós-fixado). A decisão considera preço, tributação e o objetivo do cliente.",s_body))
             elems.append(Spacer(1,0.1*cm))
             for it in prot_itens:
                 st=STATUS_LBL.get(status_por_ticker.get(it["ticker"],"pendente"),"Pendente")
-                elems.append(Paragraph(f'{it["ticker"]} — {it["rating"]} ({it["fonte"]}) · alvo {_brl(it["alvo"])} ({_pct(it["upside"])} de upside) · Status: {st}',
+                elems.append(Paragraph(f'{it["ticker"]} — {it["rating"]} ({it["fonte"]}) · alvo {_brl(it["alvo"])} (upside {_up(it["upside"])}) · Status: {st}',
                     S("Prot",fontSize=9,leading=13,tc=LARANJA)))
             elems.append(Spacer(1,0.3*cm))
 
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
     elems.append(Paragraph(f"Consenso dos Gestores — Ref. {ref_contexto}",s_sec))
-    elems.append(Paragraph("Convergencia: pos-fixado ainda atrativo mas nao deve dominar; inflacao (NTN-B) e a oportunidade do momento com juro real acima de 6% a.a.; internacional como hedge cambial; cautela com alternativos iliquidos para perfis conservadores.",s_body))
+    elems.append(Paragraph("Convergência: o pós-fixado segue atrativo, mas não deve dominar; a inflação (NTN-B) é a oportunidade do momento, com juro real elevado; o internacional atua como diversificação cambial; e há cautela com alternativos ilíquidos para perfis conservadores.",s_body))
     elems.append(Spacer(1,0.5*cm))
 
+    # ── Estratégia de realocação (transição)
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-    elems.append(Paragraph("Este relatorio e um instrumento de apoio a decisao do assessor e nao constitui recomendacao formal de investimento. Dados macro via Banco Central do Brasil (BCB). Visao dos gestores consolidada de cartas mensais publicas. Brauna Investimentos — assessoria vinculada a XP Investimentos.",s_rod))
+    elems.append(Paragraph("Estratégia de realocação",s_sec))
+    elems.append(Paragraph(
+        "A transição parte da redução das concentrações identificadas — sobretudo em renda variável — em direção às classes "
+        "sub-alocadas: pós-fixado, inflação (IPCA+) e internacional. A execução deve ser gradual e está sempre condicionada à "
+        "validação tributária, ao preço e à liquidez de cada posição e à anuência do cliente. Os valores por classe indicados "
+        "nas recomendações são referência de destino, não ordens de execução.", s_body))
+    elems.append(Spacer(1,0.3*cm))
+
+    # ── Plano de ação recomendado (página final)
+    elems.append(PageBreak())
+    elems.append(Paragraph("Plano de ação recomendado",s_sec))
+    for _t,_d in [
+        ("Etapa 1 — Diagnóstico completo","Consolidar o patrimônio total (inclusive fora da XP), validar objetivos, prazos e a liquidez necessária."),
+        ("Etapa 2 — Redução de concentração","Revisar as maiores posições em renda variável, definindo realização imediata ou gradual e avaliando os impactos tributários."),
+        ("Etapa 3 — Reequilíbrio","Elevar o pós-fixado, introduzir proteção inflacionária (IPCA+) e diversificação internacional, e avaliar parcela complementar em multimercados."),
+        ("Etapa 4 — Acompanhamento","Revisão periódica, rebalanceamento por faixa e atualização dos objetivos."),
+    ]:
+        elems.append(Paragraph(_t, s_olh_h))
+        elems.append(Paragraph(_d, s_body))
+    elems.append(Spacer(1,0.25*cm))
+    elems.append(Paragraph("A implementação depende da validação dos objetivos, do patrimônio consolidado, da análise tributária, das condições de mercado e da aprovação expressa do cliente.", s_bold))
+    elems.append(Spacer(1,0.3*cm))
+
+    # ── Metodologia e fontes
+    elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+    elems.append(Paragraph("Metodologia e fontes",s_sec))
+    elems.append(Paragraph(
+        f"Modelo de referência: {modelo_lbl} — alocação estratégica por indexador aplicada ao perfil {perfil_lbl}"
+        + (f", data-base {data_ref}" if data_ref else "") + ". "
+        "A análise considera a carteira mantida na XP; posições fora da XP ainda não estão consolidadas "
+        "(Open Finance/Open Investment em implantação) e devem ser incorporadas para uma recomendação completa. "
+        "Dados macroeconômicos via Banco Central do Brasil (BCB). Visão dos gestores consolidada de cartas mensais públicas.",
+        s_gest))
+    elems.append(Spacer(1,0.3*cm))
+
+    # ── Disclaimer (versão do cliente)
+    elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+    elems.append(Paragraph(
+        "Este material tem caráter informativo e não constitui recomendação individualizada de investimento, oferta ou promessa "
+        "de rentabilidade. Rentabilidade passada não garante resultados futuros. A adequação de qualquer produto depende do perfil "
+        "(suitability), dos objetivos e da situação financeira do investidor. Braúna Investimentos — escritório vinculado à XP Investimentos.",
+        S("Disc",fontSize=8,leading=11,tc=colors.HexColor("#8AA79A"),alignment=TA_CENTER)))
 
     def fundo(canvas,doc):
         canvas.saveState(); canvas.setFillColor(PRETO)
