@@ -891,15 +891,30 @@ def _fpct(v):
     except Exception:
         return "—"
 
-def _sug_rf(filtro, obs, n):
-    """Produtos de RF tradicional (suitability Geral) — isentos primeiro, depois por rating."""
+def _sug_rf(filtro, obs, n, excluir=None):
+    """RF tradicional (suitability Geral) — isentos primeiro, depois por rating.
+    Exclui o que o cliente já tem e diversifica emissor entre produtos com FGC (teto)."""
     xs = [p for p in _prat("rf_tradicional_br.json").get("produtos", [])
           if (p.get("publico") or "").startswith("Investidor Geral") and filtro(p)]
     xs.sort(key=lambda p: (not p.get("isento"), str(p.get("risco") or "99")))
-    _vistos = set()   # dedup por ativo (mesmo papel com tickers diferentes)
-    xs = [p for p in xs if not (p.get("ativo") in _vistos or _vistos.add(p.get("ativo")))]
+    _vistos, _emis, sel = set(), set(), []
+    for p in xs:
+        at = p.get("ativo")
+        if at in _vistos:                    # mesmo papel com tickers diferentes
+            continue
+        _vistos.add(at)
+        if excluir and (at or "").upper() in excluir:
+            continue
+        if p.get("fgc"):                     # diversifica emissor só entre bancários (teto FGC)
+            ek = " ".join((at or "").split()[:2]).upper()
+            if ek in _emis:
+                continue
+            _emis.add(ek)
+        sel.append(p)
+        if len(sel) >= n:
+            break
     out = []
-    for p in xs[:n]:
+    for p in sel:
         det = p.get("tax_max") or p.get("tax_min") or ""
         if p.get("isento") and p.get("grossup_max"):
             det = f"{det} · isento (≈{p['grossup_max']} bruto)"
@@ -907,59 +922,80 @@ def _sug_rf(filtro, obs, n):
                     "fgc": p.get("fgc"), "obs": obs})
     return out
 
-def _sug_fund(classes, obs, n):
-    xs = [p for p in _prat("fundos_xp.json").get("fundos", [])
-          if (p.get("investidor") in (None, "", "Geral")) and p.get("xp_class") in classes
-          and isinstance(p.get("rent_12m"), (int, float))]
-    xs.sort(key=lambda p: -(p.get("rent_12m") or 0))
+def _sug_fund(classes, obs, n, excluir=None):
+    """Fundos (suitability Geral) — prioriza track record 24/36m e menor taxa
+    (evita 'chasing' do 12m); exclui o que o cliente já tem."""
+    def _base(p):
+        for k in ("rent_36m", "rent_24m", "rent_12m"):
+            v = p.get(k)
+            if isinstance(v, (int, float)):
+                return v, (k != "rent_12m")
+        return None, False
+    cand = []
+    for p in _prat("fundos_xp.json").get("fundos", []):
+        if p.get("investidor") not in (None, "", "Geral"):
+            continue
+        if p.get("xp_class") not in classes:
+            continue
+        if excluir and (p.get("nome") or "").upper() in excluir:
+            continue
+        b, tem_track = _base(p)
+        if b is None:
+            continue
+        adm = p.get("taxa_adm") or 0
+        cand.append((1 if tem_track else 0, b - adm * 2, p))   # track longo + custo
+    cand.sort(key=lambda t: (t[0], t[1]), reverse=True)
     return [{"nome": p.get("nome"),
-             "detalhe": f"12m {_fpct(p.get('rent_12m'))} · adm {_fpct(p.get('taxa_adm'))}",
-             "fonte": "Fundo XP", "obs": obs} for p in xs[:n]]
+             "detalhe": f"36m {_fpct(p.get('rent_36m'))} · 24m {_fpct(p.get('rent_24m'))} · adm {_fpct(p.get('taxa_adm'))}",
+             "fonte": "Fundo XP", "obs": obs} for _, __, p in cand[:n]]
 
-def _sug_intl(n):
+def _sug_intl(n, excluir=None):
     xs = [p for p in _prat("rf_internacional.json").get("produtos", [])
-          if p.get("tipo") in ("treasury", "bond") and isinstance(p.get("rentab_aa"), (int, float))]
+          if p.get("tipo") in ("treasury", "bond") and isinstance(p.get("rentab_aa"), (int, float))
+          and not (excluir and (p.get("ativo") or "").upper() in excluir)]
     # Treasuries (soberano) primeiro — núcleo conservador; depois bonds por yield.
     xs.sort(key=lambda p: (p.get("tipo") != "treasury", -(p.get("rentab_aa") or 0)))
     return [{"nome": f"{p.get('ativo')} ({p.get('vencimento')})",
              "detalhe": f"{_fpct(p.get('rentab_aa'))} a.a. USD · {p.get('rating') or ''}".strip(" ·"),
              "fonte": "RF Intl", "obs": "15% anual (Lei 14.754)"} for p in xs[:n]]
 
-def _sug_cetip(filtro, obs, n):
-    xs = [f for f in _prat("fundos_cetipados.json").get("fundos", []) if filtro(f)]
+def _sug_cetip(filtro, obs, n, excluir=None):
+    xs = [f for f in _prat("fundos_cetipados.json").get("fundos", [])
+          if filtro(f) and not (excluir and (f.get("ticker") or "").upper() in excluir)]
     xs.sort(key=lambda f: -(f.get("dy_aa") or 0))
     return [{"nome": f.get("ticker"), "detalhe": f"DY {_fpct(f.get('dy_aa'))} · {f.get('categoria')}",
              "fonte": "Cetipado", "obs": obs} for f in xs[:n]]
 
-def _sugerir_por_classe(cat, n=3):
-    """Retorna até n produtos da prateleira adequados para a classe subalocada."""
+def _sugerir_por_classe(cat, n=3, excluir=None):
+    """Retorna até n produtos da prateleira adequados para a classe subalocada.
+    `excluir` = conjunto de nomes/tickers (UPPER) que o cliente já tem, para não repetir."""
     up = lambda s: (s or "").upper()
     if cat == "pos_fixado":
         return _sug_rf(lambda p: "CDI" in up(p.get("indexador")) and p.get("fgc"),
-                       "Carrego pós-fixado; com FGC. Comparar líquido (isento vence tributável).", n)
+                       "Carrego pós-fixado; com FGC. Comparar líquido (isento vence tributável).", n, excluir)
     if cat == "inflacao":
-        r = _sug_rf(lambda p: "IPC" in up(p.get("indexador")), "Proteção inflacionária (IPCA+).", n)
+        r = _sug_rf(lambda p: "IPC" in up(p.get("indexador")), "Proteção inflacionária (IPCA+).", n, excluir)
         return r or _sug_cetip(lambda f: f.get("exposicao", {}).get("IPCA", 0) >= 50,
-                               "FII Infra/imobiliário IPCA — atenção à liquidez.", n)
+                               "FII Infra/imobiliário IPCA — atenção à liquidez.", n, excluir)
     if cat == "pre_fixado":
         return _sug_rf(lambda p: "PRÉ" in up(p.get("indexador")) or "PREF" in up(p.get("indexador")),
-                       "Prefixado tático; aceita marcação a mercado.", n)
+                       "Prefixado tático; aceita marcação a mercado.", n, excluir)
     if cat == "acoes":
         return _sug_fund(["Renda Variável Long Only", "Renda Variável Long Biased"],
-                         "Ações via fundo; IR 15% no resgate, sem come-cotas.", n)
+                         "Ações via fundo; IR 15% no resgate, sem come-cotas.", n, excluir)
     if cat == "fiis":
         return _sug_cetip(lambda f: "FII" in up(f.get("exposicao", {}) and "") or f.get("categoria") in ("Fundos Imobiliários", "FII Infra"),
-                          "FII — renda; rendimento isento PF (requisitos).", n) \
-               or _sug_fund(["Fundo Listado"], "FII/listados via fundo.", n)
+                          "FII — renda; rendimento isento PF (requisitos).", n, excluir) \
+               or _sug_fund(["Fundo Listado"], "FII/listados via fundo.", n, excluir)
     if cat == "multimercado":
         return _sug_fund(["Macro Alta Vol", "Macro Média Vol", "Multiestratégia", "Macro Baixa Vol"],
-                         "Multimercado; come-cotas semestral. Precisa justificar risco vs CDI.", n)
+                         "Multimercado; come-cotas semestral. Precisa justificar risco vs CDI.", n, excluir)
     if cat == "internacional":
-        return _sug_intl(n) or _sug_fund(["Internacional Ações Hedgeado", "Internacional Renda Fixa"],
-                                         "Internacionalização; 15% anual no exterior.", n)
+        return _sug_intl(n, excluir) or _sug_fund(["Internacional Ações Hedgeado", "Internacional Renda Fixa"],
+                                         "Internacionalização; 15% anual no exterior.", n, excluir)
     if cat == "alternativos":
         return _sug_fund(["Alternativo Ilíquido", "Multiestratégia"],
-                         "Alternativos; prêmio de iliquidez — checar prazo/suitability.", n)
+                         "Alternativos; prêmio de iliquidez — checar prazo/suitability.", n, excluir)
     return []
 
 def sugestoes_realocacao(comp, perfil, max_classes=3, por_classe=3):
@@ -8523,11 +8559,27 @@ def analyze_xp():
     _fonte_txt = " · ".join(f"{f['label']} (+{f['excesso_pp']:.0f}pp)" for f in _fontes[:3]) or "aporte novo / caixa"
     _ORDEM_PF = ["super_conservadora", "conservadora", "moderada", "arrojada", "agressiva"]
     _idx_pf = _ORDEM_PF.index(perfil_form) if perfil_form in _ORDEM_PF else 2
+    # O que o cliente já tem (para não sugerir de novo): tickers e nomes das posições
+    _held = set()
+    for _a in (dados.get("acoes") or []):
+        _held.add((_a.get("ticker") or "").upper()); _held.add((_a.get("nome") or "").upper())
+    for _f in (dados.get("fiis") or []):
+        _held.add((_f.get("ticker") or "").upper()); _held.add((_f.get("nome") or "").upper())
+    for _r in (dados.get("rf_ativos") or []):
+        _held.add((_r.get("nome") or "").upper())
+    _held.discard("")
+    # Piso: só vale a troca se o gap for material em pp E em R$ (evita ruído de contas pequenas)
+    MIN_GAP_PP, MIN_VALOR = 1.5, 1000.0
+
     sugestoes_por_classe = []
     for d in desvios:
-        if d["desvio"] >= -0.5:
+        gap_pp = d["desvio"]
+        if gap_pp >= 0:                      # só classes subalocadas
             continue
-        cls = d["cls"]; gap_pp = d["desvio"]
+        gap_valor = round(_patr * abs(gap_pp) / 100.0, 2)
+        if abs(gap_pp) < MIN_GAP_PP or gap_valor < MIN_VALOR:
+            continue                         # gap irrelevante — não gera troca de R$ irrisório
+        cls = d["cls"]
         prioridade = "alta" if abs(gap_pp) >= 8 else ("media" if abs(gap_pp) >= 3 else "baixa")
         prods_head = []
         for p in (hp_prods.get(cls, []) if isinstance(hp_prods, dict) else []):
@@ -8536,11 +8588,11 @@ def analyze_xp():
                 prods_head.append({"nome": p.get("nome") or p.get("titulo", "—"),
                                    "detalhe": p.get("taxa") or p.get("rentabilidade", ""),
                                    "fonte": "Head Braúna", "obs": p.get("descricao", "")})
-        try: prods_prat = _sugerir_por_classe(cls, 3)
+        try: prods_prat = _sugerir_por_classe(cls, 3, _held)
         except Exception: prods_prat = []
         sugestoes_por_classe.append({
             "classe": cls, "label_classe": LABELS.get(cls, cls),
-            "gap_pp": round(gap_pp, 2), "gap_valor": round(_patr * abs(gap_pp) / 100.0, 2),
+            "gap_pp": round(gap_pp, 2), "gap_valor": gap_valor,
             "prioridade": prioridade,
             "produtos": prods_head, "produtos_prateleira": prods_prat,
             "fonte_recurso": _fontes[:3], "fonte_txt": _fonte_txt,
@@ -8788,11 +8840,10 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
         gap_pp = float(dev.get("desvio", dev.get("desvio_pp", 0)) or 0)
         atual  = float(dev.get("atual", 0) or 0)
         alvo   = float(dev.get("alvo", dev.get("modelo", 0)) or 0)
-        if gap_pp >= -0.5:
-            # Não subexposição relevante — pula
-            continue
-
         gap_valor = patrimonio * abs(gap_pp) / 100.0
+        # Piso: só troca material (mesmos limites da UI) — evita R$ irrisório/gaps mínimos
+        if gap_pp >= 0 or abs(gap_pp) < 1.5 or gap_valor < 1000.0:
+            continue
 
         # Determinar prioridade
         asses_tem_gap = _asses_gap_por_cls.get(cls, 0) > 10.0
@@ -8834,9 +8885,15 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
             })
 
         # Produtos das prateleiras completas (RF 375 / fundos 865 / intl / cetipados),
-        # já casados por função/suitability/isento/FGC pelo despachante existente.
+        # já casados por função/suitability/isento/FGC; exclui o que o cliente já tem.
+        _held_pdf = set()
+        for _a in (acoes_cli or []):
+            _held_pdf.add((_a.get("ticker") or "").upper()); _held_pdf.add((_a.get("nome") or "").upper())
+        for _f in (fiis_cli or []):
+            _held_pdf.add((_f.get("ticker") or "").upper()); _held_pdf.add((_f.get("nome") or "").upper())
+        _held_pdf.discard("")
         try:
-            produtos_prateleira = _sugerir_por_classe(cls, 3)
+            produtos_prateleira = _sugerir_por_classe(cls, 3, _held_pdf)
         except Exception:
             produtos_prateleira = []
 
