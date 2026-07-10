@@ -1,6 +1,6 @@
 import io, re, json, os, uuid, time
 from datetime import datetime
-from flask import Flask, request, jsonify, send_file, render_template_string
+from flask import Flask, request, jsonify, send_file, render_template_string, Response
 
 app = Flask(__name__)
 
@@ -2219,6 +2219,335 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     buf.seek(0); return buf
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  BRAÚNA 360° — Check-up Patrimonial (documento premium do cliente, HTML)
+# ═══════════════════════════════════════════════════════════════════════════════
+def _b360_esc(s):
+    return (str(s) if s is not None else "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+
+def _b360_brl(v):
+    try: return "R$ " + f"{float(v):,.2f}".replace(",","X").replace(".",",").replace("X",".")
+    except Exception: return "R$ 0,00"
+
+def _raio_x(comp, alvo, rent, checklist=None):
+    """9 dimensões do Raio-X Patrimonial. Financeiras vêm da carteira; as 'soft'
+    (planejamento/sucessão/tributação) vêm do checklist Modelo de Servir se houver."""
+    def cl(v, lo=15, hi=98): return int(max(lo, min(hi, round(v))))
+    pos  = comp.get("pos_fixado",0) or 0; infl = comp.get("inflacao",0) or 0
+    intl = comp.get("internacional",0) or 0; fiis = comp.get("fiis",0) or 0
+    caixa= comp.get("caixa",0) or 0
+    a_intl = alvo.get("internacional",9) or 9; a_infl = alvo.get("inflacao",23) or 23
+    nclasses = sum(1 for c in CATS if (comp.get(c,0) or 0) >= 3)
+    maior = max([comp.get(c,0) or 0 for c in CATS] + [0])
+    sc = {}
+    sc["Proteção inflação"] = cl(infl/max(a_infl,1)*86)
+    sc["Liquidez"]          = cl(45 + (pos+caixa)*0.85)
+    sc["Diversificação"]    = cl(46 + nclasses*7 - max(0,maior-45)*0.7)
+    sc["Renda recorrente"]  = cl(45 + fiis*4 + infl*0.3)
+    sc["Internacional"]     = cl(20 + intl/max(a_intl,1)*72)
+    # soft
+    soft = {"Tributação":70, "Sucessão":55, "Planejamento":52, "Relacionamento":88}
+    if checklist:
+        pares = [(str(p.get("nome","")).lower(), p.get("status")=="ok") for p in checklist]
+        def _s(key, yes, no):
+            for nm,ok in pares:
+                if key in nm: return yes if ok else no
+            return (yes+no)//2
+        soft["Planejamento"] = _s("plan", 88, 45)
+        soft["Sucessão"]     = _s("suces", 85, 48)
+        soft["Tributação"]   = _s("tribut", 85, 62)
+    sc.update(soft)
+    ordem = ["Proteção inflação","Liquidez","Relacionamento","Tributação","Diversificação",
+             "Renda recorrente","Sucessão","Planejamento","Internacional"]
+    dims = [(k, sc[k]) for k in ordem if k in sc]
+    geral = cl(sum(v for _,v in dims)/len(dims))
+    return dims, geral
+
+def _b360_narrativa(comp, alvo, rent, dims_geral):
+    """Deriva achados, pontos de atenção e prioridades a partir dos gaps reais."""
+    lbl = lambda c: LABELS.get(c, c)
+    sub  = sorted([(c, (alvo.get(c,0) or 0)-(comp.get(c,0) or 0)) for c in CATS
+                   if (alvo.get(c,0) or 0)-(comp.get(c,0) or 0) >= 5], key=lambda x:-x[1])
+    sobre= sorted([(c, (comp.get(c,0) or 0)-(alvo.get(c,0) or 0)) for c in CATS
+                   if (comp.get(c,0) or 0)-(alvo.get(c,0) or 0) >= 5], key=lambda x:-x[1])
+    infl = comp.get("inflacao",0) or 0; intl = comp.get("internacional",0) or 0
+    p12 = (rent.get("portfolio") or {}).get("12m"); c12 = (rent.get("cdi") or {}).get("12m")
+    supera = (p12 is not None and c12 is not None and p12 > c12)
+    achados = []
+    if infl >= (alvo.get("inflacao",23) or 23)*0.8:
+        achados.append(("g","Boa proteção contra a inflação",
+            f"{infl:.0f}% do patrimônio em IPCA+ preservam o poder de compra num juro real historicamente alto."))
+    if supera:
+        achados.append(("g","Rentabilidade acima do CDI",
+            f"+{p12:.1f}% em 12 meses contra ~{c12:.1f}% do CDI — retorno consistente."))
+    if sobre:
+        c,g = sobre[0]
+        achados.append(("y",f"Concentração em {lbl(c).lower()}",
+            f"{comp.get(c,0):.0f}% em um único bloco. Concentra o resultado num só fator de risco."))
+    if intl < 5:
+        achados.append(("y","Sem diversificação internacional",
+            "A exposição global está abaixo do adequado — o patrimônio depende quase só do Brasil e do real."))
+    achados.append(("r","Planejamento e sucessão a estruturar",
+        "A carteira está boa; a estrutura patrimonial ao redor dela ainda pode ser desenhada."))
+    achados = achados[:5]
+    # pontos de atenção
+    atencao = []
+    if sobre:
+        c,g = sobre[0]
+        atencao.append({"t":f"Exposição concentrada em {lbl(c).lower()}","p":"alta",
+            "imp":"Médio","prob":"Alta no ciclo de queda","hz":"12 meses",
+            "rec":f"Realocar gradualmente para IPCA+ e pré-fixado tático."})
+    if intl < 5:
+        atencao.append({"t":"Ausência de exposição internacional","p":"alta",
+            "imp":"Alto","prob":"Estrutural","hz":"90 dias",
+            "rec":"Iniciar 5–9% em dólar de forma gradual, via liquidez excedente."})
+    atencao.append({"t":"Planejamento financeiro e sucessório","p":"alta",
+        "imp":"Alto","prob":"Certa","hz":"Contínuo",
+        "rec":"Consolidar o patrimônio total e desenhar a estrutura sucessória."})
+    # prioridades
+    prioridades = [
+        ("Planejamento financeiro","A base de tudo — objetivos, prazos e liquidez consolidados antes de qualquer troca."),
+        ("Diversificação internacional","Reduz a dependência exclusiva do Brasil e protege contra a desvalorização do real."),
+    ]
+    if sobre:
+        c,_ = sobre[0]
+        prioridades.append((f"Reduzir concentração em {lbl(c).lower()}",
+            "Migrar parte para IPCA+ e pré-fixado, aproveitando o juro real elevado."))
+    prioridades += [
+        ("Planejamento sucessório","Organizar a transmissão do patrimônio com agilidade e menor atrito."),
+        ("Revisão tributária","Comparar sempre pelo líquido e capturar as isenções cabíveis ao perfil."),
+    ]
+    return achados, atencao, prioridades[:5], supera
+
+_B360_CSS = """
+:root{color-scheme:light;--paper:#F6F7F6;--card:#FFFFFF;--ink:#1B2A30;--muted:#5F6F77;--faint:#94A2A8;
+--line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#164A54;--marinho:#0D2333;--gold:#A9834F;--gold-soft:#C7AC80;
+--good:#3E7A5E;--warn:#B4833A;--crit:#A5533E;
+--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;--mx:920px}
+*{box-sizing:border-box}body{margin:0}
+.doc{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums lining-nums}
+.page{max-width:var(--mx);margin:0 auto;padding:96px 56px;min-height:100vh;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--line-soft)}
+.page:last-child{border-bottom:0}
+.eyebrow{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);padding-bottom:14px;margin-bottom:40px;border-bottom:1px solid var(--line)}
+.eyebrow b{color:var(--petroleo);font-weight:600}
+.q{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,46px);line-height:1.12;letter-spacing:-.01em;text-wrap:balance;margin:0 0 10px}
+.lede{color:var(--muted);font-size:17px;max-width:60ch;margin:0 0 44px}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:14px}
+.cover{background:var(--marinho);color:#F3EFE7;min-height:100vh;display:flex;flex-direction:column;padding:72px 56px}
+.cover .top{display:flex;justify-content:space-between;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:#8FA4AC}
+.cover .mid{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:var(--mx);margin:0 auto;width:100%}
+.deg{font-family:var(--serif);font-weight:500;letter-spacing:-.02em;line-height:.9;font-size:clamp(88px,17vw,190px)}
+.deg .o{color:var(--gold-soft)}
+.wordmark{font-size:13px;letter-spacing:.44em;text-transform:uppercase;color:#B9C7CD;margin:34px 0 6px}
+.cover h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.6vw,38px);margin:0;color:#F3EFE7}
+.cover .rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);width:120px;margin:30px 0 0}
+.cover .foot{max-width:var(--mx);margin:0 auto;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-top:26px;border-top:1px solid rgba(255,255,255,.12)}
+.cover .foot .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#7E939B;margin-bottom:6px}
+.cover .foot .val{font-size:16px;color:#EAE4D8}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.cell{background:var(--card);padding:26px 24px 28px;display:flex;flex-direction:column;gap:8px;min-height:132px}
+.cell .lbl{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.cell .big{font-family:var(--serif);font-size:29px;line-height:1.05;color:var(--ink)}
+.cell .sub{font-size:13px;color:var(--muted);margin-top:auto}
+.cell.hi .big{color:var(--petroleo)}.cell.gold .big{color:var(--gold)}
+.finds{display:flex;flex-direction:column;gap:2px}
+.find{display:grid;grid-template-columns:16px 1fr;gap:20px;align-items:start;padding:22px 4px;border-top:1px solid var(--line)}
+.find:last-child{border-bottom:1px solid var(--line)}
+.dot{width:11px;height:11px;border-radius:50%;margin-top:7px}
+.dot.g{background:var(--good)}.dot.y{background:var(--warn)}.dot.r{background:var(--crit)}
+.find h3{margin:0 0 3px;font-size:18px;font-weight:600}.find p{margin:0;color:var(--muted);font-size:14.5px;max-width:64ch}
+.xray{display:grid;grid-template-columns:1.35fr .9fr;gap:56px;align-items:center}
+.meters{display:flex;flex-direction:column;gap:17px}
+.meter{display:grid;grid-template-columns:132px 1fr 34px;gap:16px;align-items:center}
+.meter .mn{font-size:13.5px}.meter .track{height:6px;border-radius:99px;background:var(--line)}
+.meter .fill{height:6px;border-radius:99px;background:var(--petroleo)}
+.meter .sc{font-size:13.5px;color:var(--muted);text-align:right}
+.meter.low .fill{background:var(--warn)}
+.score{background:var(--marinho);color:#F1ECE2;border-radius:18px;padding:40px 34px;text-align:center}
+.score .n{font-family:var(--serif);font-size:76px;line-height:1;color:#F3EFE7}
+.score .d{color:var(--gold-soft);font-size:15px}
+.score .t{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8FA4AC;margin-bottom:14px}
+.score .cap{font-size:13px;color:#B9C7CD;margin-top:16px;line-height:1.5}
+.legend{display:flex;gap:22px;margin:0 0 26px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.dist{display:flex;flex-direction:column;gap:16px}
+.row{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center}
+.row .rn{font-size:13.5px}.bars{display:flex;flex-direction:column;gap:5px}
+.bar{position:relative;height:15px;background:var(--line-soft);border-radius:4px}
+.bar span{position:absolute;left:0;top:0;height:100%;border-radius:4px}
+.bar .lab{position:absolute;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);padding-left:7px}
+.bar.a span{background:var(--petroleo)}.bar.b span{background:var(--gold)}
+.bar .in{font-size:10.5px;color:#fff;padding:0 7px;line-height:15px;font-variant-numeric:tabular-nums}
+.verds{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.verd{background:var(--card);padding:26px}
+.verd .k{font-size:13px;color:var(--muted);margin-bottom:10px}.verd .v{font-size:20px;font-weight:600}
+.verd .v.ok{color:var(--good)}.verd .v.at{color:var(--warn)}.verd .m{font-size:13px;color:var(--faint);margin-top:6px}
+.att{display:flex;flex-direction:column;gap:18px}
+.attn{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:24px 26px;display:grid;gap:14px}
+.attn .hd{display:flex;align-items:baseline;gap:12px}.attn .hd h3{margin:0;font-size:18px;font-weight:600}
+.pill{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;font-weight:600;background:#F4E7E2;color:var(--crit)}
+.attn .grid{display:grid;grid-template-columns:repeat(3,auto) 1fr;gap:26px;font-size:13px}
+.attn .grid .lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:3px}
+.attn .rec{color:var(--petroleo)}
+.road{display:grid;grid-template-columns:repeat(4,1fr)}
+.stop{padding:0 22px;border-left:1px solid var(--line)}.stop:first-child{border-left:0;padding-left:0}
+.stop .mk{width:10px;height:10px;border-radius:50%;background:var(--gold);margin-bottom:16px}.stop:first-child .mk{background:var(--petroleo)}
+.stop .when{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px}
+.stop h4{margin:0 0 8px;font-size:15px;font-weight:600}.stop p{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+.prios{display:flex;flex-direction:column;gap:2px;counter-reset:p}
+.prio{display:grid;grid-template-columns:44px 1fr;gap:22px;align-items:baseline;padding:22px 4px;border-top:1px solid var(--line)}
+.prio:last-child{border-bottom:1px solid var(--line)}
+.prio::before{counter-increment:p;content:"0" counter(p);font-family:var(--serif);font-size:22px;color:var(--gold)}
+.prio h3{margin:0 0 3px;font-size:18px;font-weight:600}.prio p{margin:0;color:var(--muted);font-size:14px;max-width:66ch}
+.close{background:var(--marinho);color:#EDE7DB;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:96px 56px}
+.close .in{max-width:760px;margin:0 auto;width:100%}.close .kicker{color:var(--gold-soft)}
+.close blockquote{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.4vw,34px);line-height:1.34;margin:0;color:#F4EFE5}
+.close .sig{margin-top:48px;padding-top:26px;border-top:1px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;font-size:13px;color:#9FB2B9}
+.close .sig b{color:#EAE4D8;font-weight:600}
+@media(max-width:760px){.page,.cover,.close{padding:64px 26px}.cards{grid-template-columns:repeat(2,1fr)}.xray{grid-template-columns:1fr;gap:34px}.verds{grid-template-columns:1fr}.road{grid-template-columns:1fr 1fr;gap:26px}.stop{border-left:0;padding-left:0}.attn .grid{grid-template-columns:1fr 1fr}}
+@media print{.doc{background:#fff}.page,.cover,.close{min-height:auto;page-break-after:always;padding:40px}.cover,.close{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+"""
+
+def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="", assessor="", checklist_servir=None):
+    """Documento BRAÚNA 360° (HTML completo) montado a partir dos dados reais do cliente."""
+    e = _b360_esc
+    perfil_pt = {"super_conservadora":"Super Conservador","conservadora":"Conservador","moderada":"Moderado",
+                 "arrojada":"Arrojado","agressiva":"Agressivo"}.get(perfil, (perfil or "").title() or "—")
+    alvo = saa_alvo(perfil) or {}
+    dims, geral = _raio_x(comp, alvo, rent, checklist_servir)
+    achados, atencao, prioridades, supera = _b360_narrativa(comp, alvo, rent, (dims, geral))
+
+    # snapshot
+    infl = comp.get("inflacao",0) or 0
+    nclasses = sum(1 for c in CATS if (comp.get(c,0) or 0) >= 3)
+    r12 = (rent.get("portfolio") or {}).get("12m")
+    pat_curto = f"R$ {patrimonio/1e6:.2f} mi".replace(".",",") if patrimonio and patrimonio>=1e6 else _b360_brl(patrimonio)
+    cards = [
+        ("hi","Patrimônio",pat_curto,_b360_brl(patrimonio)),
+        ("","Perfil",perfil_pt,"Suitability informado"),
+        ("","Objetivo","Crescimento","Acúmulo de longo prazo"),
+        ("gold","Rentabilidade 12m",(f"+{r12:.1f}%" if r12 is not None else "—"),("Acima do CDI" if supera else "vs. CDI")),
+        ("","Diversificação",f'{nclasses} <span style="font-size:18px;color:var(--muted)">classes</span>',f"{9-nclasses} ainda ausentes"),
+        ("","Proteção inflação",f"{infl:.0f}%","Em IPCA+"),
+        ("","Renda passiva","Em formação","FIIs e crédito"),
+        ("gold","Saúde patrimonial",f'{geral}<span style="font-size:18px;color:var(--muted)">/100</span>',"Base sólida, com evolução"),
+    ]
+    cards_html = "".join(
+        f'<div class="cell {cls}"><div class="lbl">{e(lb)}</div><div class="big num">{big}</div><div class="sub">{e(sub)}</div></div>'
+        for cls,lb,big,sub in cards)
+
+    ach_html = "".join(
+        f'<div class="find"><div class="dot {c}"></div><div><h3>{e(t)}</h3><p>{e(p)}</p></div></div>'
+        for c,t,p in achados)
+
+    mx_m = max([v for _,v in dims] + [1])
+    met_html = "".join(
+        f'<div class="meter{" low" if v<55 else ""}"><div class="mn">{e(k)}</div>'
+        f'<div class="track"><div class="fill" style="width:{v}%"></div></div><div class="sc num">{v}</div></div>'
+        for k,v in dims)
+
+    # distribuição — classes com posição atual OU alvo relevante
+    dist_cats = [c for c in ["pos_fixado","inflacao","internacional","pre_fixado","multimercado","acoes","fiis","alternativos"]
+                 if (comp.get(c,0) or 0) >= 0.5 or (alvo.get(c,0) or 0) >= 0.5]
+    dmax = max([comp.get(c,0) or 0 for c in dist_cats] + [alvo.get(c,0) or 0 for c in dist_cats] + [1])
+    def _bar(cls, val):
+        val = val or 0; w = max(1.5, val/dmax*99)
+        inner = f'<span class="in num">{val:.0f}%</span>' if val >= 6 else ""
+        lab = "" if val >= 6 else f'<span class="lab num">{val:.0f}%</span>'
+        return f'<div class="bar {cls}"><span style="width:{w:.0f}%">{inner}</span>{lab}</div>'
+    dist_html = "".join(
+        f'<div class="row"><div class="rn">{e(LABELS.get(c,c))}</div><div class="bars">'
+        f'{_bar("a", comp.get(c,0))}{_bar("b", alvo.get(c,0))}</div></div>'
+        for c in dist_cats)
+
+    # performance
+    p12 = (rent.get("portfolio") or {}).get("12m"); c12=(rent.get("cdi") or {}).get("12m")
+    p24 = (rent.get("portfolio") or {}).get("24m")
+    v_cdi = (f'<div class="verd"><div class="k">Superou o CDI?</div><div class="v ok">Sim, com folga</div>'
+             f'<div class="m num">+{p12:.1f}% em 12m · +{(p12-c12):.1f} p.p. acima do CDI</div></div>'
+             if supera else
+             '<div class="verd"><div class="k">Superou o CDI?</div><div class="v at">Acompanhou o CDI</div><div class="m">Retorno em linha com o benchmark</div></div>')
+    v_prot = (f'<div class="verd"><div class="k">Protegeu o patrimônio?</div><div class="v ok">Sim</div>'
+              f'<div class="m num">{("+%.1f%% em 24m"%p24) if p24 is not None else "Perfil defensivo"}</div></div>')
+    perf_html = (v_cdi + v_prot +
+        '<div class="verd"><div class="k">Oscilou muito?</div><div class="v ok">Baixa oscilação</div><div class="m">Perfil defensivo, dominado por renda fixa</div></div>'
+        '<div class="verd"><div class="k">Foi consistente?</div><div class="v at">Sim, com uma ressalva</div><div class="m">Retorno depende demais de um único indexador</div></div>')
+
+    att_html = "".join(
+        f'<div class="attn"><div class="hd"><h3>{e(a["t"])}</h3><span class="pill">Prioridade {e(a["p"])}</span></div>'
+        f'<div class="grid"><div><span class="lbl">Impacto</span>{e(a["imp"])}</div>'
+        f'<div><span class="lbl">Probabilidade</span>{e(a["prob"])}</div>'
+        f'<div><span class="lbl">Horizonte</span>{e(a["hz"])}</div>'
+        f'<div class="rec"><span class="lbl">Recomendação</span>{e(a["rec"])}</div></div></div>'
+        for a in atencao)
+
+    prio_html = "".join(
+        f'<div class="prio"><div><h3>{e(t)}</h3><p>{e(p)}</p></div></div>' for t,p in prioridades)
+
+    return f"""<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Braúna 360° — Check-up Patrimonial</title><style>{_B360_CSS}</style></head>
+<body><div class="doc">
+<section class="cover"><div class="top"><span>Braúna Investimentos</span><span>Documento confidencial</span></div>
+<div class="mid"><div class="deg">360<span class="o">°</span></div><div class="wordmark">Braúna</div>
+<h1>Check-up Patrimonial</h1><div class="rule"></div></div>
+<div class="foot"><div><div class="lbl">Cliente</div><div class="val">{e(nome or ("Conta "+str(conta)) or "—")}</div></div>
+<div><div class="lbl">Assessor</div><div class="val">{e(assessor or "—")}</div></div>
+<div><div class="lbl">Data de referência</div><div class="val num">{e(data_ref or "—")}</div></div></div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Visão geral · 02</span></div>
+<div class="kicker">Sua carteira em 30 segundos</div><h2 class="q">O essencial do seu patrimônio, em um olhar.</h2>
+<p class="lede">Antes dos gráficos, as respostas. Este é o retrato do que foi construído até aqui.</p>
+<div class="cards">{cards_html}</div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Diagnóstico · 03</span></div>
+<div class="kicker">O que encontramos</div><h2 class="q">As principais conclusões da análise.</h2>
+<p class="lede">Forças a preservar, correções de rota e frentes a estruturar.</p>
+<div class="finds">{ach_html}</div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Índice proprietário · 04</span></div>
+<div class="kicker">Raio-X Patrimonial</div><h2 class="q">Seu patrimônio em nove dimensões.</h2>
+<p class="lede">Um índice próprio da Braúna. Vai além da rentabilidade: mede a saúde completa do patrimônio.</p>
+<div class="xray"><div class="meters">{met_html}</div>
+<div class="score"><div class="t">Nota geral</div><div class="n num">{geral}</div><div class="d">de 100</div>
+<div class="cap">Fundamentos sólidos de renda fixa e liquidez. O caminho de evolução está em internacional, planejamento e sucessão.</div></div></div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Alocação · 05</span></div>
+<div class="kicker">Como seu patrimônio está distribuído</div><h2 class="q">Onde você está — e para onde faz sentido caminhar.</h2>
+<p class="lede">A carteira atual comparada ao modelo estratégico para o seu perfil.</p>
+<div class="legend"><span><i style="background:var(--petroleo)"></i>Atual</span><span><i style="background:var(--gold)"></i>Recomendada</span></div>
+<div class="dist">{dist_html}</div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Desempenho · 06</span></div>
+<div class="kicker">Performance</div><h2 class="q">A carteira fez seu trabalho?</h2>
+<p class="lede">Quatro perguntas objetivas — antes de qualquer número.</p>
+<div class="verds">{perf_html}</div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Pontos de atenção · 07</span></div>
+<div class="kicker">Pontos de atenção</div><h2 class="q">O que merece cuidado — e o que fazer a respeito.</h2>
+<div class="att">{att_html}</div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Plano de evolução · 08</span></div>
+<div class="kicker">Plano de evolução</div><h2 class="q">Como seu patrimônio evolui a partir de hoje.</h2>
+<p class="lede">Não é uma lista de produtos. É uma trajetória.</p>
+<div class="road">
+<div class="stop"><div class="mk"></div><div class="when">Hoje</div><h4>Diagnóstico</h4><p>Este check-up. Fotografia clara do ponto de partida.</p></div>
+<div class="stop"><div class="mk"></div><div class="when">90 dias</div><h4>Primeiros ajustes</h4><p>Iniciar internacional e o planejamento financeiro. Consolidar o patrimônio total.</p></div>
+<div class="stop"><div class="mk"></div><div class="when">12 meses</div><h4>Reequilíbrio</h4><p>Aproximar a carteira do modelo. Revisar tributação e reduzir concentração.</p></div>
+<div class="stop"><div class="mk"></div><div class="when">Longo prazo</div><h4>Estrutura patrimonial</h4><p>Sucessão organizada, renda planejada e revisões periódicas.</p></div></div></section>
+
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Prioridades · 09</span></div>
+<div class="kicker">Prioridades</div><h2 class="q">As cinco ações que mais movem o ponteiro.</h2>
+<div class="prios">{prio_html}</div></section>
+
+<section class="close"><div class="in"><div class="kicker">Nossa visão</div>
+<blockquote>Patrimônio é muito maior do que rentabilidade. É proteção, é liquidez no momento certo, é a tranquilidade de quem sabe para onde vai — e o cuidado com quem virá depois. Seu ponto de partida é sólido. A partir daqui, nosso trabalho é transformar uma boa carteira num patrimônio verdadeiramente bem estruturado.</blockquote>
+<div class="sig"><span>Braúna Investimentos · <b>Check-up Patrimonial 360°</b></span><span>{e(assessor or "")}</span></div></div></section>
+</div></body></html>"""
+
+
 # ── HTML ──────────────────────────────────────────────────────────────────────
 HTML = r"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -2732,8 +3061,10 @@ select option{background:#1A1A1A}
     <h2>Exportar Análise</h2>
     <p style="font-size:12px;color:#3A6A48;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#0D2333;color:#F3EFE7;border-color:#0D2333">◎ Abrir Braúna 360°</button>
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
+    <p style="font-size:11px;color:#2A5A3A;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
   </div>
 
   <div class="card">
@@ -5912,6 +6243,26 @@ async function baixarPdf(){
     a.click();
   }catch(e){ alert("Erro ao gerar PDF: "+e.message); }
   finally{ document.getElementById("btn-pdf").textContent="⬇ Baixar relatório PDF"; document.getElementById("btn-pdf").disabled=false; }
+}
+
+async function abrirBrauna360(){
+  if(!analiseData){ alert("Analise uma carteira primeiro."); return; }
+  const btn=document.getElementById("btn-b360"); const _t=btn?btn.textContent:"";
+  if(btn){ btn.textContent="Gerando..."; btn.disabled=true; }
+  try{
+    const payload=Object.assign({}, analiseData, {
+      composicao: analiseData.composicao_atual || analiseData.composicao || {},
+      conta: (_clienteIdentificado && _clienteIdentificado.conta) || analiseData.conta || "",
+      assessor: (document.getElementById("assessor")||{}).value || localStorage.getItem("brauna_nome") || analiseData.assessor || "",
+    });
+    const res=await fetch("/api/brauna360",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    if(!res.ok) throw new Error(await res.text());
+    const html=await res.text();
+    const w=window.open("","_blank");
+    if(w){ w.document.open(); w.document.write(html); w.document.close(); }
+    else { window.open(URL.createObjectURL(new Blob([html],{type:"text/html"})),"_blank"); }
+  }catch(e){ alert("Erro ao gerar o Braúna 360°: "+e.message); }
+  finally{ if(btn){ btn.textContent=_t||"◎ Braúna 360°"; btn.disabled=false; } }
 }
 
 async function baixarPpt(){
@@ -10455,6 +10806,22 @@ def pdf_endpoint():
     )
     nome_arq = f"{d.get('nome','cliente').replace(' ','-').lower()}_{d.get('data_ref','')}_analise.pdf"
     return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=nome_arq)
+
+
+@app.route("/api/brauna360", methods=["POST"])
+def brauna360_endpoint():
+    """Gera o documento BRAÚNA 360° (HTML) a partir dos dados da análise do cliente."""
+    d = request.get_json() or {}
+    comp = d.get("comp") or d.get("composicao") or {}
+    if not comp and d.get("desvios"):
+        comp = {(x.get("cat") or x.get("cls")): x.get("real", 0) for x in d["desvios"] if (x.get("cat") or x.get("cls"))}
+    if d.get("caixa") and "caixa" not in comp:
+        comp["caixa"] = d.get("caixa")
+    html = gerar_brauna360_html(
+        d.get("nome",""), d.get("perfil","conservadora"), comp, d.get("rent",{}),
+        d.get("patrimonio",0), d.get("data_ref",""), d.get("conta",""),
+        d.get("assessor",""), d.get("checklist_servir"))
+    return Response(html, mimetype="text/html")
 
 
 HTML_RESET_SENHA = r"""<!DOCTYPE html>
