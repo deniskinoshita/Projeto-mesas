@@ -1234,6 +1234,89 @@ def _parse_ret_classe(texto):
     return out
 
 
+_POS_CLASSE_MAP = [
+    (r"^P[oó]s\s*Fix",            "pos_fixado"),
+    (r"^Infla",                   "inflacao"),
+    (r"^Pr[eé]\s*Fix",            "pre_fixado"),
+    (r"^Multi.?mercado",          "multimercado"),
+    (r"^Renda\s*Vari[aá]vel",     "acoes"),
+    (r"^Fundos\s*Listados",       "fiis"),
+    (r"^Renda\s*Fixa\s*Global",   "internacional"),
+    (r"^Internacion",             "internacional"),
+    (r"^Alternativ",              "alternativos"),
+    (r"^Cripto",                  "criptomoedas"),
+]
+_POS_CAIXA_HDR = re.compile(r"^(Caixa|Proventos)\b", re.I)
+_POS_RUIDO = re.compile(r"^(CP\s*RL|RF\s*RL|RF\s*CP|CP\s*LP|CDI|RL|RF|CP|Limitada|Resp|LP)$", re.I)
+_POS_NUM_LINE = re.compile(r"R\$\s*([\d\.]+,\d{2})\s+(-|[\d\.]+)\s+(-?[\d\.,]+%.*)$")
+_POS_TICKER = re.compile(r"^([A-Z]{4}\d{1,2})\b")
+
+def _parse_posicao_detalhada(texto):
+    """Lê a tabela 'POSIÇÃO DETALHADA DOS ATIVOS' do XPerformance.
+    Colunas por ativo: Saldo Bruto | Qtd | %Aloc | Rent.Mês %CDI | Rent.Ano %CDI | Rent.24M %CDI.
+    Retorna lista de dicts {nome,ticker,classe,saldo,qtd,perc,rent_mes,rent_ano,rent_24m}.
+    Cabeçalho de classe tem Qtd='-'; retorno é a rentabilidade da posição (já marcada a mercado)."""
+    def _f(s):
+        try: return float(s.replace(".", "").replace(",", "."))
+        except Exception: return None
+    def _fq(s):
+        if s in ("-", None): return None
+        try: return float(s)
+        except Exception: return None
+
+    em_tab = False; classe = None; nome_buf = []; ativos = []
+    for raw in texto.splitlines():
+        l = raw.strip()
+        if not l:
+            continue
+        if re.search(r"POSI..O\s+DETALHADA\s+DOS\s+ATIVOS", l, re.I):
+            em_tab = True; nome_buf = []; continue   # mantém a classe (tabela segue entre páginas)
+        if not em_tab:
+            continue
+        if re.search(r"EVOLU..O|ESTRAT.GIA:", l, re.I):
+            em_tab = False; classe = None; nome_buf = []; continue
+        if re.search(r"Relat.rio\s+informativo", l, re.I):
+            continue
+        if re.match(r"^(MÊS ATUAL|Estrat.gia Saldo|.*Saldo Bruto Qtd|PRECIFICA|POSI..O DETALHADA)", l, re.I):
+            continue
+
+        m = _POS_NUM_LINE.search(l)
+        if not m:
+            if _POS_RUIDO.match(l):
+                continue
+            nome_buf.append(l)
+            continue
+
+        saldo = _f(m.group(1)); qtd = m.group(2); rest = m.group(3)
+        pcts = re.findall(r"(-?[\d\.]*\d,\d+)%", rest)
+        antes = l[:m.start()].strip()
+        if qtd == "-":                                  # cabeçalho de classe
+            base = antes or (nome_buf[-1] if nome_buf else "")
+            alvo = None
+            for pat, cls in _POS_CLASSE_MAP:
+                if re.search(pat, base, re.I):
+                    alvo = cls; break
+            if alvo is None and _POS_CAIXA_HDR.match(base):
+                alvo = "_skip"
+            classe = alvo; nome_buf = []; continue
+
+        nome = antes if antes else " ".join(nome_buf).strip()
+        nome_buf = []
+        nome = re.sub(r"\s+(CP\s*RL|RF\s*RL|RF\s*CP|CP\s*LP|RL|RF|CP)$", "", nome).strip()
+        if classe in (None, "_skip") or not nome or saldo is None:
+            continue
+        mt = _POS_TICKER.match(nome)
+        ativos.append({
+            "nome": nome, "ticker": (mt.group(1) if mt else None), "classe": classe,
+            "saldo": saldo, "qtd": _fq(qtd),
+            "perc":     _f(pcts[0]) if len(pcts) >= 1 else None,
+            "rent_mes": _f(pcts[1]) if len(pcts) >= 2 else None,
+            "rent_ano": _f(pcts[3]) if len(pcts) >= 4 else None,
+            "rent_24m": _f(pcts[5]) if len(pcts) >= 6 else None,
+        })
+    return ativos
+
+
 def extrair_xperformance(pdf_bytes):
     """Parser especializado para o relatório XPerformance da XP Investimentos."""
     import pdfplumber
@@ -1449,6 +1532,27 @@ def extrair_xperformance(pdf_bytes):
                     not RF_RUIDO_PAT.match(l) and
                     len(l) > 5):
                 rf_nome_buf = l
+
+    # ── Parser unificado da POSIÇÃO DETALHADA (retorno por ativo, p/ deságio) ─────
+    # Fonte única e correta de rent_ano/rent_mes por ativo; sobrepõe os loops antigos
+    # (que confundiam rentabilidade com %CDI). Fallback: mantém o resultado antigo.
+    try:
+        _pos = _parse_posicao_detalhada(texto)
+    except Exception:
+        _pos = []
+    if _pos:
+        acoes     = [{"ticker": a["ticker"] or a["nome"][:8], "nome": a["nome"], "saldo": a["saldo"],
+                      "qtd": a["qtd"], "perc": a["perc"], "rent_mes": a["rent_mes"],
+                      "rent_ano": a["rent_ano"], "rent_24m": a["rent_24m"]}
+                     for a in _pos if a["classe"] == "acoes"]
+        fiis_list = [{"ticker": a["ticker"] or a["nome"][:8], "nome": a["nome"], "saldo": a["saldo"],
+                      "qtd": a["qtd"], "perc": a["perc"], "rent_mes": a["rent_mes"],
+                      "rent_ano": a["rent_ano"], "rent_24m": a["rent_24m"]}
+                     for a in _pos if a["classe"] == "fiis"]
+        rf_ativos = [{"nome": a["nome"], "classe": a["classe"], "saldo": a["saldo"],
+                      "perc": a["perc"], "rent_mes": a["rent_mes"], "rent_ano": a["rent_ano"],
+                      "rent_24m": a["rent_24m"], "rent_12m": None}
+                     for a in _pos if a["classe"] not in ("acoes", "fiis")]
 
     return {
         "conta":     conta,
@@ -5814,9 +5918,57 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
 }
 
 // Plano de Troca — para cada classe subalocada: fonte do recurso (venda) + produtos concretos (compra)
-function renderPlanoTroca(sugs){
+function renderPlanoTroca(sugs, plano){
   const el=document.getElementById("plano-troca");
   if(!el) return;
+  const fmt0=v=>"R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+  // ── Plano concreto venda→compra (com deságio da posição) ──────────────────────
+  if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length))){
+    const lim=plano.limite_desagio||3;
+    let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
+    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Já sabendo quanto precisa sair de cada classe para reenquadrar no asset allocation, escolhemos o ativo a vender pelo <b>deságio</b> (rentabilidade da posição). Ativo com deságio acima de '+lim+'% não é vendido — para não realizar prejuízo.</p>';
+    if(plano.total_mover>0) h+='<div style="font-size:12px;color:#8B9FE8;margin-bottom:10px">Total a realocar: <b style="color:#F0F0F0">'+fmt0(plano.total_mover)+'</b></div>';
+    (plano.movimentacoes||[]).forEach(function(m){
+      const des=m.origem_desagio;
+      const desTxt = (des==null) ? '' :
+        (des<0 ? '<span style="color:#E8A87C">no ano '+des.toFixed(1)+'%</span>'
+               : '<span style="color:#5DCAA5">no ano +'+des.toFixed(1)+'%</span>');
+      const fgc=m.destino_fgc?'<span style="font-size:9px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
+      h+='<div style="border:1px solid #1C3A24;border-radius:10px;padding:11px 13px;margin-bottom:8px;background:#0B1410">'
+        +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        +'<div style="flex:1;min-width:150px"><span style="font-size:10px;color:#FF6B6B;font-weight:700">↓ VENDER</span> '
+        +'<span style="font-size:13px;font-weight:800;color:#F0F0F0">'+fmt0(m.valor)+'</span> '
+        +'<span style="font-size:11px;color:#AAA">de <b>'+m.origem_nome+'</b> <span style="color:#6A7A6A">('+m.origem_label+')</span></span> '+desTxt+'</div>'
+        +'<div style="font-size:16px;color:#3A6A48">→</div>'
+        +'<div style="flex:1;min-width:150px;text-align:right"><span style="font-size:10px;color:#5DCAA5;font-weight:700">↑ COMPRAR</span> '
+        +'<span style="font-size:13px;font-weight:800;color:#F0F0F0">'+fmt0(m.valor)+'</span> '
+        +'<span style="font-size:11px;color:#AAA">em <b>'+m.destino_produto+'</b>'+fgc+' <span style="color:#6A7A6A">('+m.destino_label+')</span></span>'
+        +(m.destino_detalhe?' <span style="font-size:10px;color:#C9A96E">'+m.destino_detalhe+'</span>':'')+'</div>'
+        +'</div></div>';
+    });
+    if(plano.bloqueados&&plano.bloqueados.length){
+      h+='<div style="margin-top:12px;border:1px solid #3A1010;border-radius:10px;padding:11px 13px;background:#150808">';
+      h+='<div style="font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:7px">⚠ Não vender agora — deságio acima de '+lim+'%</div>';
+      plano.bloqueados.forEach(function(b){
+        h+='<div style="font-size:11.5px;color:#E0C8C8;margin-bottom:5px;line-height:1.5">'
+          +'<b style="color:#F0F0F0">'+b.nome+'</b> <span style="color:#6A7A6A">('+b.label+')</span> — deságio de <b style="color:#FF9B7B">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
+          +'Ainda que fosse o ativo escolhido para a venda, <b>não realizamos a troca</b> para não cristalizar o prejuízo. '
+          +'A partir de hoje monitoramos e sinalizamos a troca quando recuperar (deságio abaixo de '+lim+'%).</div>';
+      });
+      h+='</div>';
+    }
+    if(plano.monitorar_classes&&plano.monitorar_classes.length){
+      h+='<div style="margin-top:10px;border:1px solid #3A2E00;border-radius:10px;padding:11px 13px;background:#151100">';
+      plano.monitorar_classes.forEach(function(mc){
+        h+='<div style="font-size:11.5px;color:#FFD966;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
+          +'Sem opção de venda sem prejuízo — a partir de hoje monitoramos e sinalizamos a troca quando os ativos recuperarem.</div>';
+      });
+      h+='</div>';
+    }
+    h+='<div style="font-size:10px;color:#6A7A6A;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
+    el.innerHTML=h;
+    return;
+  }
   sugs=(sugs||[]).filter(s=>Array.isArray(s.produtos_prateleira)&&s.produtos_prateleira.length);
   if(!sugs.length){ el.innerHTML=""; return; }
   const PRIO={alta:["#FF6B6B","🔴 Alta"],media:["#FFD966","🟡 Média"],baixa:["#5DCAA5","🟢 Baixa"]};
@@ -5894,19 +6046,19 @@ function renderPosicaoConsolidada(data){
     rfHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
     rfHtml += '<th style="text-align:left;padding:6px 8px">Ativo</th><th style="text-align:left;padding:6px 8px">Classe</th>';
     rfHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
-    rfHtml += '<th style="text-align:right;padding:6px 8px">Rent. Mês</th><th style="text-align:right;padding:6px 8px">Rent. 12M</th>';
+    rfHtml += '<th style="text-align:right;padding:6px 8px">Rent. Mês</th><th style="text-align:right;padding:6px 8px">Rent. Ano</th>';
     rfHtml += '</tr></thead><tbody>';
     rf.forEach(function(a,i){
       var bg = i%2===0?"#071E17":"#081F18";
       var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#5DCAA5">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#FF6B6B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "—";
-      var r12 = a.rent_12m!=null ? parseFloat(a.rent_12m).toFixed(2)+"%" : "—";
+      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#FF6B6B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#AAA">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "—";
       rfHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
       rfHtml += '<td style="padding:6px 8px;color:#F0F0F0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.nome+'">'+a.nome+'</td>';
       rfHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.classe||"—")+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right">'+rm+'</td>';
-      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#AAA">'+r12+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right">'+ra+'</td>';
       rfHtml += '</tr>';
     });
     rfHtml += '</tbody></table></div></div>';
@@ -6002,7 +6154,7 @@ function renderizar(data){
   // Diversificação por classe e plano de ação
   try{ renderClassesAtivos(desvios, patrimonio); }catch(e){ console.error("[renderClassesAtivos]",e); }
   try{ renderPlanoAcao(desvios, data.perfil||"", patrimonio, data.objetivo||""); }catch(e){ console.error("[renderPlanoAcao]",e); }
-  try{ renderPlanoTroca((data._xp&&data._xp.sugestoes_por_classe)||data.sugestoes_por_classe||[]); }catch(e){ console.error("[renderPlanoTroca]",e); }
+  try{ renderPlanoTroca((data._xp&&data._xp.sugestoes_por_classe)||data.sugestoes_por_classe||[], (data._xp&&data._xp.plano_troca)||data.plano_troca||null); }catch(e){ console.error("[renderPlanoTroca]",e); }
 
   // Carteira atual do cliente — exibe no Plano de Ação e ao lado dos Desvios
   const _compAtual = (_clienteIdentificado && _clienteIdentificado.composicao_atual) || data.composicao_atual || data.composicao || {};
@@ -8940,6 +9092,99 @@ def hp_knowledge_publicar():
     update_know_meta(doc_id, **changes)
     return jsonify({"ok": True, **changes})
 
+DESAGIO_LIMITE = 3.0  # % — acima disso não se realiza a venda (evita cristalizar prejuízo)
+
+def _plano_troca(desvios, patrimonio, dados, destinos):
+    """Monta o plano concreto venda→compra: escolhe QUAL ativo vender dentro de cada
+    classe sobre-alocada, respeitando o deságio (rentabilidade da posição, marcada a
+    mercado no XP). Ativo com rent. no ano pior que -DESAGIO_LIMITE% não é vendido.
+    Retorna {total_mover, movimentacoes[], bloqueados[], monitorar_classes[]} ou None."""
+    if not patrimonio or not destinos:
+        return None
+    # posições por classe (com rent_ano = deságio da posição)
+    holdings = {}
+    for a in (dados.get("acoes") or []):
+        holdings.setdefault("acoes", []).append(a)
+    for a in (dados.get("fiis") or []):
+        holdings.setdefault("fiis", []).append(a)
+    for a in (dados.get("rf_ativos") or []):
+        holdings.setdefault(a.get("classe") or "pos_fixado", []).append(a)
+
+    # classes sobre-alocadas = fontes de recurso (excesso em R$)
+    fontes = []
+    for d in desvios:
+        if d.get("desvio", 0) <= 1.5:            # só excesso material
+            continue
+        cls = d.get("cls")
+        exc_val = round(patrimonio * d["desvio"] / 100.0, 2)
+        ativos = sorted(holdings.get(cls, []), key=lambda a: -(a.get("saldo") or 0))
+        vend, todos_bloq = [], bool(ativos)
+        for a in ativos:
+            des = a.get("rent_ano")
+            nome = a.get("ticker") or a.get("nome") or "—"
+            if des is not None and des < -DESAGIO_LIMITE:
+                continue                          # em deságio: não vende
+            todos_bloq = False
+            vend.append({"nome": nome, "desagio": des, "restante": a.get("saldo") or 0})
+        fontes.append({"classe": cls, "label": LABELS.get(cls, cls), "restante": exc_val,
+                       "excesso_valor": exc_val, "ativos": ativos, "vend": vend,
+                       "todos_bloqueados": todos_bloq})
+    fontes.sort(key=lambda f: -f["excesso_valor"])
+
+    # ativos em deságio dentro das classes-fonte (não serão vendidos — avisar)
+    bloqueados, _seen = [], set()
+    for f in fontes:
+        for a in f["ativos"]:
+            des = a.get("rent_ano")
+            if des is None or des >= -DESAGIO_LIMITE:
+                continue
+            nome = a.get("ticker") or a.get("nome") or "—"
+            k = (nome, f["classe"])
+            if k in _seen:
+                continue
+            _seen.add(k)
+            bloqueados.append({"nome": nome, "classe": f["classe"], "label": f["label"],
+                               "desagio": round(des, 2), "saldo": a.get("saldo")})
+
+    # classes-fonte onde TODO o excesso está travado por deságio → monitorar
+    monitorar = [{"classe": f["classe"], "label": f["label"], "excesso_valor": f["excesso_valor"]}
+                 for f in fontes if f["todos_bloqueados"] and f["excesso_valor"] >= 1000 and f["ativos"]]
+
+    # casa cada destino (subalocado) com os ativos vendáveis das fontes
+    movimentacoes = []
+    for dest in sorted(destinos, key=lambda s: -s.get("gap_valor", 0)):
+        need = dest.get("gap_valor", 0)
+        prod = (dest.get("produtos_prateleira") or [{}])[0] or {}
+        for f in fontes:
+            if need <= 1:
+                break
+            if f["restante"] <= 1:
+                continue
+            for v in f["vend"]:
+                if need <= 1 or f["restante"] <= 1:
+                    break
+                if v["restante"] <= 1:
+                    continue
+                mov = min(need, f["restante"], v["restante"])
+                if mov < 500:                     # ignora migalhas
+                    continue
+                movimentacoes.append({
+                    "origem_nome": v["nome"], "origem_classe": f["classe"], "origem_label": f["label"],
+                    "origem_desagio": (round(v["desagio"], 2) if v["desagio"] is not None else None),
+                    "valor": round(mov, 2),
+                    "destino_produto": prod.get("nome", "—"), "destino_classe": dest.get("classe"),
+                    "destino_label": dest.get("label_classe", ""), "destino_detalhe": prod.get("detalhe", ""),
+                    "destino_fgc": bool(prod.get("fgc")),
+                })
+                need -= mov; f["restante"] -= mov; v["restante"] -= mov
+
+    if not movimentacoes and not bloqueados and not monitorar:
+        return None
+    return {"total_mover": round(sum(m["valor"] for m in movimentacoes), 2),
+            "movimentacoes": movimentacoes, "bloqueados": bloqueados,
+            "monitorar_classes": monitorar, "limite_desagio": DESAGIO_LIMITE}
+
+
 @app.route("/api/analyze-xp", methods=["POST"])
 def analyze_xp():
     """Lê PDF XPerformance, compara com modelo HP e sugere produtos cadastrados."""
@@ -9446,6 +9691,11 @@ def analyze_xp():
     _ordp = {"alta": 0, "media": 1, "baixa": 2}
     sugestoes_por_classe.sort(key=lambda x: (_ordp.get(x["prioridade"], 9), x["gap_pp"]))
 
+    try:
+        plano_troca = _plano_troca(desvios, _patr, dados, sugestoes_por_classe)
+    except Exception as _e:
+        app.logger.warning(f"plano_troca warning: {_e}"); plano_troca = None
+
     resultado = {
         "conta":       dados["conta"],
         "assessor":    dados["assessor"] or assessor,
@@ -9464,6 +9714,7 @@ def analyze_xp():
         "fiis":        dados["fiis"],
         "sugestoes_produtos": sugestoes_prods,
         "sugestoes_por_classe": sugestoes_por_classe,
+        "plano_troca": plano_troca,
         "cenario_macro": {
             "global":        cenario.get("global",""),
             "brasil":        cenario.get("brasil",""),
