@@ -1001,10 +1001,14 @@ def _travas_institucionais(cls, gap_valor, auc, prods_prat):
     top   = (prods_prat or [{}])[0]
     nome  = (top.get("nome") or "").upper()
     is_tesouro = any(w in nome for w in ("NTN", "TESOURO", "LTN", "LFT"))
-    is_credito = cls in ("pos_fixado", "pre_fixado") or (cls == "inflacao" and not is_tesouro)
-    is_banco   = bool(top.get("fgc"))
+    # Emissão BANCÁRIA (risco de banco, com FGC): CDB, LCI, LCA, LC, RDB, LF.
+    is_banco = bool(top.get("fgc")) or bool(_re.search(r"\b(CDB|LCI|LCA|RDB|LC|LF|LETRA\s+FINANCEIRA)\b", nome))
+    # Crédito PRIVADO (dívida de empresa não-financeira, sem FGC): debênture, CRI, CRA,
+    # nota comercial, FIDC. NÃO inclui emissão bancária nem título público.
+    is_cred_priv = (not is_banco and not is_tesouro) and bool(
+        _re.search(r"\b(DEB[ÊE]NTURE|CRI|CRA|NOTA\s+COMERCIAL|FIDC|CDCA|CDA)\b", nome))
     # 1) Crédito privado — máx 5% do AUC por emissor
-    if is_credito:
+    if is_cred_priv:
         lim = 0.05 * auc
         if gap_valor > lim:
             n = int(gap_valor // lim) + (1 if gap_valor % lim else 0)
@@ -1014,9 +1018,10 @@ def _travas_institucionais(cls, gap_valor, auc, prods_prat):
         m = _re.search(r"(20\d{2})", nome)
         if m and int(m.group(1)) >= 2040:
             travas.append(f"NTN-B ≥2040: concentração máx 15% do AUC ({_brl(0.15*auc)}).")
-    # 3) Emissão bancária high yield — máx R$ 180k por emissor
-    if is_banco and gap_valor > 180000:
-        travas.append("Emissão bancária high yield: máx R$ 180k por emissor — checar rating e dividir.")
+    # 3) Emissão bancária — FGC cobre até R$ 250k por emissor/conglomerado
+    if is_banco and gap_valor > 250000:
+        n = int(gap_valor // 250000) + (1 if gap_valor % 250000 else 0)
+        travas.append(f"Emissão bancária: FGC cobre até R$ 250k por emissor/conglomerado — dividir em ~{n} emissores para manter a cobertura (se high yield, teto de R$ 180k).")
     return travas
 
 def _sugerir_por_classe(cat, n=3, excluir=None):
