@@ -2380,6 +2380,10 @@ _B360_CSS = """
 .bar .lab{position:absolute;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);padding-left:7px}
 .bar.a span{background:var(--petroleo)}.bar.b span{background:var(--gold)}
 .bar .in{font-size:10.5px;color:#fff;padding:0 7px;line-height:15px;font-variant-numeric:tabular-nums}
+.distsum{margin-top:34px;padding-top:22px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+.distsum b{color:var(--petroleo);font-weight:600}
+.distsum .up{color:var(--good);font-weight:600}.distsum .dn{color:var(--warn);font-weight:600}
+.visao-intro{color:#B9C7CD;font-size:16px;line-height:1.6;margin:0 0 26px;max-width:60ch}
 .verds{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .verd{background:var(--card);padding:26px}
 .verd .k{font-size:13px;color:var(--muted);margin-bottom:10px}.verd .v{font-size:20px;font-weight:600}
@@ -2424,6 +2428,18 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     alvo = saa_alvo(perfil) or {}
     dims, geral = _raio_x(comp, alvo, rent, checklist_servir)
     achados, atencao, prioridades, supera = _b360_narrativa(comp, alvo, rent, (dims, geral))
+
+    # Principais ajustes (resumo da distribuição) + destaque/fronteira (visão personalizada)
+    _aj = sorted([(c, (alvo.get(c,0) or 0)-(comp.get(c,0) or 0)) for c in CATS
+                  if abs((alvo.get(c,0) or 0)-(comp.get(c,0) or 0)) >= 3], key=lambda x:-abs(x[1]))[:3]
+    ajustes_html = (" &nbsp;·&nbsp; ".join(
+        (f'<span class="up">↑ {_b360_esc(LABELS.get(c,c))}</span>' if d > 0
+         else f'<span class="dn">↓ {_b360_esc(LABELS.get(c,c))}</span>') for c,d in _aj)
+        if _aj else "Carteira próxima do modelo.")
+    _sd = sorted(dims, key=lambda x:-x[1])
+    _forte = (_sd[0][0].lower() if _sd else "renda fixa")
+    _fraca = (_sd[-1][0].lower() if _sd else "internacional")
+    visao_intro = f"Sua carteira já cumpre bem o essencial — com destaque em {_forte}. O próximo salto de qualidade está em {_fraca}."
 
     # nome do cliente — ignora placeholders do parser
     _n = (nome or "").strip()
@@ -2542,7 +2558,8 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <div class="kicker">Como seu patrimônio está distribuído</div><h2 class="q">Onde você está — e para onde faz sentido caminhar.</h2>
 <p class="lede">A carteira atual comparada ao modelo estratégico para o seu perfil.</p>
 <div class="legend"><span><i style="background:var(--petroleo)"></i>Atual</span><span><i style="background:var(--gold)"></i>Recomendada</span></div>
-<div class="dist">{dist_html}</div></section>
+<div class="dist">{dist_html}</div>
+<div class="distsum">Principais ajustes sugeridos: &nbsp;{ajustes_html}</div></section>
 
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Desempenho · 06</span></div>
 <div class="kicker">Performance</div><h2 class="q">A carteira fez seu trabalho?</h2>
@@ -2567,6 +2584,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <div class="prios">{prio_html}</div></section>
 
 <section class="close"><div class="in"><div class="kicker">Nossa visão</div>
+<p class="visao-intro">{e(visao_intro)}</p>
 <blockquote>Patrimônio é muito maior do que rentabilidade. É proteção, é liquidez no momento certo, é a tranquilidade de quem sabe para onde vai — e o cuidado com quem virá depois. Seu ponto de partida é sólido. A partir daqui, nosso trabalho é transformar uma boa carteira num patrimônio verdadeiramente bem estruturado.</blockquote>
 <div class="sig"><span>Braúna Investimentos · <b>Check-up Patrimonial 360°</b></span><span>{e(assessor or "")}</span></div></div></section>
 </div></body></html>"""
