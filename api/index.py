@@ -2406,8 +2406,14 @@ _B360_CSS = """
 .close blockquote{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.4vw,34px);line-height:1.34;margin:0;color:#F4EFE5}
 .close .sig{margin-top:48px;padding-top:26px;border-top:1px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;font-size:13px;color:#9FB2B9}
 .close .sig b{color:#EAE4D8;font-weight:600}
+.cover .prep{margin-top:22px;font-size:14px;letter-spacing:.02em;color:#C7D3D8}
+.cover .prep b{color:#EAE4D8;font-weight:600}
+.printbtn{position:fixed;top:20px;right:20px;z-index:60;font-family:var(--sans);font-size:12px;
+letter-spacing:.06em;color:#EAE4D8;background:rgba(13,35,51,.86);border:1px solid rgba(199,172,128,.5);
+border-radius:99px;padding:9px 16px;cursor:pointer;backdrop-filter:blur(6px)}
+.printbtn:hover{background:#0D2333;border-color:var(--gold-soft)}
 @media(max-width:760px){.page,.cover,.close{padding:64px 26px}.cards{grid-template-columns:repeat(2,1fr)}.xray{grid-template-columns:1fr;gap:34px}.verds{grid-template-columns:1fr}.road{grid-template-columns:1fr 1fr;gap:26px}.stop{border-left:0;padding-left:0}.attn .grid{grid-template-columns:1fr 1fr}}
-@media print{.doc{background:#fff}.page,.cover,.close{min-height:auto;page-break-after:always;padding:40px}.cover,.close{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{.doc{background:#fff}.page,.cover,.close{min-height:auto;page-break-after:always;padding:40px}.cover,.close{-webkit-print-color-adjust:exact;print-color-adjust:exact}.printbtn{display:none}}
 """
 
 def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="", assessor="", checklist_servir=None):
@@ -2419,19 +2425,35 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     dims, geral = _raio_x(comp, alvo, rent, checklist_servir)
     achados, atencao, prioridades, supera = _b360_narrativa(comp, alvo, rent, (dims, geral))
 
+    # nome do cliente — ignora placeholders do parser
+    _n = (nome or "").strip()
+    if (not _n) or ("identificado" in _n.lower()):
+        _n = (f"Conta {conta}" if conta else "—")
+    nome_disp = _n
+
     # snapshot
     infl = comp.get("inflacao",0) or 0
     nclasses = sum(1 for c in CATS if (comp.get(c,0) or 0) >= 3)
     r12 = (rent.get("portfolio") or {}).get("12m")
     pat_curto = f"R$ {patrimonio/1e6:.2f} mi".replace(".",",") if patrimonio and patrimonio>=1e6 else _b360_brl(patrimonio)
+    # renda passiva estimada — FIIs distribuem ~10% a.a. (referência, não garantia)
+    fiis_pct = comp.get("fiis",0) or 0
+    renda_mes = (patrimonio*(fiis_pct/100.0)*0.10/12.0) if (patrimonio and fiis_pct) else 0
+    if renda_mes >= 1000:
+        renda_val, renda_sub = f"≈ R$ {renda_mes/1000:.1f} mil".replace(".",",")+"/mês", "Estimada · FIIs"
+    elif renda_mes >= 80:
+        renda_val, renda_sub = f"≈ R$ {renda_mes:.0f}/mês", "Estimada · FIIs"
+    else:
+        renda_val, renda_sub = "Em formação", "FIIs e crédito"
+    obj = "Crescimento" if perfil in ("moderada","arrojada","agressiva") else "Preservação"
     cards = [
         ("hi","Patrimônio",pat_curto,_b360_brl(patrimonio)),
         ("","Perfil",perfil_pt,"Suitability informado"),
-        ("","Objetivo","Crescimento","Acúmulo de longo prazo"),
+        ("","Objetivo",obj,"Acúmulo de longo prazo" if obj=="Crescimento" else "Renda e proteção"),
         ("gold","Rentabilidade 12m",(f"+{r12:.1f}%" if r12 is not None else "—"),("Acima do CDI" if supera else "vs. CDI")),
         ("","Diversificação",f'{nclasses} <span style="font-size:18px;color:var(--muted)">classes</span>',f"{9-nclasses} ainda ausentes"),
         ("","Proteção inflação",f"{infl:.0f}%","Em IPCA+"),
-        ("","Renda passiva","Em formação","FIIs e crédito"),
+        ("","Renda passiva",renda_val,renda_sub),
         ("gold","Saúde patrimonial",f'{geral}<span style="font-size:18px;color:var(--muted)">/100</span>',"Base sólida, com evolução"),
     ]
     cards_html = "".join(
@@ -2490,10 +2512,12 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Braúna 360° — Check-up Patrimonial</title><style>{_B360_CSS}</style></head>
 <body><div class="doc">
+<button class="printbtn" onclick="window.print()">⬇ Salvar em PDF</button>
 <section class="cover"><div class="top"><span>Braúna Investimentos</span><span>Documento confidencial</span></div>
 <div class="mid"><div class="deg">360<span class="o">°</span></div><div class="wordmark">Braúna</div>
-<h1>Check-up Patrimonial</h1><div class="rule"></div></div>
-<div class="foot"><div><div class="lbl">Cliente</div><div class="val">{e(nome or ("Conta "+str(conta)) or "—")}</div></div>
+<h1>Check-up Patrimonial</h1><div class="rule"></div>
+<div class="prep">Check-up preparado para <b>{e(nome_disp)}</b></div></div>
+<div class="foot"><div><div class="lbl">Cliente</div><div class="val">{e(nome_disp)}</div></div>
 <div><div class="lbl">Assessor</div><div class="val">{e(assessor or "—")}</div></div>
 <div><div class="lbl">Data de referência</div><div class="val num">{e(data_ref or "—")}</div></div></div></section>
 
