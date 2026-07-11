@@ -829,6 +829,28 @@ def load_msg():
     return _load(_MSG_FILE, {"mensagem":"","estrategia":"","atualizado":""})
 def save_msg(d): _save(_MSG_FILE, d)
 
+# Comunicado da Administração some da tela dos assessores após 72h (3 dias).
+COMUNICADO_TTL_H = 72
+def _msg_base_dt(m):
+    """Momento de publicação do comunicado, como datetime (ou None)."""
+    iso = (m or {}).get("publicado_iso")
+    if iso:
+        try: return datetime.fromisoformat(iso)
+        except Exception: pass
+    at = (m or {}).get("atualizado")
+    if at:
+        try: return datetime.strptime(at, "%d/%m/%Y %H:%M")
+        except Exception: pass
+    return None
+def msg_expirada(m):
+    dt = _msg_base_dt(m)
+    return bool(dt and (datetime.now() - dt).total_seconds() > COMUNICADO_TTL_H*3600)
+def msg_horas_restantes(m):
+    dt = _msg_base_dt(m)
+    if not dt: return None
+    resta = COMUNICADO_TTL_H*3600 - (datetime.now() - dt).total_seconds()
+    return max(0, int(resta // 3600))
+
 
 def carregar_contexto():
     try:
@@ -3683,10 +3705,14 @@ if(_dataEl) _dataEl.value = new Date().toISOString().split("T")[0];
 
 // Carrega mensagem do admin e carta ativa
 fetch("/api/admin/mensagem").then(r=>r.json()).then(d=>{
-  if(d.mensagem){
+  if(d.mensagem && !d.expirado){
     document.getElementById("msg-admin-box").style.display="block";
     document.getElementById("msg-admin-txt").textContent=d.mensagem;
-    document.getElementById("msg-admin-data").textContent="Atualizado em: "+d.atualizado;
+    let rodape="Publicado em: "+d.atualizado;
+    if(typeof d.horas_restantes==="number"){
+      rodape += d.horas_restantes>0 ? "  ·  expira em "+d.horas_restantes+"h" : "  ·  expira em breve";
+    }
+    document.getElementById("msg-admin-data").textContent=rodape;
   }
 }).catch(()=>{});
 fetch("/api/admin/contexto-info").then(r=>r.json()).then(d=>{
@@ -7601,10 +7627,15 @@ def admin_dashboard():
 def mensagem_endpoint():
     if request.method == "POST":
         d = request.get_json()
-        d["atualizado"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+        agora = datetime.now()
+        d["atualizado"] = agora.strftime("%d/%m/%Y %H:%M")
+        d["publicado_iso"] = agora.isoformat()
         save_msg(d)
         return jsonify({"ok":True})
-    return jsonify(load_msg())
+    m = load_msg()
+    m["expirado"] = msg_expirada(m)
+    m["horas_restantes"] = msg_horas_restantes(m)
+    return jsonify(m)
 
 @app.route("/api/admin/upload-contexto", methods=["POST"])
 def upload_contexto():
@@ -13302,7 +13333,17 @@ async function init(){
     if(info.mensagem && info.mensagem.atualizado){
       document.getElementById("txt-estrategia").value = info.mensagem.estrategia || "";
       document.getElementById("txt-mensagem").value   = info.mensagem.mensagem   || "";
-      msgEl.innerHTML = `<div class="info-box"><b>Publicado em:</b> ${info.mensagem.atualizado}</div>`;
+      // Estado da expiração (72h) — a partir da data de publicação
+      let selo = "";
+      const p = (info.mensagem.atualizado||"").match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+      if(p){
+        const dt = new Date(+p[3], +p[2]-1, +p[1], +p[4], +p[5]);
+        const h = (Date.now() - dt.getTime())/3600000;
+        selo = h > 72
+          ? `<br><span style="color:#E8A87C">⏳ Expirado — não aparece mais para os assessores. Republique para reexibir por mais 72h.</span>`
+          : `<br><span style="color:#5DCAA5">✓ Visível aos assessores — expira em ${Math.ceil(72-h)}h</span>`;
+      }
+      msgEl.innerHTML = `<div class="info-box"><b>Publicado em:</b> ${info.mensagem.atualizado}${selo}</div>`;
     } else {
       msgEl.innerHTML = `<div class="info-box" style="color:#1E4A30">Nenhum comunicado publicado.</div>`;
     }
