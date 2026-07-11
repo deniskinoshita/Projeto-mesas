@@ -5986,27 +5986,8 @@ function renderizar(data){
     html+=`<div class="metric"><div class="lbl">CDI 12M</div><div class="val">${c["12m"].toFixed(2)}%</div></div>`;
     html+=`<div class="metric"><div class="lbl">% do CDI (12M)</div><div class="val ${cls}">${p12}%</div></div>`;
   }
-  // Score Modelo de Servir como métrica
-  if(checklist_servir){
-    const scoreColor=score_servir>=5?"ok":score_servir>=3?"":"danger";
-    const barColor = score_servir>=5?"#5DCAA5":score_servir>=3?"#FFD966":"#FF6B6B";
-    const bordaColor = pendentes_criticos>0?"#FF4444":score_servir>=5?"#2A5040":"#1C4A34";
-    const bgColor = pendentes_criticos>0?"#2A1010":score_servir>=5?"#0A2A18":"#0B2A1F";
-
-    html+=`<div class="metric" style="grid-column:span 4;background:${bgColor};border:1px solid ${bordaColor}">
-      <div class="lbl">Modelo de Servir</div>
-      <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
-        <div class="val ${scoreColor}" style="font-size:28px;line-height:1">${score_servir}/6</div>
-        <div style="flex:1">
-          <div style="font-size:11px;color:#3A6A48;margin-bottom:5px">pilares completos</div>
-          <div style="height:6px;background:#1A4030;border-radius:3px;overflow:hidden">
-            <div style="width:${score_servir/6*100}%;height:100%;background:${barColor};border-radius:3px"></div>
-          </div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:#888;margin-top:6px">${pendentes_criticos>0?`🔴 ${pendentes_criticos} crítico(s) pendente(s) `:''}${pendentes_altos>0?`🟡 ${pendentes_altos} importante(s) pendente(s)`:score_servir>=6?'✓ Todos completos':''}</div>
-    </div>`;
-  }
+  // (Card de métrica "Modelo de Servir" removido — o mesmo dado já aparece
+  //  completo na seção dedicada "Modelo de Servir" logo abaixo.)
   m.innerHTML=html;
 
   // Gráfico
