@@ -5931,7 +5931,7 @@ function renderPlanoTroca(sugs, plano){
   if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
     let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
-    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Dentro de cada classe sobre-alocada, vendemos primeiro os ativos de <b>pior rentabilidade</b> (trim dos laggards) e a venda é <b>espalhada</b> para não esvaziar um único ativo. A trava de <b>deságio acima de '+lim+'%</b> vale só para <b>renda fixa e crédito privado</b> (marcados a mercado) — <b>ações e FIIs são livres</b>. <b>Previdência</b> fica de fora (só por portabilidade).</p>';
+    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Vendemos primeiro os ativos de <b>pior rentabilidade</b> (trim dos laggards), com a venda <b>espalhada</b> entre vários ativos e a <b>compra diversificada</b> entre os produtos da prateleira de cada classe (não concentra num único título). A trava de <b>deságio acima de '+lim+'%</b> vale só para <b>renda fixa e crédito privado</b> (marcados a mercado) — <b>ações e FIIs são livres</b>. <b>Previdência</b> fica de fora (só por portabilidade).</p>';
     if(plano.total_mover>0) h+='<div style="font-size:12px;color:#8B9FE8;margin-bottom:10px">Total a realocar: <b style="color:#F0F0F0">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
       const des=m.origem_desagio;
@@ -9194,11 +9194,21 @@ def _plano_troca(desvios, patrimonio, dados, destinos):
     monitorar = [{"classe": f["classe"], "label": f["label"], "excesso_valor": f["excesso_valor"]}
                  for f in fontes if f["todos_bloqueados"] and f["excesso_valor"] >= 1000]
 
-    # casa cada destino (subalocado) com os ativos vendáveis das fontes
+    # Alvos de COMPRA: espalha o gap de cada destino entre os produtos da prateleira
+    # (até 3) — evita jogar tudo num só título (ex.: só NTN-B). Divisão igual.
+    alvos = []
+    for dest in destinos:
+        prods = [p for p in (dest.get("produtos_prateleira") or []) if p][:3] or [{}]
+        gap = dest.get("gap_valor", 0)
+        share = gap / len(prods)
+        for prod in prods:
+            alvos.append({"need": share, "prod": prod, "dest": dest})
+    alvos.sort(key=lambda x: -x["need"])   # maiores fatias primeiro (preserva prioridade de classe)
+
+    # casa cada alvo de compra com os ativos vendáveis das fontes
     movimentacoes = []
-    for dest in sorted(destinos, key=lambda s: -s.get("gap_valor", 0)):
-        need = dest.get("gap_valor", 0)
-        prod = (dest.get("produtos_prateleira") or [{}])[0] or {}
+    for alvo in alvos:
+        need = alvo["need"]; prod = alvo["prod"]; dest = alvo["dest"]
         for f in fontes:
             if need <= 1:
                 break
