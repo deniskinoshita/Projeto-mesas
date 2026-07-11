@@ -5931,7 +5931,7 @@ function renderPlanoTroca(sugs, plano){
   if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
     let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
-    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Dentro de cada classe sobre-alocada, vendemos primeiro os ativos de <b>pior rentabilidade</b> (trim dos laggards), evitando os que estão em <b>deságio acima de '+lim+'%</b> (para não realizar prejuízo) e a venda é <b>espalhada</b> para não esvaziar um único ativo. <b>Previdência</b> fica de fora (só por portabilidade).</p>';
+    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Dentro de cada classe sobre-alocada, vendemos primeiro os ativos de <b>pior rentabilidade</b> (trim dos laggards) e a venda é <b>espalhada</b> para não esvaziar um único ativo. A trava de <b>deságio acima de '+lim+'%</b> vale só para <b>renda fixa e crédito privado</b> (marcados a mercado) — <b>ações e FIIs são livres</b>. <b>Previdência</b> fica de fora (só por portabilidade).</p>';
     if(plano.total_mover>0) h+='<div style="font-size:12px;color:#8B9FE8;margin-bottom:10px">Total a realocar: <b style="color:#F0F0F0">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
       const des=m.origem_desagio;
@@ -5953,7 +5953,7 @@ function renderPlanoTroca(sugs, plano){
     });
     if(plano.bloqueados&&plano.bloqueados.length){
       h+='<div style="margin-top:12px;border:1px solid #3A1010;border-radius:10px;padding:11px 13px;background:#150808">';
-      h+='<div style="font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:7px">⚠ Não vender agora — deságio acima de '+lim+'%</div>';
+      h+='<div style="font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:7px">⚠ Renda fixa / crédito privado — não vender agora (deságio acima de '+lim+'%)</div>';
       plano.bloqueados.forEach(function(b){
         h+='<div style="font-size:11.5px;color:#E0C8C8;margin-bottom:5px;line-height:1.5">'
           +'<b style="color:#F0F0F0">'+b.nome+'</b> <span style="color:#6A7A6A">('+b.label+')</span> — deságio de <b style="color:#FF9B7B">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
@@ -5981,7 +5981,7 @@ function renderPlanoTroca(sugs, plano){
       });
       h+='</div>';
     }
-    h+='<div style="font-size:10px;color:#6A7A6A;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, sem realizar deságio > '+lim+'%, venda espalhada, previdência de fora. Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
+    h+='<div style="font-size:10px;color:#6A7A6A;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
     el.innerHTML=h;
     return;
   }
@@ -9109,6 +9109,19 @@ def hp_knowledge_publicar():
     return jsonify({"ok": True, **changes})
 
 DESAGIO_LIMITE = 3.0  # % — acima disso não se realiza a venda (evita cristalizar prejuízo)
+_CLS_RF_DESAGIO = {"pos_fixado", "pre_fixado", "inflacao"}
+
+def _aplica_desagio(classe, nome):
+    """A trava de deságio vale só para RENDA FIXA e CRÉDITO PRIVADO (marcados a
+    mercado, com recuperação no vencimento). Ações e FIIs são livres — podem ser
+    vendidos mesmo no negativo. Pega também RF/CP classificado em outra classe
+    (ex.: Renda Fixa Global) pelo nome do instrumento."""
+    if classe in ("acoes", "fiis"):
+        return False
+    if classe in _CLS_RF_DESAGIO:
+        return True
+    return bool(re.search(r"\b(NTN|LTN|LFT|TESOURO|TREASURY|CDB|LCI|LCA|LCD|RDB|DEB[ÊE]NTURE|CRI|CRA|CDCA|FIDC)\b",
+                          (nome or "").upper()))
 
 def _plano_troca(desvios, patrimonio, dados, destinos):
     """Monta o plano concreto venda→compra: escolhe QUAL ativo vender dentro de cada
@@ -9152,7 +9165,8 @@ def _plano_troca(desvios, patrimonio, dados, destinos):
                                         "saldo": a.get("saldo"), "rent_ano": des})
                 continue
             nao_prev.append(a)
-            if des is not None and des < -DESAGIO_LIMITE:   # deságio: avisa e não vende
+            # deságio só trava RF/crédito privado (ações e FIIs são livres)
+            if des is not None and des < -DESAGIO_LIMITE and _aplica_desagio(cls, nome):
                 k = (nome, cls)
                 if k not in _seen:
                     _seen.add(k)
