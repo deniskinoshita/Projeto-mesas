@@ -2384,6 +2384,25 @@ _B360_CSS = """
 .distsum b{color:var(--petroleo);font-weight:600}
 .distsum .up{color:var(--good);font-weight:600}.distsum .dn{color:var(--warn);font-weight:600}
 .visao-intro{color:#B9C7CD;font-size:16px;line-height:1.6;margin:0 0 26px;max-width:60ch}
+.ptab{margin-top:30px;display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+.ptab>div{background:var(--card);padding:13px 18px;font-variant-numeric:tabular-nums}
+.ptab .th{background:#EFF2F1;color:var(--faint);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase}
+.ptab .pp{color:var(--good)}.ptab .pn{color:var(--warn)}
+.posh,.posr{display:grid;grid-template-columns:66px 44px 1fr 96px 78px;gap:18px;align-items:center}
+.posh{padding:0 4px 8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.posr{padding:15px 4px;border-top:1px solid var(--line);font-size:14px}
+.posr:last-child{border-bottom:1px solid var(--line)}
+.posr .tk{font-weight:600;color:var(--petroleo)}.posr .pz,.posr .av{color:var(--muted);font-variant-numeric:tabular-nums}
+.posr .av,.posr .up{text-align:right;font-variant-numeric:tabular-nums}.posr .up{font-weight:600}
+.posr .up.pos{color:var(--good)}.posr .up.neg{color:var(--warn)}
+.rbh,.rbr{display:grid;grid-template-columns:1.7fr 1.2fr 1fr 1.1fr 74px;gap:16px;align-items:center}
+.rbh{padding:0 4px 8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.rbr{padding:15px 4px;border-top:1px solid var(--line);font-size:13.5px}
+.rbr:last-of-type{border-bottom:1px solid var(--line)}
+.rbr .ro{color:var(--ink);font-weight:600}.rbr .ra{color:var(--muted)}
+.rbr .rv{font-variant-numeric:tabular-nums;color:var(--petroleo);font-weight:600}
+.rbr .rd{color:var(--gold);font-size:13px}.rbr .rp{color:var(--muted);font-size:12.5px}
+@media(max-width:760px){.rbh,.rbr{grid-template-columns:1.4fr 1fr 90px}.rbh div:nth-child(4),.rbh div:nth-child(5),.rbr .rd,.rbr .rp{display:none}}
 .verds{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .verd{background:var(--card);padding:26px}
 .verd .k{font-size:13px;color:var(--muted);margin-bottom:10px}.verd .v{font-size:20px;font-weight:600}
@@ -2420,7 +2439,38 @@ border-radius:99px;padding:9px 16px;cursor:pointer;backdrop-filter:blur(6px)}
 @media print{.doc{background:#fff}.page,.cover,.close{min-height:auto;page-break-after:always;padding:40px}.cover,.close{-webkit-print-color-adjust:exact;print-color-adjust:exact}.printbtn{display:none}}
 """
 
-def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="", assessor="", checklist_servir=None):
+def _b360_rebal(comp, alvo, patrimonio, carteira=None):
+    """Movimentações de rebalanceamento: fontes (over-alocadas) → destinos (sub-alocadas), em R$."""
+    if not patrimonio:
+        return None
+    val = lambda pp: (pp or 0)/100.0*patrimonio
+    deltas = [(c, (alvo.get(c,0) or 0)-(comp.get(c,0) or 0)) for c in CATS]
+    sources = sorted([(c,-d) for c,d in deltas if d <= -1.5], key=lambda x:-x[1])
+    dests   = sorted([(c, d) for c,d in deltas if d >=  1.5], key=lambda x:-x[1])
+    if not sources or not dests:
+        return None
+    def _top_ativo(c):
+        try:
+            ats = sorted(((carteira or {}).get(c,{}) or {}).get("ativos") or [],
+                         key=lambda a:-(a.get("saldo",0) or 0))
+            if ats:
+                return str(ats[0].get("nome") or ats[0].get("ticker") or "")[:40]
+        except Exception:
+            pass
+        return None
+    rows = []
+    for c, pp in sources[:4]:
+        origem = _top_ativo(c)
+        origem_txt = (f"{origem} · {LABELS.get(c,c)}" if origem else LABELS.get(c,c))
+        acao = "Realizar parte da posição" if c == "acoes" else "Reduzir gradualmente"
+        rows.append((origem_txt, acao, val(pp)))
+    return {"tot_red": sum(val(pp) for _,pp in sources),
+            "tot_add": sum(val(pp) for _,pp in dests),
+            "src_lbls": [LABELS.get(c,c) for c,_ in sources[:3]],
+            "dest_lbls": ", ".join(LABELS.get(c,c) for c,_ in dests[:3]),
+            "rows": rows}
+
+def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="", assessor="", checklist_servir=None, acoes=None, carteira=None):
     """Documento BRAÚNA 360° (HTML completo) montado a partir dos dados reais do cliente."""
     e = _b360_esc
     perfil_pt = {"super_conservadora":"Super Conservador","conservadora":"Conservador","moderada":"Moderado",
@@ -2440,6 +2490,68 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     _forte = (_sd[0][0].lower() if _sd else "renda fixa")
     _fraca = (_sd[-1][0].lower() if _sd else "internacional")
     visao_intro = f"Sua carteira já cumpre bem o essencial — com destaque em {_forte}. O próximo salto de qualidade está em {_fraca}."
+
+    # (1) mini-tabela de performance (números reais, estilo enxuto)
+    _pf = rent.get("portfolio") or {}; _cd = rent.get("cdi") or {}
+    perf_table_html = ""
+    if any(_pf.get(k) is not None for k in ("mes","ano","12m","24m")):
+        rows = ['<div class="th">Período</div><div class="th">Carteira</div><div class="th">CDI</div><div class="th">Diferença</div>']
+        for k,lb in [("mes","Mês"),("ano","Ano"),("12m","12 meses"),("24m","24 meses")]:
+            pv=_pf.get(k); cv=_cd.get(k)
+            if pv is None: continue
+            dpp=(pv-cv) if (cv is not None) else None
+            dtxt=(f'<span class="{"pp" if dpp>=0 else "pn"}">{dpp:+.2f} p.p.</span>' if dpp is not None else "—")
+            rows.append(f'<div>{lb}</div><div>{pv:.2f}%</div><div>{("%.2f%%"%cv) if cv is not None else "—"}</div><div>{dtxt}</div>')
+        perf_table_html = '<div class="ptab">'+"".join(rows)+'</div>'
+
+    # (2) gaps em R$ (os mesmos 3 ajustes, agora em valores)
+    gap_reais_html = ""
+    if patrimonio and _aj:
+        parts=[(('<span class="up">↑</span>' if d>0 else '<span class="dn">↓</span>')
+                + f' {_b360_esc(LABELS.get(c,c))} <b>{_b360_brl(abs(d)/100.0*patrimonio)}</b>') for c,d in _aj]
+        gap_reais_html = '<div style="margin-top:10px;font-size:14px;color:var(--muted)">Em valores aproximados: &nbsp;'+" &nbsp;·&nbsp; ".join(parts)+'</div>'
+
+    # (3) página de posições em ações (visão Levante/XP + preço-alvo)
+    acoes_section = ""
+    _acs = [a for a in (acoes or []) if float(a.get("perc",0) or 0) >= 0.1]
+    if _acs:
+        guia = (carregar_stock_guide() or {}).get("acoes", {})
+        def _uptxt(v): return "—" if v is None else (f"+{v*100:.0f}%" if v>=0 else f"−{abs(v)*100:.0f}%")
+        linhas=['<div class="posh"><div>Ativo</div><div>Peso</div><div>Visão (Levante)</div><div class="av">Preço-alvo</div><div class="up">Potencial</div></div>']
+        for a in sorted(_acs, key=lambda x:-(float(x.get("perc",0) or 0)))[:10]:
+            tk=str(a.get("ticker") or a.get("nome") or "").upper()[:8]
+            g=guia.get(tk) or {}; lev=g.get("levante"); xp=g.get("xp"); src=lev or xp
+            visao=(lev.get("rating") if lev else ((str(xp.get("rating",""))+" (XP)") if xp else "sem cobertura"))
+            alvo_v=_b360_brl(src.get("alvo")) if (src and src.get("alvo") is not None) else "—"
+            up_v=src.get("upside") if src else None
+            linhas.append(f'<div class="posr"><div class="tk">{_b360_esc(tk)}</div>'
+                f'<div class="pz">{float(a.get("perc",0) or 0):.1f}%</div>'
+                f'<div class="vw">{_b360_esc(visao)}</div><div class="av">{alvo_v}</div>'
+                f'<div class="up {"pos" if (up_v is not None and up_v>=0) else "neg"}">{_uptxt(up_v)}</div></div>')
+        acoes_section = (
+            '<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Renda variável · 07</span></div>'
+            '<div class="kicker">Suas posições em ações</div><h2 class="q">Como está cada empresa da sua carteira.</h2>'
+            '<p class="lede">A visão da casa (Levante) e o preço-alvo de cada ativo que você já detém.</p>'
+            + "".join(linhas) +
+            '<p style="font-size:12px;color:var(--faint);margin-top:18px">Preço-alvo é referência; o preço vigente vem do XPerformance. Não constitui recomendação individualizada.</p></section>')
+
+    # (4) seção de rebalanceamento (movimentações origem→destino em R$)
+    rebal = _b360_rebal(comp, alvo, patrimonio, carteira)
+    rebal_section = ""
+    if rebal:
+        rows_html = "".join(
+            f'<div class="rbr"><div class="ro">{_b360_esc(o)}</div><div class="ra">{_b360_esc(a)}</div>'
+            f'<div class="rv">{_b360_brl(v)}</div><div class="rd">→ {_b360_esc(rebal["dest_lbls"])}</div>'
+            f'<div class="rp">Gradual</div></div>' for o,a,v in rebal["rows"])
+        rebal_section = (
+            '<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Rebalanceamento · 06</span></div>'
+            '<div class="kicker">Movimentações sugeridas</div><h2 class="q">Como sair de onde você está e chegar ao modelo.</h2>'
+            f'<p class="lede">Reduzir cerca de <b style="color:var(--petroleo)">{_b360_brl(rebal["tot_red"])}</b> em '
+            f'{_b360_esc(", ".join(rebal["src_lbls"]))}, direcionando para {_b360_esc(rebal["dest_lbls"])}. '
+            'A execução é gradual — priorizando novos aportes, caixa e vencimentos, para evitar custo tributário e perdas por marcação.</p>'
+            '<div class="rbh"><div>Origem</div><div>Ação</div><div class="rv">Valor aprox.</div><div>Destino</div><div>Prazo</div></div>'
+            + rows_html +
+            '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos — validada com o assessor. Produto de destino específico sujeito à validação.</p></section>')
 
     # nome do cliente — ignora placeholders do parser
     _n = (nome or "").strip()
@@ -2524,7 +2636,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     prio_html = "".join(
         f'<div class="prio"><div><h3>{e(t)}</h3><p>{e(p)}</p></div></div>' for t,p in prioridades)
 
-    return f"""<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+    html_doc = f"""<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Braúna 360° — Check-up Patrimonial</title><style>{_B360_CSS}</style></head>
 <body><div class="doc">
@@ -2559,18 +2671,20 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <p class="lede">A carteira atual comparada ao modelo estratégico para o seu perfil.</p>
 <div class="legend"><span><i style="background:var(--petroleo)"></i>Atual</span><span><i style="background:var(--gold)"></i>Recomendada</span></div>
 <div class="dist">{dist_html}</div>
-<div class="distsum">Principais ajustes sugeridos: &nbsp;{ajustes_html}</div></section>
+<div class="distsum">Principais ajustes sugeridos: &nbsp;{ajustes_html}{gap_reais_html}</div></section>
 
+{rebal_section}
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Desempenho · 06</span></div>
 <div class="kicker">Performance</div><h2 class="q">A carteira fez seu trabalho?</h2>
 <p class="lede">Quatro perguntas objetivas — antes de qualquer número.</p>
-<div class="verds">{perf_html}</div></section>
+<div class="verds">{perf_html}</div>{perf_table_html}</section>
 
-<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Pontos de atenção · 07</span></div>
+{acoes_section}
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Pontos de atenção · 08</span></div>
 <div class="kicker">Pontos de atenção</div><h2 class="q">O que merece cuidado — e o que fazer a respeito.</h2>
 <div class="att">{att_html}</div></section>
 
-<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Plano de evolução · 08</span></div>
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Plano de evolução · 09</span></div>
 <div class="kicker">Plano de evolução</div><h2 class="q">Como seu patrimônio evolui a partir de hoje.</h2>
 <p class="lede">Não é uma lista de produtos. É uma trajetória.</p>
 <div class="road">
@@ -2579,7 +2693,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <div class="stop"><div class="mk"></div><div class="when">12 meses</div><h4>Reequilíbrio</h4><p>Aproximar a carteira do modelo. Revisar tributação e reduzir concentração.</p></div>
 <div class="stop"><div class="mk"></div><div class="when">Longo prazo</div><h4>Estrutura patrimonial</h4><p>Sucessão organizada, renda planejada e revisões periódicas.</p></div></div></section>
 
-<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Prioridades · 09</span></div>
+<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Prioridades · 10</span></div>
 <div class="kicker">Prioridades</div><h2 class="q">As cinco ações que mais movem o ponteiro.</h2>
 <div class="prios">{prio_html}</div></section>
 
@@ -2588,6 +2702,13 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <blockquote>Patrimônio é muito maior do que rentabilidade. É proteção, é liquidez no momento certo, é a tranquilidade de quem sabe para onde vai — e o cuidado com quem virá depois. Seu ponto de partida é sólido. A partir daqui, nosso trabalho é transformar uma boa carteira num patrimônio verdadeiramente bem estruturado.</blockquote>
 <div class="sig"><span>Braúna Investimentos · <b>Check-up Patrimonial 360°</b></span><span>{e(assessor or "")}</span></div></div></section>
 </div></body></html>"""
+    # Renumeração dinâmica das páginas (02, 03, …) — robusta à inserção de seções
+    import re as _re360
+    _pg = [1]
+    def _rn(_m):
+        _pg[0] += 1
+        return f"· {_pg[0]:02d}</span>"
+    return _re360.sub(r"· \d+</span>", _rn, html_doc)
 
 
 # ── HTML ──────────────────────────────────────────────────────────────────────
@@ -10859,10 +10980,15 @@ def brauna360_endpoint():
         comp = {(x.get("cat") or x.get("cls")): x.get("real", 0) for x in d["desvios"] if (x.get("cat") or x.get("cls"))}
     if d.get("caixa") and "caixa" not in comp:
         comp["caixa"] = d.get("caixa")
+    # carteira leve por classe (para nomear o ativo de origem no rebalanceamento)
+    carteira = {}
+    if d.get("acoes"): carteira["acoes"] = {"ativos": d.get("acoes")}
+    if d.get("fiis"):  carteira["fiis"]  = {"ativos": d.get("fiis")}
     html = gerar_brauna360_html(
         d.get("nome",""), d.get("perfil","conservadora"), comp, d.get("rent",{}),
         d.get("patrimonio",0), d.get("data_ref",""), d.get("conta",""),
-        d.get("assessor",""), d.get("checklist_servir"))
+        d.get("assessor",""), d.get("checklist_servir"),
+        acoes=d.get("acoes") or [], carteira=carteira)
     return Response(html, mimetype="text/html")
 
 
