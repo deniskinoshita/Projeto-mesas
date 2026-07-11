@@ -5928,10 +5928,10 @@ function renderPlanoTroca(sugs, plano){
   if(!el) return;
   const fmt0=v=>"R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
   // ── Plano concreto venda→compra (com deságio da posição) ──────────────────────
-  if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length))){
+  if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
     let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
-    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Já sabendo quanto precisa sair de cada classe para reenquadrar no asset allocation, escolhemos o ativo a vender pelo <b>deságio</b> (rentabilidade da posição). Ativo com deságio acima de '+lim+'% não é vendido — para não realizar prejuízo.</p>';
+    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Dentro de cada classe sobre-alocada, vendemos primeiro os ativos de <b>pior rentabilidade</b> (trim dos laggards), evitando os que estão em <b>deságio acima de '+lim+'%</b> (para não realizar prejuízo) e a venda é <b>espalhada</b> para não esvaziar um único ativo. <b>Previdência</b> fica de fora (só por portabilidade).</p>';
     if(plano.total_mover>0) h+='<div style="font-size:12px;color:#8B9FE8;margin-bottom:10px">Total a realocar: <b style="color:#F0F0F0">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
       const des=m.origem_desagio;
@@ -5970,7 +5970,18 @@ function renderPlanoTroca(sugs, plano){
       });
       h+='</div>';
     }
-    h+='<div style="font-size:10px;color:#6A7A6A;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
+    if(plano.previdencia&&plano.previdencia.length){
+      h+='<div style="margin-top:10px;border:1px solid #24304A;border-radius:10px;padding:11px 13px;background:#0B1020">';
+      h+='<div style="font-size:11px;color:#8B9FE8;font-weight:700;margin-bottom:7px">🛡️ Previdência — não entra na venda automática</div>';
+      plano.previdencia.forEach(function(p){
+        const val=p.saldo!=null?' <span style="color:#6A7A6A">('+fmt0(p.saldo)+')</span>':'';
+        h+='<div style="font-size:11.5px;color:#C8D0E0;margin-bottom:5px;line-height:1.5">'
+          +'<b style="color:#F0F0F0">'+p.nome+'</b>'+val+' <span style="color:#6A7A6A">('+p.label+')</span> — '
+          +'previdência não se resgata como fundo comum: avaliar <b>portabilidade</b>, regime tributário (regressivo/progressivo), carência e IR antes de qualquer movimento.</div>';
+      });
+      h+='</div>';
+    }
+    h+='<div style="font-size:10px;color:#6A7A6A;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, sem realizar deságio > '+lim+'%, venda espalhada, previdência de fora. Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
     el.innerHTML=h;
     return;
   }
@@ -9115,45 +9126,59 @@ def _plano_troca(desvios, patrimonio, dados, destinos):
     for a in (dados.get("rf_ativos") or []):
         holdings.setdefault(a.get("classe") or "pos_fixado", []).append(a)
 
+    def _eh_previdencia(nm):
+        return bool(re.search(r"PREV|VGBL|PGBL", (nm or "").upper()))
+
     # classes sobre-alocadas = fontes de recurso (excesso em R$)
     fontes = []
+    previdencia, _seen_prev = [], set()            # previdência: não se vende (só portabilidade)
+    bloqueados, _seen = [], set()                  # em deságio > 3%: não vender
     for d in desvios:
-        if d.get("desvio", 0) <= 1.5:            # só excesso material
+        if d.get("desvio", 0) <= 1.5:              # só excesso material
             continue
         cls = d.get("cls")
+        lbl = LABELS.get(cls, cls)
         exc_val = round(patrimonio * d["desvio"] / 100.0, 2)
-        ativos = sorted(holdings.get(cls, []), key=lambda a: -(a.get("saldo") or 0))
-        vend, todos_bloq = [], bool(ativos)
+        ativos = holdings.get(cls, [])
+        vend, nao_prev = [], []
         for a in ativos:
-            des = a.get("rent_ano")
             nome = a.get("ticker") or a.get("nome") or "—"
-            if des is not None and des < -DESAGIO_LIMITE:
-                continue                          # em deságio: não vende
-            todos_bloq = False
-            vend.append({"nome": nome, "desagio": des, "restante": a.get("saldo") or 0})
-        fontes.append({"classe": cls, "label": LABELS.get(cls, cls), "restante": exc_val,
+            des = a.get("rent_ano")
+            if _eh_previdencia(nome):              # fora do pool de venda automática
+                k = (nome, cls)
+                if k not in _seen_prev:
+                    _seen_prev.add(k)
+                    previdencia.append({"nome": nome, "classe": cls, "label": lbl,
+                                        "saldo": a.get("saldo"), "rent_ano": des})
+                continue
+            nao_prev.append(a)
+            if des is not None and des < -DESAGIO_LIMITE:   # deságio: avisa e não vende
+                k = (nome, cls)
+                if k not in _seen:
+                    _seen.add(k)
+                    bloqueados.append({"nome": nome, "classe": cls, "label": lbl,
+                                       "desagio": round(des, 2), "saldo": a.get("saldo")})
+                continue
+            vend.append({"nome": nome, "desagio": des,
+                         "restante": a.get("saldo") or 0, "saldo": a.get("saldo") or 0})
+        # ordem de venda: PIOR rentabilidade primeiro (trim laggards); depois maior saldo
+        vend.sort(key=lambda v: (v["desagio"] if v["desagio"] is not None else 999, -v["saldo"]))
+        # espalha: com ≥2 vendáveis, nenhum ativo supre mais que ~metade do excesso
+        # da classe (piso R$ 50k para não fragmentar planos pequenos)
+        if len(vend) >= 2:
+            teto = max(0.5 * exc_val, 50000.0)
+            for v in vend:
+                v["restante"] = min(v["restante"], teto)
+        # classe cujo excesso não-previdência está TODO travado por deságio → monitorar
+        todos_bloq = bool(nao_prev) and not vend
+        fontes.append({"classe": cls, "label": lbl, "restante": exc_val,
                        "excesso_valor": exc_val, "ativos": ativos, "vend": vend,
                        "todos_bloqueados": todos_bloq})
     fontes.sort(key=lambda f: -f["excesso_valor"])
 
-    # ativos em deságio dentro das classes-fonte (não serão vendidos — avisar)
-    bloqueados, _seen = [], set()
-    for f in fontes:
-        for a in f["ativos"]:
-            des = a.get("rent_ano")
-            if des is None or des >= -DESAGIO_LIMITE:
-                continue
-            nome = a.get("ticker") or a.get("nome") or "—"
-            k = (nome, f["classe"])
-            if k in _seen:
-                continue
-            _seen.add(k)
-            bloqueados.append({"nome": nome, "classe": f["classe"], "label": f["label"],
-                               "desagio": round(des, 2), "saldo": a.get("saldo")})
-
-    # classes-fonte onde TODO o excesso está travado por deságio → monitorar
+    # classes-fonte onde TODO o excesso vendável está travado por deságio → monitorar
     monitorar = [{"classe": f["classe"], "label": f["label"], "excesso_valor": f["excesso_valor"]}
-                 for f in fontes if f["todos_bloqueados"] and f["excesso_valor"] >= 1000 and f["ativos"]]
+                 for f in fontes if f["todos_bloqueados"] and f["excesso_valor"] >= 1000]
 
     # casa cada destino (subalocado) com os ativos vendáveis das fontes
     movimentacoes = []
@@ -9183,11 +9208,12 @@ def _plano_troca(desvios, patrimonio, dados, destinos):
                 })
                 need -= mov; f["restante"] -= mov; v["restante"] -= mov
 
-    if not movimentacoes and not bloqueados and not monitorar:
+    if not movimentacoes and not bloqueados and not monitorar and not previdencia:
         return None
     return {"total_mover": round(sum(m["valor"] for m in movimentacoes), 2),
             "movimentacoes": movimentacoes, "bloqueados": bloqueados,
-            "monitorar_classes": monitorar, "limite_desagio": DESAGIO_LIMITE}
+            "monitorar_classes": monitorar, "previdencia": previdencia,
+            "limite_desagio": DESAGIO_LIMITE}
 
 
 @app.route("/api/analyze-xp", methods=["POST"])
