@@ -9262,7 +9262,9 @@ def _rec_tickers(classe, held):
                 tks.append(tu)
     return tks
 
-def _alocar_compra(classe, valor, held):
+_PERFIS_RV_REC = {"arrojada", "agressiva", "arrojado", "agressivo"}
+
+def _alocar_compra(classe, valor, held, perfil=None):
     """Distribui o valor a comprar numa classe conforme as regras:
     - ações e FIIs: até 3 fundos por Markowitz-tangência (peso ∝ retorno/risco);
     - renda fixa: diretos (3 banc + 3 priv, FGC 250k) e depois fundos (até 5);
@@ -9273,9 +9275,10 @@ def _alocar_compra(classe, valor, held):
     if not valor or valor <= 0:
         return []
     if classe in ("acoes", "fiis"):
-        # Acima de R$25k: segue a CARTEIRA RECOMENDADA (nomes), peso igual entre eles.
+        # Só perfis arrojado/agressivo, acima de R$25k: segue a CARTEIRA RECOMENDADA
+        # (nomes), peso igual entre eles. Demais perfis (ou <R$25k): fundo.
         rec = _rec_tickers(classe, held)
-        if valor > RV_REC_MINIMO and rec:
+        if valor > RV_REC_MINIMO and rec and (perfil or "") in _PERFIS_RV_REC:
             rec = rec[:12]
             w = valor / len(rec)
             tipo = "acao" if classe == "acoes" else "fii"
@@ -9315,7 +9318,7 @@ def _aplica_desagio(classe, nome):
     return bool(re.search(r"\b(NTN|LTN|LFT|TESOURO|TREASURY|CDB|LCI|LCA|LCD|RDB|DEB[ÊE]NTURE|CRI|CRA|CDCA|FIDC)\b",
                           (nome or "").upper()))
 
-def _plano_troca(desvios, patrimonio, dados, destinos):
+def _plano_troca(desvios, patrimonio, dados, destinos, perfil=None):
     """Monta o plano concreto venda→compra: escolhe QUAL ativo vender dentro de cada
     classe sobre-alocada, respeitando o deságio (rentabilidade da posição, marcada a
     mercado no XP). Ativo com rent. no ano pior que -DESAGIO_LIMITE% não é vendido.
@@ -9400,7 +9403,7 @@ def _plano_troca(desvios, patrimonio, dados, destinos):
     alvos = []
     for dest in destinos:
         try:
-            aloc = _alocar_compra(dest.get("classe"), dest.get("gap_valor", 0), held_set)
+            aloc = _alocar_compra(dest.get("classe"), dest.get("gap_valor", 0), held_set, perfil)
         except Exception:
             aloc = []
         if aloc:
@@ -9955,7 +9958,7 @@ def analyze_xp():
     sugestoes_por_classe.sort(key=lambda x: (_ordp.get(x["prioridade"], 9), x["gap_pp"]))
 
     try:
-        plano_troca = _plano_troca(desvios, _patr, dados, sugestoes_por_classe)
+        plano_troca = _plano_troca(desvios, _patr, dados, sugestoes_por_classe, perfil_form)
     except Exception as _e:
         app.logger.warning(f"plano_troca warning: {_e}"); plano_troca = None
 
