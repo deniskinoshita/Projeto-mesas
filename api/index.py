@@ -2006,9 +2006,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     import matplotlib.pyplot as plt
     import numpy as np
 
-    PRETO=colors.HexColor("#EFF3EF"); DOURADO=colors.HexColor("#A8833C"); DESC=colors.HexColor("#A07840")
-    CESC=colors.HexColor("#F5F8F5"); CMED=colors.HexColor("#F5F8F5"); BRANCO=colors.white
-    VERM=colors.HexColor("#D93B3B"); VERDE=colors.HexColor("#1F9D77"); AMARELO=colors.HexColor("#A9800F")
+    PRETO=colors.HexColor("#081F18"); DOURADO=colors.HexColor("#C9A96E"); DESC=colors.HexColor("#A07840")
+    CESC=colors.HexColor("#1A1A1A"); CMED=colors.HexColor("#2C2C2C"); BRANCO=colors.white
+    VERM=colors.HexColor("#FF6B6B"); VERDE=colors.HexColor("#5DCAA5"); AMARELO=colors.HexColor("#FFD966")
     LARANJA=colors.HexColor("#FF8C00")
 
     buf=io.BytesIO()
@@ -2020,12 +2020,12 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     s_sub=S("S",fontSize=10,tc=DESC,alignment=TA_CENTER,spaceAfter=2)
     s_sec=S("Se",fontSize=11,tc=DOURADO,spaceBefore=10,spaceAfter=4)
     s_body=S("B",fontSize=9,leading=13)
-    s_rod=S("R",fontSize=7,tc=colors.HexColor("#5C7365"),alignment=TA_CENTER)
+    s_rod=S("R",fontSize=7,tc=colors.HexColor("#4A7055"),alignment=TA_CENTER)
     s_frag=S("F",fontSize=9,leading=13,tc=VERM)
     s_opor=S("O",fontSize=9,leading=13,tc=VERDE)
     s_sug=S("Su",fontSize=9,leading=14,tc=DOURADO)
     s_bold=S("Sb",fontSize=9,leading=13,tc=BRANCO,fontName="Helvetica-Bold")
-    s_gest=S("Sg",fontSize=8,leading=12,tc=colors.HexColor("#8A9A8E"))
+    s_gest=S("Sg",fontSize=8,leading=12,tc=colors.HexColor("#AAAAAA"))
     s_crit=S("Sc",fontSize=9,leading=13,tc=VERM,fontName="Helvetica-Bold")
     s_warn=S("Sw",fontSize=9,leading=13,tc=AMARELO)
     s_ok=S("Sok",fontSize=9,leading=13,tc=VERDE)
@@ -2060,7 +2060,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         ("FONTSIZE",(0,0),(-1,-1),8),("TEXTCOLOR",(0,0),(-1,-1),BRANCO),
         ("TEXTCOLOR",(0,0),(0,-1),DOURADO),("TEXTCOLOR",(2,0),(2,-1),DOURADO),
         ("ROWBACKGROUNDS",(0,0),(-1,-1),[CESC,CMED]),
-        ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),("PADDING",(0,0),(-1,-1),4),
+        ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),("PADDING",(0,0),(-1,-1),4),
     ]))
     elems.append(tm); elems.append(Spacer(1,0.3*cm))
 
@@ -2102,7 +2102,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             ("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
             ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
             ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),
-            ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),
+            ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
             ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),
             ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
         ]))
@@ -2114,21 +2114,21 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     lbs=[d["label"] for d in _dv]; rea=[d["real"] for d in _dv]; alv=[d["alvo"] for d in _dv]
     y=np.arange(len(lbs)); h=0.38
     fig,ax=plt.subplots(figsize=(10,max(2.4,0.62*len(lbs)+1)))
-    fig.patch.set_facecolor("#EFF3EF"); ax.set_facecolor("#F5F8F5")
-    b1=ax.barh(y+h/2,rea,h,color="#A8833C",zorder=3,label="Atual")
-    b2=ax.barh(y-h/2,alv,h,color="#5C7365",zorder=3,label="Modelo")
+    fig.patch.set_facecolor("#081F18"); ax.set_facecolor("#1A1A1A")
+    b1=ax.barh(y+h/2,rea,h,color="#C9A96E",zorder=3,label="Atual")
+    b2=ax.barh(y-h/2,alv,h,color="#2A5A3A",zorder=3,label="Modelo")
     ax.set_yticks(y); ax.set_yticklabels(lbs,color="white",fontsize=9); ax.invert_yaxis()
-    ax.tick_params(colors="white"); ax.spines[:].set_color("#F5F8F5")
-    ax.xaxis.grid(True,color="#D9E3DB",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="white")
+    ax.tick_params(colors="white"); ax.spines[:].set_color("#2C2C2C")
+    ax.xaxis.grid(True,color="#1C4A34",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="white")
     _mx=max(rea+alv+[1])
     for bars in (b1,b2):
         for r in bars:
             wv=r.get_width()
             if wv>0: ax.text(wv+_mx*0.01,r.get_y()+r.get_height()/2,f"{wv:.0f}%",va="center",color="white",fontsize=7.5)
     ax.set_xlim(0,_mx*1.13)
-    ax.legend(facecolor="#F5F8F5",edgecolor="#F5F8F5",labelcolor="white",fontsize=8,loc="lower right")
+    ax.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="lower right")
     fig.tight_layout(pad=1)
-    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#EFF3EF"); plt.close(fig); ib.seek(0)
+    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#081F18"); plt.close(fig); ib.seek(0)
     _hh=max(3.2,0.72*len(lbs)+1.2)
     elems.append(Image(ib,width=15*cm,height=_hh*cm)); elems.append(Spacer(1,0.3*cm))
 
@@ -2154,22 +2154,22 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                        else "Rentabilidade da Carteira vs. CDI")
             elems.append(Paragraph(_titulo,s_sec))
             figr,axr=plt.subplots(figsize=(10,3.8))
-            figr.patch.set_facecolor("#EFF3EF"); axr.set_facecolor("#F5F8F5")
+            figr.patch.set_facecolor("#081F18"); axr.set_facecolor("#1A1A1A")
             _xs=np.arange(len(_pers))
-            _series=[(_cli_vals,"#A8833C","Carteira")]
-            if _tem_rec: _series.append((_rec_vals,"#1F9D77","Carteira-Modelo"))
-            _series.append((_cdi_vals,"#2E86B8","CDI"))
+            _series=[(_cli_vals,"#C9A96E","Carteira")]
+            if _tem_rec: _series.append((_rec_vals,"#5DCAA5","Carteira-Modelo"))
+            _series.append((_cdi_vals,"#7DCFEF","CDI"))
             _n=len(_series); _bw=0.8/_n
             for _k,(vals,cor,lbl) in enumerate(_series):
                 _vv=[float(v) if v is not None else 0.0 for v in vals]
                 axr.bar(_xs+(_k-(_n-1)/2)*_bw,_vv,_bw,color=cor,label=lbl,zorder=3)
-            axr.axhline(0,color="#C6D6C9",linewidth=0.8)
+            axr.axhline(0,color="#3A3A3A",linewidth=0.8)
             axr.set_xticks(_xs); axr.set_xticklabels([p[1] for p in _pers],color="white",fontsize=9)
-            axr.tick_params(colors="white"); axr.spines[:].set_color("#F5F8F5")
-            axr.yaxis.grid(True,color="#D9E3DB"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
-            axr.legend(facecolor="#F5F8F5",edgecolor="#F5F8F5",labelcolor="white",fontsize=8,loc="best")
+            axr.tick_params(colors="white"); axr.spines[:].set_color("#2C2C2C")
+            axr.yaxis.grid(True,color="#1C4A34"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
+            axr.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="best")
             figr.tight_layout(pad=1)
-            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#EFF3EF"); plt.close(figr); ibr.seek(0)
+            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#081F18"); plt.close(figr); ibr.seek(0)
             elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.3*cm))
     except Exception:
         pass
@@ -2180,7 +2180,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     td=Table(dd,colWidths=[5*cm,3.5*cm,3.5*cm,3.5*cm])
     est=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
          ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
-         ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),
+         ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
          ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold")]
     for i,d in enumerate(desvios,1):
         _ad=abs(d["desvio"])
@@ -2207,7 +2207,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             _valor = patrimonio * (_falta / 100.0)
             elems.append(Paragraph(
                 f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}%) &nbsp;&nbsp;"
-                f"<font size=14 color=\"#A9800F\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
+                f"<font size=14 color=\"#FFD966\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
             elems.append(Paragraph(rec["explicacao"],s_body))
             if rec.get("produtos"):
                 prods=", ".join(rec["produtos"])
@@ -2231,11 +2231,11 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         for it in _pt["reduzir"]:
             des = it.get("desagio")
             dtxt = (f" · no ano {des:+.1f}%") if des is not None else ""
-            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#8A9A8E\">({_pesc(it['label'])})</font>{dtxt} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
+            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{dtxt} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
         elems.append(Paragraph("Comprar / aplicar",s_bold))
         for it in _pt["comprar"]:
             det = (f" · {_pesc(it['detalhe'])}") if it.get("detalhe") else ""
-            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#8A9A8E\">({_pesc(it['label'])})</font>{det} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
+            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{det} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
         if _pt["bloqueados"]:
             elems.append(Paragraph(f"Não vender agora — deságio acima de {_lim:.0f}% (renda fixa / crédito privado)",s_bold))
             for b in _pt["bloqueados"]:
@@ -2254,7 +2254,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             if "COMPRA" in r: return VERDE
             if "VENDA" in r:  return VERM
             if "NEUTRO" in r: return AMARELO
-            return colors.HexColor("#8A9A8E")
+            return colors.HexColor("#AAAAAA")
         def _up(v):
             if v is None: return "—"
             pv=v*100
@@ -2286,7 +2286,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm])
             est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
                      ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
-                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),
+                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
                      ("ALIGN",(1,0),(1,-1),"CENTER"),("ALIGN",(3,0),(4,-1),"CENTER"),
                      ("PADDING",(0,0),(-1,-1),3),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
                      ("TEXTCOLOR",(0,1),(0,-1),DOURADO),("VALIGN",(0,0),(-1,-1),"MIDDLE")]
