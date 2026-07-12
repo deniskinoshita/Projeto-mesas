@@ -2939,68 +2939,68 @@ HTML = r"""<!DOCTYPE html>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#EFF3EF;color:#0A0F0C;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#FFFFFF;border-bottom:1px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;gap:12px}
-header h1{font-size:21px;color:#A8833C;font-weight:700;letter-spacing:.5px}
-header p{font-size:14px;color:#5C7365;margin-top:2px}
+header h1{font-size:21px;color:#8A6A28;font-weight:700;letter-spacing:.5px}
+header p{font-size:14px;color:#39493F;margin-top:2px}
 .container{max-width:1320px;margin:0 auto;padding:28px 32px}
 .card{background:#E9F5EE;border:1px solid #D9E3DB;border-radius:12px;padding:22px;margin-bottom:18px}
-.card h2{font-size:15px;color:#A8833C;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.card h2{font-size:15px;color:#8A6A28;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-label{font-size:15px;color:#5F7065;display:block;margin-bottom:5px}
+label{font-size:15px;color:#3B4D43;display:block;margin-bottom:5px}
 input,select{width:100%;background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#0A0F0C;font-size:16px;outline:none;transition:border .2s}
-input:focus,select:focus{border-color:#A8833C}
+input:focus,select:focus{border-color:#8A6A28}
 select option{background:#F5F8F5}
 .upload-area{border:1.5px dashed #D9E3DB;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#FFFFFF}
-.upload-area:hover,.upload-area.drag{border-color:#A8833C;background:#F5F8F5}
+.upload-area:hover,.upload-area.drag{border-color:#8A6A28;background:#F5F8F5}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .icon{font-size:29px;margin-bottom:6px}
-.upload-area p{font-size:16px;color:#5C7365}
-.upload-area .fname{color:#A8833C;font-weight:600;font-size:16px;margin-top:6px}
+.upload-area p{font-size:16px;color:#39493F}
+.upload-area .fname{color:#8A6A28;font-weight:600;font-size:16px;margin-top:6px}
 .btn{width:100%;background:#A8833C;color:#EFF3EF;border:none;border-radius:8px;padding:13px;font-size:17px;font-weight:700;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.88}.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-out{background:transparent;color:#A8833C;border:1px solid #A8833C}
+.btn-out{background:transparent;color:#8A6A28;border:1px solid #A8833C}
 .btn-out:hover{background:#F5F8F5}
 .metric{background:#F5F8F5;border-radius:10px;padding:14px;text-align:center}
-.metric .lbl{font-size:13px;color:#5C7365;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.metric .val{font-size:23px;font-weight:700;color:#A8833C}
+.metric .lbl{font-size:13px;color:#39493F;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.metric .val{font-size:23px;font-weight:700;color:#8A6A28}
 .metric .val.danger{color:#D93B3B}.metric .val.ok{color:#1F9D77}
 .desvio-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F5F8F5;font-size:15px}
 .desvio-row:last-child{border:none}
-.dn{width:106px;font-weight:500}.da{width:46px;color:#5F7065;font-size:14px}
+.dn{width:106px;font-weight:500}.da{width:46px;color:#3B4D43;font-size:14px}
 .db-w{flex:1;background:#F5F8F5;border-radius:3px;height:5px;overflow:hidden}
 .db{height:100%;background:#A8833C;border-radius:3px;transition:width .5s}
-.dalvo{width:52px;color:#5C7365;font-size:13px}
+.dalvo{width:52px;color:#39493F;font-size:13px}
 .dpp{width:60px;text-align:right;font-weight:700;font-size:14px}
-.red{color:#D93B3B}.grn{color:#1F9D77}.dim{color:#5C7365}
+.red{color:#D93B3B}.grn{color:#1F9D77}.dim{color:#39493F}
 .alert{border-radius:8px;padding:10px 14px;margin:5px 0;font-size:15px;line-height:1.5}
 .alert.danger{background:#FCEBEB;border-left:3px solid #D93B3B;color:#FFB3B3}
 .alert.success{background:#F5F8F5;border-left:3px solid #1F9D77;color:#9FE1CB}
-.alert.gold{background:#FBF3D2;border-left:3px solid #A8833C;color:#A8833C}
-.alert.warn{background:#FBF3D2;border-left:3px solid #A9800F;color:#A9800F}
+.alert.gold{background:#FBF3D2;border-left:3px solid #A8833C;color:#8A6A28}
+.alert.warn{background:#FBF3D2;border-left:3px solid #A9800F;color:#7C5D0B}
 .rec-card{background:#F5F8F5;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #D9E3DB}
 .rec-header{font-size:16px;font-weight:700;margin-bottom:6px}
-.rec-ctx{font-size:15px;color:#5F7065;line-height:1.5;margin-bottom:6px}
-.rec-carta{font-size:14px;color:#5F7065;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#FFFFFF;border-radius:6px;border-left:2px solid #A8833C}
+.rec-ctx{font-size:15px;color:#3B4D43;line-height:1.5;margin-bottom:6px}
+.rec-carta{font-size:14px;color:#3B4D43;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#FFFFFF;border-radius:6px;border-left:2px solid #A8833C}
 .rec-prods{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.prod-tag{background:#EFF3EF;border:1px solid #5C7365;border-radius:20px;padding:3px 10px;font-size:14px;color:#A8833C}
+.prod-tag{background:#EFF3EF;border:1px solid #5C7365;border-radius:20px;padding:3px 10px;font-size:14px;color:#8A6A28}
 .gestor-card{background:#F5F8F5;border-radius:8px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #5C7365}
-.gestor-nome{font-size:14px;color:#A8833C;font-weight:700;margin-bottom:3px}
-.gestor-msg{font-size:14px;color:#5F7065;line-height:1.4}
+.gestor-nome{font-size:14px;color:#8A6A28;font-weight:700;margin-bottom:3px}
+.gestor-msg{font-size:14px;color:#3B4D43;line-height:1.4}
 .gestor-impl{font-size:14px;color:#1F9D77;margin-top:3px}
 .macro-badge{display:inline-flex;align-items:center;gap:6px;background:#F5F8F5;border:1px solid #D9E3DB;border-radius:20px;padding:4px 12px;font-size:15px;margin:3px}
-.macro-badge span{color:#A8833C;font-weight:700}
+.macro-badge span{color:#8A6A28;font-weight:700}
 #results{display:none}
-.spinner{display:none;text-align:center;padding:32px;color:#A8833C}
+.spinner{display:none;text-align:center;padding:32px;color:#8A6A28}
 .spinner.show{display:block}
-.loader{width:36px;height:36px;border:3px solid #D9E3DB;border-top-color:#A8833C;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+.loader{width:36px;height:36px;border:3px solid #D9E3DB;border-top-color:#8A6A28;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .chart-wrap{position:relative;width:100%;height:250px}
 .tab-btns{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.tab-btn{background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:6px 14px;font-size:15px;color:#5F7065;cursor:pointer;transition:all .2s}
-.tab-btn.active{background:#A8833C;color:#EFF3EF;border-color:#A8833C;font-weight:700}
+.tab-btn{background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:6px 14px;font-size:15px;color:#3B4D43;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:#A8833C;color:#EFF3EF;border-color:#8A6A28;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
-.rodape{text-align:center;font-size:14px;color:#5C7365;margin-top:32px;padding-top:14px;border-top:1px solid #F5F8F5}
+.rodape{text-align:center;font-size:14px;color:#39493F;margin-top:32px;padding-top:14px;border-top:1px solid #F5F8F5}
 /* Checklist Modelo de Servir */
 .pilar-toggle{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;background:#FFFFFF;border:1px solid #FFFFFF;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
 .pilar-toggle:hover{border-color:#D9E3DB}
@@ -3015,44 +3015,44 @@ select option{background:#F5F8F5}
 .pilar-nome .badge{font-size:13px;padding:2px 8px;border-radius:10px;font-weight:700}
 .badge-crit{background:#FF2222;color:#fff}
 .badge-high{background:#A9800F;color:#000}
-.badge-med{background:#5C7365;color:#5F7065}
+.badge-med{background:#5C7365;color:#3B4D43}
 .badge-dir{background:#A8833C;color:#000}
-.pilar-desc{font-size:14px;color:#5C7365;line-height:1.4}
+.pilar-desc{font-size:14px;color:#39493F;line-height:1.4}
 .pilar-falta{display:none;margin-top:10px;padding:10px;background:#EFF3EF;border-radius:8px;border-left:3px solid #D93B3B}
 .pilar-falta.show{display:block}
-.pilar-falta.warn{border-left-color:#A9800F}
-.pilar-falta.med{border-left-color:#5C7365}
-.pilar-falta p{font-size:14px;color:#5F7065;line-height:1.6;margin-bottom:6px}
-.pilar-falta .acao{font-size:14px;color:#A8833C;line-height:1.5;padding:8px;background:#F5F8F5;border-radius:6px;margin-top:6px}
-.pilar-falta .diretriz-badge{font-size:13px;color:#A8833C;font-weight:700;margin-top:6px;padding:4px 8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:4px;display:inline-block}
+.pilar-falta.warn{border-left-color:#7C5D0B}
+.pilar-falta.med{border-left-color:#39493F}
+.pilar-falta p{font-size:14px;color:#3B4D43;line-height:1.6;margin-bottom:6px}
+.pilar-falta .acao{font-size:14px;color:#8A6A28;line-height:1.5;padding:8px;background:#F5F8F5;border-radius:6px;margin-top:6px}
+.pilar-falta .diretriz-badge{font-size:13px;color:#8A6A28;font-weight:700;margin-top:6px;padding:4px 8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:4px;display:inline-block}
 /* Placard de score */
 .servir-score{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:10px;background:#FFFFFF;border:1px solid #D9E3DB;margin-bottom:14px}
-.score-num{font-size:39px;font-weight:700;color:#A8833C;min-width:56px;text-align:center}
+.score-num{font-size:39px;font-weight:700;color:#8A6A28;min-width:56px;text-align:center}
 .score-info{flex:1}
-.score-label{font-size:14px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.score-label{font-size:14px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .score-bar-w{height:6px;background:#D9E3DB;border-radius:3px;overflow:hidden}
 .score-bar{height:100%;border-radius:3px;transition:width .5s}
-.score-pendentes{font-size:14px;color:#5F7065;margin-top:5px}
+.score-pendentes{font-size:14px;color:#3B4D43;margin-top:5px}
 /* Pilar result card */
 .pilar-result{background:#F5F8F5;border-radius:10px;padding:14px;margin-bottom:8px;border-left:4px solid #5C7365}
 .pilar-result.ok{border-left-color:#1F9D77}
 .pilar-result.crit{border-left-color:#CF2E2E}
-.pilar-result.high{border-left-color:#A9800F}
-.pilar-result.med{border-left-color:#5C7365}
+.pilar-result.high{border-left-color:#7C5D0B}
+.pilar-result.med{border-left-color:#39493F}
 .pilar-result-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .pilar-result-nome{font-size:16px;font-weight:700}
 .pilar-result-status{font-size:13px;padding:2px 8px;border-radius:10px}
 .status-ok{background:#F5F8F5;color:#1F9D77}
 .status-pendente{background:#FCEBEB;color:#D93B3B}
-.pilar-result-impacto{font-size:14px;color:#5F7065;line-height:1.5;margin-bottom:6px}
-.pilar-result-acao{font-size:14px;color:#A8833C;padding:8px;background:#FFFFFF;border-radius:6px}
+.pilar-result-impacto{font-size:14px;color:#3B4D43;line-height:1.5;margin-bottom:6px}
+.pilar-result-acao{font-size:14px;color:#8A6A28;padding:8px;background:#FFFFFF;border-radius:6px}
 /* Cross Sell chips */
-.cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #D9E3DB;background:#FFFFFF;cursor:pointer;font-size:15px;font-weight:600;color:#5F7065;transition:all .2s;user-select:none}
-.cs-chip:hover{border-color:#A8833C;color:#A8833C}
-.cs-chip.ativo{background:#F5F8F5;border-color:#A8833C;color:#A8833C}
+.cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #D9E3DB;background:#FFFFFF;cursor:pointer;font-size:15px;font-weight:600;color:#3B4D43;transition:all .2s;user-select:none}
+.cs-chip:hover{border-color:#8A6A28;color:#8A6A28}
+.cs-chip.ativo{background:#F5F8F5;border-color:#8A6A28;color:#8A6A28}
 .cs-chip .cs-icon{font-size:19px}
 .cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
-.cs-chip.ativo .cs-check{background:#A8833C;border-color:#A8833C;color:#EFF3EF;font-weight:900}
+.cs-chip.ativo .cs-check{background:#A8833C;border-color:#8A6A28;color:#EFF3EF;font-weight:900}
 /* Clientes salvos — colunas por categoria (lado a lado) */
 .cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;align-items:start}
 .cs-grupo{margin:0}
@@ -3067,17 +3067,17 @@ select option{background:#F5F8F5}
 .cs-area-nome{font-size:17px;font-weight:700;flex:1}
 .cs-status-tag{font-size:13px;padding:3px 10px;border-radius:10px;font-weight:700}
 .cs-tem-tag{background:#F5F8F5;color:#1F9D77}
-.cs-falta-tag{background:#F5F8F5;color:#A8833C}
-.cs-pitch{font-size:15px;color:#A8833C;font-style:italic;padding:10px 12px;background:#FFFFFF;border-radius:8px;border-left:3px solid #A8833C;margin-bottom:10px;line-height:1.6}
+.cs-falta-tag{background:#F5F8F5;color:#8A6A28}
+.cs-pitch{font-size:15px;color:#8A6A28;font-style:italic;padding:10px 12px;background:#FFFFFF;border-radius:8px;border-left:3px solid #A8833C;margin-bottom:10px;line-height:1.6}
 .cs-ops{list-style:none;padding:0}
-.cs-ops li{font-size:14px;color:#5F7065;padding:5px 0;border-bottom:1px solid #F5F8F5;line-height:1.5}
+.cs-ops li{font-size:14px;color:#3B4D43;padding:5px 0;border-bottom:1px solid #F5F8F5;line-height:1.5}
 .cs-ops li:last-child{border:none}
-.cs-ops li::before{content:"→ ";color:#A8833C}
+.cs-ops li::before{content:"→ ";color:#8A6A28}
 /* Especialista FP */
 .fp-bloco{background:#FFFFFF;border-radius:10px;padding:14px;margin-top:10px;border:1px solid #D9E3DB}
-.fp-bloco-titulo{font-size:15px;font-weight:700;color:#A8833C;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.fp-bloco p{font-size:14px;color:#5F7065;line-height:1.6;margin-bottom:6px}
-.fp-bloco .fp-item{padding:6px 0;border-bottom:1px solid #F5F8F5;font-size:14px;color:#5F7065;line-height:1.5}
+.fp-bloco-titulo{font-size:15px;font-weight:700;color:#8A6A28;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fp-bloco p{font-size:14px;color:#3B4D43;line-height:1.6;margin-bottom:6px}
+.fp-bloco .fp-item{padding:6px 0;border-bottom:1px solid #F5F8F5;font-size:14px;color:#3B4D43;line-height:1.5}
 .fp-bloco .fp-item:last-child{border:none}
 .fp-bloco .fp-item b{color:#0A0F0C}
 .fp-bloco .fp-pitch{font-size:14px;color:#1F9D77;padding:8px;background:#E9F5EE;border-radius:6px;border-left:2px solid #1F9D77;margin-top:8px}
@@ -3085,39 +3085,39 @@ select option{background:#F5F8F5}
 .cs-score-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FFFFFF;border-radius:10px;border:1px solid #D9E3DB;margin-bottom:14px}
 /* Sugestões de Alocação */
 .sg-bloco{background:#FFFFFF;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #D9E3DB}
-.sg-bloco-title{font-size:14px;font-weight:700;color:#A8833C;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sg-bloco-title{font-size:14px;font-weight:700;color:#8A6A28;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .sg-card{background:#F5F8F5;border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid #D9E3DB;position:relative}
 .sg-card.urg-alta{border-left-color:#D93B3B}
-.sg-card.urg-media{border-left-color:#A9800F}
+.sg-card.urg-media{border-left-color:#7C5D0B}
 .sg-card.urg-baixa{border-left-color:#1F9D77}
 .sg-card .sg-topo{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.sg-card .sg-acao{font-size:13px;padding:2px 8px;border-radius:8px;font-weight:700;background:#D9E3DB;color:#5F7065}
+.sg-card .sg-acao{font-size:13px;padding:2px 8px;border-radius:8px;font-weight:700;background:#D9E3DB;color:#3B4D43}
 .sg-card .sg-produto{font-size:16px;font-weight:700;color:#0A0F0C;flex:1}
-.sg-card .sg-idx{font-size:13px;color:#A8833C;padding:2px 7px;border-radius:6px;background:#F5F8F5;border:1px solid #A8833C}
-.sg-card .sg-motivo{font-size:14px;color:#5F7065;line-height:1.5;margin-top:4px}
+.sg-card .sg-idx{font-size:13px;color:#8A6A28;padding:2px 7px;border-radius:6px;background:#F5F8F5;border:1px solid #A8833C}
+.sg-card .sg-motivo{font-size:14px;color:#3B4D43;line-height:1.5;margin-top:4px}
 .sg-card .sg-de{font-size:14px;color:#D93B3B;margin-bottom:4px}
-.sg-card .sg-fonte{font-size:13px;color:#5C7365;margin-top:4px}
+.sg-card .sg-fonte{font-size:13px;color:#39493F;margin-top:4px}
 .sg-ja-tem{opacity:.6;border-left-color:#1F9D77 !important}
 .sg-ja-tem-badge{font-size:13px;color:#1F9D77;background:#F5F8F5;border-radius:6px;padding:2px 8px;margin-bottom:4px;display:inline-block}
-.sg-est-box{background:#F5F8F5;border-radius:8px;padding:14px;border:1px solid #D9E3DB;font-size:15px;color:#5C7365;line-height:1.7;white-space:pre-wrap}
+.sg-est-box{background:#F5F8F5;border-radius:8px;padding:14px;border:1px solid #D9E3DB;font-size:15px;color:#39493F;line-height:1.7;white-space:pre-wrap}
 .sg-fii-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
-.sg-fii-table th{text-align:left;color:#5C7365;font-weight:600;padding:5px 8px;border-bottom:1px solid #D9E3DB;font-size:13px;text-transform:uppercase}
-.sg-fii-table td{padding:7px 8px;border-bottom:1px solid #F5F8F5;color:#5C7365}
+.sg-fii-table th{text-align:left;color:#39493F;font-weight:600;padding:5px 8px;border-bottom:1px solid #D9E3DB;font-size:13px;text-transform:uppercase}
+.sg-fii-table td{padding:7px 8px;border-bottom:1px solid #F5F8F5;color:#39493F}
 .sg-fii-table tr:last-child td{border:none}
-.sg-fii-table .fii-ticker{color:#A8833C;font-weight:700}
+.sg-fii-table .fii-ticker{color:#8A6A28;font-weight:700}
 .sg-header-box{background:#F5F8F5;border:1px solid #A8833C;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .sg-vazio{font-size:16px;color:#1F9D77;padding:16px;text-align:center}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 /* ── Fluxo em 2 etapas ── */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
 .step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
-.step-item.active{background:#F5F8F5;border-color:#A8833C}
+.step-item.active{background:#F5F8F5;border-color:#8A6A28}
 .step-item.done{background:#E9F5EE;border-color:#EAF4EC}
-.step-circle{width:26px;height:26px;border-radius:50%;background:#D9E3DB;border:2px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#5C7365;flex-shrink:0;transition:all .3s}
-.step-item.active .step-circle{background:#A8833C;border-color:#A8833C;color:#EFF3EF}
+.step-circle{width:26px;height:26px;border-radius:50%;background:#D9E3DB;border:2px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#39493F;flex-shrink:0;transition:all .3s}
+.step-item.active .step-circle{background:#A8833C;border-color:#8A6A28;color:#EFF3EF}
 .step-item.done .step-circle{background:#1F9D77;border-color:#1F9D77;color:#000}
-.step-label{font-size:15px;font-weight:700;color:#5C7365;letter-spacing:.3px;transition:all .3s}
-.step-item.active .step-label{color:#A8833C}
+.step-label{font-size:15px;font-weight:700;color:#39493F;letter-spacing:.3px;transition:all .3s}
+.step-item.active .step-label{color:#8A6A28}
 .step-item.done .step-label{color:#1F9D77}
 .step-line{flex:1;height:1px;background:#D9E3DB;min-width:20px}
 .step2-banner{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
@@ -3133,7 +3133,7 @@ select option{background:#F5F8F5}
     <p>Análise de Alocação por Indexador</p>
   </div>
   <div id="mkt-ticker" style="flex:1;min-width:0;overflow:hidden;white-space:nowrap;margin:0 8px" title="Últimas do mercado">
-    <div id="mkt-ticker-inner" style="display:inline-block;white-space:nowrap;will-change:transform;font-size:15px;color:#A8833C"></div>
+    <div id="mkt-ticker-inner" style="display:inline-block;white-space:nowrap;will-change:transform;font-size:15px;color:#8A6A28"></div>
   </div>
   <nav style="display:flex;gap:8px;align-items:center;flex-shrink:0" id="nav-assessor">
     <!-- Sino de notificações -->
@@ -3141,16 +3141,16 @@ select option{background:#F5F8F5}
       <span style="font-size:23px">🔔</span>
       <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#E53935;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center"></span>
     </div>
-    <button onclick="sair()" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #FBE9E9;color:#5F7065;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#FBE9E9';this.style.color='#5F7065'">Sair</button>
+    <button onclick="sair()" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #FBE9E9;color:#3B4D43;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#FBE9E9';this.style.color='#5F7065'">Sair</button>
   </nav>
 
   <!-- Painel de notificações flutuante -->
   <div id="notif-panel" style="display:none;position:fixed;top:60px;right:16px;width:380px;max-height:70vh;overflow-y:auto;background:#F5F8F5;border:1px solid #EAF4EC;border-radius:12px;z-index:9999;box-shadow:0 8px 32px #000a">
     <div style="padding:12px 16px;border-bottom:1px solid #EAF4EC;display:flex;justify-content:space-between;align-items:center">
-      <span style="color:#A8833C;font-weight:700;font-size:17px">🔔 Alertas do Head de Produtos</span>
+      <span style="color:#8A6A28;font-weight:700;font-size:17px">🔔 Alertas do Head de Produtos</span>
       <div style="display:flex;gap:8px;align-items:center">
         <button onclick="marcarTodasLidas()" style="font-size:14px;color:#1F9D77;background:none;border:none;cursor:pointer;padding:0">Marcar todas lidas</button>
-        <button onclick="toggleNotifPanel()" style="color:#5F7065;background:none;border:none;cursor:pointer;font-size:21px;line-height:1">×</button>
+        <button onclick="toggleNotifPanel()" style="color:#3B4D43;background:none;border:none;cursor:pointer;font-size:21px;line-height:1">×</button>
       </div>
     </div>
     <div id="notif-lista" style="padding:8px 0"></div>
@@ -3161,12 +3161,12 @@ select option{background:#F5F8F5}
     if(role === "admin"){
       const nav = document.getElementById("nav-assessor");
       nav.innerHTML = `
-        <a href="/assessor" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #A8833C;color:#A8833C;text-decoration:none;font-weight:700">📊 Assessor</a>
-        <a href="/lider" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">👥 Líder</a>
-        <a href="/head-produtos" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">🏛️ Head</a>
-        <a href="/painel" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">📋 Painel</a>
-        <a href="/admin" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">⚙️ Admin</a>
-        <button onclick="sair()" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #FBE9E9;color:#5F7065;background:none;cursor:pointer">Sair</button>`;
+        <a href="/assessor" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #A8833C;color:#8A6A28;text-decoration:none;font-weight:700">📊 Assessor</a>
+        <a href="/lider" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#39493F;text-decoration:none">👥 Líder</a>
+        <a href="/head-produtos" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#39493F;text-decoration:none">🏛️ Head</a>
+        <a href="/painel" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#39493F;text-decoration:none">📋 Painel</a>
+        <a href="/admin" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#39493F;text-decoration:none">⚙️ Admin</a>
+        <button onclick="sair()" style="font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid #FBE9E9;color:#3B4D43;background:none;cursor:pointer">Sair</button>`;
     }
   })();
   </script>
@@ -3194,9 +3194,9 @@ select option{background:#F5F8F5}
 <!-- Painel de destaques do mercado: dólar + maiores altas do dia -->
 <div id="mkt-destaques-card" class="card" style="display:none;background:#FFFFFF">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-    <h2 style="margin:0;display:flex;align-items:center;gap:8px">📈 Destaques do Mercado <span id="mkt-dest-hora" style="font-size:13px;color:#5C7365;font-weight:400"></span></h2>
+    <h2 style="margin:0;display:flex;align-items:center;gap:8px">📈 Destaques do Mercado <span id="mkt-dest-hora" style="font-size:13px;color:#39493F;font-weight:400"></span></h2>
     <div id="mkt-dest-dolar" style="display:flex;align-items:baseline;gap:8px">
-      <span style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;font-weight:700">Dólar</span>
+      <span style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;font-weight:700">Dólar</span>
       <span id="mkt-dest-dolar-val" style="font-size:26px;font-weight:800;color:#0A0F0C">—</span>
       <span id="mkt-dest-dolar-var" style="font-size:15px;font-weight:700"></span>
     </div>
@@ -3216,22 +3216,22 @@ select option{background:#F5F8F5}
 <!-- Formulário -->
 <!-- Mensagem do Admin (se houver) -->
 <div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#F5F8F5;border:1px solid #A8833C;border-radius:10px">
-  <p style="font-size:13px;color:#A8833C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
-  <p id="msg-admin-txt" style="font-size:15px;color:#5C7365;line-height:1.6"></p>
-  <p id="msg-admin-data" style="font-size:13px;color:#5C7365;margin-top:4px"></p>
+  <p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
+  <p id="msg-admin-txt" style="font-size:15px;color:#39493F;line-height:1.6"></p>
+  <p id="msg-admin-data" style="font-size:13px;color:#39493F;margin-top:4px"></p>
 </div>
 
 <!-- Calls do Head — proativo: para cada call ativa, os clientes DESTE assessor -->
 <div id="calls-assessor-card" class="card" style="display:none">
-  <h2 style="display:flex;align-items:center;gap:8px">📣 Calls do Head <span id="calls-assessor-cont" style="font-size:14px;color:#5C7365;font-weight:400"></span></h2>
-  <p style="font-size:14px;color:#7A8A80;margin:-4px 0 12px;line-height:1.5">Recomendações de renda variável publicadas pela mesa. Para cada ativo, seus clientes que já o possuem ou têm perfil compatível com a operação.</p>
+  <h2 style="display:flex;align-items:center;gap:8px">📣 Calls do Head <span id="calls-assessor-cont" style="font-size:14px;color:#39493F;font-weight:400"></span></h2>
+  <p style="font-size:14px;color:#42524A;margin:-4px 0 12px;line-height:1.5">Recomendações de renda variável publicadas pela mesa. Para cada ativo, seus clientes que já o possuem ou têm perfil compatível com a operação.</p>
   <div id="calls-assessor-lista"></div>
 </div>
 
 <!-- Radar de notícias dos ativos que os clientes têm em carteira -->
 <div id="radar-noticias-card" class="card" style="display:none">
-  <h2 style="display:flex;align-items:center;gap:8px">📰 Radar dos seus ativos <span id="radar-cont" style="font-size:14px;color:#5C7365;font-weight:400"></span></h2>
-  <p style="font-size:14px;color:#7A8A80;margin:-4px 0 12px;line-height:1.5">Notícias recentes dos ativos mais presentes nas carteiras dos seus clientes. Priorizados pelos que mais têm exposição.</p>
+  <h2 style="display:flex;align-items:center;gap:8px">📰 Radar dos seus ativos <span id="radar-cont" style="font-size:14px;color:#39493F;font-weight:400"></span></h2>
+  <p style="font-size:14px;color:#42524A;margin:-4px 0 12px;line-height:1.5">Notícias recentes dos ativos mais presentes nas carteiras dos seus clientes. Priorizados pelos que mais têm exposição.</p>
   <div id="radar-noticias-lista"></div>
 </div>
 
@@ -3242,15 +3242,15 @@ select option{background:#F5F8F5}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
     <div>
       <label>Assessor</label>
-      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#F5F8F5;cursor:default;color:#A8833C;display:none">
-      <select id="assessor-select" onchange="document.getElementById('assessor').value=this.value;buscarClientesSalvos()" style="display:none;width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#A8833C;font-size:16px;outline:none">
+      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#F5F8F5;cursor:default;color:#8A6A28;display:none">
+      <select id="assessor-select" onchange="document.getElementById('assessor').value=this.value;buscarClientesSalvos()" style="display:none;width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#8A6A28;font-size:16px;outline:none">
         <option value="">— Selecione o assessor —</option>
       </select>
     </div>
     <div>
-      <label>Código do cliente <span style="font-size:13px;color:#5C7365;font-weight:400">— busca no sistema</span></label>
+      <label>Código do cliente <span style="font-size:13px;color:#39493F;font-weight:400">— busca no sistema</span></label>
       <input type="text" id="codigo-cliente" placeholder="Ex: 7712906 — Enter para carregar" oninput="buscarPorCodigoCliente(this.value)" onkeydown="if(event.key==='Enter')buscarUltimoXpPorCodigo(this.value)" autocomplete="off"
-        style="width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#E8D5A3;font-size:16px;outline:none;box-sizing:border-box">
+        style="width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#0A0F0C;font-size:16px;outline:none;box-sizing:border-box">
       <input type="text" id="nome" placeholder="" style="display:none">
       <p id="cliente-encontrado-label" style="display:none;font-size:14px;color:#1F9D77;margin-top:4px;font-weight:700"></p>
     </div>
@@ -3258,7 +3258,7 @@ select option{background:#F5F8F5}
 
   <!-- Clientes salvos: resumo por perfil (expansível) + desenquadrados -->
   <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#EFF3EF;border-radius:10px;border:1px solid #FFFFFF">
-    <p style="font-size:13px;color:#A8833C;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px;font-weight:700">📁 Clientes salvos <span id="cs-contador" style="color:#5C7365;font-weight:400"></span></p>
+    <p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px;font-weight:700">📁 Clientes salvos <span id="cs-contador" style="color:#39493F;font-weight:400"></span></p>
     <div id="clientes-salvos-lista"></div>
     <p id="xp-aviso-atualizar" style="display:none;font-size:14px;color:#C0673A;margin-top:10px;line-height:1.5"></p>
   </div>
@@ -3272,12 +3272,12 @@ select option{background:#F5F8F5}
         onchange="onXpFileChange(this)">
       <div class="icon" style="font-size:25px;margin-bottom:4px">📊</div>
       <p id="upload-hint-text" style="font-size:15px;margin:0">XPerformance — clique para identificar o cliente</p>
-      <p style="font-size:13px;color:#5C7365;margin:3px 0 0">ou solte um <b style="color:#A8833C">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
+      <p style="font-size:13px;color:#39493F;margin:3px 0 0">ou solte um <b style="color:#8A6A28">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
       <p class="fname" id="fname-xp" style="font-size:14px;margin:2px 0 0"></p>
     </div>
     <!-- Progresso + resultado da importação em lote (ZIP) -->
     <div id="xp-lote-progress" style="display:none;margin-top:10px">
-      <div style="display:flex;justify-content:space-between;font-size:14px;color:#5C7365;margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;font-size:14px;color:#39493F;margin-bottom:4px">
         <span id="xp-lote-txt">Processando...</span><span id="xp-lote-pct">0%</span>
       </div>
       <div style="height:6px;background:#EAF4EC;border-radius:3px;overflow:hidden">
@@ -3294,7 +3294,7 @@ select option{background:#F5F8F5}
   <div style="margin-bottom:14px">
     <label style="margin-bottom:8px;display:block">Perfil do cliente</label>
     <!-- Aviso quando o perfil foi sugerido automaticamente pela carteira atual -->
-    <p id="perfil-sugerido-hint" style="display:none;font-size:14px;color:#A8833C;margin:0 0 8px 0;font-weight:600"></p>
+    <p id="perfil-sugerido-hint" style="display:none;font-size:14px;color:#8A6A28;margin:0 0 8px 0;font-weight:600"></p>
     <!-- Cards clicáveis por perfil — renderizados pelo servidor -->
     <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       {{ perfil_cards | safe }}
@@ -3313,7 +3313,7 @@ select option{background:#F5F8F5}
   <div style="margin-bottom:14px">
     <label style="display:block;margin-bottom:8px">
       Carteira de referência
-      <span id="perfil-lbl" style="color:#A8833C;font-size:13px;font-weight:400;text-transform:uppercase;margin-left:6px"></span>
+      <span id="perfil-lbl" style="color:#8A6A28;font-size:13px;font-weight:400;text-transform:uppercase;margin-left:6px"></span>
     </label>
 
     <!-- Toggle visual XP vs Levante -->
@@ -3329,10 +3329,10 @@ select option{background:#F5F8F5}
 
     <!-- Alocação detalhada do modelo selecionado -->
     <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:10px 14px">
-      <div style="font-size:12px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+      <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
         Alocação do modelo
-        <span id="modelo-gestora-lbl" style="color:#A8833C;margin-left:4px;font-weight:700"></span>
-        <span id="carta-ativa-nome" style="color:#5C7365;margin-left:6px;font-size:12px"></span>
+        <span id="modelo-gestora-lbl" style="color:#8A6A28;margin-left:4px;font-weight:700"></span>
+        <span id="carta-ativa-nome" style="color:#39493F;margin-left:6px;font-size:12px"></span>
       </div>
       <div id="modelo-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 22px"></div>
     </div>
@@ -3362,7 +3362,7 @@ select option{background:#F5F8F5}
   <div id="step2-icon" style="font-size:31px">👤</div>
   <div style="flex:1">
     <p id="step2-titulo" style="font-size:17px;font-weight:700;color:#0A0F0C;margin-bottom:2px"></p>
-    <p id="step2-sub" style="font-size:14px;color:#5F7065"></p>
+    <p id="step2-sub" style="font-size:14px;color:#3B4D43"></p>
   </div>
   <div id="step2-badges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
@@ -3379,12 +3379,12 @@ select option{background:#F5F8F5}
       <div style="position:relative;width:150px;margin:0 auto 0">
         <canvas id="chart-servir" width="150" height="150"></canvas>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;line-height:1">
-          <div id="servir-score-num" style="font-size:35px;font-weight:900;color:#A8833C">0</div>
-          <div style="font-size:13px;color:#5C7365;margin-top:2px">de 6 pilares</div>
+          <div id="servir-score-num" style="font-size:35px;font-weight:900;color:#8A6A28">0</div>
+          <div style="font-size:13px;color:#39493F;margin-top:2px">de 6 pilares</div>
         </div>
       </div>
       <div id="servir-legenda" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;text-align:left"></div>
-      <p style="font-size:13px;color:#5C7365;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
+      <p style="font-size:13px;color:#39493F;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
     </div>
 
     <!-- Checklist de pilares — renderizado pelo servidor -->
@@ -3397,7 +3397,7 @@ select option{background:#F5F8F5}
 <!-- Cross Sell — card separado -->
 <div class="card">
   <h2>💼 Cross Sell — Produtos Ativos na Braúna</h2>
-  <p style="font-size:14px;color:#5C7365;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#0A0F0C">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
+  <p style="font-size:14px;color:#39493F;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#0A0F0C">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
   <div id="cross-sell-form" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
   <button class="btn" id="btn-ana" onclick="analisar()">Analisar carteira</button>
 </div>
@@ -3411,7 +3411,7 @@ select option{background:#F5F8F5}
 
   <!-- ── Análise Head de Produtos (HP) ── -->
   <div class="card" id="card-hp" style="display:none;border-color:#F7F1D8">
-    <h2 style="color:#A8833C">⭐ Análise Head de Produtos — Modelo Levante</h2>
+    <h2 style="color:#8A6A28">⭐ Análise Head de Produtos — Modelo Levante</h2>
 
     <!-- Cabeçalho da conta -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px" id="hp-header"></div>
@@ -3423,17 +3423,17 @@ select option{background:#F5F8F5}
     <div id="material-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)fecharMaterial()">
       <div style="background:#EAF4EC;border:1px solid #D9E3DB;border-radius:12px;max-width:820px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #EAF4EC">
-          <span id="material-modal-titulo" style="font-size:16px;font-weight:700;color:#A8833C">Material</span>
-          <button onclick="fecharMaterial()" style="background:none;border:1px solid #D9E3DB;color:#9BB0A0;border-radius:8px;padding:4px 10px;font-size:15px;cursor:pointer">✕ Fechar</button>
+          <span id="material-modal-titulo" style="font-size:16px;font-weight:700;color:#8A6A28">Material</span>
+          <button onclick="fecharMaterial()" style="background:none;border:1px solid #D9E3DB;color:#465648;border-radius:8px;padding:4px 10px;font-size:15px;cursor:pointer">✕ Fechar</button>
         </div>
         <div id="material-modal-corpo" style="padding:14px 16px;overflow:auto;white-space:pre-wrap;font-size:15px;line-height:1.6;color:#CFE0D5"></div>
       </div>
     </div>
 
     <!-- Desvios vs Modelo HP -->
-    <div style="font-size:14px;color:#5C7365;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-      <span>Comparativo vs. <span id="hp-ref" style="color:#A8833C"></span></span>
-      <span id="hp-perfil-badge" style="background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:12px;padding:2px 10px;font-size:13px;font-weight:700"></span>
+    <div style="font-size:14px;color:#39493F;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+      <span>Comparativo vs. <span id="hp-ref" style="color:#8A6A28"></span></span>
+      <span id="hp-perfil-badge" style="background:#FBF3D2;color:#8A6A28;border:1px solid #A8833C;border-radius:12px;padding:2px 10px;font-size:13px;font-weight:700"></span>
     </div>
     <div id="hp-desvios" style="margin-bottom:16px"></div>
 
@@ -3457,15 +3457,15 @@ select option{background:#F5F8F5}
 
     <!-- Sugestões de produtos HP para fechar gaps -->
     <div id="hp-sugestoes" style="display:none">
-      <div style="font-size:14px;color:#A8833C;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
+      <div style="font-size:14px;color:#8A6A28;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
       <div id="hp-sugestoes-lista"></div>
     </div>
 
     <!-- Cenário macro HP -->
     <div id="hp-cenario" style="display:none;margin-top:14px">
-      <div style="font-size:14px;color:#A8833C;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:14px;color:#8A6A28;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between">
         <span>🌐 Cenário Macro — Head de Produtos</span>
-        <span id="hp-cenario-ref" style="font-size:13px;color:#5C7365;font-weight:400;text-transform:none"></span>
+        <span id="hp-cenario-ref" style="font-size:13px;color:#39493F;font-weight:400;text-transform:none"></span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="hp-cenario-cards"></div>
       <div id="hp-cenario-vieses" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
@@ -3489,14 +3489,14 @@ select option{background:#F5F8F5}
   <!-- Rentabilidade: Cliente x Recomendada x CDI -->
   <div class="card" id="card-rent-comp" style="display:none">
     <h2>Rentabilidade — Cliente × Carteira Recomendada × CDI</h2>
-    <p style="font-size:14px;color:#5C7365;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo — os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
+    <p style="font-size:14px;color:#39493F;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo — os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
     <div style="display:flex;gap:16px;margin-bottom:8px;font-size:14px;flex-wrap:wrap">
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#A8833C;display:inline-block"></span>Cliente</span>
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1F9D77;display:inline-block"></span>Recomendada</span>
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#2E86B8;display:inline-block"></span>CDI</span>
     </div>
     <div class="chart-wrap"><canvas id="chart-rent" role="img" aria-label="Comparativo de rentabilidade"></canvas></div>
-    <p id="rent-comp-nota" style="font-size:13px;color:#5C7365;margin-top:6px"></p>
+    <p id="rent-comp-nota" style="font-size:13px;color:#39493F;margin-top:6px"></p>
   </div>
 
   <!-- Diversificação por Classe de Ativos -->
@@ -3508,7 +3508,7 @@ select option{background:#F5F8F5}
         <div style="position:relative;width:220px;height:220px">
           <canvas id="chart-classes" width="220" height="220"></canvas>
           <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
-            <div style="font-size:14px;color:#5C7365;line-height:1.3">carteira<br>atual</div>
+            <div style="font-size:14px;color:#39493F;line-height:1.3">carteira<br>atual</div>
           </div>
         </div>
         <!-- Legenda da pizza -->
@@ -3521,14 +3521,14 @@ select option{background:#F5F8F5}
 
   <!-- Plano de Ação para atingir o objetivo -->
   <div class="card" id="card-plano">
-    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#A8833C;text-transform:capitalize"></span></h2>
+    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#8A6A28;text-transform:capitalize"></span></h2>
     <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#F5F8F5;border:1px solid #A8833C;border-radius:8px">
-      <p style="font-size:13px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
+      <p style="font-size:13px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
       <p id="plano-objetivo-txt" style="font-size:16px;color:#0A0F0C"></p>
     </div>
     <!-- Carteira atual do cliente no Plano de Ação -->
     <div id="plano-carteira-atual" style="display:none;margin-bottom:14px;background:#EAF4EC;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px">
-      <p style="font-size:13px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual do cliente</p>
+      <p style="font-size:13px;color:#39493F;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual do cliente</p>
       <div id="plano-carteira-barras"></div>
     </div>
     <div id="plano-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"></div>
@@ -3554,7 +3554,7 @@ select option{background:#F5F8F5}
         <div>
           <!-- Carteira atual ao lado dos desvios -->
           <div id="desvios-carteira-atual" style="display:none;background:#EAF4EC;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px;margin-bottom:12px">
-            <p style="font-size:13px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual</p>
+            <p style="font-size:13px;color:#39493F;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual</p>
             <div id="desvios-carteira-barras"></div>
           </div>
           <div id="diagnostico"></div>
@@ -3590,12 +3590,12 @@ select option{background:#F5F8F5}
   <!-- ── Exportar Análise — ao final ── -->
   <div class="card" style="text-align:center">
     <h2>Exportar Análise</h2>
-    <p style="font-size:15px;color:#5C7365;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
+    <p style="font-size:15px;color:#39493F;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#123047;color:#0A0F0C;border-color:#123047">◎ Abrir Braúna 360°</button>
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
-    <p style="font-size:14px;color:#5C7365;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
+    <p style="font-size:14px;color:#39493F;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
   </div>
 
 </div>
@@ -3686,7 +3686,7 @@ function renderNotifLista(){
   const lista = document.getElementById("notif-lista");
   if(!lista) return;
   if(!_notificacoes.length){
-    lista.innerHTML = '<div style="padding:24px;text-align:center;color:#5F7065;font-size:16px">Nenhum alerta no momento</div>';
+    lista.innerHTML = '<div style="padding:24px;text-align:center;color:#3B4D43;font-size:16px">Nenhum alerta no momento</div>';
     return;
   }
   lista.innerHTML = _notificacoes.map(function(n){
@@ -3699,7 +3699,7 @@ function renderNotifLista(){
         <div style="flex:1">
           <div style="font-size:16px;color:${cor};font-weight:${n.lido?'400':'700'};margin-bottom:4px">${icon} ${n.mensagem}</div>
           ${clientes ? `<div style="margin-top:5px">Clientes afetados: ${clientes}</div>` : ""}
-          <div style="font-size:14px;color:#5F7065;margin-top:4px">${n.data}</div>
+          <div style="font-size:14px;color:#3B4D43;margin-top:4px">${n.data}</div>
         </div>
         ${!n.lido ? `<div style="width:8px;height:8px;border-radius:50%;background:#E53935;flex-shrink:0;margin-top:4px"></div>` : ""}
       </div>
@@ -3792,23 +3792,23 @@ function renderCallsAssessor(){
       const bg  = m.detem ? "#EAF4EC" : "#FFFFFF";
       const tag = m.detem ? "já detém" : ("perfil "+(m.perfil||"compatível"));
       const rot = m.nome || ("#"+(m.conta||""));
-      return `<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #D9E3DB;border-radius:16px;background:${bg};color:${cor};padding:3px 10px;font-size:14px;margin:3px 4px 0 0">${rot} <span style="color:#5A6A60;font-size:12px">· ${tag}</span></span>`;
+      return `<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #D9E3DB;border-radius:16px;background:${bg};color:${cor};padding:3px 10px;font-size:14px;margin:3px 4px 0 0">${rot} <span style="color:#384840;font-size:12px">· ${tag}</span></span>`;
     }).join("");
-    const resumo = n>0 ? `<span style="color:#5A6A60;font-size:14px;margin-left:6px">${c.n_detem||0} detêm · ${c.n_compat||0} por perfil</span>` : "";
+    const resumo = n>0 ? `<span style="color:#384840;font-size:14px;margin-left:6px">${c.n_detem||0} detêm · ${c.n_compat||0} por perfil</span>` : "";
     const clientesBlock = n>0
       ? `<div id="${gid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #EAF4EC">${resumo}<div style="margin-top:6px">${chips}</div></div>`
-      : `<div id="${gid}" style="display:none;margin-top:10px;color:#5A6A60;font-size:15px;padding-top:10px;border-top:1px solid #EAF4EC">Nenhum cliente com este ativo ou perfil compatível ainda — oportunidade de prospecção.</div>`;
+      : `<div id="${gid}" style="display:none;margin-top:10px;color:#384840;font-size:15px;padding-top:10px;border-top:1px solid #EAF4EC">Nenhum cliente com este ativo ou perfil compatível ainda — oportunidade de prospecção.</div>`;
     return `<div style="background:#EFF3EF;border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:10px">
       <div onclick="callAssessorToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span style="background:${dir.bg};color:${dir.cor};border:1px solid ${dir.cor}44;border-radius:6px;padding:2px 8px;font-size:13px;font-weight:700">${dir.lbl}</span>
-        <span style="color:#E8D5A3;font-weight:700;font-size:18px;letter-spacing:.5px">${c.ticker||""}</span>
+        <span style="color:#0A0F0C;font-weight:700;font-size:18px;letter-spacing:.5px">${c.ticker||""}</span>
         ${up}
         <span style="flex:1"></span>
         <span style="background:${badgeBg};color:${badgeCor};border:1px solid ${badgeCor}55;border-radius:14px;padding:3px 11px;font-size:14px;font-weight:700">${n} cliente${n===1?"":"s"} para este ativo</span>
-        <span id="${gid}-ar" style="color:#5C7365;font-size:14px">▸</span>
+        <span id="${gid}-ar" style="color:#39493F;font-size:14px">▸</span>
       </div>
-      ${perfis?`<div style="margin-top:6px;font-size:14px;color:#7A8A80">Perfis-alvo: ${perfis}</div>`:""}
-      ${c.tese?`<div style="color:#9AAAA0;font-size:15px;margin-top:6px;line-height:1.5">${c.tese}</div>`:""}
+      ${perfis?`<div style="margin-top:6px;font-size:14px;color:#42524A">Perfis-alvo: ${perfis}</div>`:""}
+      ${c.tese?`<div style="color:#465648;font-size:15px;margin-top:6px;line-height:1.5">${c.tese}</div>`:""}
       ${clientesBlock}
     </div>`;
   }).join("");
@@ -4014,14 +4014,14 @@ function renderPilaresForm(){
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">' +
           '<span style="font-size:16px;font-weight:700;color:' + (feito?"#1F9D77":"#0A0F0C") + '">' + p.nome + '</span>' +
           '<span style="font-size:13px;padding:2px 8px;border-radius:8px;background:#FFFFFF;color:' + impCor + ';font-weight:700">' + impTxt + '</span>' +
-          (p.dir ? '<span style="font-size:13px;padding:2px 8px;border-radius:8px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
+          (p.dir ? '<span style="font-size:13px;padding:2px 8px;border-radius:8px;background:#F5F8F5;color:#8A6A28;border:1px solid #A8833C;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
         '</div>' +
-        '<div style="font-size:14px;color:#5C7365;line-height:1.4">' + p.desc + '</div>' +
+        '<div style="font-size:14px;color:#39493F;line-height:1.4">' + p.desc + '</div>' +
         (!feito ?
           '<div style="background:#FFFFFF;border-radius:6px;padding:8px 10px;border-left:3px solid ' + impCor + ';margin-top:8px">' +
-            '<div style="font-size:14px;color:#5F7065;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
-            '<div style="font-size:14px;color:#A8833C;padding:6px 8px;background:#F5F8F5;border-radius:5px">→ ' + p.acao + '</div>' +
-            (p.dir ? '<div style="font-size:13px;color:#A8833C;margin-top:6px;padding:5px 8px;border:1px solid #A8833C;border-radius:5px;background:#F5F8F5">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
+            '<div style="font-size:14px;color:#3B4D43;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
+            '<div style="font-size:14px;color:#8A6A28;padding:6px 8px;background:#F5F8F5;border-radius:5px">→ ' + p.acao + '</div>' +
+            (p.dir ? '<div style="font-size:13px;color:#8A6A28;margin-top:6px;padding:5px 8px;border:1px solid #A8833C;border-radius:5px;background:#F5F8F5">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
           '</div>' : "") +
       '</div>' +
     '</div>';
@@ -4127,7 +4127,7 @@ function renderInstToggle(){
       +'transition:all .15s;box-sizing:border-box">'
       +'<div style="font-size:21px;margin-bottom:3px">'+it.icon+'</div>'
       +'<div style="font-size:15px;font-weight:700;color:'+(isAt?it.cor:"#0A0F0C")+';margin-bottom:2px">'+it.nome+'</div>'
-      +'<div style="font-size:12px;color:#5C7365">'+it.ref+'</div>'
+      +'<div style="font-size:12px;color:#39493F">'+it.ref+'</div>'
       +(isAt?'<div style="font-size:11px;color:'+it.cor+';font-weight:700;margin-top:4px">&#10003; SELECIONADA</div>':'')
       +'</div>';
   }).join("");
@@ -4187,7 +4187,7 @@ function carregarTickerMercado(){
   fetch("/api/mercado-ticker").then(r=>r.json()).then(d=>{
     var itens=(d&&d.itens)||[]; var inner=document.getElementById("mkt-ticker-inner");
     if(!inner||!itens.length) return;
-    var sep=' <span style="color:#5C7365;margin:0 16px">•</span> ';
+    var sep=' <span style="color:#39493F;margin:0 16px">•</span> ';
     var seq=itens.join(sep);
     inner.innerHTML=seq+sep+seq;   // duplicado para loop contínuo
     var dur=Math.max(24, itens.length*7);
@@ -4203,8 +4203,8 @@ function _mktLinha(it){
   var vt=(Math.abs(v).toFixed(2)).replace(".",",");
   var pt=("R$ "+it.preco.toFixed(2)).replace(".",",");
   return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid #EAF4EC">'
-    + '<span style="font-size:15px;font-weight:700;color:#A8833C">'+it.ticker+'</span>'
-    + '<span style="font-size:14px;color:#5C7365;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pt+'</span>'
+    + '<span style="font-size:15px;font-weight:700;color:#8A6A28">'+it.ticker+'</span>'
+    + '<span style="font-size:14px;color:#39493F;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pt+'</span>'
     + '<span style="font-size:15px;font-weight:700;color:'+cor+';white-space:nowrap">'+seta+' '+vt+'%</span>'
     + '</div>';
 }
@@ -4223,8 +4223,8 @@ function carregarDestaquesMercado(){
       var el=document.getElementById("mkt-dest-dolar-var");
       el.textContent=ds+" "+(Math.abs(dv).toFixed(2)).replace(".",",")+"%"; el.style.color=dcor;
     }
-    var ac=(d.acoes||[]).map(_mktLinha).join("")||'<p style="font-size:14px;color:#5C7365;padding:6px 8px">Sem dados no momento.</p>';
-    var fi=(d.fiis||[]).map(_mktLinha).join("")||'<p style="font-size:14px;color:#5C7365;padding:6px 8px">Sem dados no momento.</p>';
+    var ac=(d.acoes||[]).map(_mktLinha).join("")||'<p style="font-size:14px;color:#39493F;padding:6px 8px">Sem dados no momento.</p>';
+    var fi=(d.fiis||[]).map(_mktLinha).join("")||'<p style="font-size:14px;color:#39493F;padding:6px 8px">Sem dados no momento.</p>';
     document.getElementById("mkt-dest-acoes").innerHTML=ac;
     document.getElementById("mkt-dest-fiis").innerHTML=fi;
   }).catch(function(){});
@@ -4284,7 +4284,7 @@ function renderChartRent(){
 }
 function _sgNorm(r){ r=(r||"").toUpperCase(); if(r.indexOf("COMPRA")>=0)return "COMPRA"; if(r.indexOf("VENDA")>=0)return "VENDA"; if(r.indexOf("NEUTRO")>=0)return "NEUTRO"; return ""; }
 function _sgCor(r){ var n=_sgNorm(r); return n==="COMPRA"?"#1F9D77":n==="VENDA"?"#D93B3B":n==="NEUTRO"?"#A8833C":"#5F7065"; }
-function _sgBadge(r){ if(!r) return '<span style="color:#5C7365">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
+function _sgBadge(r){ if(!r) return '<span style="color:#39493F">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
 function _sgUp(v){ if(v==null) return ""; var p=v*100; return ' <span style="color:'+(p>=0?"#1F9D77":"#D93B3B")+';font-size:13px">'+(p>=0?"+":"")+p.toFixed(0)+'%</span>'; }
 function _sgBrl(v){ return v!=null ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; }
 function _sgData(iso){ if(!iso) return "—"; var p=String(iso).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : iso; }
@@ -4293,13 +4293,13 @@ function _sgRow(a){
   var lev = g && g.levante, xp = g && g.xp;
   var posHtml;
   if(lev){ posHtml=_sgBadge(lev.rating + (lev.nota?(" "+lev.nota):"")); }
-  else if(xp){ posHtml=_sgBadge(xp.rating)+' <span style="color:#5C7365;font-size:12px">(via XP)</span>'; }
-  else { posHtml='<span style="color:#5C7365">sem cobertura</span>'; }
+  else if(xp){ posHtml=_sgBadge(xp.rating)+' <span style="color:#39493F;font-size:12px">(via XP)</span>'; }
+  else { posHtml='<span style="color:#39493F">sem cobertura</span>'; }
   var alvoSrc = lev || xp;
-  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#5C7365">—</span>';
+  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#39493F">—</span>';
   var xpHtml;
-  if(xp){ xpHtml=_sgBadge(xp.rating); if(xp.consenso) xpHtml+=' <span style="color:#5C7365;font-size:12px">'+xp.consenso+'</span>'; xpHtml+=_sgUp(xp.upside); }
-  else { xpHtml='<span style="color:#5C7365">—</span>'; }
+  if(xp){ xpHtml=_sgBadge(xp.rating); if(xp.consenso) xpHtml+=' <span style="color:#39493F;font-size:12px">'+xp.consenso+'</span>'; xpHtml+=_sgUp(xp.upside); }
+  else { xpHtml='<span style="color:#39493F">—</span>'; }
   var flag="";
   if(lev && xp && _sgNorm(lev.rating) && _sgNorm(xp.rating) && _sgNorm(lev.rating)!==_sgNorm(xp.rating)){
     flag=' <span title="Levante e XP divergem" style="color:#C0673A">⚠</span>';
@@ -4399,29 +4399,29 @@ function renderProtecoes(lista){
         var on=(p.status===k); var c=_PROT_STATUS[k].cor;
         return '<button onclick="setProtecaoStatus(\''+p.id+'\',\''+k+'\')" style="cursor:pointer;font-size:12px;padding:3px 8px;border-radius:6px;'
           +'border:1px solid '+(on?c:"#EAF4EC")+';background:'+(on?c+"22":"#EFF3EF")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
-      }).join("") : '<span style="font-size:12px;color:#5A7A68">Identifique o cliente para salvar o histórico</span>';
+      }).join("") : '<span style="font-size:12px;color:#395542">Identifique o cliente para salvar o histórico</span>';
     var bordaCard=acima?"#E8A87C":"#FBEEEC";
     var bgCard=acima?"#FBF0E8":"#F5F8F5";
     var msg = acima
       ? '<div style="font-size:13px;color:#0A0F0C;margin:6px 0 8px;line-height:1.5;background:#F8E3D4;border-radius:6px;padding:8px 10px">'
         +'<b style="color:#C0673A">🎯 Acima do preço-alvo — trave o ganho.</b> Sugestão: '
-        +'<b style="color:#A8833C">(a)</b> operação estruturada (collar / put de proteção / fence) para proteger o valor já ganho · '
-        +'<b style="color:#A8833C">(b)</b> realizar parte da posição e alocar em caixa (pós-fixado). Envolve custo/prazo e suitability.</div>'
-      : '<div style="font-size:13px;color:#B8A488;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
-        +'<b style="color:#A8833C">(a)</b> operação estruturada (collar / put de proteção / fence) · '
-        +'<b style="color:#A8833C">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>';
+        +'<b style="color:#8A6A28">(a)</b> operação estruturada (collar / put de proteção / fence) para proteger o valor já ganho · '
+        +'<b style="color:#8A6A28">(b)</b> realizar parte da posição e alocar em caixa (pós-fixado). Envolve custo/prazo e suitability.</div>'
+      : '<div style="font-size:13px;color:#6A5A40;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
+        +'<b style="color:#8A6A28">(a)</b> operação estruturada (collar / put de proteção / fence) · '
+        +'<b style="color:#8A6A28">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>';
     return '<div style="border:1px solid '+bordaCard+';background:'+bgCard+';border-radius:8px;padding:10px 12px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">'
-        +'<div><span style="color:#A8833C;font-weight:700;font-size:15px">'+p.ticker+'</span> '
+        +'<div><span style="color:#8A6A28;font-weight:700;font-size:15px">'+p.ticker+'</span> '
           +'<span style="color:'+_sgCor(p.rating)+';font-size:13px;font-weight:700">'+(p.rating||"")+'</span> '
-          +'<span style="color:#5F7065;font-size:13px">· '+(p.fonte||"")+' · alvo '+alvo+atualTxt+' <span style="color:#C0673A">('+upTxt+')</span></span></div>'
+          +'<span style="color:#3B4D43;font-size:13px">· '+(p.fonte||"")+' · alvo '+alvo+atualTxt+' <span style="color:#C0673A">('+upTxt+')</span></span></div>'
         +'<span style="font-size:12px;color:'+st.cor+';font-weight:700">'+st.lbl+(p.data&&p.data!=="—"?' · '+p.data:"")+'</span>'
       +'</div>'
       +msg
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'+botoes+'</div>'
     +'</div>';
   }).join("")
-  + '<div style="font-size:12px;color:#5C7365;margin-top:2px;line-height:1.5">Gatilho: <b>cotação ao vivo</b> a ≤10% do alvo — ou <b style="color:#C0673A">acima do alvo</b> (destacado), quando entra a sugestão de estruturada para travar o ganho. Alvo pela casa principal (Levante). As recomendações ficam salvas no histórico do cliente.</div>';
+  + '<div style="font-size:12px;color:#39493F;margin-top:2px;line-height:1.5">Gatilho: <b>cotação ao vivo</b> a ≤10% do alvo — ou <b style="color:#C0673A">acima do alvo</b> (destacado), quando entra a sugestão de estruturada para travar o ganho. Alvo pela casa principal (Levante). As recomendações ficam salvas no histórico do cliente.</div>';
 }
 
 function atualizarModelo(){
@@ -4468,7 +4468,7 @@ function atualizarModelo(){
   g.innerHTML = itens.map(([k,v])=>{
     const cor = COR_CLS[k]||"#5C7365";
     return '<div style="display:flex;align-items:center;gap:8px;min-width:0">' +
-      '<span style="font-size:14px;color:#9BB0A0;flex:0 0 auto;white-space:nowrap">'+(LABELS[k]||k)+'</span>'+
+      '<span style="font-size:14px;color:#465648;flex:0 0 auto;white-space:nowrap">'+(LABELS[k]||k)+'</span>'+
       '<div style="flex:1 1 auto;min-width:24px;height:6px;background:#EAF4EC;border-radius:3px;overflow:hidden">'+
         '<div style="width:'+Math.min(v,100)+'%;height:100%;background:'+cor+';border-radius:3px;transition:width .4s"></div>'+
       '</div>'+
@@ -4516,7 +4516,7 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
   const b=document.getElementById("macro-badges");
   if(d.selic_meta) b.innerHTML+=`<span class="macro-badge">Selic <span>${d.selic_meta.toFixed(2)}% a.a.</span></span>`;
   if(d.ipca_12m)   b.innerHTML+=`<span class="macro-badge">IPCA 12M <span>${d.ipca_12m.toFixed(2)}%</span></span>`;
-  if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#5C7365">Gestores ref. <span style="color:#5F7065">${d.ref_contexto}</span></span>`;
+  if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#39493F">Gestores ref. <span style="color:#3B4D43">${d.ref_contexto}</span></span>`;
 }).catch(()=>{});
 
 // Handler global do input XPerformance — chamado pelo onchange inline no HTML
@@ -4594,16 +4594,16 @@ async function processarLoteXP(file){
     const linhas = clientes.slice(0,25).map(c=>`
       <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #EAF4EC;font-size:14px">
         <span style="color:#1F9D77">✓</span>
-        <span style="flex:1;color:#5C7365">${c.nome||("#"+c.conta)}</span>
-        <span style="color:#5C7365">${c.data_ref||""}</span>
-        <span style="color:#A8833C">${fmtBrl(c.patrimonio)}</span>
+        <span style="flex:1;color:#39493F">${c.nome||("#"+c.conta)}</span>
+        <span style="color:#39493F">${c.data_ref||""}</span>
+        <span style="color:#8A6A28">${fmtBrl(c.patrimonio)}</span>
       </div>`).join("");
-    const mais = clientes.length>25 ? `<div style="font-size:13px;color:#5C7365;margin-top:4px">... e mais ${clientes.length-25} clientes</div>` : "";
+    const mais = clientes.length>25 ? `<div style="font-size:13px;color:#39493F;margin-top:4px">... e mais ${clientes.length-25} clientes</div>` : "";
     const errosHtml = erros.length ? `<div style="margin-top:8px;padding:8px 10px;background:#FBE9E9;border-radius:8px">`+erros.slice(0,15).map(e=>`<div style="font-size:13px;color:#D93B3B">⚠ ${e.arquivo||""}: ${e.erro||""}</div>`).join("")+`</div>` : "";
     res.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        <div style="background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:21px;font-weight:700;color:#1F9D77">${ok}</div><div style="font-size:12px;color:#5C7365">clientes salvos</div></div>
-        <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:21px;font-weight:700;color:#5F7065">${pdfs.length}</div><div style="font-size:12px;color:#5C7365">PDFs no ZIP</div></div>
+        <div style="background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:21px;font-weight:700;color:#1F9D77">${ok}</div><div style="font-size:12px;color:#39493F">clientes salvos</div></div>
+        <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:21px;font-weight:700;color:#3B4D43">${pdfs.length}</div><div style="font-size:12px;color:#39493F">PDFs no ZIP</div></div>
         ${erros.length?`<div style="background:#FBE9E9;border:1px solid #F7DADA;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:21px;font-weight:700;color:#D93B3B">${erros.length}</div><div style="font-size:12px;color:#CF2E2E">erros</div></div>`:""}
       </div>
       <div style="max-height:220px;overflow-y:auto">${linhas}${mais}</div>${errosHtml}
@@ -4746,14 +4746,14 @@ function mostrarPreviewPDF(d){
 
   if(semDados){
     box.style.display = "block";
-    box.innerHTML = '<p style="color:#C0673A;font-weight:700;font-size:16px;margin-bottom:4px">⚠️ PDF sem carteira detectada</p><p style="color:#5F7065;font-size:15px">Preencha os dados manualmente na Etapa 2.</p>';
+    box.innerHTML = '<p style="color:#C0673A;font-weight:700;font-size:16px;margin-bottom:4px">⚠️ PDF sem carteira detectada</p><p style="color:#3B4D43;font-size:15px">Preencha os dados manualmente na Etapa 2.</p>';
     return;
   }
   if(semComp){
     const fmtBrl = v => "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
     box.style.display = "block";
     box.innerHTML = `<p style="color:#1F9D77;font-weight:700;font-size:16px;margin-bottom:4px">✓ Conta ${d.conta} identificada — ${fmtBrl(d.patrimonio)}</p>
-      <p style="color:#5F7065;font-size:15px">Composição por classe não disponível neste PDF. A análise continuará com os dados de perfil e carteira de referência selecionados.</p>`;
+      <p style="color:#3B4D43;font-size:15px">Composição por classe não disponível neste PDF. A análise continuará com os dados de perfil e carteira de referência selecionados.</p>`;
     return;
   }
 
@@ -4785,7 +4785,7 @@ function mostrarPreviewPDF(d){
     const lbl = CLS_LBL[k] || k;
     return `<div style="margin-bottom:6px">
       <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-        <span style="font-size:14px;color:#5C7365">${lbl}</span>
+        <span style="font-size:14px;color:#39493F">${lbl}</span>
         <span style="font-size:14px;color:${cor};font-weight:700">${fmtPct(v)}</span>
       </div>
       <div style="height:6px;background:#F5F8F5;border-radius:3px;overflow:hidden">
@@ -4799,7 +4799,7 @@ function mostrarPreviewPDF(d){
     rentMes  != null ? `<span>Mês: <b style="color:#1F9D77">${rentMes}%</b></span>` : "",
     rentAno  != null ? `<span>Ano: <b style="color:#1F9D77">${rentAno}%</b></span>` : "",
     rent12m  != null ? `<span>12m: <b style="color:#1F9D77">${rent12m}%</b></span>` : "",
-  ].filter(Boolean).join('<span style="color:#5F7065;margin:0 8px">|</span>');
+  ].filter(Boolean).join('<span style="color:#3B4D43;margin:0 8px">|</span>');
 
   const assessorNome = d.assessor || "";
   const tipoConta   = d.tipo_conta || "";
@@ -4810,7 +4810,7 @@ function mostrarPreviewPDF(d){
   if(alertas.length){
     var COR_NIVEL = {alto:"#D93B3B", medio:"#C0673A", baixo:"#A8833C"};
     alertasHtml = '<div style="margin-top:14px;border-top:1px solid #F5F8F5;padding-top:12px">'
-      +'<p style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔍 Diagnósticos automáticos</p>'
+      +'<p style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔍 Diagnósticos automáticos</p>'
       + alertas.map(function(a){
           var cor = COR_NIVEL[a.nivel] || "#5F7065";
           var icone = a.nivel==="alto" ? "⚠️" : "ℹ️";
@@ -4827,19 +4827,19 @@ function mostrarPreviewPDF(d){
   var sugestoesHtml = "";
   if(sugs.length){
     sugestoesHtml = '<div style="margin-top:14px;border-top:1px solid #F5EFD9;padding-top:12px">'
-      +'<p style="font-size:13px;color:#A8833C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💡 Sugestões para fechar o gap</p>'
+      +'<p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💡 Sugestões para fechar o gap</p>'
       + sugs.map(function(s){
           var prods = (s.produtos||[]).map(function(p){
             var fgc = p.fgc===true ? ' <span style="color:#1F9D77;font-size:12px">FGC</span>'
                     : (p.fgc===false ? ' <span style="color:#8A6A2A;font-size:12px">s/FGC</span>' : '');
-            var rec = p.recomendado ? '<span style="color:#A8833C;font-size:12px;font-weight:700">⭐ Recomendado XP</span> ' : '';
+            var rec = p.recomendado ? '<span style="color:#8A6A28;font-size:12px;font-weight:700">⭐ Recomendado XP</span> ' : '';
             return '<div style="margin:3px 0 5px 12px">'
-              +'<div style="font-size:14px;color:#D9E3DB">• '+rec+(p.nome||'')+' <span style="color:#2E86B8">'+(p.detalhe||'')+'</span> <span style="color:#5C7365;font-size:12px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
-              +'<div style="font-size:13px;color:#5A7A6A;margin-left:12px;line-height:1.35">'+(p.obs||'')+'</div>'
+              +'<div style="font-size:14px;color:#D9E3DB">• '+rec+(p.nome||'')+' <span style="color:#2E86B8">'+(p.detalhe||'')+'</span> <span style="color:#39493F;font-size:12px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
+              +'<div style="font-size:13px;color:#395542;margin-left:12px;line-height:1.35">'+(p.obs||'')+'</div>'
               +'</div>';
           }).join("");
           return '<div style="margin-bottom:10px">'
-            +'<div style="font-size:14px;color:#A8833C;font-weight:700">'+s.label+' — faltam '+s.gap_pct+'% vs alvo Braúna</div>'
+            +'<div style="font-size:14px;color:#8A6A28;font-weight:700">'+s.label+' — faltam '+s.gap_pct+'% vs alvo Braúna</div>'
             + prods +'</div>';
         }).join("")
       +'<div style="font-size:12px;color:#3A5A48;margin-top:2px;line-height:1.4">Prateleira XP (investidor geral). Confirmar preço, disponibilidade e suitability. DY/taxa não são promessa — comparar sempre no líquido.</div>'
@@ -4857,10 +4857,10 @@ function mostrarPreviewPDF(d){
       }).join("") +"</tr>";
     }).join("");
     var headers = cols.map(function(c){
-      return '<th style="padding:4px 8px 4px 0;font-size:12px;color:#5C7365;text-align:left;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #F5F8F5">'+c.lbl+'</th>';
+      return '<th style="padding:4px 8px 4px 0;font-size:12px;color:#39493F;text-align:left;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #F5F8F5">'+c.lbl+'</th>';
     }).join("");
     return '<div style="margin-top:12px">'
-      +'<p style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">'+titulo+'</p>'
+      +'<p style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">'+titulo+'</p>'
       +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+headers+'</tr></thead><tbody>'+linhas+'</tbody></table></div>'
       +'</div>';
   }
@@ -4905,17 +4905,17 @@ function mostrarPreviewPDF(d){
       <div style="font-size:25px">📋</div>
       <div>
         <p style="font-size:17px;font-weight:700;color:#0A0F0C;margin:0">Carteira identificada — Conta ${d.conta} ${tipoConta ? '<span style="font-size:13px;background:#A9800F;color:#000;padding:2px 7px;border-radius:10px;margin-left:4px;font-weight:700">'+tipoConta+'</span>' : ""}</p>
-        <p style="font-size:14px;color:#5F7065;margin:2px 0 0">${assessorNome ? "Assessor: " + assessorNome + "  ·  " : ""}${d.data_ref ? "Ref.: " + d.data_ref : ""}</p>
+        <p style="font-size:14px;color:#3B4D43;margin:2px 0 0">${assessorNome ? "Assessor: " + assessorNome + "  ·  " : ""}${d.data_ref ? "Ref.: " + d.data_ref : ""}</p>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div>
-        <p style="font-size:14px;color:#5F7065;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Patrimônio total</p>
-        <p style="font-size:23px;font-weight:700;color:#A9800F;margin:0">${fmtBrl(pat)}</p>
-        ${rentRow ? '<div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:#5F7065">' + rentRow + '</div>' : ""}
+        <p style="font-size:14px;color:#3B4D43;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Patrimônio total</p>
+        <p style="font-size:23px;font-weight:700;color:#7C5D0B;margin:0">${fmtBrl(pat)}</p>
+        ${rentRow ? '<div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:#3B4D43">' + rentRow + '</div>' : ""}
       </div>
       <div>
-        <p style="font-size:14px;color:#5F7065;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Composição atual</p>
+        <p style="font-size:14px;color:#3B4D43;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Composição atual</p>
         ${barras}
       </div>
     </div>
@@ -4982,7 +4982,7 @@ function ativarEtapa2(d){
     if(iconEl) iconEl.textContent = "🆕";
     if(tituloEl) tituloEl.textContent = nomeCliente + " — Primeiro acesso";
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Preencha o Modelo de Servir e o Cross Sell abaixo";
-    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:14px;padding:4px 12px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C;border-radius:20px;font-weight:700">Novo cliente</span>';
+    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:14px;padding:4px 12px;background:#F5F8F5;color:#8A6A28;border:1px solid #A8833C;border-radius:20px;font-weight:700">Novo cliente</span>';
   } else {
     if(banner){ banner.className="step2-banner return"; }
     if(iconEl) iconEl.textContent = "🔄";
@@ -5025,8 +5025,8 @@ function renderPainelCliente(d){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
     <div style="font-size:25px">📋</div>
     <div style="flex:1">
-      <div style="font-size:17px;font-weight:700;color:#A8833C">${d.nome_cliente || "Cliente " + d.conta}</div>
-      <div style="font-size:14px;color:#5C7365">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
+      <div style="font-size:17px;font-weight:700;color:#8A6A28">${d.nome_cliente || "Cliente " + d.conta}</div>
+      <div style="font-size:14px;color:#39493F">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:19px;font-weight:700;color:#0A0F0C">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</div>
@@ -5043,7 +5043,7 @@ function renderPainelCliente(d){
   if(temFicha){
     html += `
     <div style="background:#EFF3EF;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #FFFFFF">
-      <div style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
+      <div style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${PILARES.map(p=>{
           const feito = !!chk[p.id];
@@ -5054,16 +5054,16 @@ function renderPainelCliente(d){
       </div>
       <div style="margin-top:8px;font-size:14px;color:${scoreCor};font-weight:700">${nFeitos}/${nTotal} pilares completos</div>
       ${d.ficha_salva.cross_ativos?.length ? `
-        <div style="margin-top:8px;font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
+        <div style="margin-top:8px;font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
           ${d.ficha_salva.cross_ativos.map(id=>{
             const a = CROSS_AREAS.find(x=>x.id===id);
-            return a ? `<span style="font-size:14px;padding:2px 8px;border-radius:10px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C">${a.icone} ${a.nome}</span>` : "";
+            return a ? `<span style="font-size:14px;padding:2px 8px;border-radius:10px;background:#F5F8F5;color:#8A6A28;border:1px solid #A8833C">${a.icone} ${a.nome}</span>` : "";
           }).join("")}
         </div>` : ""}
     </div>`;
   } else {
-    html += `<div style="font-size:15px;color:#5C7365;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
+    html += `<div style="font-size:15px;color:#39493F;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
   }
 
   // ── Painel 3 colunas: Recomendada | Histórico | Atual
@@ -5093,15 +5093,15 @@ function renderPainelCliente(d){
         <div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;margin-bottom:10px;align-items:end">
           <div></div>
           <div style="text-align:center">
-            <div style="font-size:12px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Recomendada</div>
+            <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Recomendada</div>
             <div style="font-size:13px;color:#4E63C8;font-weight:700">${perfil ? perfil.replace("_"," ") : "HP Modelo"}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:12px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Histórico</div>
-            <div style="font-size:13px;color:#A8833C;font-weight:700">${ultData || "—"}</div>
+            <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Histórico</div>
+            <div style="font-size:13px;color:#8A6A28;font-weight:700">${ultData || "—"}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:12px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Atual (XP)</div>
+            <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Atual (XP)</div>
             <div style="font-size:13px;color:#1F9D77;font-weight:700">${d.data_ref || "Hoje"}</div>
           </div>
         </div>
@@ -5121,20 +5121,20 @@ function renderPainelCliente(d){
           const barHist = valHist !== null ? Math.min(valHist,100) : 0;
           const barAt   = Math.min(valAt,100);
           return `<div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;align-items:center;padding:5px 0;border-top:1px solid #F5F8F5">
-            <span style="font-size:14px;color:#5F7065">${label}</span>
+            <span style="font-size:14px;color:#3B4D43">${label}</span>
             <!-- Recomendada -->
             <div style="text-align:center">
               ${valMod !== null ? `
               <div style="font-size:15px;font-weight:700;color:#4E63C8">${valMod.toFixed(1)}%</div>
               <div style="height:4px;background:#ECEFFB;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#4E63C8;border-radius:2px;width:${barMod}%"></div></div>
-              ` : `<span style="font-size:13px;color:#5C7365">—</span>`}
+              ` : `<span style="font-size:13px;color:#39493F">—</span>`}
             </div>
             <!-- Histórico -->
             <div style="text-align:center">
               ${valHist !== null ? `
-              <div style="font-size:15px;font-weight:700;color:#A8833C">${valHist.toFixed(1)}%</div>
+              <div style="font-size:15px;font-weight:700;color:#8A6A28">${valHist.toFixed(1)}%</div>
               <div style="height:4px;background:#FBF3D2;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#A8833C;border-radius:2px;width:${barHist}%"></div></div>
-              ` : `<span style="font-size:13px;color:#5C7365">sem dados</span>`}
+              ` : `<span style="font-size:13px;color:#39493F">sem dados</span>`}
             </div>
             <!-- Atual -->
             <div style="text-align:center">
@@ -5149,9 +5149,9 @@ function renderPainelCliente(d){
 
         <!-- Rodapé patrimônio -->
         <div style="margin-top:10px;padding-top:8px;border-top:1px solid #FFFFFF;display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;font-size:14px">
-          <span style="color:#5C7365">Patrimônio</span>
+          <span style="color:#39493F">Patrimônio</span>
           <div></div>
-          <div style="text-align:center;color:#A8833C">${patAnterior ? "R$ "+patAnterior : "—"}</div>
+          <div style="text-align:center;color:#8A6A28">${patAnterior ? "R$ "+patAnterior : "—"}</div>
           <div style="text-align:center">
             <span style="color:#1F9D77;font-weight:700">R$ ${patAtual}</span>
             ${patDelta !== null && Math.abs(patDelta) > 0 ? `<span style="color:${patDelta>0?"#1F9D77":"#D93B3B"};margin-left:4px">${patDelta>0?"+":""}R$ ${Math.abs(patDelta).toLocaleString("pt-BR",{maximumFractionDigits:0})}</span>` : ""}
@@ -5161,7 +5161,7 @@ function renderPainelCliente(d){
     }
   }
   if(!temHist){
-    html += `<div style="font-size:14px;color:#5C7365;padding:4px 0">📌 Após analisar, esta carteira será salva como referência para o próximo comparativo.</div>`;
+    html += `<div style="font-size:14px;color:#39493F;padding:4px 0">📌 Após analisar, esta carteira será salva como referência para o próximo comparativo.</div>`;
   }
 
   box.innerHTML = html;
@@ -5272,8 +5272,8 @@ async function buscarUltimoXpPorCodigo(conta){
       if(box){
         box.style.display="block";
         box.innerHTML=`<p style="color:#1F9D77;font-weight:700;font-size:16px;margin-bottom:4px">✓ Último XPerformance carregado — Conta ${conta}${dataRef?" · "+dataRef:""}</p>
-          <p style="color:#A8833C;font-size:16px;margin-bottom:8px;font-weight:700">${pat?fmtBrl(pat):""}</p>
-          <p style="color:#5F7065;font-size:14px">Composição do último relatório salvo. Faça o upload do XPerformance atual para dados em tempo real.</p>`;
+          <p style="color:#8A6A28;font-size:16px;margin-bottom:8px;font-weight:700">${pat?fmtBrl(pat):""}</p>
+          <p style="color:#3B4D43;font-size:14px">Composição do último relatório salvo. Faça o upload do XPerformance atual para dados em tempo real.</p>`;
       }
       const fname = document.getElementById("fname-xp");
       if(fname){ fname.style.color="#A8833C"; fname.textContent="Último XP salvo — "+dataRef; }
@@ -5359,11 +5359,11 @@ async function buscarClientesSalvos(){
       const borda = vencido ? "#E8A87C55" : "#D9E3DB";
       const selo = vencido
         ? `<span style="background:#FBEEEC;color:#C0673A;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:12px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
-        : `<span style="color:#5C7365;font-size:12px;margin-left:5px">XP há ${dias}d</span>`;
+        : `<span style="color:#39493F;font-size:12px;margin-left:5px">XP há ${dias}d</span>`;
       const detTag = c.desenquadrado ? `<span style="color:#C0673A;font-size:12px;margin-left:5px">→ parece ${PERFIL_LBL[c.perfil_detectado]||c.perfil_detectado||"outro"}</span>` : "";
-      const info = `${c.nome||("#"+(c.conta||""))}${(c.nome&&c.conta)?` <span style="color:#A8833C;font-size:13px">#${c.conta}</span>`:""}${c.gestora_nome?` <span style="color:#2E86B8;font-size:13px">· ${c.gestora_nome}</span>`:""}${selo}${detTag}`;
+      const info = `${c.nome||("#"+(c.conta||""))}${(c.nome&&c.conta)?` <span style="color:#8A6A28;font-size:13px">#${c.conta}</span>`:""}${c.gestora_nome?` <span style="color:#2E86B8;font-size:13px">· ${c.gestora_nome}</span>`:""}${selo}${detTag}`;
       return `<span class="cs-chip" style="display:inline-flex;align-items:center;border:1px solid ${borda};border-radius:20px;background:#FFFFFF;overflow:hidden">
-        <button onclick="carregarClienteIdx(${idx})" style="border:none;background:none;color:#A8833C;font-size:15px;cursor:pointer;padding:6px 4px 6px 12px;white-space:nowrap">${info}</button>
+        <button onclick="carregarClienteIdx(${idx})" style="border:none;background:none;color:#8A6A28;font-size:15px;cursor:pointer;padding:6px 4px 6px 12px;white-space:nowrap">${info}</button>
         <button onclick="excluirClienteIdx(event,${idx})" title="Excluir cliente" style="border:none;background:none;color:#7A4A4A;font-size:14px;cursor:pointer;padding:6px 10px 6px 6px" onmouseover="this.style.color='#D93B3B'" onmouseout="this.style.color='#7A4A4A'">🗑</button>
       </span>`;
     }
@@ -5407,8 +5407,8 @@ function _radarCardHtml(it){
   var tagCor=function(t){ return t==="fii"?"#2E86B8":(t==="fundo"?"#7A5CC0":"#A8833C"); };
   var tagLbl=function(t){ return t==="fii"?"FII":(t==="fundo"?"Fundo":"Ação"); };
   var nots=(it.noticias||[]).map(function(n){
-    var f=(n.fonte?(' <span style="color:#5F7065">· '+n.fonte+'</span>'):'');
-    var dt=(n.data?(' <span style="color:#5F7065">'+n.data+'</span>'):'');
+    var f=(n.fonte?(' <span style="color:#3B4D43">· '+n.fonte+'</span>'):'');
+    var dt=(n.data?(' <span style="color:#3B4D43">'+n.data+'</span>'):'');
     var titHtml=n.link
       ? '<a href="'+n.link+'" target="_blank" rel="noopener" style="color:#0A0F0C;text-decoration:none">'+n.titulo+'</a>'
       : n.titulo;
@@ -5420,10 +5420,10 @@ function _radarCardHtml(it){
     + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
     +   '<span style="font-size:16px;font-weight:700;color:'+tagCor(it.tipo)+'">'+it.ticker+'</span>'
     +   '<span style="font-size:12px;color:#fff;background:'+tagCor(it.tipo)+';border-radius:6px;padding:1px 7px;font-weight:700">'+tagLbl(it.tipo)+'</span>'
-    +   '<span style="font-size:13px;color:#5C7365">'+it.n_holders+' cliente'+(it.n_holders>1?"s":"")+' têm</span>'
+    +   '<span style="font-size:13px;color:#39493F">'+it.n_holders+' cliente'+(it.n_holders>1?"s":"")+' têm</span>'
     + '</div>'
     + '<ul style="margin:0 0 4px;padding-left:18px">'+nots+'</ul>'
-    + '<div style="font-size:12px;color:#7A8A80">👤 '+holders+maisTxt+'</div>'
+    + '<div style="font-size:12px;color:#42524A">👤 '+holders+maisTxt+'</div>'
     + '</div>';
 }
 function _radarRender(){
@@ -5586,8 +5586,8 @@ function renderAnaliseHP(xp){
     ["Rent. 12M",  xp.rent?.portfolio?.["12m"] ? xp.rent.portfolio["12m"].toFixed(2)+"%" : "—"],
   ].map(([lbl,val])=>`
     <div style="background:#EFF3EF;border:1px solid #F7F1D8;border-radius:8px;padding:8px 14px;min-width:90px">
-      <div style="font-size:12px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
-      <div style="font-size:16px;color:#A8833C;font-weight:700;margin-top:2px">${val}</div>
+      <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
+      <div style="font-size:16px;color:#8A6A28;font-weight:700;margin-top:2px">${val}</div>
     </div>
   `).join("");
 
@@ -5642,16 +5642,16 @@ function renderAnaliseHP(xp){
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
                 <span style="font-size:15px;font-weight:700;color:${cor}">${AICON[a.tipo]||"🔔"} ${a.produto||a.classe||""}</span>
                 ${orig ? `<span style="font-size:13px;background:${obkg};color:${ocor};padding:2px 7px;border-radius:10px;border:1px solid ${ocor}33">${orig}</span>` : ""}
-                <span style="font-size:13px;color:#5C7365;margin-left:auto">${a.data||""}</span>
+                <span style="font-size:13px;color:#39493F;margin-left:auto">${a.data||""}</span>
               </div>
-              <p style="font-size:14px;color:#5F7065;margin:0;line-height:1.5">${a.mensagem||""}</p>
+              <p style="font-size:14px;color:#3B4D43;margin:0;line-height:1.5">${a.mensagem||""}</p>
               ${(a.docs&&a.docs.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`+a.docs.map(dd=>`<button onclick="abrirMaterial('${dd.id}','${encodeURIComponent(dd.nome||"")}')" style="font-size:12px;padding:3px 9px;border-radius:8px;border:1px solid #5DCAA555;background:#EAF4EC;color:#1F9D77;cursor:pointer">👁 Abrir: ${(dd.nome||"material").replace(/</g,"&lt;")}</button>`).join("")+`</div>`:""}
             </div>`;
           }).join("")}
         </div>
       </div>`;
   } else {
-    alertasDiv.innerHTML = `<div style="font-size:14px;color:#5C7365;padding:8px 0;display:flex;align-items:center;gap:6px">✅ Nenhum alerta identificado para esta carteira.</div>`;
+    alertasDiv.innerHTML = `<div style="font-size:14px;color:#39493F;padding:8px 0;display:flex;align-items:center;gap:6px">✅ Nenhum alerta identificado para esta carteira.</div>`;
   }
 
   // Desvios
@@ -5660,13 +5660,13 @@ function renderAnaliseHP(xp){
   const devDiv = document.getElementById("hp-desvios");
   devDiv.innerHTML = (xp.desvios||[]).map(d=>`
     <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #FFFFFF;font-size:15px">
-      <span style="width:130px;color:#5C7365">${d.label}</span>
-      <span style="width:44px;color:#A8833C;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
+      <span style="width:130px;color:#39493F">${d.label}</span>
+      <span style="width:44px;color:#8A6A28;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
       <div style="flex:1;background:#EAF4EC;border-radius:3px;height:5px;overflow:hidden;position:relative">
         <div style="position:absolute;height:100%;background:#5C7365;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
         <div style="position:absolute;height:100%;background:${STATUS_COLOR[d.status]};border-radius:3px;width:${Math.min(d.atual,100)}%"></div>
       </div>
-      <span style="width:44px;color:#5C7365;font-size:13px;text-align:right">meta ${d.alvo.toFixed(1)}%</span>
+      <span style="width:44px;color:#39493F;font-size:13px;text-align:right">meta ${d.alvo.toFixed(1)}%</span>
       <span style="width:56px;font-weight:700;font-size:14px;color:${d.desvio>0?"#D93B3B":"#1F9D77"};text-align:right">${d.desvio>0?"+":""}${d.desvio.toFixed(1)}%</span>
       <span style="font-size:16px">${STATUS_ICON[d.status]||""}</span>
     </div>
@@ -5681,28 +5681,28 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-acoes-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <thead><tr style="background:#EFF3EF">
-          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:13px">Ativo</th>
-          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:13px">% Cart.</th>
-          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:13px">Posição Braúna (Levante)</th>
-          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:13px">Alvo / Upside</th>
-          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:13px">Mercado (XP)</th>
+          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Ativo</th>
+          <th style="text-align:right;padding:6px 8px;color:#39493F;font-size:13px">% Cart.</th>
+          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Posição Braúna (Levante)</th>
+          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Alvo / Upside</th>
+          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Mercado (XP)</th>
         </tr></thead>
         <tbody>${xp.acoes.map((a,i)=>{ var sv=_sgRow(a); return `
           <tr style="background:${i%2?"#EAF4EC":"#EFF3EF"}">
             <td style="padding:6px 8px">
-              <span style="color:#A8833C;font-weight:700">${a.ticker}</span>
-              ${sv.nome?`<span style="color:#5C7365;font-size:12px;display:block">${sv.nome}</span>`:""}
-              <span style="color:#5F7065;font-size:12px">${a.qtd?("Qtd "+a.qtd+" · "):""}R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
+              <span style="color:#8A6A28;font-weight:700">${a.ticker}</span>
+              ${sv.nome?`<span style="color:#39493F;font-size:12px;display:block">${sv.nome}</span>`:""}
+              <span style="color:#3B4D43;font-size:12px">${a.qtd?("Qtd "+a.qtd+" · "):""}R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
             </td>
             <td style="padding:6px 8px;text-align:right;color:#1F9D77">${(a.perc||0).toFixed(2)}%</td>
             <td style="padding:6px 8px">${sv.posHtml}</td>
-            <td style="padding:6px 8px;color:#5C7365">${sv.alvoHtml}</td>
+            <td style="padding:6px 8px;color:#39493F">${sv.alvoHtml}</td>
             <td style="padding:6px 8px">${sv.xpHtml}</td>
           </tr>`}).join("")}
         </tbody>
       </table>
-      <div style="font-size:12px;color:#5C7365;margin-top:6px;line-height:1.5">
-        <b style="color:#A8833C">Levante</b> = casa principal do posicionamento (${_sgData(_sgMeta.fonte_levante_data)}) · <b style="color:#2E86B8">XP</b> = como o mercado está vendo (${_sgData(_sgMeta.fonte_xp_data)}). O preço-alvo é referência; o preço vivo vem do XPerformance. <span style="color:#C0673A">⚠</span> = Levante e XP divergem.
+      <div style="font-size:12px;color:#39493F;margin-top:6px;line-height:1.5">
+        <b style="color:#8A6A28">Levante</b> = casa principal do posicionamento (${_sgData(_sgMeta.fonte_levante_data)}) · <b style="color:#2E86B8">XP</b> = como o mercado está vendo (${_sgData(_sgMeta.fonte_xp_data)}). O preço-alvo é referência; o preço vivo vem do XPerformance. <span style="color:#C0673A">⚠</span> = Levante e XP divergem.
       </div>`;
   }
 
@@ -5715,16 +5715,16 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-fiis-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <thead><tr style="background:#EFF3EF">
-          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:13px">Ticker</th>
-          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:13px">Qtd.</th>
-          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:13px">Saldo</th>
-          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:13px">% Cart.</th>
+          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Ticker</th>
+          <th style="text-align:right;padding:6px 8px;color:#39493F;font-size:13px">Qtd.</th>
+          <th style="text-align:right;padding:6px 8px;color:#39493F;font-size:13px">Saldo</th>
+          <th style="text-align:right;padding:6px 8px;color:#39493F;font-size:13px">% Cart.</th>
         </tr></thead>
         <tbody>${xp.fiis.map((f,i)=>`
           <tr style="background:${i%2?"#EAF4EC":"#EFF3EF"}">
             <td style="padding:6px 8px;color:#2E86B8;font-weight:700">${f.ticker}</td>
-            <td style="padding:6px 8px;color:#5F7065;text-align:right">${f.qtd||"—"}</td>
-            <td style="padding:6px 8px;color:#5C7365;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
+            <td style="padding:6px 8px;color:#3B4D43;text-align:right">${f.qtd||"—"}</td>
+            <td style="padding:6px 8px;color:#39493F;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
             <td style="padding:6px 8px;text-align:right">${(f.perc||0).toFixed(2)}%</td>
           </tr>`).join("")}
         </tbody>
@@ -5740,13 +5740,13 @@ function renderAnaliseHP(xp){
       return `
         <div style="background:#EFF3EF;border:1px solid #F7F1D8;border-left:3px solid #A8833C;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-            <span style="font-size:13px;background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
+            <span style="font-size:13px;background:#FBF3D2;color:#8A6A28;border:1px solid #A8833C;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
             <span style="font-size:15px;color:#D93B3B;font-weight:700">gap ${s.gap.toFixed(1)}%</span>
             <span style="font-size:16px;font-weight:700;color:#0A0F0C">${p.nome||"—"}</span>
             ${p.taxa ? `<span style="font-size:14px;color:#1F9D77">${p.taxa}</span>` : ""}
           </div>
-          ${p.motivo ? `<p style="font-size:14px;color:#5F7065;line-height:1.5;margin:0">${p.motivo}</p>` : ""}
-          ${p.indicado_por ? `<p style="font-size:13px;color:#5C7365;margin-top:4px">Indicado por: ${p.indicado_por} ${p.indicado_em ? "· "+p.indicado_em : ""}</p>` : ""}
+          ${p.motivo ? `<p style="font-size:14px;color:#3B4D43;line-height:1.5;margin:0">${p.motivo}</p>` : ""}
+          ${p.indicado_por ? `<p style="font-size:13px;color:#39493F;margin-top:4px">Indicado por: ${p.indicado_por} ${p.indicado_em ? "· "+p.indicado_em : ""}</p>` : ""}
         </div>`;
     }).join("");
   }
@@ -5766,7 +5766,7 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-cenario-cards").innerHTML = cards.map(card => card.texto ? `
       <div style="background:#EFF3EF;border:1px solid #FBF3D2;border-radius:10px;padding:12px;border-top:2px solid ${card.cor}">
         <div style="font-size:13px;color:${card.cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${card.titulo}</div>
-        <p style="font-size:14px;color:#5C7365;line-height:1.7">${card.texto}</p>
+        <p style="font-size:14px;color:#39493F;line-height:1.7">${card.texto}</p>
       </div>` : "").join("");
 
     const vieses = c.vieses || {};
@@ -5906,8 +5906,8 @@ function renderSugestoes(sg){
   let html = `<div class="sg-header-box">
     <span style="font-size:23px">💡</span>
     <div>
-      <div style="font-size:15px;font-weight:700;color:#A8833C">${sg.titulo||"Sugestões do Gestor"}</div>
-      <div style="font-size:13px;color:#5C7365">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
+      <div style="font-size:15px;font-weight:700;color:#8A6A28">${sg.titulo||"Sugestões do Gestor"}</div>
+      <div style="font-size:13px;color:#39493F">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
     </div>
   </div>`;
 
@@ -5922,7 +5922,7 @@ function renderSugestoes(sg){
           <span class="sg-acao">${item.acao==="substituir"?"↔ Substituir":"+ Alocar"}</span>
           <span class="sg-produto">${item.para||"—"}</span>
           ${item.indexador?`<span class="sg-idx">${item.indexador}</span>`:""}
-          <span style="font-size:13px;color:#5C7365">${urgTxt}</span>
+          <span style="font-size:13px;color:#39493F">${urgTxt}</span>
         </div>
         ${item.de?`<div class="sg-de">↓ Sair / reduzir: ${item.de}</div>`:""}
         <div class="sg-motivo">${item.motivo||""}</div>
@@ -5953,7 +5953,7 @@ function renderSugestoes(sg){
   // ── Estruturadas ──────────────────────────────────────────
   if(sg.estruturadas){
     html += `<div class="sg-bloco">
-      <div class="sg-bloco-title">⚙️ Operações Estruturadas <span style="font-size:13px;font-weight:400;color:#5C7365;text-transform:none;letter-spacing:0">(cliente tem ações na carteira)</span></div>
+      <div class="sg-bloco-title">⚙️ Operações Estruturadas <span style="font-size:13px;font-weight:400;color:#39493F;text-transform:none;letter-spacing:0">(cliente tem ações na carteira)</span></div>
       <div class="sg-est-box">${sg.estruturadas}</div>
     </div>`;
   }
@@ -5989,7 +5989,7 @@ function renderSugestoes(sg){
           <td class="fii-ticker">${f.ticker}</td>
           <td>${f.segmento||"—"}</td>
           <td>${f.alocacao||"—"}</td>
-          <td style="color:#5F7065">${f.motivo||""}</td>
+          <td style="color:#3B4D43">${f.motivo||""}</td>
         </tr>`).join("")}</tbody>
       </table>
     </div>`;
@@ -6062,7 +6062,7 @@ function renderClassesAtivos(desvios, patrimonio){
       const dCor = Math.abs(desvio)<1.5?"#5C7365":desvio>0?"#A9800F":"#D93B3B";
       return `<div style="display:flex;align-items:center;gap:7px">
         <span style="width:12px;height:12px;border-radius:3px;background:${g.cor};flex-shrink:0;display:inline-block"></span>
-        <span style="font-size:14px;color:#5F7065;flex:1">${g.nome}</span>
+        <span style="font-size:14px;color:#3B4D43;flex:1">${g.nome}</span>
         <span style="font-size:15px;font-weight:700;color:${g.cor}">${g.real.toFixed(1)}%</span>
         <span style="font-size:13px;color:${dCor};min-width:40px;text-align:right">${desvio>=0?"+":""}${desvio.toFixed(1)}%</span>
       </div>`;
@@ -6081,7 +6081,7 @@ function renderClassesAtivos(desvios, patrimonio){
         <span style="font-size:21px">${g.icone}</span>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700;color:#0A0F0C">${g.nome}</div>
-          <div style="font-size:13px;color:#5C7365">${realVal}</div>
+          <div style="font-size:13px;color:#39493F">${realVal}</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:20px;font-weight:800;color:${g.cor}">${g.real.toFixed(1)}%</div>
@@ -6095,7 +6095,7 @@ function renderClassesAtivos(desvios, patrimonio){
         <div style="height:100%;background:#D9E3DB;border-radius:3px;width:${Math.min(g.alvo/70*100,100)}%"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:13px">
-        <span style="color:${g.cor}">atual</span><span style="color:#5C7365">meta ${g.alvo.toFixed(1)}%</span>
+        <span style="color:${g.cor}">atual</span><span style="color:#39493F">meta ${g.alvo.toFixed(1)}%</span>
       </div>
     </div>`;
   }).join("");
@@ -6125,8 +6125,8 @@ function renderCarteiraAtual(comp, patrimonio, containerBarrasId, containerWrapI
     const valBrl = pat>0 ? "R$ "+(pat*v/100).toLocaleString("pt-BR",{maximumFractionDigits:0}) : "";
     return `<div style="margin-bottom:7px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
-        <span style="font-size:14px;color:#5C7365">${lbl}</span>
-        <span style="font-size:14px;color:${cor};font-weight:700">${Number(v).toFixed(1)}%${valBrl?' <span style="font-size:13px;color:#5C7365;font-weight:400">'+valBrl+'</span>':''}</span>
+        <span style="font-size:14px;color:#39493F">${lbl}</span>
+        <span style="font-size:14px;color:${cor};font-weight:700">${Number(v).toFixed(1)}%${valBrl?' <span style="font-size:13px;color:#39493F;font-weight:400">'+valBrl+'</span>':''}</span>
       </div>
       <div style="height:5px;background:#F5F8F5;border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${Math.min(v,100)}%;background:${cor};border-radius:3px"></div>
@@ -6156,7 +6156,7 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
       <span style="color:${col};font-size:19px;font-weight:700">${seta}</span>
       <div style="flex:1">
         <div style="font-size:15px;font-weight:700;color:#0A0F0C">${d.label}</div>
-        <div style="font-size:13px;color:#5C7365">${d.real.toFixed(1)}% atual → meta ${d.alvo.toFixed(1)}%${val}</div>
+        <div style="font-size:13px;color:#39493F">${d.real.toFixed(1)}% atual → meta ${d.alvo.toFixed(1)}%${val}</div>
       </div>
       <span style="font-size:16px;font-weight:800;color:${col}">${tipo==="aumentar"?"+":""}${(-d.desvio).toFixed(1)}%</span>
     </div>`;
@@ -6166,17 +6166,17 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   pg.innerHTML=`
     <div>
       <p style="font-size:13px;color:#1F9D77;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▲ Aumentar / Comprar</p>
-      ${aumentar.length?aumentar.map(d=>makeItem(d,"aumentar")).join(""):'<p style="font-size:15px;color:#5C7365">Nenhum ativo abaixo da meta</p>'}
+      ${aumentar.length?aumentar.map(d=>makeItem(d,"aumentar")).join(""):'<p style="font-size:15px;color:#39493F">Nenhum ativo abaixo da meta</p>'}
     </div>
     <div>
       <p style="font-size:13px;color:#D93B3B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▼ Reduzir / Resgatar</p>
-      ${reduzir.length?reduzir.map(d=>makeItem(d,"reduzir")).join(""):'<p style="font-size:15px;color:#5C7365">Nenhum ativo acima da meta</p>'}
+      ${reduzir.length?reduzir.map(d=>makeItem(d,"reduzir")).join(""):'<p style="font-size:15px;color:#39493F">Nenhum ativo acima da meta</p>'}
     </div>`;
 
   const pv=document.getElementById("plano-valores");
   if(alinhado.length){
-    pv.innerHTML=`<p style="font-size:13px;color:#5C7365;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">✓ Classes alinhadas ao modelo</p>`
-      +alinhado.map(d=>`<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:12px;background:#F5F8F5;border:1px solid #D9E3DB;font-size:14px;color:#5C7365">${d.label} ${d.real.toFixed(1)}%</span>`).join("");
+    pv.innerHTML=`<p style="font-size:13px;color:#39493F;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">✓ Classes alinhadas ao modelo</p>`
+      +alinhado.map(d=>`<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:12px;background:#F5F8F5;border:1px solid #D9E3DB;font-size:14px;color:#39493F">${d.label} ${d.real.toFixed(1)}%</span>`).join("");
   } else { pv.innerHTML=""; }
 }
 
@@ -6188,8 +6188,8 @@ function renderPlanoTroca(sugs, plano){
   // ── Plano concreto venda→compra (com deságio da posição) ──────────────────────
   if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
-    let h='<p style="font-size:14px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
-    h+='<p style="font-size:14px;color:#5C7365;margin:0 0 12px">Venda: os de <b>pior rentabilidade</b> primeiro (trim dos laggards), <b>espalhada</b>; trava de <b>deságio > '+lim+'%</b> só em <b>renda fixa/crédito privado</b> (ações e FIIs livres); previdência fica de fora (só portabilidade). Compra: <b>ações e FIIs por Markowitz</b> (peso risco-retorno); <b>renda fixa</b> em títulos diretos respeitando o <b>FGC (R$ 250k/emissor)</b>, até 3 bancários + 3 crédito privado e o excedente em fundos; multi/alternativos em até 5 fundos.</p>';
+    let h='<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
+    h+='<p style="font-size:14px;color:#39493F;margin:0 0 12px">Venda: os de <b>pior rentabilidade</b> primeiro (trim dos laggards), <b>espalhada</b>; trava de <b>deságio > '+lim+'%</b> só em <b>renda fixa/crédito privado</b> (ações e FIIs livres); previdência fica de fora (só portabilidade). Compra: <b>ações e FIIs por Markowitz</b> (peso risco-retorno); <b>renda fixa</b> em títulos diretos respeitando o <b>FGC (R$ 250k/emissor)</b>, até 3 bancários + 3 crédito privado e o excedente em fundos; multi/alternativos em até 5 fundos.</p>';
     if(plano.total_mover>0) h+='<div style="font-size:15px;color:#4E63C8;margin-bottom:10px">Total a realocar: <b style="color:#0A0F0C">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
       const des=m.origem_desagio;
@@ -6201,12 +6201,12 @@ function renderPlanoTroca(sugs, plano){
         +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
         +'<div style="flex:1;min-width:150px"><span style="font-size:13px;color:#D93B3B;font-weight:700">↓ VENDER</span> '
         +'<span style="font-size:16px;font-weight:800;color:#0A0F0C">'+fmt0(m.valor)+'</span> '
-        +'<span style="font-size:14px;color:#5F7065">de <b>'+m.origem_nome+'</b> <span style="color:#5C7365">('+m.origem_label+')</span></span> '+desTxt+'</div>'
-        +'<div style="font-size:19px;color:#5C7365">→</div>'
+        +'<span style="font-size:14px;color:#3B4D43">de <b>'+m.origem_nome+'</b> <span style="color:#39493F">('+m.origem_label+')</span></span> '+desTxt+'</div>'
+        +'<div style="font-size:19px;color:#39493F">→</div>'
         +'<div style="flex:1;min-width:150px;text-align:right"><span style="font-size:13px;color:#1F9D77;font-weight:700">↑ COMPRAR</span> '
         +'<span style="font-size:16px;font-weight:800;color:#0A0F0C">'+fmt0(m.valor)+'</span> '
-        +'<span style="font-size:14px;color:#5F7065">em <b>'+m.destino_produto+'</b>'+fgc+' <span style="color:#5C7365">('+m.destino_label+')</span></span>'
-        +(m.destino_detalhe?' <span style="font-size:13px;color:#A8833C">'+m.destino_detalhe+'</span>':'')+'</div>'
+        +'<span style="font-size:14px;color:#3B4D43">em <b>'+m.destino_produto+'</b>'+fgc+' <span style="color:#39493F">('+m.destino_label+')</span></span>'
+        +(m.destino_detalhe?' <span style="font-size:13px;color:#8A6A28">'+m.destino_detalhe+'</span>':'')+'</div>'
         +'</div></div>';
     });
     if(plano.bloqueados&&plano.bloqueados.length){
@@ -6214,7 +6214,7 @@ function renderPlanoTroca(sugs, plano){
       h+='<div style="font-size:14px;color:#D93B3B;font-weight:700;margin-bottom:7px">⚠ Renda fixa / crédito privado — não vender agora (deságio acima de '+lim+'%)</div>';
       plano.bloqueados.forEach(function(b){
         h+='<div style="font-size:14.5px;color:#E0C8C8;margin-bottom:5px;line-height:1.5">'
-          +'<b style="color:#0A0F0C">'+b.nome+'</b> <span style="color:#5C7365">('+b.label+')</span> — deságio de <b style="color:#C0673A">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
+          +'<b style="color:#0A0F0C">'+b.nome+'</b> <span style="color:#39493F">('+b.label+')</span> — deságio de <b style="color:#C0673A">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
           +'Ainda que fosse o ativo escolhido para a venda, <b>não realizamos a troca</b> para não cristalizar o prejuízo. '
           +'A partir de hoje monitoramos e sinalizamos a troca quando recuperar (deságio abaixo de '+lim+'%).</div>';
       });
@@ -6223,7 +6223,7 @@ function renderPlanoTroca(sugs, plano){
     if(plano.monitorar_classes&&plano.monitorar_classes.length){
       h+='<div style="margin-top:10px;border:1px solid #FBEEEC;border-radius:10px;padding:11px 13px;background:#FBF3D2">';
       plano.monitorar_classes.forEach(function(mc){
-        h+='<div style="font-size:14.5px;color:#A9800F;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
+        h+='<div style="font-size:14.5px;color:#7C5D0B;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
           +'Sem opção de venda sem prejuízo — a partir de hoje monitoramos e sinalizamos a troca quando os ativos recuperarem.</div>';
       });
       h+='</div>';
@@ -6232,14 +6232,14 @@ function renderPlanoTroca(sugs, plano){
       h+='<div style="margin-top:10px;border:1px solid #D7DEF5;border-radius:10px;padding:11px 13px;background:#ECEFFB">';
       h+='<div style="font-size:14px;color:#4E63C8;font-weight:700;margin-bottom:7px">🛡️ Previdência — não entra na venda automática</div>';
       plano.previdencia.forEach(function(p){
-        const val=p.saldo!=null?' <span style="color:#5C7365">('+fmt0(p.saldo)+')</span>':'';
-        h+='<div style="font-size:14.5px;color:#5C7365;margin-bottom:5px;line-height:1.5">'
-          +'<b style="color:#0A0F0C">'+p.nome+'</b>'+val+' <span style="color:#5C7365">('+p.label+')</span> — '
+        const val=p.saldo!=null?' <span style="color:#39493F">('+fmt0(p.saldo)+')</span>':'';
+        h+='<div style="font-size:14.5px;color:#39493F;margin-bottom:5px;line-height:1.5">'
+          +'<b style="color:#0A0F0C">'+p.nome+'</b>'+val+' <span style="color:#39493F">('+p.label+')</span> — '
           +'previdência não se resgata como fundo comum: avaliar <b>portabilidade</b>, regime tributário (regressivo/progressivo), carência e IR antes de qualquer movimento.</div>';
       });
       h+='</div>';
     }
-    h+='<div style="font-size:13px;color:#5C7365;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
+    h+='<div style="font-size:13px;color:#39493F;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
     el.innerHTML=h;
     return;
   }
@@ -6247,7 +6247,7 @@ function renderPlanoTroca(sugs, plano){
   if(!sugs.length){ el.innerHTML=""; return; }
   const PRIO={alta:["#D93B3B","🔴 Alta"],media:["#A9800F","🟡 Média"],baixa:["#1F9D77","🟢 Baixa"]};
   const fmt=v=>"R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
-  let h='<p style="font-size:14px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca — venda → compra</p>';
+  let h='<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca — venda → compra</p>';
   sugs.forEach(function(s){
     const pr=PRIO[s.prioridade]||PRIO.media;
     const fonte=(s.fonte_recurso&&s.fonte_recurso.length)
@@ -6257,12 +6257,12 @@ function renderPlanoTroca(sugs, plano){
       const fgc=p.fgc?'<span style="font-size:12px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
       return `<div style="padding:7px 10px;background:#F5F8F5;border:1px solid #F5F8F5;border-left:3px solid #1F9D77;border-radius:0 6px 6px 0;margin-bottom:5px">
         <div style="font-size:15px;font-weight:700;color:#0A0F0C">${p.nome||"—"}${fgc}
-          <span style="font-size:13px;color:#5C7365;font-weight:400;margin-left:6px">${p.fonte||""}</span></div>
-        <div style="font-size:14px;color:#A8833C">${p.detalhe||""}</div>
-        ${p.obs?`<div style="font-size:13px;color:#5C7365;margin-top:2px">${p.obs}</div>`:""}
+          <span style="font-size:13px;color:#39493F;font-weight:400;margin-left:6px">${p.fonte||""}</span></div>
+        <div style="font-size:14px;color:#8A6A28">${p.detalhe||""}</div>
+        ${p.obs?`<div style="font-size:13px;color:#39493F;margin-top:2px">${p.obs}</div>`:""}
       </div>`;
     }).join("");
-    const travas=(s.travas||[]).map(t=>`<div style="font-size:13px;color:#A9800F;background:#FBF3D2;border:1px solid #FBEEEC;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
+    const travas=(s.travas||[]).map(t=>`<div style="font-size:13px;color:#7C5D0B;background:#FBF3D2;border:1px solid #FBEEEC;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
     h+=`<div style="border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#FFFFFF">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
         <span style="font-size:16px;font-weight:800;color:#0A0F0C">${s.label_classe}</span>
@@ -6275,7 +6275,7 @@ function renderPlanoTroca(sugs, plano){
       ${prods}
     </div>`;
   });
-  h+=`<div style="font-size:13px;color:#5C7365;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy — o oficial soma todas as marcas XP + OPIN.</div>`;
+  h+=`<div style="font-size:13px;color:#39493F;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy — o oficial soma todas as marcas XP + OPIN.</div>`;
   el.innerHTML=h;
 }
 
@@ -6286,7 +6286,7 @@ function renderPosicaoConsolidada(data){
   var acoes = data.acoes       || [];
   var fiis  = data.fiis        || [];
   var diags = data.diagnosticos|| [];
-  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#5C7365'>Nenhuma posição detalhada disponível — suba o PDF do XPerformance.</p>"; return; }
+  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#39493F'>Nenhuma posição detalhada disponível — suba o PDF do XPerformance.</p>"; return; }
 
   // Mostra aba
   var tabBtn = document.getElementById("tab-btn-posicao");
@@ -6300,7 +6300,7 @@ function renderPosicaoConsolidada(data){
   if(diags.length){
     var COR = {alto:"#D93B3B", medio:"#A9800F", baixo:"#2E86B8"};
     diagHtml = '<div style="margin-bottom:18px">';
-    diagHtml += '<p style="font-size:14px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Diagnósticos Automáticos</p>';
+    diagHtml += '<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Diagnósticos Automáticos</p>';
     diags.forEach(function(a){
       var cor = COR[a.nivel]||"#5F7065";
       diagHtml += '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:#EFF3EF;border-left:3px solid '+cor+';border-radius:0 6px 6px 0;margin-bottom:6px">';
@@ -6317,7 +6317,7 @@ function renderPosicaoConsolidada(data){
     rfHtml = '<div style="margin-bottom:20px">';
     rfHtml += '<p style="font-size:14px;color:#2E86B8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Renda Fixa ('+rf.length+' ativos)</p>';
     rfHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">';
-    rfHtml += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB">';
+    rfHtml += '<thead><tr style="color:#39493F;border-bottom:1px solid #D9E3DB">';
     rfHtml += '<th style="text-align:left;padding:6px 8px">Ativo</th><th style="text-align:left;padding:6px 8px">Classe</th>';
     rfHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
     rfHtml += '<th style="text-align:right;padding:6px 8px">Rent. Mês</th><th style="text-align:right;padding:6px 8px">Rent. Ano</th>';
@@ -6325,12 +6325,12 @@ function renderPosicaoConsolidada(data){
     rf.forEach(function(a,i){
       var bg = i%2===0?"#EFF3EF":"#EFF3EF";
       var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#1F9D77">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#D93B3B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "—";
-      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#D93B3B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#5F7065">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "—";
+      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#D93B3B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#3B4D43">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "—";
       rfHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
       rfHtml += '<td style="padding:6px 8px;color:#0A0F0C;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.nome+'">'+a.nome+'</td>';
-      rfHtml += '<td style="padding:6px 8px;color:#5F7065">'+( a.classe||"—")+'</td>';
-      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+fmt(a.saldo)+'</td>';
-      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+pct(a.perc)+'</td>';
+      rfHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.classe||"—")+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+fmt(a.saldo)+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+pct(a.perc)+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right">'+rm+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right">'+ra+'</td>';
       rfHtml += '</tr>';
@@ -6344,7 +6344,7 @@ function renderPosicaoConsolidada(data){
     acoesHtml = '<div style="margin-bottom:20px">';
     acoesHtml += '<p style="font-size:14px;color:#1F9D77;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📈 Ações / Renda Variável ('+acoes.length+' ativos)</p>';
     acoesHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">';
-    acoesHtml += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB">';
+    acoesHtml += '<thead><tr style="color:#39493F;border-bottom:1px solid #D9E3DB">';
     acoesHtml += '<th style="text-align:left;padding:6px 8px">Ticker</th><th style="text-align:left;padding:6px 8px">Nome</th>';
     acoesHtml += '<th style="text-align:right;padding:6px 8px">Qtd</th><th style="text-align:right;padding:6px 8px">Preço Médio</th>';
     acoesHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
@@ -6355,11 +6355,11 @@ function renderPosicaoConsolidada(data){
       var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "—";
       acoesHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
       acoesHtml += '<td style="padding:6px 8px;color:#2E86B8;font-weight:700">'+a.ticker+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;color:#5F7065">'+( a.nome||"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.nome||"—")+'</td>';
       acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#0A0F0C">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#5F7065">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+fmt(a.saldo)+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+pct(a.perc)+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#3B4D43">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+fmt(a.saldo)+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+pct(a.perc)+'</td>';
       acoesHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
       acoesHtml += '</tr>';
     });
@@ -6370,9 +6370,9 @@ function renderPosicaoConsolidada(data){
   var fiisHtml = "";
   if(fiis.length){
     fiisHtml = '<div style="margin-bottom:20px">';
-    fiisHtml += '<p style="font-size:14px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏢 Fundos Imobiliários ('+fiis.length+' ativos)</p>';
+    fiisHtml += '<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏢 Fundos Imobiliários ('+fiis.length+' ativos)</p>';
     fiisHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">';
-    fiisHtml += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB">';
+    fiisHtml += '<thead><tr style="color:#39493F;border-bottom:1px solid #D9E3DB">';
     fiisHtml += '<th style="text-align:left;padding:6px 8px">Ticker</th><th style="text-align:left;padding:6px 8px">Nome</th>';
     fiisHtml += '<th style="text-align:right;padding:6px 8px">Qtd</th><th style="text-align:right;padding:6px 8px">Preço Médio</th>';
     fiisHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
@@ -6382,12 +6382,12 @@ function renderPosicaoConsolidada(data){
       var bg = i%2===0?"#EFF3EF":"#EFF3EF";
       var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "—";
       fiisHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
-      fiisHtml += '<td style="padding:6px 8px;color:#A8833C;font-weight:700">'+a.ticker+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;color:#5F7065">'+( a.nome||"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;color:#8A6A28;font-weight:700">'+a.ticker+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.nome||"—")+'</td>';
       fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#0A0F0C">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#5F7065">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+fmt(a.saldo)+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+pct(a.perc)+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#3B4D43">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+fmt(a.saldo)+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+pct(a.perc)+'</td>';
       fiisHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
       fiisHtml += '</tr>';
     });
@@ -6449,8 +6449,8 @@ function renderizar(data){
   const frags=desvios.filter(d=>d.desvio<-1.5), opors=desvios.filter(d=>d.desvio>1.5);
   let diag="";
   if(alertas&&alertas.length){ alertas.forEach(a=>{diag+=`<div class="alert warn">${a}</div>`;}); }
-  if(frags.length){ diag+=`<p style="font-size:13px;color:#5C7365;margin:8px 0 4px;text-transform:uppercase">Fragilidades</p>`; frags.forEach(f=>{diag+=`<div class="alert danger">▸ <b>${f.label}</b>: falta ${Math.abs(f.desvio).toFixed(1)}%</div>`;}); }
-  if(opors.length){ diag+=`<p style="font-size:13px;color:#5C7365;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
+  if(frags.length){ diag+=`<p style="font-size:13px;color:#39493F;margin:8px 0 4px;text-transform:uppercase">Fragilidades</p>`; frags.forEach(f=>{diag+=`<div class="alert danger">▸ <b>${f.label}</b>: falta ${Math.abs(f.desvio).toFixed(1)}%</div>`;}); }
+  if(opors.length){ diag+=`<p style="font-size:13px;color:#39493F;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
   document.getElementById("diagnostico").innerHTML=diag||`<p style="color:#1F9D77">✓ Carteira alinhada ao modelo.</p>`;
 
   // Recomendações — inclui painel de calls HP
@@ -6466,7 +6466,7 @@ function renderizar(data){
       <div style="background:#F5F8F5;padding:10px 14px;display:flex;align-items:center;gap:8px">
         <span style="font-size:18px">📈</span>
         <span style="font-size:16px;font-weight:700;color:#1F9D77">Calls do HP para este cliente</span>
-        <span style="font-size:14px;color:#5C7365;margin-left:4px">${callsRel.length} call(s) relevante(s)</span>
+        <span style="font-size:14px;color:#39493F;margin-left:4px">${callsRel.length} call(s) relevante(s)</span>
       </div>
       <div style="padding:10px 14px;display:flex;flex-direction:column;gap:8px">
         ${callsRel.map(c=>{
@@ -6475,23 +6475,23 @@ function renderizar(data){
           const naCarteira = (analiseData._xp?.acoes||[]).some(a=>a.ticker===c.ticker) || (analiseData._xp?.fiis||[]).some(f=>f.ticker===c.ticker);
           const badge = naCarteira
             ? `<span style="font-size:13px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;padding:2px 8px;border-radius:10px">✓ já na carteira</span>`
-            : `<span style="font-size:13px;background:#F5F8F5;color:#A8833C;border:1px solid #C9A96E44;padding:2px 8px;border-radius:10px">oportunidade de entrada</span>`;
+            : `<span style="font-size:13px;background:#F5F8F5;color:#8A6A28;border:1px solid #C9A96E44;padding:2px 8px;border-radius:10px">oportunidade de entrada</span>`;
           return `<div style="background:#F5F8F5;border:1px solid #EAF1F6;border-left:3px solid ${cor};border-radius:0 8px 8px 0;padding:10px 12px">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
               <span style="font-size:17px;font-weight:900;color:${cor}">${c.ticker}</span>
               <span style="font-size:13px;font-weight:700;padding:2px 8px;border-radius:8px;background:${cor}22;color:${cor}">${DIR_LABEL[c.direcao]||c.direcao}</span>
-              ${c.nome ? `<span style="font-size:15px;color:#5C7365">${c.nome}</span>` : ""}
+              ${c.nome ? `<span style="font-size:15px;color:#39493F">${c.nome}</span>` : ""}
               ${badge}
             </div>
             <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:15px;margin-bottom:4px">
-              ${c.preco_entrada ? `<span style="color:#5F7065">Entrada: <b style="color:#0A0F0C">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
-              ${c.preco_alvo ? `<span style="color:#5F7065">→ Alvo: <b style="color:#0A0F0C">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.preco_entrada ? `<span style="color:#3B4D43">Entrada: <b style="color:#0A0F0C">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.preco_alvo ? `<span style="color:#3B4D43">→ Alvo: <b style="color:#0A0F0C">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
               ${c.upside !== undefined ? `<span style="color:${upCor};font-weight:700">Upside ${c.upside>=0?"+":""}${c.upside}%</span>` : ""}
-              ${c.stop ? `<span style="color:#5F7065">Stop: <b style="color:#D93B3B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
-              ${c.prazo ? `<span style="color:#5F7065">Prazo: ${c.prazo}</span>` : ""}
+              ${c.stop ? `<span style="color:#3B4D43">Stop: <b style="color:#D93B3B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.prazo ? `<span style="color:#3B4D43">Prazo: ${c.prazo}</span>` : ""}
             </div>
-            ${c.tese ? `<p style="font-size:14px;color:#5F7065;margin:0 0 3px;line-height:1.5;font-style:italic">"${c.tese.length>160?c.tese.slice(0,160)+"...":c.tese}"</p>` : ""}
-            ${c.fonte ? `<div style="font-size:13px;color:#5C7365">${c.fonte}</div>` : ""}
+            ${c.tese ? `<p style="font-size:14px;color:#3B4D43;margin:0 0 3px;line-height:1.5;font-style:italic">"${c.tese.length>160?c.tese.slice(0,160)+"...":c.tese}"</p>` : ""}
+            ${c.fonte ? `<div style="font-size:13px;color:#39493F">${c.fonte}</div>` : ""}
           </div>`;
         }).join("")}
       </div>
@@ -6501,7 +6501,7 @@ function renderizar(data){
   if(recomendacoes&&recomendacoes.length){
     recHtml+=recomendacoes.map(r=>`
       <div class="rec-card">
-        <div class="rec-header">${r.urgencia} <span style="color:#A8833C">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
+        <div class="rec-header">${r.urgencia} <span style="color:#8A6A28">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
         <div class="rec-ctx">${r.explicacao}</div>
         ${r.carta_insight?`<div class="rec-carta">📄 Carta da gestão: "${r.carta_insight}"</div>`:""}
         <div class="rec-prods">${(r.produtos||[]).map(p=>`<span class="prod-tag">${p}</span>`).join("")}</div>
@@ -6540,7 +6540,7 @@ function renderizar(data){
           </div>
           <div class="pilar-result-impacto">${p.impacto_falta}</div>
           <div class="pilar-result-acao">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:6px;font-size:14px;color:#A8833C">
+          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:6px;font-size:14px;color:#8A6A28">
             <b>★ 1ª DIRETRIZ BRAÚNA — QUALIDADE</b><br>Provocar o cliente sobre o Financial Planning. Perguntar ao assessor: O FP deste cliente já foi feito? Quando? Isso é primordial para traçar o caminho do destino que o cliente deseja alcançar.
           </div>`:""}
         </div>`;
@@ -6570,7 +6570,7 @@ function renderizar(data){
         <div class="gestor-nome">${g.gestor} — ${g.tema}</div>
         <div class="gestor-msg">${g.mensagem}</div>
         <div class="gestor-impl">→ ${g.implicacao_alocacao}</div>
-        <div style="font-size:13px;color:#5C7365;margin-top:4px">${g.fonte}</div>
+        <div style="font-size:13px;color:#39493F;margin-top:4px">${g.fonte}</div>
       </div>`).join("");
   }
 
@@ -6611,9 +6611,9 @@ function renderCrossSellResult(areas, tem, naoTem){
   let html=`<div class="cs-score-bar">
     <span style="font-size:31px;font-weight:700;color:${barColor};min-width:44px;text-align:center">${score}/5</span>
     <div style="flex:1">
-      <div style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Áreas ativas na Braúna</div>
+      <div style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Áreas ativas na Braúna</div>
       <div style="height:6px;background:#D9E3DB;border-radius:3px;overflow:hidden"><div style="width:${score/5*100}%;height:100%;background:${barColor};border-radius:3px"></div></div>
-      <div style="font-size:14px;color:#5F7065;margin-top:5px">${naoTem.length} oportunidade(s) de negócio em aberto</div>
+      <div style="font-size:14px;color:#3B4D43;margin-top:5px">${naoTem.length} oportunidade(s) de negócio em aberto</div>
     </div>
   </div>`;
 
@@ -6631,19 +6631,19 @@ function renderCrossSellResult(areas, tem, naoTem){
     html += `<div style="border:1px solid #A8833C;background:linear-gradient(180deg,#F6EFDA,#FFFFFF);border-radius:12px;padding:14px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:21px">💎</span>
-        <span style="font-size:15px;font-weight:800;color:#A8833C;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
+        <span style="font-size:15px;font-weight:800;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
       </div>
       <div style="font-size:15px;color:#FBEEEC;line-height:1.6">
         Cliente com <b>${brl0(patC)}</b> (acima de R$ 1 mi): dá para estruturar uma <b>carta de consórcio de ${brl0(carta)}</b> (imóvel ou veículo) <b>sustentada pelos dividendos da carteira</b>, sem descapitalizar o principal.
         <div style="margin-top:8px;padding:8px 10px;background:#EFF3EF;border-radius:8px">
           Parcela estimada <b>≈ ${brl0(parcela)}/mês</b> · Dividendos estimados da carteira <b>≈ ${brl0(rendaMes)}/mês</b>${rendaMes>0?` (cobrem <b style="color:${cob>=100?'#1F9D77':'#C0673A'}">${cob}%</b> da parcela)`:''}
-          <div style="font-size:13px;color:#5C7365;margin-top:3px">Estimativas conservadoras (taxa adm ~17%, ~200 meses; DY de FIIs ~9,6% a.a. e ações ~3,6% a.a.). Confirmar com a administradora e com os proventos reais do cliente.</div>
+          <div style="font-size:13px;color:#39493F;margin-top:3px">Estimativas conservadoras (taxa adm ~17%, ~200 meses; DY de FIIs ~9,6% a.a. e ações ~3,6% a.a.). Confirmar com a administradora e com os proventos reais do cliente.</div>
         </div>
-        <div style="margin-top:8px;font-size:14px;color:#5C7365">
+        <div style="margin-top:8px;font-size:14px;color:#39493F">
           <b>Como conduzir (sem promessas):</b> consórcio é aquisição planejada, <b>sem juros</b> — mas há taxa de administração, fundo de reserva e seguro; a <b>contemplação é por sorteio ou lance</b>, sem data garantida; a parcela é reajustada pelo índice do contrato. O capital segue investido e apenas os proventos sustentam a parcela.
         </div>
         ${aqAtivo?'<div style="margin-top:8px;font-size:14px;color:#1F9D77">✓ Aquisição de Bens já ativa — reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
-                 :'<div style="margin-top:8px;font-size:14px;color:#A8833C">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
+                 :'<div style="margin-top:8px;font-size:14px;color:#8A6A28">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
       </div>
     </div>`;
   }
@@ -6687,18 +6687,18 @@ function renderCrossSellResult(areas, tem, naoTem){
   if(insights.length){
     const COR = {oportunidade:"#A8833C", atencao:"#C0673A", urgente:"#D93B3B", novidade:"#1F9D77"};
     html += `<div style="background:#EFF3EF;border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:14px">
-      <div style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🧠 Insights para esta reunião</div>
+      <div style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🧠 Insights para esta reunião</div>
       ${insights.map(i=>`
         <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #EAF4EC">
           <span style="font-size:17px;flex-shrink:0">${i.icone}</span>
-          <span style="font-size:15px;color:#5C7365;line-height:1.5">${i.texto}</span>
+          <span style="font-size:15px;color:#39493F;line-height:1.5">${i.texto}</span>
         </div>`).join("")}
-      ${crossHist.length ? `<div style="margin-top:8px;font-size:13px;color:#5C7365">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"—"}</div>` : ""}
+      ${crossHist.length ? `<div style="margin-top:8px;font-size:13px;color:#39493F">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"—"}</div>` : ""}
     </div>`;
   }
 
   if(naoTemAreas.length){
-    html+=`<p style="font-size:14px;color:#A8833C;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
+    html+=`<p style="font-size:14px;color:#8A6A28;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
     naoTemAreas.forEach(a=>{
       html+=`<div class="cs-area nao-tem">
         <div class="cs-area-header">
@@ -6711,7 +6711,7 @@ function renderCrossSellResult(areas, tem, naoTem){
       // Área especial: Planejamento Financeiro
       if(a.id==="planejamento_financeiro" && a.especialista){
         const esp=a.especialista;
-        html+=`<p style="font-size:14px;color:#5F7065;margin-bottom:8px">Como especialista, estas são as três frentes prioritárias:</p>`;
+        html+=`<p style="font-size:14px;color:#3B4D43;margin-bottom:8px">Como especialista, estas são as três frentes prioritárias:</p>`;
 
         // Previdência
         const prev=esp.previdencia;
