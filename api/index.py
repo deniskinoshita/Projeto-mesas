@@ -2512,8 +2512,8 @@ def _b360_narrativa(comp, alvo, rent, dims_geral):
     return achados, atencao, prioridades[:5], supera
 
 _B360_CSS = """
-:root{color-scheme:light;--paper:#F6F7F6;--card:#FFFFFF;--ink:#1B2A30;--muted:#5F6F77;--faint:#94A2A8;
---line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#164A54;--marinho:#123047;--gold:#A9834F;--gold-soft:#C7AC80;
+:root{color-scheme:light;--paper:#F6F7F6;--card:#FFFFFF;--ink:#ECEFFB;--muted:#5F6F77;--faint:#94A2A8;
+--line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#ECEFFB;--marinho:#123047;--gold:#A9834F;--gold-soft:#C7AC80;
 --good:#3E7A5E;--warn:#B4833A;--crit:#A5533E;
 --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;--mx:920px}
@@ -2976,7 +2976,7 @@ select option{background:#F5F8F5}
 .alert{border-radius:8px;padding:10px 14px;margin:5px 0;font-size:12px;line-height:1.5}
 .alert.danger{background:#FCEBEB;border-left:3px solid #D93B3B;color:#FFB3B3}
 .alert.success{background:#F5F8F5;border-left:3px solid #1F9D77;color:#9FE1CB}
-.alert.gold{background:#1A160A;border-left:3px solid #A8833C;color:#A8833C}
+.alert.gold{background:#FBF3D2;border-left:3px solid #A8833C;color:#A8833C}
 .alert.warn{background:#FBF3D2;border-left:3px solid #A9800F;color:#A9800F}
 .rec-card{background:#F5F8F5;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #D9E3DB}
 .rec-header{font-size:13px;font-weight:700;margin-bottom:6px}
@@ -3004,9 +3004,9 @@ select option{background:#F5F8F5}
 /* Checklist Modelo de Servir */
 .pilar-toggle{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;background:#FFFFFF;border:1px solid #FFFFFF;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
 .pilar-toggle:hover{border-color:#D9E3DB}
-.pilar-toggle.done{border-color:#2A4030;background:#E9F5EE}
-.pilar-toggle.pending-crit{border-color:#4A1010;background:#FBE9E9}
-.pilar-toggle.pending-high{border-color:#3A3A00;background:#141400}
+.pilar-toggle.done{border-color:#EAF4EC;background:#E9F5EE}
+.pilar-toggle.pending-crit{border-color:#FBE9E9;background:#FBE9E9}
+.pilar-toggle.pending-high{border-color:#FBF3D2;background:#FBF3D2}
 .pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid #5C7365;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
 .pilar-check.checked{background:#1F9D77;border-color:#1F9D77;color:#000;font-weight:700}
 .pilar-icon{font-size:20px;flex-shrink:0}
@@ -3106,7 +3106,7 @@ select option{background:#F5F8F5}
 .steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
 .step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
 .step-item.active{background:#F5F8F5;border-color:#A8833C}
-.step-item.done{background:#E9F5EE;border-color:#2A4030}
+.step-item.done{background:#E9F5EE;border-color:#EAF4EC}
 .step-circle{width:26px;height:26px;border-radius:50%;background:#D9E3DB;border:2px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#5C7365;flex-shrink:0;transition:all .3s}
 .step-item.active .step-circle{background:#A8833C;border-color:#A8833C;color:#EFF3EF}
 .step-item.done .step-circle{background:#1F9D77;border-color:#1F9D77;color:#000}
@@ -3115,8 +3115,8 @@ select option{background:#F5F8F5}
 .step-item.done .step-label{color:#1F9D77}
 .step-line{flex:1;height:1px;background:#D9E3DB;min-width:20px}
 .step2-banner{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
-.step2-banner.first{background:#E9F5EE;border:1px solid #2A4030}
-.step2-banner.return{background:#F5F8F5;border:1px solid #3A2A00}
+.step2-banner.first{background:#E9F5EE;border:1px solid #EAF4EC}
+.step2-banner.return{background:#F5F8F5;border:1px solid #FBEEEC}
 </style>
 </head>
 <body>
@@ -3135,12 +3135,12 @@ select option{background:#F5F8F5}
       <span style="font-size:20px">🔔</span>
       <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#E53935;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center"></span>
     </div>
-    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#8A9A8E;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#8A9A8E'">Sair</button>
+    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #FBE9E9;color:#8A9A8E;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#FBE9E9';this.style.color='#8A9A8E'">Sair</button>
   </nav>
 
   <!-- Painel de notificações flutuante -->
-  <div id="notif-panel" style="display:none;position:fixed;top:60px;right:16px;width:380px;max-height:70vh;overflow-y:auto;background:#F5F8F5;border:1px solid #2A2A2A;border-radius:12px;z-index:9999;box-shadow:0 8px 32px #000a">
-    <div style="padding:12px 16px;border-bottom:1px solid #2A2A2A;display:flex;justify-content:space-between;align-items:center">
+  <div id="notif-panel" style="display:none;position:fixed;top:60px;right:16px;width:380px;max-height:70vh;overflow-y:auto;background:#F5F8F5;border:1px solid #EAF4EC;border-radius:12px;z-index:9999;box-shadow:0 8px 32px #000a">
+    <div style="padding:12px 16px;border-bottom:1px solid #EAF4EC;display:flex;justify-content:space-between;align-items:center">
       <span style="color:#A8833C;font-weight:700;font-size:14px">🔔 Alertas do Head de Produtos</span>
       <div style="display:flex;gap:8px;align-items:center">
         <button onclick="marcarTodasLidas()" style="font-size:11px;color:#1F9D77;background:none;border:none;cursor:pointer;padding:0">Marcar todas lidas</button>
@@ -3160,7 +3160,7 @@ select option{background:#F5F8F5}
         <a href="/head-produtos" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">🏛️ Head</a>
         <a href="/painel" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">📋 Painel</a>
         <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">⚙️ Admin</a>
-        <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#8A9A8E;background:none;cursor:pointer">Sair</button>`;
+        <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #FBE9E9;color:#8A9A8E;background:none;cursor:pointer">Sair</button>`;
     }
   })();
   </script>
@@ -3253,7 +3253,7 @@ select option{background:#F5F8F5}
   </div>
 
   <!-- Preview dos dados extraídos do PDF -->
-  <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#0A1F18;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
+  <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#EAF4EC;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
 
   <!-- LINHA 3: Seletor visual de perfil -->
   <div style="margin-bottom:14px">
@@ -3386,8 +3386,8 @@ select option{background:#F5F8F5}
 
     <!-- Modal: material da Base de Conhecimento -->
     <div id="material-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)fecharMaterial()">
-      <div style="background:#0A1A12;border:1px solid #D9E3DB;border-radius:12px;max-width:820px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #1C3A28">
+      <div style="background:#EAF4EC;border:1px solid #D9E3DB;border-radius:12px;max-width:820px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #EAF4EC">
           <span id="material-modal-titulo" style="font-size:13px;font-weight:700;color:#A8833C">Material</span>
           <button onclick="fecharMaterial()" style="background:none;border:1px solid #D9E3DB;color:#9BB0A0;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer">✕ Fechar</button>
         </div>
@@ -3492,7 +3492,7 @@ select option{background:#F5F8F5}
       <p id="plano-objetivo-txt" style="font-size:13px;color:#17271E"></p>
     </div>
     <!-- Carteira atual do cliente no Plano de Ação -->
-    <div id="plano-carteira-atual" style="display:none;margin-bottom:14px;background:#0A1A14;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px">
+    <div id="plano-carteira-atual" style="display:none;margin-bottom:14px;background:#EAF4EC;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px">
       <p style="font-size:10px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual do cliente</p>
       <div id="plano-carteira-barras"></div>
     </div>
@@ -3518,7 +3518,7 @@ select option{background:#F5F8F5}
         <div id="desvios-list"></div>
         <div>
           <!-- Carteira atual ao lado dos desvios -->
-          <div id="desvios-carteira-atual" style="display:none;background:#0A1A14;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px;margin-bottom:12px">
+          <div id="desvios-carteira-atual" style="display:none;background:#EAF4EC;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px;margin-bottom:12px">
             <p style="font-size:10px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual</p>
             <div id="desvios-carteira-barras"></div>
           </div>
@@ -3658,7 +3658,7 @@ function renderNotifLista(){
     const cor = n.tipo==="call" ? "#1F9D77" : n.mensagem.includes("URGENTE") ? "#E53935" : "#F59E0B";
     const icon = n.tipo==="call" ? "📈" : "⚠️";
     const fundo = n.lido ? "#FFFFFF" : "#FFFFFF";
-    const clientes = (n.clientes_afetados||[]).map(c=>`<span style="background:#1A3A2A;color:#1F9D77;border-radius:4px;padding:1px 7px;font-size:11px;margin-right:4px">${c}</span>`).join("");
+    const clientes = (n.clientes_afetados||[]).map(c=>`<span style="background:#EAF4EC;color:#1F9D77;border-radius:4px;padding:1px 7px;font-size:11px;margin-right:4px">${c}</span>`).join("");
     return `<div style="padding:12px 16px;border-bottom:1px solid #F5F8F5;background:${fundo};cursor:pointer" onclick="marcarLida('${n.id}')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div style="flex:1">
@@ -3740,21 +3740,21 @@ function renderCallsAssessor(){
   card.style.display = "block";
   if(cont) cont.textContent = "("+_callsAssessor.length+" ativa"+(_callsAssessor.length>1?"s":"")+")";
   const DIR = {
-    compra:{lbl:"COMPRA",cor:"#1F9D77",bg:"#0E2A1E"},
+    compra:{lbl:"COMPRA",cor:"#1F9D77",bg:"#EAF4EC"},
     venda: {lbl:"VENDA", cor:"#D93B3B",bg:"#FCEBEB"},
-    neutro:{lbl:"NEUTRO",cor:"#A8833C",bg:"#2A230E"}
+    neutro:{lbl:"NEUTRO",cor:"#A8833C",bg:"#FBF3D2"}
   };
   lista.innerHTML = _callsAssessor.map(function(c,i){
     const dir = DIR[(c.direcao||"compra").toLowerCase()] || DIR.compra;
     const n = c.n_clientes||0;
     const badgeCor = n>0 ? "#1F9D77" : "#5C7365";
-    const badgeBg  = n>0 ? "#0E2A1E" : "#0A160F";
+    const badgeBg  = n>0 ? "#EAF4EC" : "#EAF4EC";
     const up = (typeof c.upside==="number" && c.upside) ? `<span style="color:#1F9D77;font-size:11px;margin-left:6px">▲ ${c.upside}%</span>` : "";
     const perfis = (c.perfis||[]).map(p=>`<span style="background:#EAF4EC;color:#8FBFA5;border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px">${p}</span>`).join("");
     const gid = "callcli-"+i;
     const chips = (c.clientes||[]).map(function(m){
       const cor = m.detem ? "#1F9D77" : "#A8833C";
-      const bg  = m.detem ? "#0E2A1E" : "#FFFFFF";
+      const bg  = m.detem ? "#EAF4EC" : "#FFFFFF";
       const tag = m.detem ? "já detém" : ("perfil "+(m.perfil||"compatível"));
       const rot = m.nome || ("#"+(m.conta||""));
       return `<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #D9E3DB;border-radius:16px;background:${bg};color:${cor};padding:3px 10px;font-size:11px;margin:3px 4px 0 0">${rot} <span style="color:#5A6A60;font-size:9px">· ${tag}</span></span>`;
@@ -3961,8 +3961,8 @@ function renderPilaresForm(){
     const feito  = !!checklist[p.id];
     const impCor = p.importancia==="CRÍTICA" ? "#D93B3B" : p.importancia==="ALTA" ? "#A9800F" : "#5C7365";
     const impTxt = p.importancia==="CRÍTICA" ? "🔴 CRÍTICO" : p.importancia==="ALTA" ? "🟡 IMPORTANTE" : "⚪ MÉDIO";
-    const bg     = feito ? "#E9F5EE" : p.importancia==="CRÍTICA" ? "#FBE9E9" : p.importancia==="ALTA" ? "#151500" : "#181818";
-    const border = feito ? "#C6D6C9" : p.importancia==="CRÍTICA" ? "#4A1212" : p.importancia==="ALTA" ? "#3A3A00" : "#282828";
+    const bg     = feito ? "#E9F5EE" : p.importancia==="CRÍTICA" ? "#FBE9E9" : p.importancia==="ALTA" ? "#FBF3D2" : "#EAF4EC";
+    const border = feito ? "#C6D6C9" : p.importancia==="CRÍTICA" ? "#FBE9E9" : p.importancia==="ALTA" ? "#FBF3D2" : "#EAF4EC";
 
     return '<div onclick="togglePilar(\'' + p.id + '\')" style="' +
       'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;' +
@@ -4006,8 +4006,8 @@ function togglePilar(id){
   checklist[id] = !checklist[id];
   const feito = checklist[id];
   const imp   = (PILARES.find(p=>p.id===id)||{}).importancia||"MÉDIA";
-  const bg     = feito ? "#E9F5EE" : imp==="CRÍTICA" ? "#FBE9E9" : imp==="ALTA" ? "#151500" : "#181818";
-  const border = feito ? "#C6D6C9" : imp==="CRÍTICA" ? "#4A1212" : imp==="ALTA" ? "#3A3A00" : "#282828";
+  const bg     = feito ? "#E9F5EE" : imp==="CRÍTICA" ? "#FBE9E9" : imp==="ALTA" ? "#FBF3D2" : "#EAF4EC";
+  const border = feito ? "#C6D6C9" : imp==="CRÍTICA" ? "#FBE9E9" : imp==="ALTA" ? "#FBF3D2" : "#EAF4EC";
   const el = document.getElementById("pilar-"+id);
   if(el){
     el.style.background = bg;
@@ -4087,7 +4087,7 @@ function renderInstToggle(){
     var isAt = (it.id === _instAtiva);
     return '<div onclick="selecionarInstituicao(\''+it.id+'\')" style="'
       +'flex:1;min-width:120px;max-width:220px;cursor:pointer;border-radius:10px;padding:10px 14px;'
-      +'border:2px solid '+(isAt?it.cor:"#1E2E28")+';'
+      +'border:2px solid '+(isAt?it.cor:"#EAF4EC")+';'
       +'background:'+(isAt?it.cor+'18':"#EFF3EF")+';'
       +'transition:all .15s;box-sizing:border-box">'
       +'<div style="font-size:18px;margin-bottom:3px">'+it.icon+'</div>'
@@ -4294,9 +4294,9 @@ function renderProtecoes(lista){
     var botoes = p.id ? Object.keys(_PROT_STATUS).map(function(k){
         var on=(p.status===k); var c=_PROT_STATUS[k].cor;
         return '<button onclick="setProtecaoStatus(\''+p.id+'\',\''+k+'\')" style="cursor:pointer;font-size:9px;padding:3px 8px;border-radius:6px;'
-          +'border:1px solid '+(on?c:"#1E2E28")+';background:'+(on?c+"22":"#EFF3EF")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
+          +'border:1px solid '+(on?c:"#EAF4EC")+';background:'+(on?c+"22":"#EFF3EF")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
       }).join("") : '<span style="font-size:9px;color:#5A7A68">Identifique o cliente para salvar o histórico</span>';
-    return '<div style="border:1px solid #2A1E12;background:#140D07;border-radius:8px;padding:10px 12px;margin-bottom:8px">'
+    return '<div style="border:1px solid #FBEEEC;background:#F5F8F5;border-radius:8px;padding:10px 12px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">'
         +'<div><span style="color:#A8833C;font-weight:700;font-size:12px">'+p.ticker+'</span> '
           +'<span style="color:'+_sgCor(p.rating)+';font-size:10px;font-weight:700">'+(p.rating||"")+'</span> '
@@ -4381,7 +4381,7 @@ function renderPerfilCards(){
     var key   = card.getAttribute("data-perfil");
     var cor   = card.getAttribute("data-cor") || "#A8833C";
     var isAt  = (key === ativo);
-    card.style.border      = "2px solid " + (isAt ? cor : "#1E2E28");
+    card.style.border      = "2px solid " + (isAt ? cor : "#EAF4EC");
     card.style.background  = isAt ? cor + "15" : "#EFF3EF";
     var nome  = card.querySelector(".perfil-card-nome");
     if(nome)  nome.style.color = isAt ? cor : "#17271E";
@@ -4480,7 +4480,7 @@ async function processarLoteXP(file){
     bar.style.width="100%"; pct.textContent="100%"; txt.textContent="Concluído!";
     const fmtBrl = v => "R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
     const linhas = clientes.slice(0,25).map(c=>`
-      <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #10241A;font-size:11px">
+      <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #EAF4EC;font-size:11px">
         <span style="color:#1F9D77">✓</span>
         <span style="flex:1;color:#5C7365">${c.nome||("#"+c.conta)}</span>
         <span style="color:#5C7365">${c.data_ref||""}</span>
@@ -4741,7 +4741,7 @@ function mostrarPreviewPDF(d){
       return "<tr>"+ cols.map(function(c){
         var v = it[c.key];
         var txt = c.fmt ? c.fmt(v) : (v||"");
-        return '<td style="padding:3px 8px 3px 0;font-size:10px;color:'+(c.cor||"#5C7365")+';border-bottom:1px solid #0D2018">'+txt+'</td>';
+        return '<td style="padding:3px 8px 3px 0;font-size:10px;color:'+(c.cor||"#5C7365")+';border-bottom:1px solid #EAF4EC">'+txt+'</td>';
       }).join("") +"</tr>";
     }).join("");
     var headers = cols.map(function(c){
@@ -4935,7 +4935,7 @@ function renderPainelCliente(d){
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${PILARES.map(p=>{
           const feito = !!chk[p.id];
-          return `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:${feito?"#F5F8F5":"#FBE9E9"};color:${feito?"#1F9D77":"#D93B3B"};border:1px solid ${feito?"#C6D6C9":"#4A1010"}">
+          return `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:${feito?"#F5F8F5":"#FBE9E9"};color:${feito?"#1F9D77":"#D93B3B"};border:1px solid ${feito?"#C6D6C9":"#FBE9E9"}">
             ${feito?"✓":"✕"} ${p.icone} ${p.nome}
           </span>`;
         }).join("")}
@@ -5021,7 +5021,7 @@ function renderPainelCliente(d){
             <div style="text-align:center">
               ${valHist !== null ? `
               <div style="font-size:12px;font-weight:700;color:#A8833C">${valHist.toFixed(1)}%</div>
-              <div style="height:4px;background:#1E1A0A;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#A8833C;border-radius:2px;width:${barHist}%"></div></div>
+              <div style="height:4px;background:#FBF3D2;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#A8833C;border-radius:2px;width:${barHist}%"></div></div>
               ` : `<span style="font-size:10px;color:#5C7365">sem dados</span>`}
             </div>
             <!-- Atual -->
@@ -5030,7 +5030,7 @@ function renderPainelCliente(d){
                 <span style="font-size:12px;font-weight:700;color:#1F9D77">${valAt.toFixed(1)}%</span>
                 ${deltaHist !== null && Math.abs(deltaHist) >= 0.5 ? `<span style="font-size:10px;color:${dCorHist};font-weight:700">${sHist}${Math.abs(deltaHist).toFixed(1)}</span>` : ""}
               </div>
-              <div style="height:4px;background:#0A1E0F;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#1F9D77;border-radius:2px;width:${barAt}%"></div></div>
+              <div style="height:4px;background:#EAF4EC;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#1F9D77;border-radius:2px;width:${barAt}%"></div></div>
             </div>
           </div>`;
         }).join("")}
@@ -5246,7 +5246,7 @@ async function buscarClientesSalvos(){
       const vencido = (dias===null) || (dias>60);
       const borda = vencido ? "#E8A87C55" : "#D9E3DB";
       const selo = vencido
-        ? `<span style="background:#2A1A0A;color:#C0673A;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
+        ? `<span style="background:#FBEEEC;color:#C0673A;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
         : `<span style="color:#5C7365;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
       const detTag = c.desenquadrado ? `<span style="color:#C0673A;font-size:9px;margin-left:5px">→ parece ${PERFIL_LBL[c.perfil_detectado]||c.perfil_detectado||"outro"}</span>` : "";
       const info = `${c.nome||("#"+(c.conta||""))}${(c.nome&&c.conta)?` <span style="color:#A8833C;font-size:10px">#${c.conta}</span>`:""}${c.gestora_nome?` <span style="color:#2E86B8;font-size:10px">· ${c.gestora_nome}</span>`:""}${selo}${detTag}`;
@@ -5275,7 +5275,7 @@ async function buscarClientesSalvos(){
     });
     if(desenq.length){
       h += `<div style="margin-top:10px;border-top:1px solid #EAF4EC;padding-top:10px">
-        <div onclick="csToggle('csg-desenq')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F5EAE0;border:1px solid #3A1E10;border-radius:8px">
+        <div onclick="csToggle('csg-desenq')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F5EAE0;border:1px solid #FBEEEC;border-radius:8px">
           <span id="csg-desenq-ar" style="color:#7A4A2A;font-size:11px">▸</span>
           <span style="font-size:11px;color:#C0673A;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1">⚠ Desenquadrados do perfil</span>
           <span style="font-size:13px;color:#C0673A;font-weight:700">${desenq.length}</span>
@@ -5420,7 +5420,7 @@ function renderAnaliseHP(xp){
   const hpHeader = document.getElementById("hp-header");
   if(xp.carteira_salva && hpHeader){
     const salvo = document.createElement("span");
-    salvo.style.cssText = "font-size:10px;background:#F5F8F5;color:#1F9D77;border:1px solid #1A4A2A;padding:3px 10px;border-radius:10px;display:inline-flex;align-items:center;gap:4px";
+    salvo.style.cssText = "font-size:10px;background:#F5F8F5;color:#1F9D77;border:1px solid #EAF4EC;padding:3px 10px;border-radius:10px;display:inline-flex;align-items:center;gap:4px";
     salvo.innerHTML = "💾 Carteira registrada";
     hpHeader.prepend(salvo);
   }
@@ -5433,7 +5433,7 @@ function renderAnaliseHP(xp){
     const ACOR  = {info:"#1F9D77", atencao:"#A8833C", urgente:"#D93B3B"};
     const AICON = {info:"ℹ️", atencao:"⚠️", urgente:"🚨"};
     const ORIG  = {hp_manual:"HP", knowledge_base:"📚 Base", auto:"🤖 Auto", mercado:"📰 Mercado"};
-    const OBKG  = {hp_manual:"#FBF3D2", knowledge_base:"#0A200A", auto:"#ECEFFB", mercado:"#0A1A28"};
+    const OBKG  = {hp_manual:"#FBF3D2", knowledge_base:"#EAF4EC", auto:"#ECEFFB", mercado:"#ECEFFB"};
     const OCOR  = {hp_manual:"#8A9A8E", knowledge_base:"#1F9D77", auto:"#7777DD", mercado:"#5BA8D4"};
 
     const urgentes = alertas.filter(a=>a.tipo==="urgente");
@@ -5447,7 +5447,7 @@ function renderAnaliseHP(xp){
           </span>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             ${urgentes.length ? `<span style="font-size:10px;background:#FF6B6B22;color:#D93B3B;border:1px solid #FF6B6B44;padding:2px 8px;border-radius:10px">${urgentes.length} urgente${urgentes.length>1?"s":""}</span>` : ""}
-            ${nMercado ? `<span style="font-size:10px;background:#0A1A2822;color:#5BA8D4;border:1px solid #5BA8D444;padding:2px 8px;border-radius:10px">📰 ${nMercado} do mercado</span>` : ""}
+            ${nMercado ? `<span style="font-size:10px;background:#ECEFFB22;color:#5BA8D4;border:1px solid #5BA8D444;padding:2px 8px;border-radius:10px">📰 ${nMercado} do mercado</span>` : ""}
           </div>
         </div>
         <div style="padding:8px 14px 10px">
@@ -5458,14 +5458,14 @@ function renderAnaliseHP(xp){
             const obkg  = OBKG[ot] || "#FBF3D2";
             const ocor  = OCOR[ot] || "#8A9A8E";
             const isMercado = ot === "mercado";
-            return `<div style="border-left:3px solid ${cor};background:${isMercado?"#060F18":"#EFF3EF"};border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
+            return `<div style="border-left:3px solid ${cor};background:${isMercado?"#ECEFFB":"#EFF3EF"};border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
                 <span style="font-size:12px;font-weight:700;color:${cor}">${AICON[a.tipo]||"🔔"} ${a.produto||a.classe||""}</span>
                 ${orig ? `<span style="font-size:10px;background:${obkg};color:${ocor};padding:2px 7px;border-radius:10px;border:1px solid ${ocor}33">${orig}</span>` : ""}
                 <span style="font-size:10px;color:#5C7365;margin-left:auto">${a.data||""}</span>
               </div>
               <p style="font-size:11px;color:#8A9A8E;margin:0;line-height:1.5">${a.mensagem||""}</p>
-              ${(a.docs&&a.docs.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`+a.docs.map(dd=>`<button onclick="abrirMaterial('${dd.id}','${encodeURIComponent(dd.nome||"")}')" style="font-size:9px;padding:3px 9px;border-radius:8px;border:1px solid #5DCAA555;background:#0A200A;color:#1F9D77;cursor:pointer">👁 Abrir: ${(dd.nome||"material").replace(/</g,"&lt;")}</button>`).join("")+`</div>`:""}
+              ${(a.docs&&a.docs.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`+a.docs.map(dd=>`<button onclick="abrirMaterial('${dd.id}','${encodeURIComponent(dd.nome||"")}')" style="font-size:9px;padding:3px 9px;border-radius:8px;border:1px solid #5DCAA555;background:#EAF4EC;color:#1F9D77;cursor:pointer">👁 Abrir: ${(dd.nome||"material").replace(/</g,"&lt;")}</button>`).join("")+`</div>`:""}
             </div>`;
           }).join("")}
         </div>
@@ -5482,7 +5482,7 @@ function renderAnaliseHP(xp){
     <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #FFFFFF;font-size:12px">
       <span style="width:130px;color:#5C7365">${d.label}</span>
       <span style="width:44px;color:#A8833C;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
-      <div style="flex:1;background:#0F3525;border-radius:3px;height:5px;overflow:hidden;position:relative">
+      <div style="flex:1;background:#EAF4EC;border-radius:3px;height:5px;overflow:hidden;position:relative">
         <div style="position:absolute;height:100%;background:#5C7365;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
         <div style="position:absolute;height:100%;background:${STATUS_COLOR[d.status]};border-radius:3px;width:${Math.min(d.atual,100)}%"></div>
       </div>
@@ -5508,7 +5508,7 @@ function renderAnaliseHP(xp){
           <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:10px">Mercado (XP)</th>
         </tr></thead>
         <tbody>${xp.acoes.map((a,i)=>{ var sv=_sgRow(a); return `
-          <tr style="background:${i%2?"#070707":"#EFF3EF"}">
+          <tr style="background:${i%2?"#EAF4EC":"#EFF3EF"}">
             <td style="padding:6px 8px">
               <span style="color:#A8833C;font-weight:700">${a.ticker}</span>
               ${sv.nome?`<span style="color:#5C7365;font-size:9px;display:block">${sv.nome}</span>`:""}
@@ -5541,7 +5541,7 @@ function renderAnaliseHP(xp){
           <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:10px">% Cart.</th>
         </tr></thead>
         <tbody>${xp.fiis.map((f,i)=>`
-          <tr style="background:${i%2?"#070707":"#EFF3EF"}">
+          <tr style="background:${i%2?"#EAF4EC":"#EFF3EF"}">
             <td style="padding:6px 8px;color:#2E86B8;font-weight:700">${f.ticker}</td>
             <td style="padding:6px 8px;color:#8A9A8E;text-align:right">${f.qtd||"—"}</td>
             <td style="padding:6px 8px;color:#5C7365;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
@@ -5584,7 +5584,7 @@ function renderAnaliseHP(xp){
       {titulo:"📌 Posicionamento", texto: c.posicionamento, cor:"#A8833C"},
     ];
     document.getElementById("hp-cenario-cards").innerHTML = cards.map(card => card.texto ? `
-      <div style="background:#EFF3EF;border:1px solid #1A1A10;border-radius:10px;padding:12px;border-top:2px solid ${card.cor}">
+      <div style="background:#EFF3EF;border:1px solid #FBF3D2;border-radius:10px;padding:12px;border-top:2px solid ${card.cor}">
         <div style="font-size:10px;color:${card.cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${card.titulo}</div>
         <p style="font-size:11px;color:#5C7365;line-height:1.7">${card.texto}</p>
       </div>` : "").join("");
@@ -6017,7 +6017,7 @@ function renderPlanoTroca(sugs, plano){
         (des<0 ? '<span style="color:#C0673A">no ano '+des.toFixed(1)+'%</span>'
                : '<span style="color:#1F9D77">no ano +'+des.toFixed(1)+'%</span>');
       const fgc=m.destino_fgc?'<span style="font-size:9px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
-      h+='<div style="border:1px solid #1C3A24;border-radius:10px;padding:11px 13px;margin-bottom:8px;background:#FFFFFF">'
+      h+='<div style="border:1px solid #EAF4EC;border-radius:10px;padding:11px 13px;margin-bottom:8px;background:#FFFFFF">'
         +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
         +'<div style="flex:1;min-width:150px"><span style="font-size:10px;color:#D93B3B;font-weight:700">↓ VENDER</span> '
         +'<span style="font-size:13px;font-weight:800;color:#17271E">'+fmt0(m.valor)+'</span> '
@@ -6041,7 +6041,7 @@ function renderPlanoTroca(sugs, plano){
       h+='</div>';
     }
     if(plano.monitorar_classes&&plano.monitorar_classes.length){
-      h+='<div style="margin-top:10px;border:1px solid #3A2E00;border-radius:10px;padding:11px 13px;background:#FBF3D2">';
+      h+='<div style="margin-top:10px;border:1px solid #FBEEEC;border-radius:10px;padding:11px 13px;background:#FBF3D2">';
       plano.monitorar_classes.forEach(function(mc){
         h+='<div style="font-size:11.5px;color:#A9800F;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
           +'Sem opção de venda sem prejuízo — a partir de hoje monitoramos e sinalizamos a troca quando os ativos recuperarem.</div>';
@@ -6082,8 +6082,8 @@ function renderPlanoTroca(sugs, plano){
         ${p.obs?`<div style="font-size:10px;color:#5C7365;margin-top:2px">${p.obs}</div>`:""}
       </div>`;
     }).join("");
-    const travas=(s.travas||[]).map(t=>`<div style="font-size:10px;color:#A9800F;background:#FBF3D2;border:1px solid #4A3A00;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
-    h+=`<div style="border:1px solid #1C3A24;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#FFFFFF">
+    const travas=(s.travas||[]).map(t=>`<div style="font-size:10px;color:#A9800F;background:#FBF3D2;border:1px solid #FBEEEC;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
+    h+=`<div style="border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#FFFFFF">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
         <span style="font-size:13px;font-weight:800;color:#17271E">${s.label_classe}</span>
         <span style="font-size:10px;font-weight:700;color:${pr[0]}">${pr[1]}</span>
@@ -6453,7 +6453,7 @@ function renderCrossSellResult(areas, tem, naoTem){
         <span style="font-size:18px">💎</span>
         <span style="font-size:12px;font-weight:800;color:#A8833C;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
       </div>
-      <div style="font-size:12px;color:#3A2E12;line-height:1.6">
+      <div style="font-size:12px;color:#FBEEEC;line-height:1.6">
         Cliente com <b>${brl0(patC)}</b> (acima de R$ 1 mi): dá para estruturar uma <b>carta de consórcio de ${brl0(carta)}</b> (imóvel ou veículo) <b>sustentada pelos dividendos da carteira</b>, sem descapitalizar o principal.
         <div style="margin-top:8px;padding:8px 10px;background:#EFF3EF;border-radius:8px">
           Parcela estimada <b>≈ ${brl0(parcela)}/mês</b> · Dividendos estimados da carteira <b>≈ ${brl0(rendaMes)}/mês</b>${rendaMes>0?` (cobrem <b style="color:${cob>=100?'#1F9D77':'#C0673A'}">${cob}%</b> da parcela)`:''}
@@ -6506,10 +6506,10 @@ function renderCrossSellResult(areas, tem, naoTem){
 
   if(insights.length){
     const COR = {oportunidade:"#A8833C", atencao:"#C0673A", urgente:"#D93B3B", novidade:"#1F9D77"};
-    html += `<div style="background:#EFF3EF;border:1px solid #1A3A20;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+    html += `<div style="background:#EFF3EF;border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:14px">
       <div style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🧠 Insights para esta reunião</div>
       ${insights.map(i=>`
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #0F2A18">
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #EAF4EC">
           <span style="font-size:14px;flex-shrink:0">${i.icone}</span>
           <span style="font-size:12px;color:#5C7365;line-height:1.5">${i.texto}</span>
         </div>`).join("")}
@@ -6685,8 +6685,8 @@ def _pilar_html_inicial(p):
     imp = p.get("importancia", "CRÍTICA")
     imp_cor  = "#D93B3B" if imp=="CRÍTICA" else "#A9800F" if imp=="ALTA" else "#5C7365"
     imp_txt  = "🔴 CRÍTICO" if imp=="CRÍTICA" else "🟡 IMPORTANTE" if imp=="ALTA" else "⚪ MÉDIO"
-    bg       = "#FBE9E9" if imp=="CRÍTICA" else "#151500" if imp=="ALTA" else "#181818"
-    border   = "#4A1212" if imp=="CRÍTICA" else "#3A3A00" if imp=="ALTA" else "#282828"
+    bg       = "#FBE9E9" if imp=="CRÍTICA" else "#FBF3D2" if imp=="ALTA" else "#EAF4EC"
+    border   = "#FBE9E9" if imp=="CRÍTICA" else "#FBF3D2" if imp=="ALTA" else "#EAF4EC"
     eh_dir   = p.get("importancia_diretriz", False)
     pid      = p["id"]
     nome     = p["nome"]
@@ -6906,7 +6906,7 @@ def _perfil_cards_html():
         )
         # "moderada" é o default selecionado
         is_default = (p["key"] == "moderada")
-        border_style = f'2px solid {p["cor"]}' if is_default else '2px solid #1E2E28'
+        border_style = f'2px solid {p["cor"]}' if is_default else '2px solid #EAF4EC'
         bg_style = f'{p["cor"]}15' if is_default else '#EFF3EF'
         badge = f'<div class="perfil-sel-badge" style="position:absolute;top:5px;right:6px;font-size:8px;color:{p["cor"]};font-weight:700;display:{"block" if is_default else "none"}">&#10003; SELECIONADO</div>'
         card = (
@@ -11728,14 +11728,14 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .role-card.assessor.selected{border-color:#A8833C;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#F5F8F5}
 .role-card.assessor:hover{border-color:#A8833C}
 /* Líder */
-.role-card.lider.selected{border-color:#4E63C8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#0D0D1F}
+.role-card.lider.selected{border-color:#4E63C8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#ECEFFB}
 .role-card.lider:hover{border-color:#4E63C8}
 /* Head */
 .role-card.head.selected{border-color:#A8833C;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#FBF3D2}
 .role-card.head:hover{border-color:#A8833C}
 .head .role-check{background:#A8833C;color:#000}
 /* Admin */
-.role-card.admin.selected{border-color:#1F9D77;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#081410}
+.role-card.admin.selected{border-color:#1F9D77;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#EAF4EC}
 .role-card.admin:hover{border-color:#1F9D77}
 
 .role-icon{font-size:36px;margin-bottom:12px;display:block}
@@ -12125,8 +12125,8 @@ HTML_LIDER = r"""<!DOCTYPE html>
 <title>Braúna — Painel do Líder</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0A0A14;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#0D0D1F;border-bottom:1px solid #ECEFFB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+body{background:#ECEFFB;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#ECEFFB;border-bottom:1px solid #ECEFFB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:17px;color:#4E63C8;font-weight:700}
 header p{font-size:11px;color:#5C7365;margin-top:2px}
 .nav{display:flex;gap:8px;align-items:center}
@@ -12134,7 +12134,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .nav a:hover{border-color:#4E63C8;color:#4E63C8}
 .nav a.active{background:#4E63C8;color:#000;border-color:#4E63C8;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
-.card{background:#0F0F22;border:1px solid #ECEFFB;border-radius:12px;padding:20px;margin-bottom:16px}
+.card{background:#ECEFFB;border:1px solid #ECEFFB;border-radius:12px;padding:20px;margin-bottom:16px}
 .card h2{font-size:11px;color:#4E63C8;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px}
 /* KPIs 6 colunas */
 .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
@@ -12148,22 +12148,22 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 /* Filtros */
 .filtros-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:#ECEFFB;border:1px solid #ECEFFB;border-radius:10px}
 .filtros-bar label{font-size:11px;color:#5C7365;margin-right:4px}
-.filtros-bar select{background:#0D0D22;border:1px solid #ECEFFB;color:#C0C0D0;font-size:11px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer}
+.filtros-bar select{background:#ECEFFB;border:1px solid #ECEFFB;color:#C0C0D0;font-size:11px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer}
 .filtros-bar select:focus{border-color:#4E63C8}
 .btn-limpar{font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #ECEFFB;color:#5C7365;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
 .btn-limpar:hover{border-color:#D93B3B;color:#D93B3B}
 /* Card risco */
-.card-risco{background:#140A0A;border:1px solid #3A1A1A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card-risco{background:#FBE9E9;border:1px solid #FBE9E9;border-radius:12px;padding:18px 20px;margin-bottom:16px}
 .card-risco h2{font-size:11px;color:#D93B3B;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .risco-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;background:#FBE9E9;border:1px solid #FCEBEB;margin-bottom:8px;flex-wrap:wrap}
 .risco-nome{font-size:13px;font-weight:700;color:#17271E;flex:1;min-width:120px}
 .risco-assessor{font-size:11px;color:#5C7365}
 .risco-pat{font-size:11px;color:#4E63C8}
-.risco-motivo{font-size:11px;color:#A9800F;padding:2px 8px;background:#FBF3D2;border-radius:6px;border:1px solid #2A2000}
+.risco-motivo{font-size:11px;color:#A9800F;padding:2px 8px;background:#FBF3D2;border-radius:6px;border:1px solid #FBEEEC}
 .btn-ver{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #F7DADA;color:#D93B3B;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
 .btn-ver:hover{background:#FCEBEB;border-color:#D93B3B}
-.risco-ok{padding:12px 16px;color:#1F9D77;font-size:13px;background:#F5F8F5;border-radius:8px;border:1px solid #0A3020}
-.risco-grupo{margin-bottom:8px;border:1px solid #FCEBEB;border-radius:8px;overflow:hidden;background:#140808}
+.risco-ok{padding:12px 16px;color:#1F9D77;font-size:13px;background:#F5F8F5;border-radius:8px;border:1px solid #EAF4EC}
+.risco-grupo{margin-bottom:8px;border:1px solid #FCEBEB;border-radius:8px;overflow:hidden;background:#FBE9E9}
 .risco-grupo-head{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;user-select:none}
 .risco-grupo-head:hover{background:#FBE9E9}
 .risco-grupo-nome{font-size:13px;font-weight:700;color:#17271E;flex:1;min-width:120px}
@@ -12172,23 +12172,23 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .risco-grupo-chev{font-size:14px;color:#8A5A5A;transition:transform .2s;width:16px;text-align:center}
 .risco-grupo-body{padding:2px 10px 10px}
 /* Card alertas */
-.card-alertas{background:#0D0A14;border:1px solid #2A1E3A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card-alertas{background:#ECEFFB;border:1px solid #ECEFFB;border-radius:12px;padding:18px 20px;margin-bottom:16px}
 .card-alertas h2{font-size:11px;color:#A8833C;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .alerta-acordeao{border:1px solid #ECEFFB;border-radius:8px;margin-bottom:6px;overflow:hidden}
 .alerta-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#ECEFFB;transition:background .2s}
-.alerta-header:hover{background:#0D0D22}
+.alerta-header:hover{background:#ECEFFB}
 .alerta-header-nome{font-size:13px;font-weight:700;color:#17271E;flex:1}
-.alerta-count{font-size:11px;color:#A8833C;padding:2px 8px;background:#1A1200;border-radius:8px}
-.alerta-body{display:none;padding:10px 14px;background:#080814}
+.alerta-count{font-size:11px;color:#A8833C;padding:2px 8px;background:#FBF3D2;border-radius:8px}
+.alerta-body{display:none;padding:10px 14px;background:#ECEFFB}
 .alerta-body.aberto{display:block}
 .alerta-linha{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #ECEFFB;flex-wrap:wrap}
 .alerta-linha:last-child{border-bottom:none}
 .alerta-ticker{font-size:12px;font-weight:700;color:#4E63C8;min-width:60px}
 .alerta-titulo{font-size:12px;color:#D0D0E0;flex:1}
 .alerta-tipo{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
-.alerta-compra{background:#F5F8F5;color:#1F9D77;border:1px solid #0A3020}
+.alerta-compra{background:#F5F8F5;color:#1F9D77;border:1px solid #EAF4EC}
 .alerta-venda{background:#FCEBEB;color:#D93B3B;border:1px solid #F7DADA}
-.alerta-atencao{background:#FBF3D2;color:#A9800F;border:1px solid #2A2000}
+.alerta-atencao{background:#FBF3D2;color:#A9800F;border:1px solid #FBEEEC}
 /* Ranking assessores */
 .rank-item{
   display:flex;align-items:center;gap:14px;
@@ -12196,7 +12196,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
   background:#ECEFFB;border:1px solid #ECEFFB;
   margin-bottom:8px;cursor:pointer;transition:all .2s;
 }
-.rank-item:hover,.rank-item.aberto{border-color:#4E63C8;background:#0D0D22}
+.rank-item:hover,.rank-item.aberto{border-color:#4E63C8;background:#ECEFFB}
 .rank-pos{font-size:20px;font-weight:900;color:#ECEFFB;min-width:28px;text-align:center}
 .rank-pos.top1{color:#A8833C}
 .rank-pos.top2{color:#4E63C8}
@@ -12215,7 +12215,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .detalhe-assessor.aberto{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 /* Métricas assessor */
-.metricas-assessor{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;margin-bottom:8px;background:#080814;border-radius:8px;border:1px solid #ECEFFB}
+.metricas-assessor{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;margin-bottom:8px;background:#ECEFFB;border-radius:8px;border:1px solid #ECEFFB}
 .met-item{text-align:center;padding:8px}
 .met-n{font-size:18px;font-weight:700;color:#4E63C8}
 .met-l{font-size:10px;color:#5C7365;margin-top:2px}
@@ -12224,12 +12224,12 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .meta-nok{background:#D93B3B}
 /* Cards de cliente */
 .cliente-card{
-  background:#080816;border:1px solid #1A1A30;border-radius:10px;
+  background:#ECEFFB;border:1px solid #ECEFFB;border-radius:10px;
   padding:14px 16px;margin-bottom:10px;
 }
 .cliente-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
 .cliente-nome{font-size:14px;font-weight:700;color:#17271E}
-.cliente-perfil{font-size:11px;padding:2px 10px;border-radius:10px;background:#1A1A3A;color:#4E63C8;font-weight:700}
+.cliente-perfil{font-size:11px;padding:2px 10px;border-radius:10px;background:#ECEFFB;color:#4E63C8;font-weight:700}
 .cliente-objetivo{font-size:11px;color:#5C7365;flex:1}
 .c-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700}
 .c-ok{background:#F5F8F5;color:#1F9D77}
@@ -12237,17 +12237,17 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .c-critico{background:#FCEBEB;color:#D93B3B}
 /* Timeline de análises */
 .timeline{position:relative;padding-left:20px}
-.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:#1A1A30}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:#ECEFFB}
 .tl-entry{position:relative;margin-bottom:12px}
 .tl-dot{
   position:absolute;left:-17px;top:4px;
-  width:10px;height:10px;border-radius:50%;border:2px solid #0A0A14;
+  width:10px;height:10px;border-radius:50%;border:2px solid #ECEFFB;
 }
 .tl-dot.ok{background:#1F9D77}
 .tl-dot.atencao{background:#A9800F}
 .tl-dot.critico{background:#D93B3B}
 .tl-dot.first{width:13px;height:13px;left:-18px;top:3px}
-.tl-content{background:#0D0D20;border:1px solid #ECEFFB;border-radius:8px;padding:10px 12px}
+.tl-content{background:#ECEFFB;border:1px solid #ECEFFB;border-radius:8px;padding:10px 12px}
 .tl-data{font-size:10px;color:#5C7365;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .tl-data b{color:#4E63C8;font-size:11px}
 .tl-metrics{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px}
@@ -12279,7 +12279,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .tabela-resumo{width:100%;border-collapse:collapse;font-size:12px;min-width:780px}
 .tabela-resumo th{background:#EFF3EF;color:#1F9D77;font-weight:700;padding:9px 10px;text-align:right;border-bottom:2px solid #D9E3DB;white-space:nowrap}
 .tabela-resumo th:first-child{text-align:left}
-.tabela-resumo td{padding:8px 10px;border-bottom:1px solid #0F1F0F;text-align:right;color:#C0C8C0;vertical-align:middle}
+.tabela-resumo td{padding:8px 10px;border-bottom:1px solid #EAF4EC;text-align:right;color:#C0C8C0;vertical-align:middle}
 .tabela-resumo td:first-child{text-align:left;color:#E0E8E0;font-weight:600;max-width:180px}
 .tabela-resumo tr:hover td{background:#EFF3EF}
 .tabela-resumo tr.tr-total td{background:#EFF3EF;color:#A8833C;font-weight:700;border-top:2px solid #D9E3DB}
@@ -12287,9 +12287,9 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .okr-bar-mini-fill{height:100%;border-radius:3px;transition:width .4s}
 .pct-okr-chip{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700}
 /* Botões resumo */
-.btn-resumo{display:inline-block;padding:7px 16px;border:1px solid #2A3A2A;border-radius:8px;background:#EFF3EF;color:#1F9D77;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-resumo{display:inline-block;padding:7px 16px;border:1px solid #EAF4EC;border-radius:8px;background:#EFF3EF;color:#1F9D77;font-size:12px;cursor:pointer;transition:all .2s}
 .btn-resumo:hover{border-color:#1F9D77;color:#fff}
-.btn-gold{background:#1A1200;color:#A8833C;border-color:#3A2A00}
+.btn-gold{background:#FBF3D2;color:#A8833C;border-color:#FBEEEC}
 .btn-gold:hover{border-color:#A8833C;color:#fff}
 .btn-danger{color:#D93B3B;border-color:#F7DADA;background:#FBE9E9}
 .btn-danger:hover{border-color:#D93B3B}
@@ -12308,7 +12308,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider" class="active">👥 Líder</a>
     <a href="/painel">📋 Painel</a>
-    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#5C7365;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#5C7365'">Sair</button>
+    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #ECEFFB;color:#5C7365;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#ECEFFB';this.style.color='#5C7365'">Sair</button>
   </nav>
   <script>
   (function(){
@@ -12338,7 +12338,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 </div>
 
 <!-- Objetivos / OKR por assessor (definidos pelo líder) -->
-<div style="background:#FFFFFF;border:1px solid #1C3A24;border-radius:12px;padding:18px 20px;margin-bottom:18px">
+<div style="background:#FFFFFF;border:1px solid #EAF4EC;border-radius:12px;padding:18px 20px;margin-bottom:18px">
   <div style="font-size:15px;font-weight:700;color:#A8833C;margin-bottom:6px">🎯 Objetivos por Assessor</div>
   <p style="font-size:12px;color:#5C7365;margin-bottom:14px;line-height:1.6">Objetivo de <b style="color:#A8833C">volume financeiro (R$)</b> a operar por classe. Cada troca de produto executada é lançada em <b>Realizado</b> e <b>abate</b> o objetivo da classe — a coluna <b>Restante</b> mostra o quanto ainda falta para bater. (Registro do realizado é manual por enquanto.)</p>
   <div id="obj-status" style="font-size:12px;color:#1F9D77;min-height:16px;margin-bottom:8px"></div>
@@ -12389,7 +12389,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
     <h2 style="margin:0">🏆 Ranking dos Assessores</h2>
     <label style="font-size:12px;color:#5C7365;cursor:pointer;display:flex;align-items:center;gap:6px">
       <input type="file" id="input-planilha" accept=".xlsx" style="display:none" onchange="importarPlanilha(this)">
-      <span style="padding:5px 14px;border:1px solid #2A3A2A;border-radius:6px;background:#EFF3EF;color:#1F9D77;font-size:12px" onclick="document.getElementById('input-planilha').click()">📥 Atualizar planilha</span>
+      <span style="padding:5px 14px;border:1px solid #EAF4EC;border-radius:6px;background:#EFF3EF;color:#1F9D77;font-size:12px" onclick="document.getElementById('input-planilha').click()">📥 Atualizar planilha</span>
     </label>
   </div>
   <div id="ranking-container">
@@ -13093,7 +13093,7 @@ function renderClientesAssessor(clientes, assessorNome){
             if(s.acao==="substituir" && s.de && diff2>0.5) aderiuRF=true;
           });
           if(aderiuRF){
-            deltaHtml += '<div style="margin-top:6px;font-size:11px;color:#1F9D77;padding:5px 10px;background:#F5F8F5;border-radius:6px;border:1px solid #0A3020">Adesao a sugestao de Renda Fixa detectada nesta analise</div>';
+            deltaHtml += '<div style="margin-top:6px;font-size:11px;color:#1F9D77;padding:5px 10px;background:#F5F8F5;border-radius:6px;border:1px solid #EAF4EC">Adesao a sugestao de Renda Fixa detectada nesta analise</div>';
           }
         }
       }
@@ -13278,8 +13278,8 @@ HTML_ADMIN = r"""<!DOCTYPE html>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#060D08;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#071209;border-bottom:2px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+body{background:#EAF4EC;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#EAF4EC;border-bottom:2px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header h1{font-size:16px;color:#1F9D77;font-weight:700;letter-spacing:.5px}
 header p{font-size:10px;color:#5C7365;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
@@ -13296,7 +13296,7 @@ header p{font-size:10px;color:#5C7365;margin-top:2px}
 .main-panel{display:none}.main-panel.active{display:block}
 
 /* Cards */
-.card{background:#0A1A0C;border:1px solid #D9E3DB;border-radius:12px;padding:20px;margin-bottom:16px}
+.card{background:#EAF4EC;border:1px solid #D9E3DB;border-radius:12px;padding:20px;margin-bottom:16px}
 .card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 label{font-size:11px;color:#5C7365;display:block;margin-bottom:5px}
 input[type=text],textarea,select{width:100%;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:7px;padding:8px 10px;color:#17271E;font-size:13px;outline:none;font-family:inherit}
@@ -13310,26 +13310,26 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
 
 /* KPI chips */
 .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-.kpi{background:#0D1C10;border:1px solid #D9E3DB;border-radius:10px;padding:14px 18px;min-width:130px;flex:1}
+.kpi{background:#EAF4EC;border:1px solid #D9E3DB;border-radius:10px;padding:14px 18px;min-width:130px;flex:1}
 .kpi-val{font-size:28px;font-weight:900;line-height:1}
 .kpi-lbl{font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
 /* Tabela de atividade */
 .act-table{width:100%;border-collapse:collapse;font-size:12px}
 .act-table th{text-align:left;padding:8px 10px;font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #D9E3DB;font-weight:700}
-.act-table td{padding:9px 10px;border-bottom:1px solid #0D1A0E;vertical-align:top}
-.act-table tr:hover td{background:#0C180E}
+.act-table td{padding:9px 10px;border-bottom:1px solid #EAF4EC;vertical-align:top}
+.act-table tr:hover td{background:#EAF4EC}
 
 /* Badges */
 .badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700}
-.badge-assessor{background:#0D2A1D;color:#1F9D77;border:1px solid #1A4A2A}
-.badge-lider{background:#0D1030;color:#4E63C8;border:1px solid #1A2050}
-.badge-head{background:#2A1A08;color:#A8833C;border:1px solid #4A3010}
+.badge-assessor{background:#EAF4EC;color:#1F9D77;border:1px solid #EAF4EC}
+.badge-lider{background:#ECEFFB;color:#4E63C8;border:1px solid #ECEFFB}
+.badge-head{background:#FBEEEC;color:#A8833C;border:1px solid #FBEEEC}
 .badge-ok{background:#F5F8F5;color:#1F9D77}
-.badge-warn{background:#2A1808;color:#A8833C}
+.badge-warn{background:#FBEEEC;color:#A8833C}
 
 /* Assessor cards */
-.user-card{background:#0A1A0C;border:1px solid #D9E3DB;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
+.user-card{background:#EAF4EC;border:1px solid #D9E3DB;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
 .user-card:hover{border-color:#5C7365}
 .user-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
 .user-info{flex:1;min-width:0}
@@ -13341,12 +13341,12 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
 
 /* Head info cards */
 .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
-.info-card{background:#0A1A0C;border:1px solid #D9E3DB;border-radius:10px;padding:14px}
+.info-card{background:#EAF4EC;border:1px solid #D9E3DB;border-radius:10px;padding:14px}
 .info-card-title{font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px}
 .info-card-body{font-size:12px;color:#5C7365;line-height:1.6}
 
 /* Doc list */
-.doc-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #0D1A0E;font-size:12px}
+.doc-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #EAF4EC;font-size:12px}
 .doc-row:last-child{border-bottom:none}
 .doc-icon{font-size:14px;flex-shrink:0}
 .doc-name{flex:1;color:#A8833C;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -13355,20 +13355,20 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
 /* Config tab */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .upload-area{border:1.5px dashed #F5F8F5;border-radius:10px;padding:22px;text-align:center;cursor:pointer;position:relative;background:#EFF3EF;transition:all .2s}
-.upload-area:hover{border-color:#1F9D77;background:#050D05}
+.upload-area:hover{border-color:#1F9D77;background:#EAF4EC}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .ui{pointer-events:none}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
 .upload-area p{font-size:12px;color:#5C7365}
 .upload-area .fname{color:#1F9D77;font-weight:600;font-size:12px;margin-top:4px;min-height:18px}
 .tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#EFF3EF;border:1px dashed #F5F8F5;border-radius:8px;margin-bottom:12px}
-.tab-toolbar .lbl{font-size:11px;color:#3A4A3A;flex:1;min-width:120px}
+.tab-toolbar .lbl{font-size:11px;color:#EAF4EC;flex:1;min-width:120px}
 .btn-file-wrap{position:relative;overflow:hidden;display:inline-flex}
 .btn-file-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .pdf-preview{background:#EFF3EF;border:1px solid #1F9D77;border-radius:8px;padding:12px;margin-bottom:12px;display:none}
 .pdf-preview .pdf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .pdf-preview .pdf-title{font-size:11px;color:#1F9D77;font-weight:700}
-.pdf-preview textarea{height:140px;font-size:11px;font-family:monospace;color:#9A9;background:#040A04;resize:vertical}
+.pdf-preview textarea{height:140px;font-size:11px;font-family:monospace;color:#9A9;background:#EAF4EC;resize:vertical}
 .pdf-preview .pdf-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .sg-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #F5F8F5;background:#EFF3EF;color:#5C7365;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
@@ -13376,8 +13376,8 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
 .sg-panel{display:none}.sg-panel.active{display:block}
 .sg-item{background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.sg-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#2A3A2A;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
-.sg-del:hover{color:#D93B3B;background:#1A0505}
+.sg-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#EAF4EC;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
+.sg-del:hover{color:#D93B3B;background:#FBE9E9}
 .sg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .sg-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
 .sg-mini label{font-size:10px;color:#5C7365;margin-bottom:3px}
@@ -13504,7 +13504,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
   </div>
 
   <!-- Cenário Macro -->
-  <div class="card" style="border-color:#2A3A20">
+  <div class="card" style="border-color:#FBF3D2">
     <div class="card-title" style="color:#A8833C">🌐 Cenário Macro Atual</div>
     <div id="head-cenario"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
@@ -13544,13 +13544,13 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
   </div>
 
   <!-- Alertas -->
-  <div class="card" style="border-color:#2A1A08">
+  <div class="card" style="border-color:#FBEEEC">
     <div class="card-title" style="color:#D93B3B">🚨 Alertas Ativos</div>
     <div id="head-alertas"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
 
   <!-- Clientes Registrados -->
-  <div class="card" style="border-color:#1A2A3A">
+  <div class="card" style="border-color:#ECEFFB">
     <div class="card-title" style="color:#4E63C8">👤 Carteiras de Clientes Registradas</div>
     <div id="head-clientes"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
@@ -14372,7 +14372,7 @@ function renderSenhas(assessores, papeis){
   const tb = document.getElementById("senhas-body");
   const chip = (tem)=> tem
     ? '<span style="background:#E9F5EE;color:#1F9D77;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✓ Criada</span>'
-    : '<span style="background:#2A1A0A;color:#A8833C;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">⏳ Pendente</span>';
+    : '<span style="background:#FBEEEC;color:#A8833C;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">⏳ Pendente</span>';
   const linhas = [];
   assessores.forEach(a=>{
     linhas.push(`<tr>
@@ -14380,7 +14380,7 @@ function renderSenhas(assessores, papeis){
       <td style="font-family:monospace;color:#A8833C">${a.codigo}</td>
       <td>${chip(a.tem_senha)}</td>
       <td style="color:#8A9A8E;font-size:11px">${a.criada_em||"—"}</td>
-      <td>${a.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#5A2A2A;color:#FF8B8B" onclick="resetarSenha('${a.codigo}','${a.nome.replace(/'/g,"")}')">Resetar</button>` : ""}</td>
+      <td>${a.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#FBE9E9;color:#FF8B8B" onclick="resetarSenha('${a.codigo}','${a.nome.replace(/'/g,"")}')">Resetar</button>` : ""}</td>
     </tr>`);
   });
   papeis.forEach(p=>{
@@ -14389,7 +14389,7 @@ function renderSenhas(assessores, papeis){
       <td style="font-family:monospace;color:#4E63C8">${p.role}</td>
       <td>${chip(p.tem_senha)}</td>
       <td style="color:#8A9A8E;font-size:11px">${p.criada_em||"—"}</td>
-      <td>${p.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#5A2A2A;color:#FF8B8B" onclick="resetarSenha('${p.role}','${p.label}')">Resetar</button>` : ""}</td>
+      <td>${p.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#FBE9E9;color:#FF8B8B" onclick="resetarSenha('${p.role}','${p.label}')">Resetar</button>` : ""}</td>
     </tr>`);
   });
   tb.innerHTML = linhas.join("");
@@ -14577,7 +14577,7 @@ HTML_HEAD = r"""<!DOCTYPE html>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#EFF3EF;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#0F0F0A;border-bottom:1px solid #F7F1D8;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header{background:#EAF4EC;border-bottom:1px solid #F7F1D8;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header h1{font-size:17px;color:#A8833C;font-weight:700}
 header p{font-size:11px;color:#5C7365;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
@@ -14585,7 +14585,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .nav a:hover,.nav button:hover{border-color:#A8833C;color:#A8833C}
 .nav a.active{background:#A8833C;color:#000;border-color:#A8833C;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
-.card{background:#0F0F0A;border:1px solid #F7F1D8;border-radius:12px;padding:22px;margin-bottom:18px}
+.card{background:#EAF4EC;border:1px solid #F7F1D8;border-radius:12px;padding:22px;margin-bottom:18px}
 .card-title{font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title span{font-size:16px}
 /* Tabs */
@@ -14597,7 +14597,7 @@ header p{font-size:11px;color:#5C7365;margin-top:2px}
 .porto-table{width:100%;border-collapse:collapse;font-size:12px}
 .porto-table th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #F7F1D8;color:#5C7365}
 .porto-table th.classe{text-align:left;color:#A8833C;width:140px}
-.porto-table td{padding:6px 8px;border-bottom:1px solid #1A1A10;text-align:center}
+.porto-table td{padding:6px 8px;border-bottom:1px solid #FBF3D2;text-align:center}
 .porto-table td.classe-label{text-align:left;font-size:11px;color:#5C7365;padding-left:4px}
 .porto-table td input[type=number]{width:70px;background:#EFF3EF;border:1px solid #F7F1D8;border-radius:5px;padding:5px 6px;color:#17271E;font-size:12px;text-align:center;outline:none}
 .porto-table td input[type=number]:focus{border-color:#A8833C}
@@ -14652,7 +14652,7 @@ textarea{resize:vertical}
 @media(max-width:640px){.prod-grid-3,.prod-grid-2{grid-template-columns:1fr}}
 /* ── Abas de topo do Head ── */
 .head-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:0;z-index:20;background:#EFF3EF;padding:10px 0}
-.head-nav button{flex:1;min-width:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:11px 14px;border-radius:10px;border:1px solid #F7F1D8;background:#0F0F0A;color:#5C7365;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
+.head-nav button{flex:1;min-width:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:11px 14px;border-radius:10px;border:1px solid #F7F1D8;background:#EAF4EC;color:#5C7365;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
 .head-nav button:hover{border-color:#A8833C;color:#A8833C}
 .head-nav button.active{background:#A8833C;color:#EFF3EF;border-color:#A8833C}
 .head-nav button .ht-sub{font-size:9.5px;font-weight:600;opacity:.7;text-transform:none;letter-spacing:0}
@@ -14724,7 +14724,7 @@ textarea{resize:vertical}
   <div class="card-title" style="color:#2E86B8"><span>🧭</span> Visão dos Gestores — Consenso da Carta</div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
     <span style="font-size:11px;color:#5C7365">Extraído da carta atual. Embasa os textos acima e chega ao assessor no sistema dele.</span>
-    <span id="vg-ref" style="font-size:10px;color:#2E86B8;background:#0A1A24;border:1px solid #EAF1F6;border-radius:10px;padding:3px 10px;margin-left:auto"></span>
+    <span id="vg-ref" style="font-size:10px;color:#2E86B8;background:#ECEFFB;border:1px solid #EAF1F6;border-radius:10px;padding:3px 10px;margin-left:auto"></span>
   </div>
 
   <!-- Tese central -->
@@ -14752,7 +14752,7 @@ textarea{resize:vertical}
 <!-- ══ CARTEIRAS RECOMENDADAS (Research XP) ════════════════════════════════════ -->
 <div class="card" style="border-color:#F5EFD9">
   <div class="card-title" style="color:#A8833C"><span>⭐</span> Carteiras Recomendadas — Research XP</div>
-  <div style="background:#0C0A06;border:1px solid #F5EFD9;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+  <div style="background:#F5F8F5;border:1px solid #F5EFD9;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
     <span style="font-size:11px;color:#8A7A5A;flex:1;line-height:1.5">Suba os PDFs das carteiras recomendadas (RF, Fundos, FIIs, Alocação). O sistema extrai os ativos e passa a marcar <b style="color:#A8833C">⭐ Recomendado XP</b> nas sugestões que o assessor recebe na análise do cliente.</span>
     <input type="file" id="cartrec-input" accept=".pdf" style="display:none" onchange="uploadCarteiraRec(this)">
     <button class="btn btn-sm" onclick="document.getElementById('cartrec-input').click()" style="white-space:nowrap">📂 Subir carteira (PDF)</button>
@@ -14828,7 +14828,7 @@ textarea{resize:vertical}
   </p>
 
   <!-- Sugestões já salvas no arquivo (persistidas) — nunca são esquecidas -->
-  <div id="sugestoes-salvas" style="background:#060C06;border:1px solid #16241A;border-radius:10px;padding:14px 16px;margin-bottom:16px"></div>
+  <div id="sugestoes-salvas" style="background:#EAF4EC;border:1px solid #EAF4EC;border-radius:10px;padding:14px 16px;margin-bottom:16px"></div>
 
   <div style="font-size:11px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">➕ Cadastrar novos ativos</div>
   <div class="tabs">
@@ -14858,7 +14858,7 @@ textarea{resize:vertical}
   </div>
 
   <!-- Alertas de produtos inline -->
-  <div style="margin-top:16px;padding-top:16px;border-top:1px solid #1A1A28">
+  <div style="margin-top:16px;padding-top:16px;border-top:1px solid #ECEFFB">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
       <span style="font-size:11px;color:#B08FCF;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🔔 Alertas de Produtos</span>
       <span style="font-size:10px;color:#5C7365">▾ expandir</span>
@@ -14949,7 +14949,7 @@ textarea{resize:vertical}
       </div>
       <div>
         <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Upside calculado</label>
-        <div id="call-upside-display" style="padding:8px;border-radius:6px;background:#E9F5EE;border:1px solid #1A3A28;font-size:14px;font-weight:700;color:#1F9D77;text-align:center">—</div>
+        <div id="call-upside-display" style="padding:8px;border-radius:6px;background:#E9F5EE;border:1px solid #EAF4EC;font-size:14px;font-weight:700;color:#1F9D77;text-align:center">—</div>
       </div>
       <div>
         <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Stop (R$)</label>
@@ -15079,7 +15079,7 @@ textarea{resize:vertical}
 </div>
 
 <!-- ══ 6b. CARTEIRA BRAÚNA — DESTAQUE DO MÊS ══════════════════════════════════ -->
-<div class="card" style="border-color:#2A1A3A">
+<div class="card" style="border-color:#ECEFFB">
   <div class="card-title" style="color:#A8833C"><span>📋</span> Carteira Braúna — Destaque do Mês</div>
   <p style="font-size:11px;color:#5C7365;margin-bottom:16px;line-height:1.6">
     Produtos recomendados por categoria. O Head adiciona o <b style="color:#A8833C">motivo / racional</b> de cada alocação e salva um por um. Essa inteligência embasa os assessores nas conversas com clientes.
@@ -15107,7 +15107,7 @@ textarea{resize:vertical}
 <div class="head-tabpanel" id="ht-base">
 
 <!-- ══ UPLOAD RÁPIDO ═══════════════════════════════════════════════════════════ -->
-<div class="card" style="border-color:#3A3A20">
+<div class="card" style="border-color:#FBF3D2">
   <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
     <div style="display:flex;align-items:center;gap:10px">
@@ -15117,11 +15117,11 @@ textarea{resize:vertical}
     <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
   </div>
   <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
-    style="border:2px dashed #2A4A2A;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
-    onmouseover="this.style.borderColor='#A8833C'" onmouseout="this.style.borderColor='#2A4A2A'">
+    style="border:2px dashed #EAF4EC;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
+    onmouseover="this.style.borderColor='#A8833C'" onmouseout="this.style.borderColor='#EAF4EC'">
     <div style="font-size:26px;margin-bottom:8px">📂</div>
     <div style="font-size:13px;color:#5C7365;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
-    <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Carteiras recomendadas Levante / XP, relatórios, material sobre ativos</div>
+    <div style="font-size:11px;color:#EAF4EC">Até 5 arquivos · Carteiras recomendadas Levante / XP, relatórios, material sobre ativos</div>
   </div>
   <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
     <div style="font-size:11px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Arquivos selecionados — <span id="pdf-rapido-contador">0</span></div>
@@ -15143,7 +15143,7 @@ textarea{resize:vertical}
   <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
     <div>
       <label>PDF da carta</label>
-      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#EFF3EF;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#A8833C'" onmouseout="this.style.borderColor='#3A3A20'">
+      <div id="know-drop" style="border:1.5px dashed #FBF3D2;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#EFF3EF;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#A8833C'" onmouseout="this.style.borderColor='#FBF3D2'">
         <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
         <div style="font-size:28px;margin-bottom:8px">📄</div>
         <p style="font-size:12px;color:#5C7365">Arraste ou clique — múltiplos PDFs</p>
@@ -15202,7 +15202,7 @@ textarea{resize:vertical}
 <style>
 .know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #F7F1D8;background:#EFF3EF;color:#5C7365;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
 .know-cls-btn.sel{background:#A8833C;color:#000;border-color:#A8833C;font-weight:700}
-.know-doc-card{background:#EFF3EF;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.know-doc-card{background:#EFF3EF;border:1px solid #FBF3D2;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
 .know-doc-card:hover{border-color:#F7F1D8}
 .know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 </style>
@@ -15220,7 +15220,7 @@ textarea{resize:vertical}
     <p id="pub-desc">Ao publicar, o cenário macro, alocações, produtos e calls ficam disponíveis para todos os assessores.</p>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <span id="pub-pendente-badge" style="display:none;font-size:11px;font-weight:700;color:#D93B3B;background:#2A0808;border:1px solid #FF444455;border-radius:8px;padding:3px 10px;animation:piscar-pub 1.2s ease-in-out infinite">⚠️ Alterações não publicadas</span>
+    <span id="pub-pendente-badge" style="display:none;font-size:11px;font-weight:700;color:#D93B3B;background:#FBE9E9;border:1px solid #FF444455;border-radius:8px;padding:3px 10px;animation:piscar-pub 1.2s ease-in-out infinite">⚠️ Alterações não publicadas</span>
     <button class="btn" id="btn-pub" onclick="publicar()" style="background:#A8833C;color:#EFF3EF;border-color:#A8833C;font-weight:700">📤 Publicar agora</button>
     <span id="pub-st" style="font-size:12px"></span>
   </div>
@@ -15280,10 +15280,10 @@ async function carregarCarteirasRec(){
     const TIPOS={rf:"Renda Fixa",fundos:"Fundos",fii:"FIIs",acoes:"Ações",alocacao:"Alocação",outro:"Outro"};
     box.innerHTML=carts.map(function(c){
       var amostra=(c.tickers||[]).slice(0,6).join(", ")+((c.tickers||[]).length>6?"…":"");
-      return '<div style="background:#0C0A06;border:1px solid #F5EFD9;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'
-        +'<div style="flex:1"><div style="font-size:12px;color:#D9E3DB;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#A8833C;background:#1A1608;border:1px solid #F5EFD9;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span></div>'
+      return '<div style="background:#F5F8F5;border:1px solid #F5EFD9;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'
+        +'<div style="flex:1"><div style="font-size:12px;color:#D9E3DB;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#A8833C;background:#FBF3D2;border:1px solid #F5EFD9;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span></div>'
         +'<div style="font-size:10px;color:#5A7A6A">'+c.qtd+' ativos'+(c.referencia?" · "+c.referencia:"")+' · '+c.data+(amostra?" · "+amostra:"")+'</div></div>'
-        +'<button onclick="deleteCarteiraRec(\''+c.id+'\')" style="background:none;border:none;color:#3A2A2A;cursor:pointer;font-size:14px" title="Remover">🗑</button></div>';
+        +'<button onclick="deleteCarteiraRec(\''+c.id+'\')" style="background:none;border:none;color:#FBE9E9;cursor:pointer;font-size:14px" title="Remover">🗑</button></div>';
     }).join("");
   }catch(e){}
 }
@@ -15474,8 +15474,8 @@ function renderVisaoGestores(data){
     elAl.innerHTML = alertas.map(a=>{
       const ok = String(a).trim().startsWith("✅");
       const cor = ok ? "#1F9D77" : "#C0673A";
-      const bg  = ok ? "#081A12" : "#1A140A";
-      const bd  = ok ? "#1A3A28" : "#3A2E14";
+      const bg  = ok ? "#EAF4EC" : "#FBF3D2";
+      const bd  = ok ? "#EAF4EC" : "#FBEEEC";
       return `<div style="font-size:11.5px;color:${cor};background:${bg};border:1px solid ${bd};border-radius:7px;padding:8px 11px;line-height:1.45">${_esc(a)}</div>`;
     }).join("");
   }
@@ -15488,7 +15488,7 @@ function renderVisaoGestores(data){
       </div>
       <div style="font-size:10px;color:#2E86B8;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:7px">${_esc(g.tema)}</div>
       <div style="font-size:11.5px;color:#5C7365;line-height:1.5;margin-bottom:8px">${_esc(g.mensagem)}</div>
-      ${g.implicacao_alocacao ? `<div style="font-size:11px;color:#A8833C;line-height:1.45;border-top:1px solid #14222C;padding-top:7px"><b style="color:#A8833C">→ Alocação:</b> ${_esc(g.implicacao_alocacao)}</div>` : ""}
+      ${g.implicacao_alocacao ? `<div style="font-size:11px;color:#A8833C;line-height:1.45;border-top:1px solid #ECEFFB;padding-top:7px"><b style="color:#A8833C">→ Alocação:</b> ${_esc(g.implicacao_alocacao)}</div>` : ""}
       ${g.fonte ? `<div style="font-size:9.5px;color:#3A5A6A;margin-top:7px">${_esc(g.fonte)}</div>` : ""}
     </div>`).join("");
 
@@ -15570,24 +15570,24 @@ function buildProdHtml(cls, id, p){
   if(cls === "fiis"){
     const segmentos = ["Papel (CRI)","Lajes Corporativas","Logística","Shopping","Residencial","Híbrido","Fundo de Fundos","Agro","Outro"].map(s=>`<option ${s===p.setor?"selected":""}>${s}</option>`).join("");
     const recs = ["Compra","Compra Forte","Neutro","Vender"].map(s=>`<option ${s===p.cobertura?"selected":""}>${s}</option>`).join("");
-    return `<div class="prod-item" id="prod-item-${cls}-${id}" style="border-color:#1A1A2A">
+    return `<div class="prod-item" id="prod-item-${cls}-${id}" style="border-color:#ECEFFB">
       <button class="prod-del" onclick="delProduto('${cls}',${id})">✕</button>
       <div class="prod-grid-3">
         <div class="prod-mini"><label>Ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: MXRF11, HGLG11" style="text-transform:uppercase"></div>
         <div class="prod-mini"><label>Nome do fundo</label><input type="text" id="pe-${cls}-${id}" value="${v("emissor")}" placeholder="Ex: Maxi Renda FII"></div>
-        <div class="prod-mini"><label>Segmento</label><select id="pt-${cls}-${id}" style="background:#EFF3EF;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${segmentos}</select></div>
+        <div class="prod-mini"><label>Segmento</label><select id="pt-${cls}-${id}" style="background:#EFF3EF;border:1px solid #ECEFFB;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${segmentos}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Preço atual (R$)</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 9,85"></div>
         <div class="prod-mini"><label>P/VP</label><input type="text" id="pv-${cls}-${id}" value="${v("vencimento")}" placeholder="Ex: 0,92"></div>
         <div class="prod-mini"><label>Dividend Yield (a.a.)</label><input type="text" id="pdy-${cls}-${id}" value="${v("dy")}" placeholder="Ex: 12,8%"></div>
-        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#EFF3EF;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${recs}</select></div>
+        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#EFF3EF;border:1px solid #ECEFFB;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${recs}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Rendimento mensal esperado (R$/cota)</label><input type="text" id="pup-${cls}-${id}" value="${v("upside")}" placeholder="Ex: R$ 0,105/cota"></div>
         <div class="prod-mini"><label>Gestora</label><input type="text" id="ppz-${cls}-${id}" value="${v("prazo")}" placeholder="Ex: CSHG, Kinea, BTG Pactual"></div>
       </div>
-      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#EFF3EF;border:1px solid #1A1A2A;border-radius:6px;padding:8px;color:#17271E;font-size:12px;resize:vertical;outline:none" placeholder="Portfólio, qualidade dos contratos, vacância, gestão...">${v("motivo")}</textarea></div>
+      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#EFF3EF;border:1px solid #ECEFFB;border-radius:6px;padding:8px;color:#17271E;font-size:12px;resize:vertical;outline:none" placeholder="Portfólio, qualidade dos contratos, vacância, gestão...">${v("motivo")}</textarea></div>
       <div class="prod-mini" style="margin-top:6px"><label>Riscos</label><input type="text" id="prisk-${cls}-${id}" value="${v("riscos")}" placeholder="Ex: Alta de juros reduz atratividade, vacância elevada, risco de crédito dos CRIs"></div>
     </div>`;
   }
@@ -15644,9 +15644,9 @@ function initProdButtons(){
 
     // Barra de importação
     const toolbar = document.createElement("div");
-    toolbar.style.cssText = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#070C07;border:1px dashed #F7F1D8;border-radius:8px;margin-bottom:12px";
+    toolbar.style.cssText = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#EAF4EC;border:1px dashed #F7F1D8;border-radius:8px;margin-bottom:12px";
     toolbar.innerHTML = `
-      <span style="font-size:11px;color:#3A4A3A;flex:1">📂 Importar produtos via arquivo:</span>
+      <span style="font-size:11px;color:#EAF4EC;flex:1">📂 Importar produtos via arquivo:</span>
       <label style="display:inline-flex;align-items:center;gap:6px;background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#A8833C';this.style.color='#000'" onmouseout="this.style.background='#FBF3D2';this.style.color='#A8833C'">
         📄 PDF
         <input type="file" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadPdfProduto('${cls.key}',this)">
@@ -15663,13 +15663,13 @@ function initProdButtons(){
     // Preview PDF por aba
     const preview = document.createElement("div");
     preview.id = `prod-pdf-preview-${cls.key}`;
-    preview.style.cssText = "display:none;background:#070C07;border:1px solid #A8833C;border-radius:8px;padding:12px;margin-bottom:12px";
+    preview.style.cssText = "display:none;background:#EAF4EC;border:1px solid #A8833C;border-radius:8px;padding:12px;margin-bottom:12px";
     preview.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:11px;color:#A8833C;font-weight:700">📄 Conteúdo extraído — ${cls.label}</span>
         <button onclick="document.getElementById('prod-pdf-preview-${cls.key}').style.display='none'" style="background:none;border:none;color:#5C7365;cursor:pointer;font-size:14px">✕</button>
       </div>
-      <textarea id="prod-pdf-texto-${cls.key}" rows="6" style="width:100%;background:#050A05;border:1px solid #F7F1D8;border-radius:7px;padding:10px;color:#8A9A8E;font-size:11px;font-family:monospace;resize:vertical;outline:none"></textarea>
+      <textarea id="prod-pdf-texto-${cls.key}" rows="6" style="width:100%;background:#EAF4EC;border:1px solid #F7F1D8;border-radius:7px;padding:10px;color:#8A9A8E;font-size:11px;font-family:monospace;resize:vertical;outline:none"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
         <button class="btn btn-sm" onclick="usarPdfComoProduto('${cls.key}')">→ Criar produto a partir deste texto</button>
         <button class="btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('prod-pdf-texto-${cls.key}').value)">📋 Copiar</button>
@@ -15857,7 +15857,7 @@ function renderSugestoesSalvas(){
     arr.forEach((p,idx)=>{
       html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;margin-bottom:5px">
         <span style="flex:1;font-size:12px;color:#17271E"><b>${_escapa(p.nome)||'—'}</b>${p.taxa?` · <span style="color:#1F9D77">${_escapa(p.taxa)}</span>`:''}${p.emissor?` · <span style="color:#8A9A8E">${_escapa(p.emissor)}</span>`:''}${p.indicado_em?`<span style="color:#5C7365;font-size:10px;margin-left:6px">salvo ${_escapa(p.indicado_em)}</span>`:''}</span>
-        <button onclick="editarSalvo('${cls}',${idx})" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:6px;padding:4px 10px;color:#2E86B8;font-size:11px;cursor:pointer">✏️ editar</button>
+        <button onclick="editarSalvo('${cls}',${idx})" style="background:#ECEFFB;border:1px solid #2A5A7A;border-radius:6px;padding:4px 10px;color:#2E86B8;font-size:11px;cursor:pointer">✏️ editar</button>
         <button onclick="removerSalvo('${cls}',${idx})" title="Remover do arquivo" style="background:#FBE9E9;border:1px solid #F7DADA;border-radius:6px;padding:4px 10px;color:#D93B3B;font-size:11px;cursor:pointer">🗑️</button>
       </div>`;
     });
@@ -16043,7 +16043,7 @@ function renderKnowledge(docs){
     const cor = KNOW_TIPO_COLORS[d.tipo]||"#8A9A8E";
     const label = KNOW_TIPO_LABELS[d.tipo]||d.tipo;
     const clsTags = (d.classes||[]).map(c=>`<span style="font-size:10px;background:#FBF3D2;color:#8A9A8E;padding:2px 7px;border-radius:10px">${c}</span>`).join(" ");
-    const pubBadge = d.publicado ? `<span style="font-size:10px;background:#0A2A0A;color:#1F9D77;padding:2px 8px;border-radius:10px;border:1px solid #1A4A1A">✓ publicado</span>` : `<span style="font-size:10px;color:#5C7365">rascunho</span>`;
+    const pubBadge = d.publicado ? `<span style="font-size:10px;background:#EAF4EC;color:#1F9D77;padding:2px 8px;border-radius:10px;border:1px solid #EAF4EC">✓ publicado</span>` : `<span style="font-size:10px;color:#5C7365">rascunho</span>`;
     return `<div class="know-doc-card">
       <div style="display:flex;align-items:flex-start;gap:12px">
         <div style="font-size:24px;flex-shrink:0">📄</div>
@@ -16068,7 +16068,7 @@ function renderKnowledge(docs){
         </div>
       </div>
       <!-- Preview expansível -->
-      <div id="know-preview-${d.id}" style="display:none;margin-top:10px;background:#050A05;border:1px solid #F5F8F5;border-radius:8px;padding:10px;font-size:11px;color:#8A9A8E;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
+      <div id="know-preview-${d.id}" style="display:none;margin-top:10px;background:#EAF4EC;border:1px solid #F5F8F5;border-radius:8px;padding:10px;font-size:11px;color:#8A9A8E;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
     </div>`;
   }).join("");
 }
@@ -16349,7 +16349,7 @@ async function carregarEstruturadas(){
     }
     const PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva"};
     lista.innerHTML = ops.map(op=>`
-      <div style="background:#080C06;border:1px solid #F3E7DD;border-left:3px solid #A8833C;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+      <div style="background:#EAF4EC;border:1px solid #F3E7DD;border-left:3px solid #A8833C;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
             <span style="font-size:12px;font-weight:700;background:#C9A96E22;color:#A8833C;padding:2px 8px;border-radius:8px">${op.tipo}</span>
@@ -16409,7 +16409,7 @@ function renderGest2Tabs(){
   tabs.innerHTML = gestoras.map(g=>`
     <button onclick="gest2ShowGestora('${g.id}')" style="font-size:12px;padding:8px 14px;border:none;border-bottom:2px solid transparent;background:none;color:#5C7365;cursor:pointer;transition:all .15s" id="gest2tab-${g.id}">
       🏦 ${g.nome||g.id}
-    </button>`).join("") + (gestoras.length ? "" : `<span style="font-size:11px;color:#1E3A2A;padding:8px 14px">Nenhuma gestora ainda.</span>`);
+    </button>`).join("") + (gestoras.length ? "" : `<span style="font-size:11px;color:#EAF4EC;padding:8px 14px">Nenhuma gestora ainda.</span>`);
 }
 
 let _gest2_ativa = null;
@@ -16456,7 +16456,7 @@ function gest2ShowGestora(gid){
               <td style="padding:7px 8px;color:#5C7365;font-weight:600">${CLASSE_LABEL[c]||c}</td>
               ${G2_PERFIS.map(p=>{
                 const v = g.perfis?.[p]?.[c]||0;
-                return `<td style="padding:7px 8px;text-align:center;color:${v>0?"#17271E":"#1E3A2A"};font-weight:${v>0?"700":"400"}">${v>0?v+"%":"—"}</td>`;
+                return `<td style="padding:7px 8px;text-align:center;color:${v>0?"#17271E":"#EAF4EC"};font-weight:${v>0?"700":"400"}">${v>0?v+"%":"—"}</td>`;
               }).join("")}
             </tr>`;
           }).join("")}
@@ -16478,7 +16478,7 @@ function gest2ShowGestora(gid){
 function renderGest2Painel(){
   const gestoras = Object.values(_gest2_data);
   if(!gestoras.length){
-    document.getElementById("gest2-painel").innerHTML = `<div style="color:#1E3A2A;font-size:11px;text-align:center;padding:20px">Adicione a primeira gestora clicando em ➕ Adicionar Gestora.</div>`;
+    document.getElementById("gest2-painel").innerHTML = `<div style="color:#EAF4EC;font-size:11px;text-align:center;padding:20px">Adicione a primeira gestora clicando em ➕ Adicionar Gestora.</div>`;
     return;
   }
   if(!_gest2_ativa && gestoras.length) gest2ShowGestora(gestoras[0].id);
@@ -16713,7 +16713,7 @@ function renderListaRapido(){
     const icone = item.status==="ok" ? "✅" : item.status==="erro" ? "❌" : item.status==="processando" ? "⏳" : "📄";
     const tamanho = `${(item.file.size/1024).toFixed(0)} KB`;
     const statusTxt = item.status==="ok" ? `Salvo · ${item.chars} caracteres` : item.status==="erro" ? `Erro: ${item.erro}` : item.status==="processando" ? "Enviando..." : `Aguardando upload · ${tamanho}`;
-    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0A140A;border:1px solid ${item.status==='ok'?'#D9E3DB':'#F5F8F5'};border-radius:8px;margin-bottom:6px">
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#EAF4EC;border:1px solid ${item.status==='ok'?'#D9E3DB':'#F5F8F5'};border-radius:8px;margin-bottom:6px">
       <span style="font-size:20px;flex-shrink:0">${icone}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;color:#A8833C;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
@@ -16940,7 +16940,7 @@ function renderGestores(){
   if(count) count.textContent = _gestores.length;
   if(!lista) return;
   if(!_gestores.length){
-    lista.innerHTML = '<div style="color:#1E3A4A;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div>';
+    lista.innerHTML = '<div style="color:#ECEFFB;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhuma carteira salva ainda.</div>';
     const comp = document.getElementById("gest-comparativo");
     if(comp) comp.style.display = "none";
     return;
@@ -16956,7 +16956,7 @@ function renderGestores(){
         <div style="font-size:10px;color:#3A7A8A;margin-bottom:6px">Fonte: <b>${g.gestora}</b>${g.observacao?" · "+g.observacao:""}</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">
           ${GEST_CLASSES.filter(c=>(g.alocacao[c.key]||0)>0).map(c=>
-            `<span style="font-size:10px;background:#0A1A20;border:1px solid #1A3A4A;border-radius:8px;padding:2px 8px;color:#2E86B8">${c.lbl}: <b>${g.alocacao[c.key]}%</b></span>`
+            `<span style="font-size:10px;background:#ECEFFB;border:1px solid #ECEFFB;border-radius:8px;padding:2px 8px;color:#2E86B8">${c.lbl}: <b>${g.alocacao[c.key]}%</b></span>`
           ).join("")}
         </div>
       </div>
@@ -16982,7 +16982,7 @@ function renderComparativo(){
     const vals = _gestores.map(g=>g.alocacao[c.key]||0);
     const media = vals.reduce((a,b)=>a+b,0)/vals.length;
     const max = Math.max(...vals);
-    return `<tr style="border-bottom:1px solid #0D1E28">
+    return `<tr style="border-bottom:1px solid #ECEFFB">
       <td style="padding:5px 10px;color:#6A9AAA;font-size:11px">${c.lbl}</td>
       ${vals.map(v=>`<td style="text-align:center;padding:5px 10px;font-size:11px;color:${v===max&&max>0?"#1F9D77":"#8A9A8E"};font-weight:${v===max&&max>0?"700":"400"}">${v>0?v+"%":"—"}</td>`).join("")}
       ${_gestores.length>1?`<td style="text-align:center;padding:5px 10px;font-size:11px;color:#FFD180;font-weight:600">${media>0?media.toFixed(1)+"%":"—"}</td>`:""}
@@ -17124,7 +17124,7 @@ function cbRenderCategorias(){
     var prods = _cbMostrarSalvos ? doPerfil : pendentes;
     if(!prods.length) return;
 
-    h += '<div style="margin-bottom:20px;background:#EFF3EF;border:1px solid #1C3A20;border-radius:10px;overflow:hidden">';
+    h += '<div style="margin-bottom:20px;background:#EFF3EF;border:1px solid #EAF4EC;border-radius:10px;overflow:hidden">';
     h += '<div style="background:#EFF3EF;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">';
     h += '<span style="font-size:12px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px">'+cat.nome+'</span>';
     h += '<span style="font-size:10px;color:#5C7365">'+pendentes.length+' pendente(s)'+(salvos.length?' · '+salvos.length+' com motivo':'')+'</span>';
@@ -17583,9 +17583,9 @@ body{padding:0 0 60px}
 .cliente-assessor{font-size:11px;color:#5C7365}
 .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .badge.ok{background:#F5F8F5;color:#1F9D77;border:1px solid #D9E3DB}
-.badge.atencao{background:#2A2000;color:#A9800F;border:1px solid #4A3A00}
-.badge.critico{background:#2A0808;color:#D93B3B;border:1px solid #4A1010}
-.badge.perfil{background:#1A1008;color:#A8833C;border:1px solid #3A2A10}
+.badge.atencao{background:#FBEEEC;color:#A9800F;border:1px solid #FBEEEC}
+.badge.critico{background:#FBE9E9;color:#D93B3B;border:1px solid #FBE9E9}
+.badge.perfil{background:#FBEEEC;color:#A8833C;border:1px solid #FBEEEC}
 .patrimonio{font-size:13px;color:#A8833C;font-weight:600;white-space:nowrap}
 .data-tag{font-size:10px;color:#C6D6C9}
 .expand-icon{font-size:12px;color:#5C7365;transition:transform .2s}
@@ -17611,7 +17611,7 @@ body{padding:0 0 60px}
 
 /* Trocas sugeridas */
 .trocas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:4px}
-.troca-card{background:#0A1A12;border:1px solid #1A3020;border-radius:10px;padding:12px 14px}
+.troca-card{background:#EAF4EC;border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px}
 .troca-card.reduzir{background:#FBE9E9;border-color:#F7DADA}
 .troca-acao{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .troca-acao.comprar{color:#1F9D77}
@@ -17622,17 +17622,17 @@ body{padding:0 0 60px}
 
 /* Ativos */
 .ativos-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.ativo-chip{background:#181818;border:1px solid #F5F8F5;border-radius:8px;padding:4px 10px;font-size:11px;color:#8A9A8E}
+.ativo-chip{background:#EAF4EC;border:1px solid #F5F8F5;border-radius:8px;padding:4px 10px;font-size:11px;color:#8A9A8E}
 .ativo-chip span{color:#A8833C;font-weight:600}
 
 /* Vazio */
 .empty-state{text-align:center;padding:60px 20px;color:#C6D6C9}
 .empty-icon{font-size:48px;margin-bottom:12px}
 .empty-msg{font-size:15px;color:#5C7365}
-.empty-sub{font-size:12px;color:#1A3A28;margin-top:6px}
+.empty-sub{font-size:12px;color:#EAF4EC;margin-top:6px}
 
 .spinner-wrap{text-align:center;padding:60px;color:#5C7365}
-.spin{width:36px;height:36px;border:3px solid #1A3A28;border-top-color:#A8833C;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+.spin{width:36px;height:36px;border:3px solid #EAF4EC;border-top-color:#A8833C;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 @media(max-width:600px){
@@ -17658,17 +17658,17 @@ body{padding:0 0 60px}
 <div class="container">
 
   <!-- Upload ZIP / PDF em lote -->
-  <div id="upload-lote-box" style="background:#0A1208;border:1.5px dashed #1A4020;border-radius:14px;padding:20px 24px;margin-bottom:22px">
+  <div id="upload-lote-box" style="background:#EAF4EC;border:1.5px dashed #EAF4EC;border-radius:14px;padding:20px 24px;margin-bottom:22px">
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
       <div style="flex:1;min-width:220px">
         <div style="font-size:13px;font-weight:700;color:#A8833C;margin-bottom:4px">📦 Importar XPerformances em lote</div>
         <div style="font-size:12px;color:#5C7365">Arraste ou selecione um <strong style="color:#A8833C">.zip</strong> com até 50 PDFs, ou um <strong style="color:#A8833C">PDF</strong> individual. Os dados de cada cliente são salvos automaticamente.</div>
       </div>
-      <label id="lote-label" style="background:#1A3018;border:1px solid #2A5028;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#1F9D77;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#A8833C';this.style.color='#A8833C'" onmouseout="this.style.borderColor='#2A5028';this.style.color='#1F9D77'">
+      <label id="lote-label" style="background:#EAF4EC;border:1px solid #EAF4EC;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#1F9D77;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#A8833C';this.style.color='#A8833C'" onmouseout="this.style.borderColor='#EAF4EC';this.style.color='#1F9D77'">
         Selecionar arquivo
         <input type="file" id="input-lote" accept=".zip,.pdf" style="display:none" onchange="processarLote(this)">
       </label>
-      <button id="btn-atualizar-painel" onclick="atualizarPainel(this)" title="Recarrega todos os dados do painel" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#2E86B8;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#2E86B8'" onmouseout="this.style.borderColor='#2A5A7A'">
+      <button id="btn-atualizar-painel" onclick="atualizarPainel(this)" title="Recarrega todos os dados do painel" style="background:#ECEFFB;border:1px solid #2A5A7A;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#2E86B8;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#2E86B8'" onmouseout="this.style.borderColor='#2A5A7A'">
         ↻ Atualizar
       </button>
     </div>
@@ -17699,7 +17699,7 @@ body{padding:0 0 60px}
   </div>
 
   <!-- Visão macro — Head de Produtos -->
-  <div id="macro-head" style="display:none;background:#0A1208;border:1px solid #1A3010;border-radius:14px;padding:18px 20px;margin-bottom:22px">
+  <div id="macro-head" style="display:none;background:#EAF4EC;border:1px solid #FBF3D2;border-radius:14px;padding:18px 20px;margin-bottom:22px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <div>
         <div style="font-size:11px;color:#8A6A2A;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:2px">🏛️ Visão Head de Produtos — Oportunidade de Realocação da Base</div>
@@ -17707,7 +17707,7 @@ body{padding:0 0 60px}
       </div>
     </div>
     <div id="macro-classes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px"></div>
-    <div style="margin-top:16px;border-top:1px solid #1A3010;padding-top:14px">
+    <div style="margin-top:16px;border-top:1px solid #FBF3D2;padding-top:14px">
       <div style="font-size:11px;color:#8A6A2A;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">💡 Produtos com maior potencial de encaixe na base atual</div>
       <div id="macro-produtos" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
@@ -17833,7 +17833,7 @@ function renderMacroHead(lista){
       (prods[cls]||[]).slice(0,2).forEach(p=>{
         const nome = typeof p==='string'?p:(p.nome||'');
         const ticker = typeof p==='object'?p.ticker||'':'';
-        if(nome) chips.push(`<div style="background:#EFF3EF;border:1px solid #1A3018;border-radius:20px;padding:6px 14px;font-size:12px;color:#A8833C;display:flex;align-items:center;gap:6px"><span style="color:#5C7365;font-size:10px">${LABELS[cls]||cls}</span> ${nome}${ticker?` <span style="color:#2A4A2A;font-size:10px">${ticker}</span>`:''}</div>`);
+        if(nome) chips.push(`<div style="background:#EFF3EF;border:1px solid #EAF4EC;border-radius:20px;padding:6px 14px;font-size:12px;color:#A8833C;display:flex;align-items:center;gap:6px"><span style="color:#5C7365;font-size:10px">${LABELS[cls]||cls}</span> ${nome}${ticker?` <span style="color:#EAF4EC;font-size:10px">${ticker}</span>`:''}</div>`);
       });
     });
     document.getElementById('macro-produtos').innerHTML = chips.length
@@ -17905,7 +17905,7 @@ function renderLista(lista){
   const restantes = lista.length - mostrar.length;
   if(restantes > 0){
     html += '<div style="text-align:center;padding:16px 0">'
-      + '<button onclick="verMais()" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 24px;color:#2E86B8;font-size:13px;cursor:pointer">'
+      + '<button onclick="verMais()" style="background:#ECEFFB;border:1px solid #2A5A7A;border-radius:10px;padding:10px 24px;color:#2E86B8;font-size:13px;cursor:pointer">'
       + '▼ Ver mais ' + Math.min(_RENDER_PASSO, restantes) + ' de ' + restantes + ' restantes</button></div>';
   }
   el.innerHTML = html;
@@ -17962,7 +17962,7 @@ function clienteCard(c, i){
     <div class="section-title">Histórico de XPerformances (${(c.snapshots||[]).length} snapshots)</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
     ${(c.snapshots||[]).map((s,si)=>`
-      <div style="background:#0F1A10;border:1px solid #F5F8F5;border-radius:10px;padding:10px 14px;min-width:180px">
+      <div style="background:#EAF4EC;border:1px solid #F5F8F5;border-radius:10px;padding:10px 14px;min-width:180px">
         <div style="font-size:10px;color:#A8833C;font-weight:700;margin-bottom:4px">${si===0?'Mais recente':'Anterior '+(si)} · ${s.data_ref||s.data}</div>
         <div style="font-size:13px;color:#17271E;font-weight:600">${brl(s.patrimonio||0)}</div>
         ${s.rent&&s.rent.portfolio?`<div style="font-size:11px;color:#5C7365;margin-top:2px">12m: ${(s.rent.portfolio['12m']||0).toFixed(1)}%</div>`:''}
@@ -18128,7 +18128,7 @@ async function processarLote(input){
       </div>
       <div style="max-height:240px;overflow-y:auto">${lista}${maisHtml}</div>
       ${errosHtml ? `<div style="margin-top:8px;padding:10px;background:#FBE9E9;border-radius:8px">${errosHtml}</div>` : ''}
-      <button onclick="carregar()" style="margin-top:12px;background:#1A3018;border:1px solid #2A5028;border-radius:8px;padding:8px 18px;color:#1F9D77;font-size:12px;cursor:pointer">
+      <button onclick="carregar()" style="margin-top:12px;background:#EAF4EC;border:1px solid #EAF4EC;border-radius:8px;padding:8px 18px;color:#1F9D77;font-size:12px;cursor:pointer">
         ↻ Atualizar painel
       </button>`;
     resBox.style.display = 'block';
