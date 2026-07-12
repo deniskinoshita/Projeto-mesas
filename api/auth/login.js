@@ -126,24 +126,24 @@ const HTML_RESET = `<!DOCTYPE html>
 <title>Braúna — Redefinir Senha</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#081F18;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+html,body{height:100%;background:#EFF3EF;font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.card{background:#111;border:1px solid #1A4030;border-radius:16px;padding:36px 32px;width:100%;max-width:400px}
+.card{background:#FFFFFF;border:1px solid #D9E3DB;border-radius:16px;padding:36px 32px;width:100%;max-width:400px}
 .logo{text-align:center;margin-bottom:28px}
-.logo-title{font-size:20px;font-weight:800;color:#C9A96E;letter-spacing:2px}
-.logo-sub{font-size:11px;color:#3A6A48;margin-top:4px}
-h2{font-size:15px;color:#F0F0F0;margin-bottom:6px}
-p.desc{font-size:12px;color:#3A6A48;margin-bottom:22px;line-height:1.5}
-label{font-size:11px;color:#3A6A48;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-input{width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:11px 14px;color:#F0F0F0;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
-input:focus{border-color:#C9A96E}
-.btn{width:100%;background:#C9A96E;color:#081F18;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.logo-title{font-size:20px;font-weight:800;color:#A8833C;letter-spacing:2px}
+.logo-sub{font-size:11px;color:#5C7365;margin-top:4px}
+h2{font-size:15px;color:#17271E;margin-bottom:6px}
+p.desc{font-size:12px;color:#5C7365;margin-bottom:22px;line-height:1.5}
+label{font-size:11px;color:#5C7365;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:11px 14px;color:#17271E;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
+input:focus{border-color:#A8833C}
+.btn{width:100%;background:#A8833C;color:#EFF3EF;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.85}.btn:disabled{opacity:.4;cursor:not-allowed}
 .msg{font-size:12px;margin-top:12px;text-align:center;min-height:18px}
-.msg.ok{color:#5DCAA5}.msg.err{color:#FF6B6B}
-.back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#3A6A48;text-decoration:none}
-.back:hover{color:#C9A96E}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid #081F18;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
+.msg.ok{color:#1F9D77}.msg.err{color:#D93B3B}
+.back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#5C7365;text-decoration:none}
+.back:hover{color:#A8833C}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #EFF3EF;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -154,13 +154,13 @@ input:focus{border-color:#C9A96E}
     <div class="logo-sub">Redefinição de senha</div>
   </div>
   <div id="st-loading" style="text-align:center;padding:20px 0">
-    <div class="spin" style="width:24px;height:24px;border-color:#C9A96E;border-top-color:transparent;display:inline-block"></div>
-    <p style="color:#3A6A48;font-size:13px;margin-top:12px">Verificando link...</p>
+    <div class="spin" style="width:24px;height:24px;border-color:#A8833C;border-top-color:transparent;display:inline-block"></div>
+    <p style="color:#5C7365;font-size:13px;margin-top:12px">Verificando link...</p>
   </div>
   <div id="st-invalido" style="display:none;text-align:center;padding:10px 0">
     <div style="font-size:36px;margin-bottom:12px">⚠️</div>
-    <h2 style="color:#FF6B6B;margin-bottom:8px">Link inválido ou expirado</h2>
-    <p style="font-size:12px;color:#888;line-height:1.5;margin-bottom:20px">Este link de redefinição já foi utilizado ou expirou.<br>Solicite um novo na tela de login.</p>
+    <h2 style="color:#D93B3B;margin-bottom:8px">Link inválido ou expirado</h2>
+    <p style="font-size:12px;color:#8A9A8E;line-height:1.5;margin-bottom:20px">Este link de redefinição já foi utilizado ou expirou.<br>Solicite um novo na tela de login.</p>
     <a href="/" class="btn" style="display:block;text-align:center;text-decoration:none;padding:13px">Voltar ao login</a>
   </div>
   <div id="st-form" style="display:none">
@@ -173,8 +173,8 @@ input:focus{border-color:#C9A96E}
   </div>
   <div id="st-sucesso" style="display:none;text-align:center;padding:10px 0">
     <div style="font-size:36px;margin-bottom:12px">✅</div>
-    <h2 style="color:#5DCAA5;margin-bottom:8px">Senha redefinida!</h2>
-    <p style="font-size:12px;color:#888;margin-bottom:20px">Sua nova senha foi salva com sucesso. Você já pode fazer login.</p>
+    <h2 style="color:#1F9D77;margin-bottom:8px">Senha redefinida!</h2>
+    <p style="font-size:12px;color:#8A9A8E;margin-bottom:20px">Sua nova senha foi salva com sucesso. Você já pode fazer login.</p>
     <a href="/" class="btn" style="display:block;text-align:center;text-decoration:none;padding:13px">Ir para o login</a>
   </div>
 </div>
@@ -219,47 +219,47 @@ const HTML_LOGIN = `<!DOCTYPE html>
 <title>Braúna Investimentos — Acesso</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#081F18;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+html,body{height:100%;background:#EFF3EF;font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .logo-area{text-align:center;margin-bottom:40px}
-.logo-title{font-size:28px;font-weight:800;color:#C9A96E;letter-spacing:2px;text-transform:uppercase}
-.logo-sub{font-size:13px;color:#2A5A3A;margin-top:6px;letter-spacing:1px}
-.logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#C9A96E,transparent);margin:14px auto 0}
+.logo-title{font-size:28px;font-weight:800;color:#A8833C;letter-spacing:2px;text-transform:uppercase}
+.logo-sub{font-size:13px;color:#C6D6C9;margin-top:6px;letter-spacing:1px}
+.logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#A8833C,transparent);margin:14px auto 0}
 .roles{display:flex;gap:16px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
-.role-card{width:200px;padding:28px 20px;border-radius:16px;border:1.5px solid #1A4030;background:#111;cursor:pointer;text-align:center;transition:all .25s;position:relative;overflow:hidden}
-.role-card:hover{border-color:#C9A96E;transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
+.role-card{width:200px;padding:28px 20px;border-radius:16px;border:1.5px solid #D9E3DB;background:#FFFFFF;cursor:pointer;text-align:center;transition:all .25s;position:relative;overflow:hidden}
+.role-card:hover{border-color:#A8833C;transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
 .role-card.selected{transform:translateY(-3px)}
-.role-card.assessor.selected{border-color:#C9A96E;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#1A2E1A}
-.role-card.assessor:hover{border-color:#C9A96E}
-.role-card.lider.selected{border-color:#8B9FE8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#0D0D1F}
-.role-card.lider:hover{border-color:#8B9FE8}
-.role-card.head.selected{border-color:#D4B483;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#1A1500}
-.role-card.head:hover{border-color:#D4B483}
-.head .role-check{background:#D4B483;color:#000}
-.role-card.admin.selected{border-color:#5DCAA5;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#081410}
-.role-card.admin:hover{border-color:#5DCAA5}
+.role-card.assessor.selected{border-color:#A8833C;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#F5F8F5}
+.role-card.assessor:hover{border-color:#A8833C}
+.role-card.lider.selected{border-color:#4E63C8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#ECEFFB}
+.role-card.lider:hover{border-color:#4E63C8}
+.role-card.head.selected{border-color:#A8833C;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#FBF3D2}
+.role-card.head:hover{border-color:#A8833C}
+.head .role-check{background:#A8833C;color:#17271E}
+.role-card.admin.selected{border-color:#1F9D77;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#EFF3EF}
+.role-card.admin:hover{border-color:#1F9D77}
 .role-icon{font-size:36px;margin-bottom:12px;display:block}
 .role-name{font-size:15px;font-weight:700;margin-bottom:4px}
-.role-desc{font-size:11px;color:#3A6A48;line-height:1.4}
+.role-desc{font-size:11px;color:#5C7365;line-height:1.4}
 .role-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;opacity:0;transition:opacity .2s}
-.assessor .role-check{background:#C9A96E;color:#000}
-.lider .role-check{background:#8B9FE8;color:#000}
-.admin .role-check{background:#5DCAA5;color:#000}
+.assessor .role-check{background:#A8833C;color:#17271E}
+.lider .role-check{background:#4E63C8;color:#17271E}
+.admin .role-check{background:#1F9D77;color:#17271E}
 .role-card.selected .role-check{opacity:1}
-.senha-box{width:100%;max-width:380px;background:#111;border-radius:14px;padding:28px;border:1px solid #1A4030;animation:fadeUp .25s ease}
+.senha-box{width:100%;max-width:380px;background:#FFFFFF;border-radius:14px;padding:28px;border:1px solid #D9E3DB;animation:fadeUp .25s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .senha-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .senha-label span{font-size:16px}
 .senha-input-wrap{position:relative;margin-bottom:14px}
-.senha-input{width:100%;background:#0A0A0A;border:1.5px solid #1C4A34;border-radius:10px;padding:13px 44px 13px 16px;color:#F0F0F0;font-size:16px;letter-spacing:4px;outline:none;transition:border .2s}
-.senha-input::placeholder{letter-spacing:1px;font-size:13px;color:#1E4A30}
+.senha-input{width:100%;background:#EFF3EF;border:1.5px solid #D9E3DB;border-radius:10px;padding:13px 44px 13px 16px;color:#17271E;font-size:16px;letter-spacing:4px;outline:none;transition:border .2s}
+.senha-input::placeholder{letter-spacing:1px;font-size:13px;color:#5C7365}
 .senha-input:focus{border-color:var(--role-color)}
-.toggle-pw{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#2A5A3A;cursor:pointer;font-size:16px;padding:0}
-.btn-entrar{width:100%;padding:14px;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;background:var(--role-color);color:#081F18}
+.toggle-pw{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#C6D6C9;cursor:pointer;font-size:16px;padding:0}
+.btn-entrar{width:100%;padding:14px;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;background:var(--role-color);color:#EFF3EF}
 .btn-entrar:hover{opacity:.88;transform:translateY(-1px)}
 .btn-entrar:disabled{opacity:.3;cursor:not-allowed;transform:none}
-.erro-msg{font-size:12px;color:#FF6B6B;text-align:center;margin-top:10px;height:18px;transition:opacity .2s}
-.rodape{font-size:11px;color:#1C4A34;margin-top:32px;text-align:center}
+.erro-msg{font-size:12px;color:#D93B3B;text-align:center;margin-top:10px;height:18px;transition:opacity .2s}
+.rodape{font-size:11px;color:#D9E3DB;margin-top:32px;text-align:center}
 </style>
 </head>
 <body>
@@ -271,22 +271,22 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 <div class="roles">
   <div class="role-card assessor" onclick="selRole('assessor')" id="card-assessor">
     <div class="role-check">✓</div><span class="role-icon">📊</span>
-    <div class="role-name" style="color:#C9A96E">Assessor</div>
+    <div class="role-name" style="color:#A8833C">Assessor</div>
     <div class="role-desc">Análise de carteiras e atendimento ao cliente</div>
   </div>
   <div class="role-card lider" onclick="selRole('lider')" id="card-lider">
     <div class="role-check">✓</div><span class="role-icon">👥</span>
-    <div class="role-name" style="color:#8B9FE8">Líder</div>
+    <div class="role-name" style="color:#4E63C8">Líder</div>
     <div class="role-desc">Visão da equipe, OKRs e orientação aos assessores</div>
   </div>
   <div class="role-card head" onclick="selRole('head')" id="card-head">
     <div class="role-check">✓</div><span class="role-icon">🏛️</span>
-    <div class="role-name" style="color:#D4B483">Head de Produtos</div>
+    <div class="role-name" style="color:#A8833C">Head de Produtos</div>
     <div class="role-desc">Portfólios modelo, cenário macro e produtos em destaque</div>
   </div>
   <div class="role-card admin" onclick="selRole('admin')" id="card-admin">
     <div class="role-check">✓</div><span class="role-icon">⚙️</span>
-    <div class="role-name" style="color:#5DCAA5">Administração</div>
+    <div class="role-name" style="color:#1F9D77">Administração</div>
     <div class="role-desc">Documentos estratégicos, cartas e configurações</div>
   </div>
 </div>
@@ -297,10 +297,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 
 <script>
 const ROLES={
-  assessor:{color:'#C9A96E',label:'ASSESSOR',icon:'📊',placeholder:'Código do assessor (ex: A74621)',dest:'/assessor'},
-  lider:{color:'#8B9FE8',label:'LÍDER',icon:'👥',placeholder:'Senha do perfil',dest:'/lider'},
-  head:{color:'#D4B483',label:'HEAD DE PRODUTOS',icon:'🏛️',placeholder:'Senha do perfil',dest:'/head-produtos'},
-  admin:{color:'#5DCAA5',label:'ADMINISTRAÇÃO',icon:'⚙️',placeholder:'Senha do perfil',dest:'/admin'},
+  assessor:{color:'#A8833C',label:'ASSESSOR',icon:'📊',placeholder:'Código do assessor (ex: A74621)',dest:'/assessor'},
+  lider:{color:'#4E63C8',label:'LÍDER',icon:'👥',placeholder:'Senha do perfil',dest:'/lider'},
+  head:{color:'#A8833C',label:'HEAD DE PRODUTOS',icon:'🏛️',placeholder:'Senha do perfil',dest:'/head-produtos'},
+  admin:{color:'#1F9D77',label:'ADMINISTRAÇÃO',icon:'⚙️',placeholder:'Senha do perfil',dest:'/admin'},
 };
 let roleAtual=null,_sessaoPendente=null;
 
@@ -372,15 +372,15 @@ function mostrarSenhaPessoal(criar){
   document.getElementById('pessoal-box').innerHTML=\`
     <div class="senha-box" style="--role-color:\${info.color}">
       <div class="senha-label" style="margin-bottom:6px"><span>\${info.icon}</span>\${_sessaoPendente.nome}</div>
-      \${criar?'<p style="font-size:11px;color:#3A6A48;margin-bottom:14px">Primeiro acesso — crie sua senha pessoal e informe seu e-mail @grupobrauna.com.br.</p>':'<p style="font-size:11px;color:#3A6A48;margin-bottom:14px">Digite sua senha pessoal para entrar.</p>'}
-      \${criar?'<label style="font-size:11px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">E-mail corporativo</label><div class="senha-input-wrap" style="margin-bottom:14px"><input class="senha-input" type="email" id="email-pessoal" placeholder="nome@grupobrauna.com.br" style="letter-spacing:normal;font-size:14px"></div>':''}
-      <label style="font-size:11px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">\${criar?'Nova senha pessoal':'Senha pessoal'}</label>
+      \${criar?'<p style="font-size:11px;color:#5C7365;margin-bottom:14px">Primeiro acesso — crie sua senha pessoal e informe seu e-mail @grupobrauna.com.br.</p>':'<p style="font-size:11px;color:#5C7365;margin-bottom:14px">Digite sua senha pessoal para entrar.</p>'}
+      \${criar?'<label style="font-size:11px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">E-mail corporativo</label><div class="senha-input-wrap" style="margin-bottom:14px"><input class="senha-input" type="email" id="email-pessoal" placeholder="nome@grupobrauna.com.br" style="letter-spacing:normal;font-size:14px"></div>':''}
+      <label style="font-size:11px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">\${criar?'Nova senha pessoal':'Senha pessoal'}</label>
       <div class="senha-input-wrap"><input class="senha-input" type="password" id="senha-pessoal" placeholder="\${criar?'Mínimo 4 caracteres':'Sua senha pessoal'}" autocomplete="new-password"><button class="toggle-pw" onclick="togglePessoal('senha-pessoal')" type="button">👁</button></div>
-      \${criar?'<label style="font-size:11px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">Confirmar senha</label><div class="senha-input-wrap"><input class="senha-input" type="password" id="conf-pessoal" placeholder="Repita a senha" autocomplete="new-password"><button class="toggle-pw" onclick="togglePessoal(\\'conf-pessoal\\')" type="button">👁</button></div>':''}
+      \${criar?'<label style="font-size:11px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">Confirmar senha</label><div class="senha-input-wrap"><input class="senha-input" type="password" id="conf-pessoal" placeholder="Repita a senha" autocomplete="new-password"><button class="toggle-pw" onclick="togglePessoal(\\'conf-pessoal\\')" type="button">👁</button></div>':''}
       <button class="btn-entrar" id="btn-pessoal" onclick="entrarPessoal()" style="background:\${info.color};margin-top:4px">\${criar?'CRIAR E ENTRAR':'ENTRAR'}</button>
       <div class="erro-msg" id="erro-pessoal"></div>
-      \${!criar?'<div style="text-align:center;margin-top:12px"><button onclick="esqueceuSenha()" style="background:none;border:none;color:#3A6A48;font-size:11px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button></div>':''}
-      <div style="text-align:center;margin-top:10px"><button onclick="voltarLogin()" style="background:none;border:none;color:#1C4A34;font-size:11px;cursor:pointer">← Voltar</button></div>
+      \${!criar?'<div style="text-align:center;margin-top:12px"><button onclick="esqueceuSenha()" style="background:none;border:none;color:#5C7365;font-size:11px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button></div>':''}
+      <div style="text-align:center;margin-top:10px"><button onclick="voltarLogin()" style="background:none;border:none;color:#D9E3DB;font-size:11px;cursor:pointer">← Voltar</button></div>
     </div>
   \`;
   setTimeout(()=>document.getElementById(criar?'email-pessoal':'senha-pessoal')?.focus(),50);
@@ -442,10 +442,10 @@ function esqueceuSenha(){
   document.getElementById('reset-box').innerHTML=\`
     <div class="senha-box">
       <div class="senha-label"><span>🔑</span>RECUPERAR SENHA</div>
-      <p id="reset-aviso" style="font-size:12px;color:#3A6A48;margin-bottom:16px;line-height:1.5">Vamos enviar um link de redefinição para o e-mail cadastrado em "\${_sessaoPendente?.nome||''}".</p>
-      <button class="btn-entrar" id="btn-reset" onclick="solicitarReset()" style="background:#C9A96E">ENVIAR LINK POR E-MAIL</button>
+      <p id="reset-aviso" style="font-size:12px;color:#5C7365;margin-bottom:16px;line-height:1.5">Vamos enviar um link de redefinição para o e-mail cadastrado em "\${_sessaoPendente?.nome||''}".</p>
+      <button class="btn-entrar" id="btn-reset" onclick="solicitarReset()" style="background:#A8833C">ENVIAR LINK POR E-MAIL</button>
       <div class="erro-msg" id="erro-reset"></div>
-      <div style="text-align:center;margin-top:10px"><button onclick="voltarLogin()" style="background:none;border:none;color:#1C4A34;font-size:11px;cursor:pointer">← Voltar</button></div>
+      <div style="text-align:center;margin-top:10px"><button onclick="voltarLogin()" style="background:none;border:none;color:#D9E3DB;font-size:11px;cursor:pointer">← Voltar</button></div>
     </div>
   \`;
 }
@@ -459,7 +459,7 @@ async function solicitarReset(){
     const r=await fetch('/api/solicitar-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:_sessaoPendente.role,senha:_sessaoPendente.codigo||document.getElementById('senha').value})});
     const d=await r.json();
     if(d.ok){
-      document.getElementById('reset-aviso').innerHTML=\`✅ Link enviado para <b>\${d.email_mascarado}</b>.<br><span style="color:#3A6A48">Verifique sua caixa de entrada.</span>\`;
+      document.getElementById('reset-aviso').innerHTML=\`✅ Link enviado para <b>\${d.email_mascarado}</b>.<br><span style="color:#5C7365">Verifique sua caixa de entrada.</span>\`;
       btn.style.display='none';
     }else{
       erro.textContent=d.msg||'Não foi possível enviar o e-mail.';
