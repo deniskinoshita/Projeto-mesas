@@ -9115,7 +9115,8 @@ _CLS_RF_DESAGIO = {"pos_fixado", "pre_fixado", "inflacao"}
 FGC_EMISSOR = 250000.0   # cobertura FGC por emissor/conglomerado
 _RF_IDX = {"pos_fixado": ("% CDI", "CDI+", "LFT"),
            "pre_fixado": ("Pré-Fixado",),
-           "inflacao":   ("IPC-A", "IGP-M")}
+           "inflacao":   ("IPC-A",)}   # só IPCA (NTN-B); exclui IGP-M/NTN-C
+RV_REC_MINIMO = 25000.0   # acima disso, ações/FIIs seguem a carteira recomendada (nomes)
 _RF_FUND_CLASSES = {
     "pos_fixado": ["Crédito High Grade", "Crédito Liquidez", "Renda Fixa Ativo", "Referenciado DI Soberano"],
     "pre_fixado": ["Renda Fixa Ativo", "Crédito High Grade"],
@@ -9140,12 +9141,15 @@ def _fundos_cand(classe, held, n=8):
     """Fundos candidatos da classe (suitability Geral) com retorno e risco_genio,
     ordenados por retorno/risco (melhor risco-ajustado primeiro)."""
     classes = _FUND_XPCLASS.get(classe, [])
+    _cred = re.compile(r"CR[ÉE]DITO|FIDC|FI-?AGRO|\bAGRO|RECEB[ÍI]VEIS|HIGH\s*YIELD|D[ÍI]VIDA|DEB[ÊE]NTURE", re.I)
     out = []
     for p in _prat("fundos_xp.json").get("fundos", []):
         if p.get("investidor") not in (None, "", "Geral"):
             continue
         if p.get("xp_class") not in classes:
             continue
+        if classe == "fiis" and _cred.search(p.get("nome") or ""):
+            continue   # FII de tijolo/renda — exclui fundos de crédito/FIAgro
         if held and (p.get("nome") or "").upper() in held:
             continue
         ret = _fund_ret(p)
@@ -9245,6 +9249,19 @@ def _alocar_rf(classe, valor, held):
                             "fgc": False, "tipo": "fundo", "fonte": "Fundo XP"})
     return out
 
+def _rec_tickers(classe, held):
+    """Tickers da carteira recomendada (subida pelo Head) para a classe, sem os que o
+    cliente já tem. classe='acoes' → ações; 'fiis' → FIIs (tickers terminados em 11)."""
+    key = "acoes" if classe == "acoes" else "fii"
+    held = held or set()
+    tks = []
+    for c in _load(_HP_CARTEIRAS_REC_FILE, []):
+        for t in (c.get(key) or []):
+            tu = (t or "").upper()
+            if tu and tu not in held and tu not in tks:
+                tks.append(tu)
+    return tks
+
 def _alocar_compra(classe, valor, held):
     """Distribui o valor a comprar numa classe conforme as regras:
     - ações e FIIs: até 3 fundos por Markowitz-tangência (peso ∝ retorno/risco);
@@ -9256,6 +9273,16 @@ def _alocar_compra(classe, valor, held):
     if not valor or valor <= 0:
         return []
     if classe in ("acoes", "fiis"):
+        # Acima de R$25k: segue a CARTEIRA RECOMENDADA (nomes), peso igual entre eles.
+        rec = _rec_tickers(classe, held)
+        if valor > RV_REC_MINIMO and rec:
+            rec = rec[:12]
+            w = valor / len(rec)
+            tipo = "acao" if classe == "acoes" else "fii"
+            return [{"nome": t, "valor": round(w, 2), "detalhe": "Carteira recomendada",
+                     "fgc": False, "tipo": tipo, "fonte": "Carteira recomendada"}
+                    for t in rec if w >= 500]
+        # Abaixo disso (ou sem carteira recomendada): fundo por Markowitz-tangência.
         pesos = _pesos_tangencia(_fundos_cand(classe, held, 6)[:3])
         return [{"nome": p["nome"], "valor": round(valor * w, 2), "detalhe": p["detalhe"],
                  "fgc": False, "tipo": "fundo", "fonte": p["fonte"]} for p, w in pesos if valor * w >= 500]
