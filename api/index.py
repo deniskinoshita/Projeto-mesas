@@ -7958,6 +7958,15 @@ def mensagem_endpoint():
         d["atualizado"] = agora.strftime("%d/%m/%Y %H:%M")
         d["publicado_iso"] = agora.isoformat()
         save_msg(d)
+        # Se o comunicado citar ativos que estão em carteiras, avisa os assessores afetados
+        texto_msg = " ".join(str(v) for v in d.values() if isinstance(v, str))
+        _mid = "msg-" + agora.strftime("%Y%m%d%H%M")
+        for tk in _tickers_no_texto(texto_msg):
+            _disparar_notificacoes_ativo(
+                tk, "alerta",
+                f"Comunicado da Administração cita {tk}: {texto_msg[:120]}",
+                f"{_mid}-{tk}",
+            )
         return jsonify({"ok":True})
     m = load_msg()
     m["expirado"] = msg_expirada(m)
@@ -8162,13 +8171,25 @@ def hp_alertas():
     alertas.insert(0, novo)
     alertas = alertas[:100]
     _save(_HP_ALERTS_FILE, alertas)
-    # Dispara notificações individuais se o produto/ticker for identificável
+    # Dispara notificações individuais para cada ativo identificável.
+    # Casa o campo 'produto' E todos os tickers citados no texto (troca/recado com vários papéis).
     produto = novo.get("produto","").strip()
+    alvos = []
     if produto:
+        alvos.append(produto)
+    for tk in _tickers_no_texto(f"{produto} {novo.get('mensagem','')}"):
+        if tk.upper() != produto.upper():
+            alvos.append(tk)
+    vistos_alvo = set()
+    for alvo in alvos:
+        chave = alvo.upper().strip()
+        if chave in vistos_alvo:
+            continue
+        vistos_alvo.add(chave)
         _disparar_notificacoes_ativo(
-            produto,
+            alvo,
             "alerta",
-            f"Head de Produtos [{novo['tipo'].upper()}] {produto}: {novo['mensagem'][:120]}",
+            f"Head de Produtos [{novo['tipo'].upper()}] {alvo}: {novo['mensagem'][:120]}",
             novo["id"],
         )
     return jsonify({"ok": True, "alerta": novo})
@@ -8211,6 +8232,21 @@ def hp_calls():
     # Notifica cada assessor que tenha clientes com o ativo OU perfil compatível
     afetados = _notificar_call_nova(novo)
     return jsonify({"ok": True, "call": novo, "assessores_notificados": list(afetados.keys())})
+
+def _tickers_no_texto(texto: str) -> list:
+    """Extrai tickers B3 (ex.: PETR4, BBAS3, KNRI11) de um texto livre.
+    Filtra falsos positivos comuns (siglas sem pregão)."""
+    if not texto:
+        return []
+    import re as _re
+    achados = _re.findall(r"\b([A-Z]{4}\d{1,2})\b", texto.upper())
+    FALSOS = {"COVID19", "IBOV11"}  # ruídos improváveis de serem posição
+    out, vistos = [], set()
+    for t in achados:
+        if t in FALSOS or t in vistos:
+            continue
+        vistos.add(t); out.append(t)
+    return out
 
 def _disparar_notificacoes_ativo(ticker_ou_nome: str, tipo: str, mensagem: str, item_id: str):
     """
