@@ -6351,6 +6351,37 @@ function renderCrossSellResult(areas, tem, naoTem){
     </div>
   </div>`;
 
+  // ── Oportunidade destacada: Consórcio pago por dividendos (cliente > R$ 1 mi) ──
+  const patC  = (_clienteIdentificado&&_clienteIdentificado.patrimonio)
+              || (typeof analiseData!=="undefined"&&analiseData?analiseData.patrimonio:0) || 0;
+  const compC = (typeof analiseData!=="undefined"&&analiseData&&analiseData.composicao) || {};
+  if(patC >= 1000000){
+    const brl0 = function(v){ return "R$ "+Math.round(v).toLocaleString("pt-BR"); };
+    const carta   = Math.max(500000, Math.round(patC*0.5/100000)*100000);  // mín. R$ 500k
+    const parcela = carta*1.17/200;                                        // ~200 meses, tx adm ~17% (estimativa)
+    const rendaMes= patC*((compC.fiis||0)/100)*0.008 + patC*((compC.acoes||0)/100)*0.003; // dividendos estimados (conservador)
+    const cob     = rendaMes>0 ? Math.round(rendaMes/parcela*100) : 0;
+    const aqAtivo = !!crossSell["aquisicao_bens"];
+    html += `<div style="border:1px solid #C9A96E;background:linear-gradient(180deg,#171204,#0B1410);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:18px">💎</span>
+        <span style="font-size:12px;font-weight:800;color:#E7C989;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
+      </div>
+      <div style="font-size:12px;color:#E8DFC8;line-height:1.6">
+        Cliente com <b>${brl0(patC)}</b> (acima de R$ 1 mi): dá para estruturar uma <b>carta de consórcio de ${brl0(carta)}</b> (imóvel ou veículo) <b>sustentada pelos dividendos da carteira</b>, sem descapitalizar o principal.
+        <div style="margin-top:8px;padding:8px 10px;background:#0A1A10;border-radius:8px">
+          Parcela estimada <b>≈ ${brl0(parcela)}/mês</b> · Dividendos estimados da carteira <b>≈ ${brl0(rendaMes)}/mês</b>${rendaMes>0?` (cobrem <b style="color:${cob>=100?'#5DCAA5':'#E8A87C'}">${cob}%</b> da parcela)`:''}
+          <div style="font-size:10px;color:#6A7A6A;margin-top:3px">Estimativas conservadoras (taxa adm ~17%, ~200 meses; DY de FIIs ~9,6% a.a. e ações ~3,6% a.a.). Confirmar com a administradora e com os proventos reais do cliente.</div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#C8D0C0">
+          <b>Como conduzir (sem promessas):</b> consórcio é aquisição planejada, <b>sem juros</b> — mas há taxa de administração, fundo de reserva e seguro; a <b>contemplação é por sorteio ou lance</b>, sem data garantida; a parcela é reajustada pelo índice do contrato. O capital segue investido e apenas os proventos sustentam a parcela.
+        </div>
+        ${aqAtivo?'<div style="margin-top:8px;font-size:11px;color:#5DCAA5">✓ Aquisição de Bens já ativa — reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
+                 :'<div style="margin-top:8px;font-size:11px;color:#E7C989">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
+      </div>
+    </div>`;
+  }
+
   // ── Painel de insights com histórico ──────────────────────────────────────
   const insights = [];
 
