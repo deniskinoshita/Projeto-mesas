@@ -3191,6 +3191,28 @@ select option{background:#F5F8F5}
   </div>
 </div>
 
+<!-- Painel de destaques do mercado: dólar + maiores altas do dia -->
+<div id="mkt-destaques-card" class="card" style="display:none;background:#FFFFFF">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <h2 style="margin:0;display:flex;align-items:center;gap:8px">📈 Destaques do Mercado <span id="mkt-dest-hora" style="font-size:13px;color:#5C7365;font-weight:400"></span></h2>
+    <div id="mkt-dest-dolar" style="display:flex;align-items:baseline;gap:8px">
+      <span style="font-size:13px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;font-weight:700">Dólar</span>
+      <span id="mkt-dest-dolar-val" style="font-size:26px;font-weight:800;color:#0A0F0C">—</span>
+      <span id="mkt-dest-dolar-var" style="font-size:15px;font-weight:700"></span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <p style="font-size:13px;color:#1F9D77;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🔼 Ações — maiores altas do dia</p>
+      <div id="mkt-dest-acoes"></div>
+    </div>
+    <div>
+      <p style="font-size:13px;color:#1F9D77;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🔼 FIIs — maiores altas do dia</p>
+      <div id="mkt-dest-fiis"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Formulário -->
 <!-- Mensagem do Admin (se houver) -->
 <div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#F5F8F5;border:1px solid #A8833C;border-radius:10px">
@@ -4167,6 +4189,41 @@ function carregarTickerMercado(){
 }
 carregarTickerMercado();
 setInterval(carregarTickerMercado, 600000);
+
+// Painel de destaques: dólar + top 5 ações e FIIs em alta no dia
+function _mktLinha(it){
+  var v=it.variacao, cor=(v>=0)?"#1F9D77":"#D93B3B", seta=(v>=0)?"▲":"▼";
+  var vt=(Math.abs(v).toFixed(2)).replace(".",",");
+  var pt=("R$ "+it.preco.toFixed(2)).replace(".",",");
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid #EAF4EC">'
+    + '<span style="font-size:15px;font-weight:700;color:#A8833C">'+it.ticker+'</span>'
+    + '<span style="font-size:14px;color:#5C7365;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pt+'</span>'
+    + '<span style="font-size:15px;font-weight:700;color:'+cor+';white-space:nowrap">'+seta+' '+vt+'%</span>'
+    + '</div>';
+}
+function carregarDestaquesMercado(){
+  fetch("/api/mercado-destaques").then(r=>r.json()).then(function(d){
+    if(!d) return;
+    var card=document.getElementById("mkt-destaques-card"); if(!card) return;
+    var temAlgo=(d.acoes&&d.acoes.length)||(d.fiis&&d.fiis.length)||d.dolar;
+    if(!temAlgo){ card.style.display="none"; return; }
+    card.style.display="block";
+    if(d.atualizado) document.getElementById("mkt-dest-hora").textContent="· atualizado "+d.atualizado;
+    // Dólar
+    if(d.dolar){
+      document.getElementById("mkt-dest-dolar-val").textContent=("R$ "+d.dolar.preco.toFixed(2)).replace(".",",");
+      var dv=d.dolar.variacao, dcor=(dv>=0)?"#1F9D77":"#D93B3B", ds=(dv>=0)?"▲":"▼";
+      var el=document.getElementById("mkt-dest-dolar-var");
+      el.textContent=ds+" "+(Math.abs(dv).toFixed(2)).replace(".",",")+"%"; el.style.color=dcor;
+    }
+    var ac=(d.acoes||[]).map(_mktLinha).join("")||'<p style="font-size:14px;color:#5C7365;padding:6px 8px">Sem dados no momento.</p>';
+    var fi=(d.fiis||[]).map(_mktLinha).join("")||'<p style="font-size:14px;color:#5C7365;padding:6px 8px">Sem dados no momento.</p>';
+    document.getElementById("mkt-dest-acoes").innerHTML=ac;
+    document.getElementById("mkt-dest-fiis").innerHTML=fi;
+  }).catch(function(){});
+}
+carregarDestaquesMercado();
+setInterval(carregarDestaquesMercado, 900000);
 
 // Retornos por classe (cadastrados pela liderança) — base do comparativo de rentabilidade
 var _retornosClasse = {classes:{}, _meta:{}, atualizado_em:""};
@@ -7238,6 +7295,92 @@ def mercado_ticker():
     if itens:
         cache["itens"] = itens; cache["ts"] = _t.time()
     return jsonify({"itens": itens or cache["itens"]})
+
+# Universo líquido para o painel de destaques (maiores altas do dia)
+_DESTAQUES_ACOES = ["PETR4","PETR3","VALE3","ITUB4","BBAS3","BBDC4","B3SA3","ABEV3","WEGE3","ITSA4",
+    "BPAC11","RENT3","PRIO3","RADL3","RAIL3","SUZB3","GGBR4","CSNA3","USIM5","ELET3",
+    "EQTL3","ENEV3","CMIG4","VBBR3","RDOR3","HAPV3","LREN3","VIVT3","TIMS3","TOTS3",
+    "EMBR3","CVCB3","CYRE3","MRVE3","BBSE3","CXSE3","ASAI3","NTCO3","KLBN11","SBSP3"]
+_DESTAQUES_FIIS = ["HGLG11","KNRI11","MXRF11","XPML11","VISC11","HGRU11","KNCR11","KNIP11","HGBS11","VILG11",
+    "XPLG11","BTLG11","RECR11","KNSC11","HGRE11","RBRR11","VGHF11","MCCI11","IRDM11","GGRC11",
+    "RZTR11","TGAR11","HFOF11","BRCO11","JSRE11","ALZR11","TRXF11","CPTS11","BCFF11","PVBI11"]
+
+def _quote_yahoo_simples(sym_b3: str):
+    """Cotação de um ticker B3 via Yahoo (v8 chart). Retorna dict ou None."""
+    import urllib.request as _ur, json as _j
+    HEAD = {"User-Agent": "Mozilla/5.0 (compatible; Brauna-Mesas/1.0)", "Accept": "application/json"}
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym_b3}.SA?range=1d&interval=1d"
+    try:
+        with _ur.urlopen(_ur.Request(url, headers=HEAD), timeout=4) as r:
+            raw = _j.loads(r.read().decode("utf-8"))
+        meta = raw["chart"]["result"][0]["meta"]
+        prc  = meta.get("regularMarketPrice") or meta.get("chartPreviousClose")
+        prev = meta.get("previousClose") or meta.get("chartPreviousClose") or prc
+        if not prc or not prev:
+            return None
+        return {"ticker": sym_b3, "preco": round(float(prc), 2),
+                "variacao": round((prc/prev - 1)*100, 2),
+                "nome": meta.get("shortName") or meta.get("longName") or sym_b3}
+    except Exception:
+        return None
+
+@app.route("/api/mercado-destaques", methods=["GET"])
+def mercado_destaques():
+    """Painel de destaques: top 5 ações e top 5 FIIs em maior alta no dia + dólar.
+    Busca o universo líquido em paralelo (Yahoo). Cache em memória por 15 min."""
+    import time as _t
+    from concurrent.futures import ThreadPoolExecutor
+    cache = mercado_destaques.__dict__.setdefault("_cache", {"ts": 0, "data": None})
+    if cache["data"] and (_t.time() - cache["ts"] < 900):
+        return jsonify(cache["data"])
+
+    universo = _DESTAQUES_ACOES + _DESTAQUES_FIIS
+    cot = {}
+    try:
+        with ThreadPoolExecutor(max_workers=20) as ex:
+            for res in ex.map(_quote_yahoo_simples, universo):
+                if res:
+                    cot[res["ticker"]] = res
+    except Exception:
+        pass
+
+    def _top(lista):
+        vals = [cot[t] for t in lista if t in cot]
+        vals.sort(key=lambda x: x["variacao"], reverse=True)
+        return vals[:5]
+
+    # Dólar (mesma fonte do ticker)
+    dolar = None
+    d = _quote_yahoo_simples_par("USDBRL=X")
+    if d:
+        dolar = {"preco": d["preco"], "variacao": d["variacao"]}
+
+    data = {
+        "acoes":     _top(_DESTAQUES_ACOES),
+        "fiis":      _top(_DESTAQUES_FIIS),
+        "dolar":     dolar,
+        "atualizado": datetime.now().strftime("%d/%m %H:%M"),
+    }
+    if data["acoes"] or data["fiis"]:
+        cache["data"] = data; cache["ts"] = _t.time()
+    return jsonify(data)
+
+def _quote_yahoo_simples_par(sym_full: str):
+    """Cotação de um símbolo Yahoo completo (ex.: USDBRL=X) — sem sufixo .SA."""
+    import urllib.request as _ur, json as _j
+    HEAD = {"User-Agent": "Mozilla/5.0 (compatible; Brauna-Mesas/1.0)", "Accept": "application/json"}
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym_full}?range=1d&interval=1d"
+    try:
+        with _ur.urlopen(_ur.Request(url, headers=HEAD), timeout=4) as r:
+            raw = _j.loads(r.read().decode("utf-8"))
+        meta = raw["chart"]["result"][0]["meta"]
+        prc  = meta.get("regularMarketPrice") or meta.get("chartPreviousClose")
+        prev = meta.get("previousClose") or meta.get("chartPreviousClose") or prc
+        if not prc or not prev:
+            return None
+        return {"preco": round(float(prc), 2), "variacao": round((prc/prev - 1)*100, 2)}
+    except Exception:
+        return None
 
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
