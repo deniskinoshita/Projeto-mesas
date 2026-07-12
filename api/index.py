@@ -8371,6 +8371,15 @@ def api_objetivos():
                     a["classes"][k] = float(v) if v not in (None, "") else None
                 except Exception:
                     a["classes"][k] = None
+        real_in = e.get("realizado", {}) or {}
+        a.setdefault("realizado", {})
+        for k in _CLS:
+            if k in real_in:
+                v = real_in[k]
+                try:
+                    a["realizado"][k] = float(v) if v not in (None, "") else None
+                except Exception:
+                    a["realizado"][k] = None
     atual.setdefault("_meta", {})["atualizado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
     _save(_OBJETIVOS_FILE, atual)
     return jsonify({"ok": True, "objetivos": atual})
@@ -12212,8 +12221,8 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 
 <!-- Objetivos / OKR por assessor (definidos pelo líder) -->
 <div style="background:#0B1410;border:1px solid #1C3A24;border-radius:12px;padding:18px 20px;margin-bottom:18px">
-  <div style="font-size:15px;font-weight:700;color:#C9A96E;margin-bottom:6px">🎯 Objetivos / OKR por Assessor</div>
-  <p style="font-size:12px;color:#3A6A48;margin-bottom:14px;line-height:1.6">Meta mensal por assessor. Preencha o <b style="color:#D4B483">volume financeiro (R$)</b> a operar no mês em cada classe — a receita é derivada por <b>volume × ROA</b> (RF 0,40% · RV 0,50% · FII 1,00% · Intl 1,50% · Estrut 1,5625%). A soma das receitas por classe deve bater o OKR. Esses números guiam o rebalanceamento no XPerformance.</p>
+  <div style="font-size:15px;font-weight:700;color:#C9A96E;margin-bottom:6px">🎯 Objetivos por Assessor</div>
+  <p style="font-size:12px;color:#3A6A48;margin-bottom:14px;line-height:1.6">Objetivo de <b style="color:#D4B483">volume financeiro (R$)</b> a operar por classe. Cada troca de produto executada é lançada em <b>Realizado</b> e <b>abate</b> o objetivo da classe — a coluna <b>Restante</b> mostra o quanto ainda falta para bater. (Registro do realizado é manual por enquanto.)</p>
   <div id="obj-status" style="font-size:12px;color:#5DCAA5;min-height:16px;margin-bottom:8px"></div>
   <div id="obj-tabela" style="overflow-x:auto"><p style="color:#3A6A48;font-size:12px">Carregando...</p></div>
   <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
@@ -13030,24 +13039,25 @@ async function carregarObjetivos(){
 
 function objRender(){
   var tb=document.getElementById("obj-tabela"); if(!tb||!_objData) return;
-  var roa=(_objData._meta||{}).roa||{}; var labels=(_objData._meta||{}).labels||{};
+  var labels=(_objData._meta||{}).labels||{};
   var ass=_objData.assessores||[];
   var h='<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:820px">';
   h+='<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34;background:#071E17">'
-    +'<th style="text-align:left;padding:6px 8px">Assessor</th>'
-    +'<th style="text-align:right;padding:6px 8px">Rec. mês</th>'
-    +'<th style="text-align:right;padding:6px 8px">OKR mensal</th>';
-  _OBJ_CLS.forEach(function(k){ h+='<th style="text-align:right;padding:6px 8px">'+(labels[k]||k)+'<br><span style="color:#2A5A3A;font-weight:400">vol. R$</span></th>'; });
-  h+='<th style="text-align:right;padding:6px 8px">Receita<br><span style="color:#2A5A3A;font-weight:400">das classes</span></th></tr></thead><tbody>';
+    +'<th style="text-align:left;padding:6px 8px">Assessor</th>';
+  _OBJ_CLS.forEach(function(k){ h+='<th style="text-align:right;padding:6px 8px">'+(labels[k]||k)+'<br><span style="color:#2A5A3A;font-weight:400">objetivo · realizado</span></th>'; });
+  h+='<th style="text-align:right;padding:6px 8px">Restante<br><span style="color:#2A5A3A;font-weight:400">p/ o objetivo</span></th></tr></thead><tbody>';
   ass.forEach(function(a,i){
     var bg=i%2===0?"#060C08":"#081208";
     h+='<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
     h+='<td style="padding:5px 8px;color:#D4B483;font-weight:700">'+a.assessor+'</td>';
-    h+='<td style="padding:5px 8px;text-align:right;color:#888">'+_objBrl(a.receita_mes)+'</td>';
-    h+='<td style="padding:5px 8px;text-align:right"><input type="number" data-obj-okr="'+i+'" value="'+_objNum(a.okr_mensal)+'" placeholder="—" style="width:78px;text-align:right;background:#071E17;border:1px solid #1C4A34;border-radius:5px;padding:4px 6px;color:#F0F0F0;font-size:11px"></td>';
     _OBJ_CLS.forEach(function(k){
       var v=(a.classes||{})[k];
-      h+='<td style="padding:5px 8px;text-align:right"><input type="number" data-obj-cls="'+i+'" data-obj-k="'+k+'" value="'+_objNum(v)+'" placeholder="—" oninput="objRecalc('+i+')" style="width:92px;text-align:right;background:#071E17;border:1px solid #1C4A34;border-radius:5px;padding:4px 6px;color:#F0F0F0;font-size:11px"></td>';
+      var rz=(a.realizado||{})[k];
+      var stInp='width:82px;text-align:right;border:1px solid #1C4A34;border-radius:5px;padding:3px 6px;color:#F0F0F0;font-size:11px';
+      h+='<td style="padding:5px 8px;text-align:right;white-space:nowrap">'
+        +'<input type="number" data-obj-cls="'+i+'" data-obj-k="'+k+'" value="'+_objNum(v)+'" placeholder="objetivo" oninput="objRecalc('+i+')" title="Objetivo" style="'+stInp+';background:#071E17">'
+        +'<br><input type="number" data-obj-real="'+i+'" data-obj-rk="'+k+'" value="'+_objNum(rz)+'" placeholder="realizado" oninput="objRecalc('+i+')" title="Realizado (abate o objetivo)" style="'+stInp+';background:#0A1508;margin-top:3px;color:#9FD8B0">'
+        +'<br><span data-obj-falta="'+i+'" data-obj-fk="'+k+'" style="font-size:9px;color:#6A7A6A">—</span></td>';
     });
     h+='<td style="padding:5px 8px;text-align:right;font-weight:700" id="obj-recclasse-'+i+'">—</td>';
     h+='</tr>';
@@ -13059,32 +13069,32 @@ function objRender(){
 
 function objRecalc(i){
   if(!_objData) return;
-  var roa=(_objData._meta||{}).roa||{};
-  var okrEl=document.querySelector('[data-obj-okr="'+i+'"]');
-  var okr=okrEl&&okrEl.value!==""?parseFloat(okrEl.value):null;
-  var recTot=0, algum=false;
+  var restTot=0, algum=false;
   _OBJ_CLS.forEach(function(k){
-    var el=document.querySelector('[data-obj-cls="'+i+'"][data-obj-k="'+k+'"]');
-    var vol=el&&el.value!==""?parseFloat(el.value):null;
-    if(vol!=null){ recTot+=vol*(roa[k]||0); algum=true; }
+    var el =document.querySelector('[data-obj-cls="'+i+'"][data-obj-k="'+k+'"]');
+    var elR=document.querySelector('[data-obj-real="'+i+'"][data-obj-rk="'+k+'"]');
+    var obj =el &&el.value!==""?parseFloat(el.value):null;
+    var real=elR&&elR.value!==""?parseFloat(elR.value):0;
+    var ft=document.querySelector('[data-obj-falta="'+i+'"][data-obj-fk="'+k+'"]');
+    if(obj!=null){
+      algum=true;
+      var falta=Math.max(obj-(real||0),0);
+      restTot+=falta;
+      if(ft){
+        if(falta<=0.5){ ft.textContent="✓ batido"; ft.style.color="#5DCAA5"; }
+        else { ft.textContent="falta R$ "+falta.toLocaleString("pt-BR",{maximumFractionDigits:0}); ft.style.color="#E8A87C"; }
+      }
+    } else if(ft){ ft.textContent="—"; ft.style.color="#6A7A6A"; }
   });
   var cell=document.getElementById("obj-recclasse-"+i);
   if(!cell) return;
-  var valTxt="R$ "+recTot.toLocaleString("pt-BR",{maximumFractionDigits:0});
-  if(!algum || okr==null || okr<=0){
-    cell.innerHTML = algum ? valTxt : "—";
-    cell.style.color = "#888"; cell.dataset.falta = "";
-    objDestacarMaisLonge(); return;
-  }
-  var falta = 100 - (recTot/okr*100);   // quanto falta para bater 100% do OKR
-  if(falta > 0.5){
-    cell.dataset.falta = falta.toFixed(1);
-    cell.style.color="#E8A87C";
-    cell.innerHTML = valTxt+' <span style="font-size:9px;color:#E8A87C">· faltam '+falta.toFixed(0)+'% p/ 100%</span>';
+  if(!algum){ cell.innerHTML="—"; cell.style.color="#888"; cell.dataset.falta=""; objDestacarMaisLonge(); return; }
+  if(restTot<=0.5){
+    cell.dataset.falta="0"; cell.style.color="#5DCAA5";
+    cell.innerHTML='R$ 0 <span style="font-size:9px;color:#5DCAA5">· objetivo batido</span>';
   } else {
-    cell.dataset.falta = "0";
-    cell.style.color="#5DCAA5";
-    cell.innerHTML = valTxt+' <span style="font-size:9px;color:#5DCAA5">· meta batida</span>';
+    cell.dataset.falta=String(restTot); cell.style.color="#E8A87C";
+    cell.innerHTML="R$ "+restTot.toLocaleString("pt-BR",{maximumFractionDigits:0})+' <span style="font-size:9px;color:#E8A87C">a operar</span>';
   }
   objDestacarMaisLonge();
 }
@@ -13102,7 +13112,7 @@ function objDestacarMaisLonge(){
   if(maxCell && maxF>0.5){
     var tr=maxCell.closest("tr");
     if(tr) tr.style.boxShadow="inset 3px 0 0 #E8A87C";
-    maxCell.insertAdjacentHTML("beforeend",'<span class="obj-longe-tag" style="font-size:8px;color:#E8A87C;display:block;margin-top:2px">▲ mais longe do OKR</span>');
+    maxCell.insertAdjacentHTML("beforeend",'<span class="obj-longe-tag" style="font-size:8px;color:#E8A87C;display:block;margin-top:2px">▲ mais longe do objetivo</span>');
   }
 }
 
@@ -13110,13 +13120,14 @@ async function objSalvar(){
   if(!_objData) return;
   var st=document.getElementById("obj-status");
   var payload={assessores:(_objData.assessores||[]).map(function(a,i){
-    var okrEl=document.querySelector('[data-obj-okr="'+i+'"]');
-    var classes={};
+    var classes={}, realizado={};
     _OBJ_CLS.forEach(function(k){
-      var el=document.querySelector('[data-obj-cls="'+i+'"][data-obj-k="'+k+'"]');
-      classes[k]= el&&el.value!=="" ? parseFloat(el.value) : null;
+      var el =document.querySelector('[data-obj-cls="'+i+'"][data-obj-k="'+k+'"]');
+      var elR=document.querySelector('[data-obj-real="'+i+'"][data-obj-rk="'+k+'"]');
+      classes[k]  = el &&el.value!==""  ? parseFloat(el.value)  : null;
+      realizado[k]= elR&&elR.value!=="" ? parseFloat(elR.value) : null;
     });
-    return {assessor:a.assessor, okr_mensal: okrEl&&okrEl.value!==""?parseFloat(okrEl.value):null, classes:classes};
+    return {assessor:a.assessor, classes:classes, realizado:realizado};
   })};
   if(st){ st.textContent="Salvando..."; st.style.color="#AAA"; }
   try{
