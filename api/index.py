@@ -3296,7 +3296,7 @@ select option{background:#F5F8F5}
     <!-- Aviso quando o perfil foi sugerido automaticamente pela carteira atual -->
     <p id="perfil-sugerido-hint" style="display:none;font-size:14px;color:#8A6A28;margin:0 0 8px 0;font-weight:600"></p>
     <!-- Cards clicáveis por perfil — renderizados pelo servidor -->
-    <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    <div id="perfil-cards" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">
       {{ perfil_cards | safe }}
     </div>
     <!-- Select oculto para manter compatibilidade com o restante do código -->
@@ -3317,7 +3317,7 @@ select option{background:#F5F8F5}
     </label>
 
     <!-- Toggle visual XP vs Levante -->
-    <div id="inst-toggle" style="display:flex;gap:8px;margin-bottom:12px">
+    <div id="inst-toggle" style="display:flex;gap:14px;margin-bottom:12px">
       <!-- cards preenchidos por JS após carregar gestoras -->
     </div>
 
@@ -4121,7 +4121,7 @@ function renderInstToggle(){
   wrap.innerHTML = itens.map(function(it){
     var isAt = (it.id === _instAtiva);
     return '<div onclick="selecionarInstituicao(\''+it.id+'\')" style="'
-      +'flex:1;min-width:120px;max-width:220px;cursor:pointer;border-radius:10px;padding:10px 14px;'
+      +'flex:1 1 0;min-width:150px;max-width:340px;cursor:pointer;border-radius:10px;padding:12px 16px;'
       +'border:2px solid '+(isAt?it.cor:"#EAF4EC")+';'
       +'background:'+(isAt?it.cor+'18':"#EFF3EF")+';'
       +'transition:all .15s;box-sizing:border-box">'
@@ -7091,8 +7091,8 @@ def _perfil_cards_html():
         badge = f'<div class="perfil-sel-badge" style="position:absolute;top:5px;right:6px;font-size:12px;color:{p["cor"]};font-weight:700;display:{"block" if is_default else "none"}">&#10003; SELECIONADO</div>'
         card = (
             f'<div onclick="selecionarPerfil(\'{p["key"]}\')" data-perfil="{p["key"]}" data-cor="{p["cor"]}" class="perfil-card-item" style="'
-            f'background:{bg_style};border:{border_style};border-radius:10px;padding:12px 14px;'
-            f'cursor:pointer;flex:1;min-width:150px;max-width:250px;position:relative;overflow:hidden;transition:all .15s;box-sizing:border-box">'
+            f'background:{bg_style};border:{border_style};border-radius:10px;padding:14px 18px;'
+            f'cursor:pointer;flex:1 1 0;min-width:200px;max-width:none;position:relative;overflow:hidden;transition:all .15s;box-sizing:border-box">'
             f'{badge}'
             f'<div style="font-size:22px;margin-bottom:4px">{p["emoji"]}</div>'
             f'<div class="perfil-card-nome" style="font-size:15px;font-weight:700;color:{"" + p["cor"] if is_default else "#0A0F0C"};margin-bottom:2px;line-height:1.2">{p["lbl"]}</div>'
