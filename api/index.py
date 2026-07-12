@@ -2941,7 +2941,7 @@ body{background:#EFF3EF;color:#0A0F0C;font-family:'Segoe UI',system-ui,sans-seri
 header{background:#FFFFFF;border-bottom:1px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;gap:12px}
 header h1{font-size:21px;color:#8A6A28;font-weight:700;letter-spacing:.5px}
 header p{font-size:14px;color:#39493F;margin-top:2px}
-.container{max-width:1320px;margin:0 auto;padding:28px 32px}
+.container{max-width:1800px;margin:0 auto;padding:28px 40px}
 .card{background:#E9F5EE;border:1px solid #D9E3DB;border-radius:12px;padding:22px;margin-bottom:18px}
 .card h2{font-size:15px;color:#8A6A28;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -7079,8 +7079,8 @@ def _perfil_cards_html():
         itens = sorted([(k,v) for k,v in m.items() if isinstance(v,(int,float)) and v>0 and k!="label"], key=lambda x: -x[1])
         top_html = "".join(
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">'
-            f'<span style="font-size:9px;color:#8A9A8E">{LABELS.get(k,k)}</span>'
-            f'<span style="font-size:9px;font-weight:700;color:#E0C878">{v}%</span>'
+            f'<span style="font-size:13px;color:#39493F">{LABELS.get(k,k)}</span>'
+            f'<span style="font-size:13px;font-weight:700;color:#8A6A28">{v}%</span>'
             f'</div>'
             for k,v in itens[:4]
         )
@@ -7088,15 +7088,15 @@ def _perfil_cards_html():
         is_default = (p["key"] == "moderada")
         border_style = f'2px solid {p["cor"]}' if is_default else '2px solid #EAF4EC'
         bg_style = f'{p["cor"]}15' if is_default else '#EFF3EF'
-        badge = f'<div class="perfil-sel-badge" style="position:absolute;top:5px;right:6px;font-size:8px;color:{p["cor"]};font-weight:700;display:{"block" if is_default else "none"}">&#10003; SELECIONADO</div>'
+        badge = f'<div class="perfil-sel-badge" style="position:absolute;top:5px;right:6px;font-size:12px;color:{p["cor"]};font-weight:700;display:{"block" if is_default else "none"}">&#10003; SELECIONADO</div>'
         card = (
             f'<div onclick="selecionarPerfil(\'{p["key"]}\')" data-perfil="{p["key"]}" data-cor="{p["cor"]}" class="perfil-card-item" style="'
-            f'background:{bg_style};border:{border_style};border-radius:10px;padding:10px 12px;'
-            f'cursor:pointer;flex:1;min-width:115px;max-width:190px;position:relative;overflow:hidden;transition:all .15s;box-sizing:border-box">'
+            f'background:{bg_style};border:{border_style};border-radius:10px;padding:12px 14px;'
+            f'cursor:pointer;flex:1;min-width:150px;max-width:250px;position:relative;overflow:hidden;transition:all .15s;box-sizing:border-box">'
             f'{badge}'
-            f'<div style="font-size:20px;margin-bottom:4px">{p["emoji"]}</div>'
-            f'<div class="perfil-card-nome" style="font-size:11px;font-weight:700;color:{"" + p["cor"] if is_default else "#17271E"};margin-bottom:2px;line-height:1.2">{p["lbl"]}</div>'
-            f'<div style="font-size:9px;color:#5C7365;margin-bottom:8px">{p["desc"]}</div>'
+            f'<div style="font-size:22px;margin-bottom:4px">{p["emoji"]}</div>'
+            f'<div class="perfil-card-nome" style="font-size:15px;font-weight:700;color:{"" + p["cor"] if is_default else "#0A0F0C"};margin-bottom:2px;line-height:1.2">{p["lbl"]}</div>'
+            f'<div style="font-size:13px;color:#39493F;margin-bottom:8px">{p["desc"]}</div>'
             f'<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#EFF3EF;margin-bottom:8px;gap:1px">{bar_segs}</div>'
             f'<div>{top_html}</div>'
             f'</div>'
