@@ -5358,6 +5358,50 @@ async function buscarClientesSalvos(){
 }
 
 // Radar de notícias dos ativos das carteiras do assessor
+var _radarItens=[], _radarPos=0, _radarRotTimer=null;
+var _RADAR_PAGE=3;        // itens visíveis por vez
+var _RADAR_ROT_MS=8000;   // troca a cada 8s
+function _radarCardHtml(it){
+  var tagCor=function(t){ return t==="fii"?"#2E86B8":(t==="fundo"?"#7A5CC0":"#A8833C"); };
+  var tagLbl=function(t){ return t==="fii"?"FII":(t==="fundo"?"Fundo":"Ação"); };
+  var nots=(it.noticias||[]).map(function(n){
+    var f=(n.fonte?(' <span style="color:#5F7065">· '+n.fonte+'</span>'):'');
+    var dt=(n.data?(' <span style="color:#5F7065">'+n.data+'</span>'):'');
+    var titHtml=n.link
+      ? '<a href="'+n.link+'" target="_blank" rel="noopener" style="color:#0A0F0C;text-decoration:none">'+n.titulo+'</a>'
+      : n.titulo;
+    return '<li style="font-size:14px;line-height:1.5;margin-bottom:5px">'+titHtml+f+dt+'</li>';
+  }).join("");
+  var holders=(it.holders||[]).join(", ");
+  var maisTxt=(it.n_holders>it.holders.length)?(" +"+(it.n_holders-it.holders.length)):"";
+  return '<div style="padding:12px;border:1px solid #EAF4EC;border-radius:10px;margin-bottom:10px;background:#F5F8F5">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+    +   '<span style="font-size:16px;font-weight:700;color:'+tagCor(it.tipo)+'">'+it.ticker+'</span>'
+    +   '<span style="font-size:12px;color:#fff;background:'+tagCor(it.tipo)+';border-radius:6px;padding:1px 7px;font-weight:700">'+tagLbl(it.tipo)+'</span>'
+    +   '<span style="font-size:13px;color:#5C7365">'+it.n_holders+' cliente'+(it.n_holders>1?"s":"")+' têm</span>'
+    + '</div>'
+    + '<ul style="margin:0 0 4px;padding-left:18px">'+nots+'</ul>'
+    + '<div style="font-size:12px;color:#7A8A80">👤 '+holders+maisTxt+'</div>'
+    + '</div>';
+}
+function _radarRender(){
+  var lista=document.getElementById("radar-noticias-lista");
+  if(!lista||!_radarItens.length) return;
+  var n=_radarItens.length, janela=[];
+  var vis=Math.min(_RADAR_PAGE, n);
+  for(var i=0;i<vis;i++){ janela.push(_radarItens[(_radarPos+i)%n]); }
+  lista.style.transition="opacity .35s"; lista.style.opacity="0";
+  setTimeout(function(){
+    lista.innerHTML=janela.map(_radarCardHtml).join("");
+    lista.style.opacity="1";
+  }, 180);
+}
+function _radarRotate(){
+  if(_radarItens.length>_RADAR_PAGE){
+    _radarPos=(_radarPos+1)%_radarItens.length;
+    _radarRender();
+  }
+}
 function carregarRadarNoticias(){
   var assessor=(document.getElementById("assessor")||{}).value||"";
   if(!assessor) return;
@@ -5367,33 +5411,19 @@ function carregarRadarNoticias(){
   fetch("/api/radar-noticias?assessor="+encodeURIComponent(assessor.toLowerCase())).then(r=>r.json()).then(function(d){
     var itens=(d&&d.itens)||[];
     if(!itens.length){ card.style.display="none"; return; }
+    _radarItens=itens; _radarPos=0;
     var cont=document.getElementById("radar-cont");
-    if(cont) cont.textContent="· "+itens.length+" ativos"+(d.atualizado?(" · atualizado "+d.atualizado):"")+(d.ia?"":" · IA off");
-    var tagCor=function(t){ return t==="fii"?"#2E86B8":(t==="fundo"?"#7A5CC0":"#A8833C"); };
-    var tagLbl=function(t){ return t==="fii"?"FII":(t==="fundo"?"Fundo":"Ação"); };
-    lista.innerHTML=itens.map(function(it){
-      var nots=(it.noticias||[]).map(function(n){
-        var f=(n.fonte?(' <span style="color:#5F7065">· '+n.fonte+'</span>'):'');
-        var dt=(n.data?(' <span style="color:#5F7065">'+n.data+'</span>'):'');
-        var titHtml=n.link
-          ? '<a href="'+n.link+'" target="_blank" rel="noopener" style="color:#0A0F0C;text-decoration:none">'+n.titulo+'</a>'
-          : n.titulo;
-        return '<li style="font-size:14px;line-height:1.5;margin-bottom:5px">'+titHtml+f+dt+'</li>';
-      }).join("");
-      var holders=(it.holders||[]).join(", ");
-      var maisTxt=(it.n_holders>it.holders.length)?(" +"+(it.n_holders-it.holders.length)):"";
-      return '<div style="padding:12px;border:1px solid #EAF4EC;border-radius:10px;margin-bottom:10px;background:#F5F8F5">'
-        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
-        +   '<span style="font-size:16px;font-weight:700;color:'+tagCor(it.tipo)+'">'+it.ticker+'</span>'
-        +   '<span style="font-size:12px;color:#fff;background:'+tagCor(it.tipo)+';border-radius:6px;padding:1px 7px;font-weight:700">'+tagLbl(it.tipo)+'</span>'
-        +   '<span style="font-size:13px;color:#5C7365">'+it.n_holders+' cliente'+(it.n_holders>1?"s":"")+' têm</span>'
-        + '</div>'
-        + '<ul style="margin:0 0 4px;padding-left:18px">'+nots+'</ul>'
-        + '<div style="font-size:12px;color:#7A8A80">👤 '+holders+maisTxt+'</div>'
-        + '</div>';
-    }).join("");
+    if(cont) cont.textContent="· "+itens.length+" ativos"+(itens.length>_RADAR_PAGE?" (em rotação)":"")+(d.atualizado?(" · atualizado "+d.atualizado):"")+(d.ia?"":" · IA off");
+    _radarRender();
     card.style.display="block";
+    // Rotação contínua até a próxima atualização
+    if(_radarRotTimer) clearInterval(_radarRotTimer);
+    _radarRotTimer=setInterval(_radarRotate, _RADAR_ROT_MS);
   }).catch(function(){ card.style.display="none"; });
+  // Recarrega de hora em hora (uma vez configurado)
+  if(!carregarRadarNoticias._poll){
+    carregarRadarNoticias._poll=setInterval(carregarRadarNoticias, 3600000);
+  }
 }
 
 function csToggle(id){
@@ -7532,7 +7562,7 @@ def radar_noticias():
         return jsonify({"itens": [], "ia": _ia_disponivel()})
     cache = radar_noticias.__dict__.setdefault("_cache", {})
     ce = cache.get(assessor)
-    if ce and (_t.time() - ce["ts"] < 10800):
+    if ce and (_t.time() - ce["ts"] < 3600):   # refresh de hora em hora
         return jsonify(ce["data"])
 
     hold = _holdings_assessor(assessor, incluir_fundos=True)
