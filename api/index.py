@@ -4316,32 +4316,62 @@ var _PROT_STATUS = {
   caixa:       {lbl:"Vendido p/ caixa",     cor:"#2E86B8"},
 };
 var _protHist = [];
+// Detecta posições a proteger usando a COTAÇÃO AO VIVO vs. o preço-alvo (stock guide).
+// Retorna Promise. Marca acima=true quando o preço já passou o alvo (upside <= 0).
 function detectarProtecoes(acoes){
-  var out=[];
+  var cand=[];
   (acoes||[]).forEach(function(a){
-    var g=_STOCK_GUIDE.acoes[String(a.ticker||"").toUpperCase()]; if(!g) return;
-    var src=g.levante||g.xp; if(!src || src.upside==null) return;
-    if(src.upside <= _PROT_LIMIAR){
-      out.push({ticker:String(a.ticker||"").toUpperCase(), alvo:src.alvo, preco:src.ultimo,
-        upside:src.upside, fonte:(g.levante?"Levante":"XP"), rating:src.rating});
-    }
+    var tk=String(a.ticker||"").toUpperCase();
+    var g=_STOCK_GUIDE.acoes[tk]; if(!g) return;
+    var src=g.levante||g.xp; if(!src || src.alvo==null) return;
+    cand.push({ticker:tk, alvo:src.alvo, precoGuia:src.ultimo, upsideGuia:src.upside,
+      fonte:(g.levante?"Levante":"XP"), rating:src.rating});
   });
-  return out;
+  if(!cand.length) return Promise.resolve([]);
+  var tks=cand.map(function(c){return c.ticker;}).join(",");
+  return fetch("/api/cotacoes?tickers="+encodeURIComponent(tks))
+    .then(function(r){return r.json();}).catch(function(){return {};})
+    .then(function(cot){
+      var out=[];
+      cand.forEach(function(c){
+        var q=(cot&&cot[c.ticker])||{};
+        var aovivo=(q.preco!=null);
+        var preco=aovivo?q.preco:c.precoGuia;
+        var upside=(preco && c.alvo!=null)?(c.alvo/preco - 1):c.upsideGuia;
+        if(upside==null) return;
+        if(upside <= _PROT_LIMIAR){
+          out.push({ticker:c.ticker, alvo:c.alvo, preco:preco, upside:upside,
+            acima:(upside<=0), aovivo:aovivo, fonte:c.fonte, rating:c.rating});
+        }
+      });
+      out.sort(function(a,b){return a.upside-b.upside;});  // acima do alvo primeiro
+      return out;
+    });
 }
 function processarProtecoes(acoes){
   var bloco=document.getElementById("hp-protecoes-bloco"); if(!bloco) return;
   var conta=_clienteIdentificado && _clienteIdentificado.conta;
-  var near=detectarProtecoes(acoes);
-  function carregar(){
-    if(!conta){ renderProtecoes(near.map(function(n){ return Object.assign({status:"pendente",data:"—",id:null},n); })); return; }
-    fetch("/api/protecoes?conta="+encodeURIComponent(conta)).then(r=>r.json())
-      .then(function(h){ _protHist=h||[]; renderProtecoes(_protHist); })
-      .catch(function(){ renderProtecoes(near.map(function(n){ return Object.assign({status:"pendente",data:"—",id:null},n); })); });
-  }
-  if(conta && near.length){
-    fetch("/api/protecoes",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({conta:conta, entradas:near})}).then(carregar).catch(carregar);
-  } else { carregar(); }
+  detectarProtecoes(acoes).then(function(near){
+    // Mescla status/id persistidos com os valores AO VIVO recém-detectados
+    function _merge(hist){
+      return near.map(function(n){
+        var p=(hist||[]).find(function(x){ return x.ticker===n.ticker &&
+          Math.round((+x.alvo||0)*100)===Math.round((+n.alvo||0)*100); }) || {};
+        return Object.assign({status:"pendente",data:"—",id:null}, p, n,
+          {status:p.status||"pendente"});
+      });
+    }
+    function carregar(){
+      if(!conta){ renderProtecoes(_merge([])); return; }
+      fetch("/api/protecoes?conta="+encodeURIComponent(conta)).then(r=>r.json())
+        .then(function(h){ _protHist=h||[]; renderProtecoes(_merge(_protHist)); })
+        .catch(function(){ renderProtecoes(_merge([])); });
+    }
+    if(conta && near.length){
+      fetch("/api/protecoes",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({conta:conta, entradas:near})}).then(carregar).catch(carregar);
+    } else { carregar(); }
+  });
 }
 function setProtecaoStatus(id,status){
   var conta=_clienteIdentificado && _clienteIdentificado.conta; if(!conta||!id) return;
@@ -4359,27 +4389,39 @@ function renderProtecoes(lista){
   bloco.style.display="";
   el.innerHTML = lista.map(function(p){
     var st=_PROT_STATUS[p.status]||_PROT_STATUS.pendente;
+    var acima=(p.acima!=null)?!!p.acima:(p.upside!=null && p.upside<=0);
     var up=(p.upside!=null)?((p.upside*100>=0?"+":"")+(p.upside*100).toFixed(0)+"%"):"—";
+    var upTxt=(p.upside!=null)?(acima?(Math.abs(p.upside*100).toFixed(0)+"% acima do alvo"):(up+" de upside")):"—";
     var alvo=(p.alvo!=null)?("R$ "+Number(p.alvo).toLocaleString("pt-BR",{minimumFractionDigits:2})):"—";
+    var precoTxt=(p.preco!=null)?("R$ "+Number(p.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})):null;
+    var atualTxt=precoTxt?(' · atual '+precoTxt+(p.aovivo?' <span style="color:#1F9D77">•ao vivo</span>':'')):'';
     var botoes = p.id ? Object.keys(_PROT_STATUS).map(function(k){
         var on=(p.status===k); var c=_PROT_STATUS[k].cor;
         return '<button onclick="setProtecaoStatus(\''+p.id+'\',\''+k+'\')" style="cursor:pointer;font-size:12px;padding:3px 8px;border-radius:6px;'
           +'border:1px solid '+(on?c:"#EAF4EC")+';background:'+(on?c+"22":"#EFF3EF")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
       }).join("") : '<span style="font-size:12px;color:#5A7A68">Identifique o cliente para salvar o histórico</span>';
-    return '<div style="border:1px solid #FBEEEC;background:#F5F8F5;border-radius:8px;padding:10px 12px;margin-bottom:8px">'
+    var bordaCard=acima?"#E8A87C":"#FBEEEC";
+    var bgCard=acima?"#FBF0E8":"#F5F8F5";
+    var msg = acima
+      ? '<div style="font-size:13px;color:#0A0F0C;margin:6px 0 8px;line-height:1.5;background:#F8E3D4;border-radius:6px;padding:8px 10px">'
+        +'<b style="color:#C0673A">🎯 Acima do preço-alvo — trave o ganho.</b> Sugestão: '
+        +'<b style="color:#A8833C">(a)</b> operação estruturada (collar / put de proteção / fence) para proteger o valor já ganho · '
+        +'<b style="color:#A8833C">(b)</b> realizar parte da posição e alocar em caixa (pós-fixado). Envolve custo/prazo e suitability.</div>'
+      : '<div style="font-size:13px;color:#B8A488;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
+        +'<b style="color:#A8833C">(a)</b> operação estruturada (collar / put de proteção / fence) · '
+        +'<b style="color:#A8833C">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>';
+    return '<div style="border:1px solid '+bordaCard+';background:'+bgCard+';border-radius:8px;padding:10px 12px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">'
         +'<div><span style="color:#A8833C;font-weight:700;font-size:15px">'+p.ticker+'</span> '
           +'<span style="color:'+_sgCor(p.rating)+';font-size:13px;font-weight:700">'+(p.rating||"")+'</span> '
-          +'<span style="color:#5F7065;font-size:13px">· '+(p.fonte||"")+' · alvo '+alvo+' <span style="color:#C0673A">('+up+' de upside)</span></span></div>'
+          +'<span style="color:#5F7065;font-size:13px">· '+(p.fonte||"")+' · alvo '+alvo+atualTxt+' <span style="color:#C0673A">('+upTxt+')</span></span></div>'
         +'<span style="font-size:12px;color:'+st.cor+';font-weight:700">'+st.lbl+(p.data&&p.data!=="—"?' · '+p.data:"")+'</span>'
       +'</div>'
-      +'<div style="font-size:13px;color:#B8A488;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
-        +'<b style="color:#A8833C">(a)</b> operação estruturada (collar / put de proteção / fence) · '
-        +'<b style="color:#A8833C">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>'
+      +msg
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'+botoes+'</div>'
     +'</div>';
   }).join("")
-  + '<div style="font-size:12px;color:#5C7365;margin-top:2px;line-height:1.5">Gatilho: preço a ≤10% do alvo (casa principal Levante). As recomendações ficam salvas no histórico do cliente — se recusadas, é só revisitar aqui numa próxima análise.</div>';
+  + '<div style="font-size:12px;color:#5C7365;margin-top:2px;line-height:1.5">Gatilho: <b>cotação ao vivo</b> a ≤10% do alvo — ou <b style="color:#C0673A">acima do alvo</b> (destacado), quando entra a sugestão de estruturada para travar o ganho. Alvo pela casa principal (Levante). As recomendações ficam salvas no histórico do cliente.</div>';
 }
 
 function atualizarModelo(){
@@ -7601,6 +7643,18 @@ def radar_noticias():
     cache[assessor] = {"ts": _t.time(), "data": data}
     return jsonify(data)
 
+@app.route("/api/cotacoes", methods=["GET"])
+def cotacoes_endpoint():
+    """Cotações em tempo real (preço + variação do dia) para tickers B3.
+    Ex.: /api/cotacoes?tickers=PETR4,VALE3 — usado na proteção de posições acima do alvo."""
+    raw = request.args.get("tickers", "") or ""
+    tickers = [t.strip().upper() for t in raw.split(",") if t.strip()]
+    if not tickers:
+        return jsonify({})
+    cot = _buscar_cotacoes_brapi(tickers[:40])
+    return jsonify({tk: {"preco": v.get("preco"), "variacao_dia": v.get("variacao_dia")}
+                    for tk, v in cot.items()})
+
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
     macro = buscar_macro_bcb()
@@ -7776,15 +7830,24 @@ def protecoes_endpoint():
         tk = str(e.get("ticker", "")).upper().strip()
         if not tk:
             continue
+        try:    _acima = bool(e.get("acima")) or (float(e.get("upside")) <= 0)
+        except Exception: _acima = bool(e.get("acima"))
         cand = {
             "id": f"{tk}-{int(time.time()*1000)}-{novos}",
             "ticker": tk, "data": hoje,
             "alvo": e.get("alvo"), "preco": e.get("preco"), "upside": e.get("upside"),
+            "acima": _acima, "aovivo": bool(e.get("aovivo")),
             "fonte": e.get("fonte", ""), "rating": e.get("rating", ""),
             "status": "pendente", "status_em": hoje,
         }
-        if any(_mesma(cand, x) for x in prot):
-            continue   # mesma recomendação (mesmo alvo) já registrada — não duplica
+        # Mesma recomendação (mesmo ticker+alvo): não duplica, mas REFRESCA preço/upside ao vivo
+        existente = next((x for x in prot if _mesma(cand, x)), None)
+        if existente:
+            existente["preco"]  = cand["preco"]
+            existente["upside"] = cand["upside"]
+            existente["acima"]  = cand["acima"]
+            existente["aovivo"] = cand["aovivo"]
+            continue
         prot.append(cand)
         novos += 1
     ficha["protecoes"] = prot[-100:]
