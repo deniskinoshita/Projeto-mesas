@@ -23,7 +23,7 @@ MODELO_SERVIR = [
         "importancia": "CRÍTICA",
         "impacto_falta": "Assessor enxerga apenas a parte do cliente na XP. A média XP é 37% do patrimônio total nos clientes acima de R$ 300k — significa que 63% do patrimônio está invisível. Sem OPIN, qualquer recomendação de alocação é incompleta e pode até duplicar posições.",
         "acao": "Solicitar consentimento OPIN pelo app XP. Pitch: 'Para que eu possa cuidar do seu patrimônio como um todo e não apenas da parte na XP, preciso que você libere o Open Investments. É tão simples quanto um Pix — 3 cliques no app. Assim consigo evitar duplicar posições e encontrar oportunidades que hoje estão invisíveis.'",
-        "cor": "#FF6B6B"
+        "cor": "#D93B3B"
     },
     {
         "id": "financial_planning",
@@ -33,7 +33,7 @@ MODELO_SERVIR = [
         "importancia": "CRÍTICA — 1ª DIRETRIZ BRAÚNA",
         "impacto_falta": "SEM FINANCIAL PLANNING, NÃO HÁ DESTINO. Toda alocação é arbitrária quando não se sabe para onde o cliente quer ir. Não sabemos: quanto ele precisa para se aposentar, quando quer comprar um imóvel, qual o horizonte de cada objetivo. A carteira existe para realizar sonhos — sem o FP, estamos construindo uma estrada sem saber o destino.",
         "acao": "DIRETRIZ QUALIDADE BRAÚNA: Provocar o cliente agora. Perguntar diretamente: 'Você sabe exatamente quanto precisa acumular para se aposentar com o padrão de vida que deseja? Você tem um plano financeiro que traga clareza sobre cada objetivo da sua vida?' O Financial Planning é o primeiro passo antes de qualquer outra conversa de investimento.",
-        "cor": "#FF4444",
+        "cor": "#CF2E2E",
         "diretriz": True
     },
     {
@@ -44,7 +44,7 @@ MODELO_SERVIR = [
         "importancia": "ALTA",
         "impacto_falta": "Carteira estagnada. Cliente sem aportes recentes é um dos critérios de ruptura no Índice de Saúde XP (2 pontos). Uma carteira sem movimentação perde oportunidades de realocação e demonstra falta de atenção ativa do assessor.",
         "acao": "Verificar última ordem executada. Se não houver movimentação recente: identificar oportunidade de aporte ou realocação compatível com o perfil e gerar uma proposta concreta com base nos desvios do modelo.",
-        "cor": "#FFD966"
+        "cor": "#A9800F"
     },
     {
         "id": "conta_acessada",
@@ -54,7 +54,7 @@ MODELO_SERVIR = [
         "importancia": "ALTA",
         "impacto_falta": "Cliente desengajado da plataforma tem maior risco de ruptura e portabilidade. Clientes que não acessam a conta tendem a estar mais suscetíveis a abordagens de concorrentes. No Índice de Saúde XP, 'Sem Ordens' vale 2 pontos de risco de ruptura.",
         "acao": "Entrar em contato ativo para reengajar o cliente. Enviar uma análise personalizada (este relatório!) como pretexto de valor. Convidar para reunião de revisão de carteira. O engajamento do cliente começa pelo engajamento do assessor.",
-        "cor": "#FFD966"
+        "cor": "#A9800F"
     },
     {
         "id": "xperformance",
@@ -64,7 +64,7 @@ MODELO_SERVIR = [
         "importancia": "MÉDIA",
         "impacto_falta": "Sem análise do XPerformance, o cliente não tem visão clara da rentabilidade vs. benchmark (CDI). É impossível ter uma conversa fundamentada sobre realocação sem este diagnóstico. O XPerformance é o ponto de partida para toda revisão de carteira.",
         "acao": "Analisar o XPerformance atual e agendar uma reunião de revisão. Mostrar ao cliente como sua carteira se compara ao CDI e ao modelo ideal para o seu perfil — use este relatório como base da conversa.",
-        "cor": "#888888"
+        "cor": "#8A9A8E"
     },
     {
         "id": "atividade_relacionamento",
@@ -74,7 +74,7 @@ MODELO_SERVIR = [
         "importancia": "ALTA",
         "impacto_falta": "Cliente silencioso = cliente em risco. A falta de relacionamento ativo é o principal precursor de portabilidade. Concorrentes que abordam o cliente com insights e atenção têm vantagem sobre um assessor ausente. A régua de relacionamento é o que mantém o cliente fiel mesmo em períodos de rentabilidade ruim.",
         "acao": "Entrar em contato hoje com um ponto de valor: análise de carteira, insight de mercado, ou simplesmente verificar se o cliente tem alguma necessidade. Use este relatório como motivo de contato: 'Fiz uma análise completa da sua carteira e gostaria de conversar sobre algumas oportunidades.'",
-        "cor": "#FFD966"
+        "cor": "#A9800F"
     },
 ]
 
@@ -304,26 +304,26 @@ Se você não solicitou a redefinição, ignore este e-mail — sua senha contin
 Braúna Investimentos
 """
     html = f"""<!DOCTYPE html>
-<html><body style="font-family:Segoe UI,sans-serif;background:#081F18;color:#F0F0F0;padding:40px 20px;margin:0">
-<div style="max-width:480px;margin:0 auto;background:#111;border-radius:16px;padding:32px;border:1px solid #1A4030">
+<html><body style="font-family:Segoe UI,sans-serif;background:#EFF3EF;color:#17271E;padding:40px 20px;margin:0">
+<div style="max-width:480px;margin:0 auto;background:#FFFFFF;border-radius:16px;padding:32px;border:1px solid #D9E3DB">
   <div style="text-align:center;margin-bottom:28px">
-    <div style="font-size:22px;font-weight:800;color:#C9A96E;letter-spacing:2px">BRAÚNA INVESTIMENTOS</div>
-    <div style="font-size:12px;color:#3A6A48;margin-top:4px">Sistema de Análise de Carteiras</div>
+    <div style="font-size:22px;font-weight:800;color:#A8833C;letter-spacing:2px">BRAÚNA INVESTIMENTOS</div>
+    <div style="font-size:12px;color:#5C7365;margin-top:4px">Sistema de Análise de Carteiras</div>
   </div>
-  <p style="color:#CCC;font-size:14px;margin-bottom:8px">Olá, <strong style="color:#F0F0F0">{nome}</strong>!</p>
-  <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:24px">
+  <p style="color:#5C7365;font-size:14px;margin-bottom:8px">Olá, <strong style="color:#17271E">{nome}</strong>!</p>
+  <p style="color:#8A9A8E;font-size:13px;line-height:1.6;margin-bottom:24px">
     Recebemos uma solicitação para redefinir sua senha no sistema Braúna.<br>
     Clique no botão abaixo para criar uma nova senha.
   </p>
   <div style="text-align:center;margin-bottom:24px">
-    <a href="{link}" style="display:inline-block;background:#C9A96E;color:#081F18;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;text-decoration:none;letter-spacing:.5px">
+    <a href="{link}" style="display:inline-block;background:#A8833C;color:#EFF3EF;font-weight:700;font-size:14px;padding:14px 32px;border-radius:10px;text-decoration:none;letter-spacing:.5px">
       Redefinir minha senha
     </a>
   </div>
-  <p style="color:#3A6A48;font-size:11px;text-align:center">Este link expira em <strong>1 hora</strong>.<br>
+  <p style="color:#5C7365;font-size:11px;text-align:center">Este link expira em <strong>1 hora</strong>.<br>
   Se não foi você, ignore este e-mail — sua senha continua a mesma.</p>
-  <hr style="border:none;border-top:1px solid #1A2A1A;margin:24px 0">
-  <p style="color:#1A4030;font-size:10px;text-align:center">Braúna Investimentos · Uso interno · Acesso restrito</p>
+  <hr style="border:none;border-top:1px solid #F5F8F5;margin:24px 0">
+  <p style="color:#D9E3DB;font-size:10px;text-align:center">Braúna Investimentos · Uso interno · Acesso restrito</p>
 </div>
 </body></html>"""
 
@@ -2006,9 +2006,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     import matplotlib.pyplot as plt
     import numpy as np
 
-    PRETO=colors.HexColor("#081F18"); DOURADO=colors.HexColor("#C9A96E"); DESC=colors.HexColor("#A07840")
-    CESC=colors.HexColor("#1A1A1A"); CMED=colors.HexColor("#2C2C2C"); BRANCO=colors.white
-    VERM=colors.HexColor("#FF6B6B"); VERDE=colors.HexColor("#5DCAA5"); AMARELO=colors.HexColor("#FFD966")
+    PRETO=colors.HexColor("#EFF3EF"); DOURADO=colors.HexColor("#A8833C"); DESC=colors.HexColor("#A07840")
+    CESC=colors.HexColor("#F5F8F5"); CMED=colors.HexColor("#F5F8F5"); BRANCO=colors.white
+    VERM=colors.HexColor("#D93B3B"); VERDE=colors.HexColor("#1F9D77"); AMARELO=colors.HexColor("#A9800F")
     LARANJA=colors.HexColor("#FF8C00")
 
     buf=io.BytesIO()
@@ -2020,12 +2020,12 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     s_sub=S("S",fontSize=10,tc=DESC,alignment=TA_CENTER,spaceAfter=2)
     s_sec=S("Se",fontSize=11,tc=DOURADO,spaceBefore=10,spaceAfter=4)
     s_body=S("B",fontSize=9,leading=13)
-    s_rod=S("R",fontSize=7,tc=colors.HexColor("#4A7055"),alignment=TA_CENTER)
+    s_rod=S("R",fontSize=7,tc=colors.HexColor("#5C7365"),alignment=TA_CENTER)
     s_frag=S("F",fontSize=9,leading=13,tc=VERM)
     s_opor=S("O",fontSize=9,leading=13,tc=VERDE)
     s_sug=S("Su",fontSize=9,leading=14,tc=DOURADO)
     s_bold=S("Sb",fontSize=9,leading=13,tc=BRANCO,fontName="Helvetica-Bold")
-    s_gest=S("Sg",fontSize=8,leading=12,tc=colors.HexColor("#AAAAAA"))
+    s_gest=S("Sg",fontSize=8,leading=12,tc=colors.HexColor("#8A9A8E"))
     s_crit=S("Sc",fontSize=9,leading=13,tc=VERM,fontName="Helvetica-Bold")
     s_warn=S("Sw",fontSize=9,leading=13,tc=AMARELO)
     s_ok=S("Sok",fontSize=9,leading=13,tc=VERDE)
@@ -2060,7 +2060,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         ("FONTSIZE",(0,0),(-1,-1),8),("TEXTCOLOR",(0,0),(-1,-1),BRANCO),
         ("TEXTCOLOR",(0,0),(0,-1),DOURADO),("TEXTCOLOR",(2,0),(2,-1),DOURADO),
         ("ROWBACKGROUNDS",(0,0),(-1,-1),[CESC,CMED]),
-        ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),("PADDING",(0,0),(-1,-1),4),
+        ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),("PADDING",(0,0),(-1,-1),4),
     ]))
     elems.append(tm); elems.append(Spacer(1,0.3*cm))
 
@@ -2102,7 +2102,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             ("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
             ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
             ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),
-            ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+            ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),
             ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),
             ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
         ]))
@@ -2114,21 +2114,21 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     lbs=[d["label"] for d in _dv]; rea=[d["real"] for d in _dv]; alv=[d["alvo"] for d in _dv]
     y=np.arange(len(lbs)); h=0.38
     fig,ax=plt.subplots(figsize=(10,max(2.4,0.62*len(lbs)+1)))
-    fig.patch.set_facecolor("#081F18"); ax.set_facecolor("#1A1A1A")
-    b1=ax.barh(y+h/2,rea,h,color="#C9A96E",zorder=3,label="Atual")
-    b2=ax.barh(y-h/2,alv,h,color="#2A5A3A",zorder=3,label="Modelo")
+    fig.patch.set_facecolor("#EFF3EF"); ax.set_facecolor("#F5F8F5")
+    b1=ax.barh(y+h/2,rea,h,color="#A8833C",zorder=3,label="Atual")
+    b2=ax.barh(y-h/2,alv,h,color="#5C7365",zorder=3,label="Modelo")
     ax.set_yticks(y); ax.set_yticklabels(lbs,color="white",fontsize=9); ax.invert_yaxis()
-    ax.tick_params(colors="white"); ax.spines[:].set_color("#2C2C2C")
-    ax.xaxis.grid(True,color="#1C4A34",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="white")
+    ax.tick_params(colors="white"); ax.spines[:].set_color("#F5F8F5")
+    ax.xaxis.grid(True,color="#D9E3DB",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="white")
     _mx=max(rea+alv+[1])
     for bars in (b1,b2):
         for r in bars:
             wv=r.get_width()
             if wv>0: ax.text(wv+_mx*0.01,r.get_y()+r.get_height()/2,f"{wv:.0f}%",va="center",color="white",fontsize=7.5)
     ax.set_xlim(0,_mx*1.13)
-    ax.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="lower right")
+    ax.legend(facecolor="#F5F8F5",edgecolor="#F5F8F5",labelcolor="white",fontsize=8,loc="lower right")
     fig.tight_layout(pad=1)
-    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#081F18"); plt.close(fig); ib.seek(0)
+    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#EFF3EF"); plt.close(fig); ib.seek(0)
     _hh=max(3.2,0.72*len(lbs)+1.2)
     elems.append(Image(ib,width=15*cm,height=_hh*cm)); elems.append(Spacer(1,0.3*cm))
 
@@ -2154,22 +2154,22 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                        else "Rentabilidade da Carteira vs. CDI")
             elems.append(Paragraph(_titulo,s_sec))
             figr,axr=plt.subplots(figsize=(10,3.8))
-            figr.patch.set_facecolor("#081F18"); axr.set_facecolor("#1A1A1A")
+            figr.patch.set_facecolor("#EFF3EF"); axr.set_facecolor("#F5F8F5")
             _xs=np.arange(len(_pers))
-            _series=[(_cli_vals,"#C9A96E","Carteira")]
-            if _tem_rec: _series.append((_rec_vals,"#5DCAA5","Carteira-Modelo"))
-            _series.append((_cdi_vals,"#7DCFEF","CDI"))
+            _series=[(_cli_vals,"#A8833C","Carteira")]
+            if _tem_rec: _series.append((_rec_vals,"#1F9D77","Carteira-Modelo"))
+            _series.append((_cdi_vals,"#2E86B8","CDI"))
             _n=len(_series); _bw=0.8/_n
             for _k,(vals,cor,lbl) in enumerate(_series):
                 _vv=[float(v) if v is not None else 0.0 for v in vals]
                 axr.bar(_xs+(_k-(_n-1)/2)*_bw,_vv,_bw,color=cor,label=lbl,zorder=3)
-            axr.axhline(0,color="#3A3A3A",linewidth=0.8)
+            axr.axhline(0,color="#C6D6C9",linewidth=0.8)
             axr.set_xticks(_xs); axr.set_xticklabels([p[1] for p in _pers],color="white",fontsize=9)
-            axr.tick_params(colors="white"); axr.spines[:].set_color("#2C2C2C")
-            axr.yaxis.grid(True,color="#1C4A34"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
-            axr.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="best")
+            axr.tick_params(colors="white"); axr.spines[:].set_color("#F5F8F5")
+            axr.yaxis.grid(True,color="#D9E3DB"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
+            axr.legend(facecolor="#F5F8F5",edgecolor="#F5F8F5",labelcolor="white",fontsize=8,loc="best")
             figr.tight_layout(pad=1)
-            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#081F18"); plt.close(figr); ibr.seek(0)
+            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#EFF3EF"); plt.close(figr); ibr.seek(0)
             elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.3*cm))
     except Exception:
         pass
@@ -2180,7 +2180,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     td=Table(dd,colWidths=[5*cm,3.5*cm,3.5*cm,3.5*cm])
     est=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
          ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
-         ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+         ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),
          ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold")]
     for i,d in enumerate(desvios,1):
         _ad=abs(d["desvio"])
@@ -2207,7 +2207,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             _valor = patrimonio * (_falta / 100.0)
             elems.append(Paragraph(
                 f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}%) &nbsp;&nbsp;"
-                f"<font size=14 color=\"#FFD966\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
+                f"<font size=14 color=\"#A9800F\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
             elems.append(Paragraph(rec["explicacao"],s_body))
             if rec.get("produtos"):
                 prods=", ".join(rec["produtos"])
@@ -2231,11 +2231,11 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         for it in _pt["reduzir"]:
             des = it.get("desagio")
             dtxt = (f" · no ano {des:+.1f}%") if des is not None else ""
-            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{dtxt} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
+            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#8A9A8E\">({_pesc(it['label'])})</font>{dtxt} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
         elems.append(Paragraph("Comprar / aplicar",s_bold))
         for it in _pt["comprar"]:
             det = (f" · {_pesc(it['detalhe'])}") if it.get("detalhe") else ""
-            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{det} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
+            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#8A9A8E\">({_pesc(it['label'])})</font>{det} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
         if _pt["bloqueados"]:
             elems.append(Paragraph(f"Não vender agora — deságio acima de {_lim:.0f}% (renda fixa / crédito privado)",s_bold))
             for b in _pt["bloqueados"]:
@@ -2254,7 +2254,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             if "COMPRA" in r: return VERDE
             if "VENDA" in r:  return VERM
             if "NEUTRO" in r: return AMARELO
-            return colors.HexColor("#AAAAAA")
+            return colors.HexColor("#8A9A8E")
         def _up(v):
             if v is None: return "—"
             pv=v*100
@@ -2286,7 +2286,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm])
             est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
                      ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
-                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#C6D6C9")),
                      ("ALIGN",(1,0),(1,-1),"CENTER"),("ALIGN",(3,0),(4,-1),"CENTER"),
                      ("PADDING",(0,0),(-1,-1),3),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
                      ("TEXTCOLOR",(0,1),(0,-1),DOURADO),("VALIGN",(0,0),(-1,-1),"MIDDLE")]
@@ -2513,7 +2513,7 @@ def _b360_narrativa(comp, alvo, rent, dims_geral):
 
 _B360_CSS = """
 :root{color-scheme:light;--paper:#F6F7F6;--card:#FFFFFF;--ink:#1B2A30;--muted:#5F6F77;--faint:#94A2A8;
---line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#164A54;--marinho:#0D2333;--gold:#A9834F;--gold-soft:#C7AC80;
+--line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#164A54;--marinho:#123047;--gold:#A9834F;--gold-soft:#C7AC80;
 --good:#3E7A5E;--warn:#B4833A;--crit:#A5533E;
 --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;--mx:920px}
@@ -2527,13 +2527,13 @@ _B360_CSS = """
 .q{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,46px);line-height:1.12;letter-spacing:-.01em;text-wrap:balance;margin:0 0 10px}
 .lede{color:var(--muted);font-size:17px;max-width:60ch;margin:0 0 44px}
 .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:14px}
-.cover{background:var(--marinho);color:#F3EFE7;min-height:100vh;display:flex;flex-direction:column;padding:72px 56px}
+.cover{background:var(--marinho);color:#17271E;min-height:100vh;display:flex;flex-direction:column;padding:72px 56px}
 .cover .top{display:flex;justify-content:space-between;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:#8FA4AC}
 .cover .mid{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:var(--mx);margin:0 auto;width:100%}
 .deg{font-family:var(--serif);font-weight:500;letter-spacing:-.02em;line-height:.9;font-size:clamp(88px,17vw,190px)}
 .deg .o{color:var(--gold-soft)}
 .wordmark{font-size:13px;letter-spacing:.44em;text-transform:uppercase;color:#B9C7CD;margin:34px 0 6px}
-.cover h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.6vw,38px);margin:0;color:#F3EFE7}
+.cover h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.6vw,38px);margin:0;color:#17271E}
 .cover .rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);width:120px;margin:30px 0 0}
 .cover .foot{max-width:var(--mx);margin:0 auto;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-top:26px;border-top:1px solid rgba(255,255,255,.12)}
 .cover .foot .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#7E939B;margin-bottom:6px}
@@ -2558,7 +2558,7 @@ _B360_CSS = """
 .meter .sc{font-size:13.5px;color:var(--muted);text-align:right}
 .meter.low .fill{background:var(--warn)}
 .score{background:var(--marinho);color:#F1ECE2;border-radius:18px;padding:40px 34px;text-align:center}
-.score .n{font-family:var(--serif);font-size:76px;line-height:1;color:#F3EFE7}
+.score .n{font-family:var(--serif);font-size:76px;line-height:1;color:#17271E}
 .score .d{color:var(--gold-soft);font-size:15px}
 .score .t{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8FA4AC;margin-bottom:14px}
 .score .cap{font-size:13px;color:#B9C7CD;margin-top:16px;line-height:1.5}
@@ -2626,7 +2626,7 @@ _B360_CSS = """
 .printbtn{position:fixed;top:20px;right:20px;z-index:60;font-family:var(--sans);font-size:12px;
 letter-spacing:.06em;color:#EAE4D8;background:rgba(13,35,51,.86);border:1px solid rgba(199,172,128,.5);
 border-radius:99px;padding:9px 16px;cursor:pointer;backdrop-filter:blur(6px)}
-.printbtn:hover{background:#0D2333;border-color:var(--gold-soft)}
+.printbtn:hover{background:#123047;border-color:var(--gold-soft)}
 @media(max-width:760px){.page,.cover,.close{padding:64px 26px}.cards{grid-template-columns:repeat(2,1fr)}.xray{grid-template-columns:1fr;gap:34px}.verds{grid-template-columns:1fr}.road{grid-template-columns:1fr 1fr;gap:26px}.stop{border-left:0;padding-left:0}.attn .grid{grid-template-columns:1fr 1fr}}
 @media print{.doc{background:#fff}.page,.cover,.close{min-height:auto;page-break-after:always;padding:40px}.cover,.close{-webkit-print-color-adjust:exact;print-color-adjust:exact}.printbtn{display:none}}
 """
@@ -2937,186 +2937,186 @@ HTML = r"""<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#081F18;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#111;border-bottom:1px solid #1A4030;padding:14px 28px;display:flex;align-items:center;gap:12px}
-header h1{font-size:18px;color:#C9A96E;font-weight:700;letter-spacing:.5px}
-header p{font-size:11px;color:#3A6A48;margin-top:2px}
+body{background:#EFF3EF;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#FFFFFF;border-bottom:1px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;color:#A8833C;font-weight:700;letter-spacing:.5px}
+header p{font-size:11px;color:#5C7365;margin-top:2px}
 .container{max-width:1020px;margin:0 auto;padding:28px 20px}
-.card{background:#0B2A1F;border:1px solid #1A4030;border-radius:12px;padding:22px;margin-bottom:18px}
-.card h2{font-size:12px;color:#C9A96E;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.card{background:#E9F5EE;border:1px solid #D9E3DB;border-radius:12px;padding:22px;margin-bottom:18px}
+.card h2{font-size:12px;color:#A8833C;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-label{font-size:12px;color:#777;display:block;margin-bottom:5px}
-input,select{width:100%;background:#1A1A1A;border:1px solid #1C4A34;border-radius:8px;padding:9px 12px;color:#F0F0F0;font-size:13px;outline:none;transition:border .2s}
-input:focus,select:focus{border-color:#C9A96E}
-select option{background:#1A1A1A}
-.upload-area{border:1.5px dashed #1C4A34;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#111}
-.upload-area:hover,.upload-area.drag{border-color:#C9A96E;background:#1A1A1A}
+label{font-size:12px;color:#8A9A8E;display:block;margin-bottom:5px}
+input,select{width:100%;background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#17271E;font-size:13px;outline:none;transition:border .2s}
+input:focus,select:focus{border-color:#A8833C}
+select option{background:#F5F8F5}
+.upload-area{border:1.5px dashed #D9E3DB;border-radius:10px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:#FFFFFF}
+.upload-area:hover,.upload-area.drag{border-color:#A8833C;background:#F5F8F5}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
-.upload-area p{font-size:13px;color:#4A7055}
-.upload-area .fname{color:#C9A96E;font-weight:600;font-size:13px;margin-top:6px}
-.btn{width:100%;background:#C9A96E;color:#081F18;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.upload-area p{font-size:13px;color:#5C7365}
+.upload-area .fname{color:#A8833C;font-weight:600;font-size:13px;margin-top:6px}
+.btn{width:100%;background:#A8833C;color:#EFF3EF;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.88}.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-out{background:transparent;color:#C9A96E;border:1px solid #C9A96E}
-.btn-out:hover{background:#1A1A1A}
-.metric{background:#1A1A1A;border-radius:10px;padding:14px;text-align:center}
-.metric .lbl{font-size:10px;color:#3A6A48;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.metric .val{font-size:20px;font-weight:700;color:#C9A96E}
-.metric .val.danger{color:#FF6B6B}.metric .val.ok{color:#5DCAA5}
-.desvio-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1A1A1A;font-size:12px}
+.btn-out{background:transparent;color:#A8833C;border:1px solid #A8833C}
+.btn-out:hover{background:#F5F8F5}
+.metric{background:#F5F8F5;border-radius:10px;padding:14px;text-align:center}
+.metric .lbl{font-size:10px;color:#5C7365;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.metric .val{font-size:20px;font-weight:700;color:#A8833C}
+.metric .val.danger{color:#D93B3B}.metric .val.ok{color:#1F9D77}
+.desvio-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F5F8F5;font-size:12px}
 .desvio-row:last-child{border:none}
-.dn{width:106px;font-weight:500}.da{width:46px;color:#777;font-size:11px}
-.db-w{flex:1;background:#1A1A1A;border-radius:3px;height:5px;overflow:hidden}
-.db{height:100%;background:#C9A96E;border-radius:3px;transition:width .5s}
-.dalvo{width:52px;color:#2A5A3A;font-size:10px}
+.dn{width:106px;font-weight:500}.da{width:46px;color:#8A9A8E;font-size:11px}
+.db-w{flex:1;background:#F5F8F5;border-radius:3px;height:5px;overflow:hidden}
+.db{height:100%;background:#A8833C;border-radius:3px;transition:width .5s}
+.dalvo{width:52px;color:#5C7365;font-size:10px}
 .dpp{width:60px;text-align:right;font-weight:700;font-size:11px}
-.red{color:#FF6B6B}.grn{color:#5DCAA5}.dim{color:#1E4A30}
+.red{color:#D93B3B}.grn{color:#1F9D77}.dim{color:#5C7365}
 .alert{border-radius:8px;padding:10px 14px;margin:5px 0;font-size:12px;line-height:1.5}
-.alert.danger{background:#2A1010;border-left:3px solid #FF6B6B;color:#FFB3B3}
-.alert.success{background:#0A2018;border-left:3px solid #5DCAA5;color:#9FE1CB}
-.alert.gold{background:#1A160A;border-left:3px solid #C9A96E;color:#C9A96E}
-.alert.warn{background:#1A1500;border-left:3px solid #FFD966;color:#FFD966}
-.rec-card{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #1C4A34}
+.alert.danger{background:#FCEBEB;border-left:3px solid #D93B3B;color:#FFB3B3}
+.alert.success{background:#F5F8F5;border-left:3px solid #1F9D77;color:#9FE1CB}
+.alert.gold{background:#1A160A;border-left:3px solid #A8833C;color:#A8833C}
+.alert.warn{background:#FBF3D2;border-left:3px solid #A9800F;color:#A9800F}
+.rec-card{background:#F5F8F5;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid #D9E3DB}
 .rec-header{font-size:13px;font-weight:700;margin-bottom:6px}
-.rec-ctx{font-size:12px;color:#AAA;line-height:1.5;margin-bottom:6px}
-.rec-carta{font-size:11px;color:#888;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#111;border-radius:6px;border-left:2px solid #C9A96E}
+.rec-ctx{font-size:12px;color:#8A9A8E;line-height:1.5;margin-bottom:6px}
+.rec-carta{font-size:11px;color:#8A9A8E;font-style:italic;margin-bottom:6px;padding:6px 10px;background:#FFFFFF;border-radius:6px;border-left:2px solid #A8833C}
 .rec-prods{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.prod-tag{background:#081F18;border:1px solid #1E4A30;border-radius:20px;padding:3px 10px;font-size:11px;color:#C9A96E}
-.gestor-card{background:#1A1A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #1E4A30}
-.gestor-nome{font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:3px}
-.gestor-msg{font-size:11px;color:#888;line-height:1.4}
-.gestor-impl{font-size:11px;color:#5DCAA5;margin-top:3px}
-.macro-badge{display:inline-flex;align-items:center;gap:6px;background:#1A1A1A;border:1px solid #1C4A34;border-radius:20px;padding:4px 12px;font-size:12px;margin:3px}
-.macro-badge span{color:#C9A96E;font-weight:700}
+.prod-tag{background:#EFF3EF;border:1px solid #5C7365;border-radius:20px;padding:3px 10px;font-size:11px;color:#A8833C}
+.gestor-card{background:#F5F8F5;border-radius:8px;padding:10px 14px;margin-bottom:6px;border-left:2px solid #5C7365}
+.gestor-nome{font-size:11px;color:#A8833C;font-weight:700;margin-bottom:3px}
+.gestor-msg{font-size:11px;color:#8A9A8E;line-height:1.4}
+.gestor-impl{font-size:11px;color:#1F9D77;margin-top:3px}
+.macro-badge{display:inline-flex;align-items:center;gap:6px;background:#F5F8F5;border:1px solid #D9E3DB;border-radius:20px;padding:4px 12px;font-size:12px;margin:3px}
+.macro-badge span{color:#A8833C;font-weight:700}
 #results{display:none}
-.spinner{display:none;text-align:center;padding:32px;color:#C9A96E}
+.spinner{display:none;text-align:center;padding:32px;color:#A8833C}
 .spinner.show{display:block}
-.loader{width:36px;height:36px;border:3px solid #1A4030;border-top-color:#C9A96E;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+.loader{width:36px;height:36px;border:3px solid #D9E3DB;border-top-color:#A8833C;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .chart-wrap{position:relative;width:100%;height:250px}
 .tab-btns{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.tab-btn{background:#1A1A1A;border:1px solid #1C4A34;border-radius:8px;padding:6px 14px;font-size:12px;color:#888;cursor:pointer;transition:all .2s}
-.tab-btn.active{background:#C9A96E;color:#081F18;border-color:#C9A96E;font-weight:700}
+.tab-btn{background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:6px 14px;font-size:12px;color:#8A9A8E;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:#A8833C;color:#EFF3EF;border-color:#A8833C;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
-.rodape{text-align:center;font-size:11px;color:#1E4A30;margin-top:32px;padding-top:14px;border-top:1px solid #1A1A1A}
+.rodape{text-align:center;font-size:11px;color:#5C7365;margin-top:32px;padding-top:14px;border-top:1px solid #F5F8F5}
 /* Checklist Modelo de Servir */
-.pilar-toggle{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;background:#111;border:1px solid #1E1E1E;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
-.pilar-toggle:hover{border-color:#1C4A34}
-.pilar-toggle.done{border-color:#2A4030;background:#0A2A18}
-.pilar-toggle.pending-crit{border-color:#4A1010;background:#1A0808}
+.pilar-toggle{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;background:#FFFFFF;border:1px solid #FFFFFF;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
+.pilar-toggle:hover{border-color:#D9E3DB}
+.pilar-toggle.done{border-color:#2A4030;background:#E9F5EE}
+.pilar-toggle.pending-crit{border-color:#4A1010;background:#FBE9E9}
 .pilar-toggle.pending-high{border-color:#3A3A00;background:#141400}
-.pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid #1E4A30;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
-.pilar-check.checked{background:#5DCAA5;border-color:#5DCAA5;color:#000;font-weight:700}
+.pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid #5C7365;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
+.pilar-check.checked{background:#1F9D77;border-color:#1F9D77;color:#000;font-weight:700}
 .pilar-icon{font-size:20px;flex-shrink:0}
 .pilar-info{flex:1}
-.pilar-nome{font-size:13px;font-weight:700;color:#F0F0F0;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+.pilar-nome{font-size:13px;font-weight:700;color:#17271E;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 .pilar-nome .badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 .badge-crit{background:#FF2222;color:#fff}
-.badge-high{background:#FFD966;color:#000}
-.badge-med{background:#2A5A3A;color:#aaa}
-.badge-dir{background:#C9A96E;color:#000}
-.pilar-desc{font-size:11px;color:#3A6A48;line-height:1.4}
-.pilar-falta{display:none;margin-top:10px;padding:10px;background:#081F18;border-radius:8px;border-left:3px solid #FF6B6B}
+.badge-high{background:#A9800F;color:#000}
+.badge-med{background:#5C7365;color:#8A9A8E}
+.badge-dir{background:#A8833C;color:#000}
+.pilar-desc{font-size:11px;color:#5C7365;line-height:1.4}
+.pilar-falta{display:none;margin-top:10px;padding:10px;background:#EFF3EF;border-radius:8px;border-left:3px solid #D93B3B}
 .pilar-falta.show{display:block}
-.pilar-falta.warn{border-left-color:#FFD966}
-.pilar-falta.med{border-left-color:#3A6A48}
-.pilar-falta p{font-size:11px;color:#AAA;line-height:1.6;margin-bottom:6px}
-.pilar-falta .acao{font-size:11px;color:#C9A96E;line-height:1.5;padding:8px;background:#1A2E1A;border-radius:6px;margin-top:6px}
-.pilar-falta .diretriz-badge{font-size:10px;color:#C9A96E;font-weight:700;margin-top:6px;padding:4px 8px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:4px;display:inline-block}
+.pilar-falta.warn{border-left-color:#A9800F}
+.pilar-falta.med{border-left-color:#5C7365}
+.pilar-falta p{font-size:11px;color:#8A9A8E;line-height:1.6;margin-bottom:6px}
+.pilar-falta .acao{font-size:11px;color:#A8833C;line-height:1.5;padding:8px;background:#F5F8F5;border-radius:6px;margin-top:6px}
+.pilar-falta .diretriz-badge{font-size:10px;color:#A8833C;font-weight:700;margin-top:6px;padding:4px 8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:4px;display:inline-block}
 /* Placard de score */
-.servir-score{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:10px;background:#111;border:1px solid #1C4A34;margin-bottom:14px}
-.score-num{font-size:36px;font-weight:700;color:#C9A96E;min-width:56px;text-align:center}
+.servir-score{display:flex;align-items:center;gap:16px;padding:14px 18px;border-radius:10px;background:#FFFFFF;border:1px solid #D9E3DB;margin-bottom:14px}
+.score-num{font-size:36px;font-weight:700;color:#A8833C;min-width:56px;text-align:center}
 .score-info{flex:1}
-.score-label{font-size:11px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.score-bar-w{height:6px;background:#1A4030;border-radius:3px;overflow:hidden}
+.score-label{font-size:11px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.score-bar-w{height:6px;background:#D9E3DB;border-radius:3px;overflow:hidden}
 .score-bar{height:100%;border-radius:3px;transition:width .5s}
-.score-pendentes{font-size:11px;color:#888;margin-top:5px}
+.score-pendentes{font-size:11px;color:#8A9A8E;margin-top:5px}
 /* Pilar result card */
-.pilar-result{background:#1A1A1A;border-radius:10px;padding:14px;margin-bottom:8px;border-left:4px solid #1E4A30}
-.pilar-result.ok{border-left-color:#5DCAA5}
-.pilar-result.crit{border-left-color:#FF4444}
-.pilar-result.high{border-left-color:#FFD966}
-.pilar-result.med{border-left-color:#3A6A48}
+.pilar-result{background:#F5F8F5;border-radius:10px;padding:14px;margin-bottom:8px;border-left:4px solid #5C7365}
+.pilar-result.ok{border-left-color:#1F9D77}
+.pilar-result.crit{border-left-color:#CF2E2E}
+.pilar-result.high{border-left-color:#A9800F}
+.pilar-result.med{border-left-color:#5C7365}
 .pilar-result-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .pilar-result-nome{font-size:13px;font-weight:700}
 .pilar-result-status{font-size:10px;padding:2px 8px;border-radius:10px}
-.status-ok{background:#0A2018;color:#5DCAA5}
-.status-pendente{background:#2A1010;color:#FF6B6B}
-.pilar-result-impacto{font-size:11px;color:#888;line-height:1.5;margin-bottom:6px}
-.pilar-result-acao{font-size:11px;color:#C9A96E;padding:8px;background:#111;border-radius:6px}
+.status-ok{background:#F5F8F5;color:#1F9D77}
+.status-pendente{background:#FCEBEB;color:#D93B3B}
+.pilar-result-impacto{font-size:11px;color:#8A9A8E;line-height:1.5;margin-bottom:6px}
+.pilar-result-acao{font-size:11px;color:#A8833C;padding:8px;background:#FFFFFF;border-radius:6px}
 /* Cross Sell chips */
-.cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #1C4A34;background:#111;cursor:pointer;font-size:12px;font-weight:600;color:#777;transition:all .2s;user-select:none}
-.cs-chip:hover{border-color:#C9A96E;color:#C9A96E}
-.cs-chip.ativo{background:#1A2E1A;border-color:#C9A96E;color:#C9A96E}
+.cs-chip{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:30px;border:1.5px solid #D9E3DB;background:#FFFFFF;cursor:pointer;font-size:12px;font-weight:600;color:#8A9A8E;transition:all .2s;user-select:none}
+.cs-chip:hover{border-color:#A8833C;color:#A8833C}
+.cs-chip.ativo{background:#F5F8F5;border-color:#A8833C;color:#A8833C}
 .cs-chip .cs-icon{font-size:16px}
-.cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #1E4A30;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
-.cs-chip.ativo .cs-check{background:#C9A96E;border-color:#C9A96E;color:#081F18;font-weight:900}
+.cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
+.cs-chip.ativo .cs-check{background:#A8833C;border-color:#A8833C;color:#EFF3EF;font-weight:900}
 /* Cross sell result cards */
-.cs-area{background:#1A1A1A;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #1C4A34}
-.cs-area.tem{border-left:4px solid #5DCAA5;opacity:.7}
-.cs-area.nao-tem{border-left:4px solid #C9A96E}
+.cs-area{background:#F5F8F5;border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid #D9E3DB}
+.cs-area.tem{border-left:4px solid #1F9D77;opacity:.7}
+.cs-area.nao-tem{border-left:4px solid #A8833C}
 .cs-area-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .cs-area-nome{font-size:14px;font-weight:700;flex:1}
 .cs-status-tag{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700}
-.cs-tem-tag{background:#0A2018;color:#5DCAA5}
-.cs-falta-tag{background:#1A2E1A;color:#C9A96E}
-.cs-pitch{font-size:12px;color:#C9A96E;font-style:italic;padding:10px 12px;background:#111;border-radius:8px;border-left:3px solid #C9A96E;margin-bottom:10px;line-height:1.6}
+.cs-tem-tag{background:#F5F8F5;color:#1F9D77}
+.cs-falta-tag{background:#F5F8F5;color:#A8833C}
+.cs-pitch{font-size:12px;color:#A8833C;font-style:italic;padding:10px 12px;background:#FFFFFF;border-radius:8px;border-left:3px solid #A8833C;margin-bottom:10px;line-height:1.6}
 .cs-ops{list-style:none;padding:0}
-.cs-ops li{font-size:11px;color:#888;padding:5px 0;border-bottom:1px solid #1A1A1A;line-height:1.5}
+.cs-ops li{font-size:11px;color:#8A9A8E;padding:5px 0;border-bottom:1px solid #F5F8F5;line-height:1.5}
 .cs-ops li:last-child{border:none}
-.cs-ops li::before{content:"→ ";color:#C9A96E}
+.cs-ops li::before{content:"→ ";color:#A8833C}
 /* Especialista FP */
-.fp-bloco{background:#111;border-radius:10px;padding:14px;margin-top:10px;border:1px solid #1C4A34}
-.fp-bloco-titulo{font-size:12px;font-weight:700;color:#C9A96E;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.fp-bloco p{font-size:11px;color:#888;line-height:1.6;margin-bottom:6px}
-.fp-bloco .fp-item{padding:6px 0;border-bottom:1px solid #1A1A1A;font-size:11px;color:#AAA;line-height:1.5}
+.fp-bloco{background:#FFFFFF;border-radius:10px;padding:14px;margin-top:10px;border:1px solid #D9E3DB}
+.fp-bloco-titulo{font-size:12px;font-weight:700;color:#A8833C;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fp-bloco p{font-size:11px;color:#8A9A8E;line-height:1.6;margin-bottom:6px}
+.fp-bloco .fp-item{padding:6px 0;border-bottom:1px solid #F5F8F5;font-size:11px;color:#8A9A8E;line-height:1.5}
 .fp-bloco .fp-item:last-child{border:none}
-.fp-bloco .fp-item b{color:#F0F0F0}
-.fp-bloco .fp-pitch{font-size:11px;color:#5DCAA5;padding:8px;background:#0A2A18;border-radius:6px;border-left:2px solid #5DCAA5;margin-top:8px}
-.fp-alerta{font-size:11px;color:#FF6B6B;padding:8px 10px;background:#2A1010;border-radius:6px;margin-top:6px;border-left:2px solid #FF6B6B}
-.cs-score-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-radius:10px;border:1px solid #1C4A34;margin-bottom:14px}
+.fp-bloco .fp-item b{color:#17271E}
+.fp-bloco .fp-pitch{font-size:11px;color:#1F9D77;padding:8px;background:#E9F5EE;border-radius:6px;border-left:2px solid #1F9D77;margin-top:8px}
+.fp-alerta{font-size:11px;color:#D93B3B;padding:8px 10px;background:#FCEBEB;border-radius:6px;margin-top:6px;border-left:2px solid #D93B3B}
+.cs-score-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FFFFFF;border-radius:10px;border:1px solid #D9E3DB;margin-bottom:14px}
 /* Sugestões de Alocação */
-.sg-bloco{background:#111;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #1C4A34}
-.sg-bloco-title{font-size:11px;font-weight:700;color:#C9A96E;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sg-card{background:#1A1A1A;border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid #1C4A34;position:relative}
-.sg-card.urg-alta{border-left-color:#FF6B6B}
-.sg-card.urg-media{border-left-color:#FFD966}
-.sg-card.urg-baixa{border-left-color:#5DCAA5}
+.sg-bloco{background:#FFFFFF;border-radius:12px;padding:16px;margin-bottom:14px;border:1px solid #D9E3DB}
+.sg-bloco-title{font-size:11px;font-weight:700;color:#A8833C;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sg-card{background:#F5F8F5;border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid #D9E3DB;position:relative}
+.sg-card.urg-alta{border-left-color:#D93B3B}
+.sg-card.urg-media{border-left-color:#A9800F}
+.sg-card.urg-baixa{border-left-color:#1F9D77}
 .sg-card .sg-topo{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.sg-card .sg-acao{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;background:#1C4A34;color:#AAA}
-.sg-card .sg-produto{font-size:13px;font-weight:700;color:#F0F0F0;flex:1}
-.sg-card .sg-idx{font-size:10px;color:#C9A96E;padding:2px 7px;border-radius:6px;background:#1A2E1A;border:1px solid #C9A96E}
-.sg-card .sg-motivo{font-size:11px;color:#888;line-height:1.5;margin-top:4px}
-.sg-card .sg-de{font-size:11px;color:#FF6B6B;margin-bottom:4px}
-.sg-card .sg-fonte{font-size:10px;color:#3A6A48;margin-top:4px}
-.sg-ja-tem{opacity:.6;border-left-color:#5DCAA5 !important}
-.sg-ja-tem-badge{font-size:10px;color:#5DCAA5;background:#0A2018;border-radius:6px;padding:2px 8px;margin-bottom:4px;display:inline-block}
-.sg-est-box{background:#1A1A1A;border-radius:8px;padding:14px;border:1px solid #1C4A34;font-size:12px;color:#CCC;line-height:1.7;white-space:pre-wrap}
+.sg-card .sg-acao{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;background:#D9E3DB;color:#8A9A8E}
+.sg-card .sg-produto{font-size:13px;font-weight:700;color:#17271E;flex:1}
+.sg-card .sg-idx{font-size:10px;color:#A8833C;padding:2px 7px;border-radius:6px;background:#F5F8F5;border:1px solid #A8833C}
+.sg-card .sg-motivo{font-size:11px;color:#8A9A8E;line-height:1.5;margin-top:4px}
+.sg-card .sg-de{font-size:11px;color:#D93B3B;margin-bottom:4px}
+.sg-card .sg-fonte{font-size:10px;color:#5C7365;margin-top:4px}
+.sg-ja-tem{opacity:.6;border-left-color:#1F9D77 !important}
+.sg-ja-tem-badge{font-size:10px;color:#1F9D77;background:#F5F8F5;border-radius:6px;padding:2px 8px;margin-bottom:4px;display:inline-block}
+.sg-est-box{background:#F5F8F5;border-radius:8px;padding:14px;border:1px solid #D9E3DB;font-size:12px;color:#5C7365;line-height:1.7;white-space:pre-wrap}
 .sg-fii-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
-.sg-fii-table th{text-align:left;color:#3A6A48;font-weight:600;padding:5px 8px;border-bottom:1px solid #1C4A34;font-size:10px;text-transform:uppercase}
-.sg-fii-table td{padding:7px 8px;border-bottom:1px solid #1A1A1A;color:#CCC}
+.sg-fii-table th{text-align:left;color:#5C7365;font-weight:600;padding:5px 8px;border-bottom:1px solid #D9E3DB;font-size:10px;text-transform:uppercase}
+.sg-fii-table td{padding:7px 8px;border-bottom:1px solid #F5F8F5;color:#5C7365}
 .sg-fii-table tr:last-child td{border:none}
-.sg-fii-table .fii-ticker{color:#C9A96E;font-weight:700}
-.sg-header-box{background:#1A2E1A;border:1px solid #C9A96E;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.sg-vazio{font-size:13px;color:#5DCAA5;padding:16px;text-align:center}
+.sg-fii-table .fii-ticker{color:#A8833C;font-weight:700}
+.sg-header-box{background:#F5F8F5;border:1px solid #A8833C;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sg-vazio{font-size:13px;color:#1F9D77;padding:16px;text-align:center}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 /* ── Fluxo em 2 etapas ── */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
-.step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#0B2A1F;border:1px solid #1A4030;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
-.step-item.active{background:#1A2E1A;border-color:#C9A96E}
-.step-item.done{background:#0A2A18;border-color:#2A4030}
-.step-circle{width:26px;height:26px;border-radius:50%;background:#1A4030;border:2px solid #1E4A30;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#3A6A48;flex-shrink:0;transition:all .3s}
-.step-item.active .step-circle{background:#C9A96E;border-color:#C9A96E;color:#081F18}
-.step-item.done .step-circle{background:#5DCAA5;border-color:#5DCAA5;color:#000}
-.step-label{font-size:12px;font-weight:700;color:#2A5A3A;letter-spacing:.3px;transition:all .3s}
-.step-item.active .step-label{color:#C9A96E}
-.step-item.done .step-label{color:#5DCAA5}
-.step-line{flex:1;height:1px;background:#1A4030;min-width:20px}
+.step-item{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:10px;cursor:default;transition:all .3s;flex-shrink:0}
+.step-item.active{background:#F5F8F5;border-color:#A8833C}
+.step-item.done{background:#E9F5EE;border-color:#2A4030}
+.step-circle{width:26px;height:26px;border-radius:50%;background:#D9E3DB;border:2px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#5C7365;flex-shrink:0;transition:all .3s}
+.step-item.active .step-circle{background:#A8833C;border-color:#A8833C;color:#EFF3EF}
+.step-item.done .step-circle{background:#1F9D77;border-color:#1F9D77;color:#000}
+.step-label{font-size:12px;font-weight:700;color:#5C7365;letter-spacing:.3px;transition:all .3s}
+.step-item.active .step-label{color:#A8833C}
+.step-item.done .step-label{color:#1F9D77}
+.step-line{flex:1;height:1px;background:#D9E3DB;min-width:20px}
 .step2-banner{padding:12px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
-.step2-banner.first{background:#0A2A18;border:1px solid #2A4030}
-.step2-banner.return{background:#1A2E1A;border:1px solid #3A2A00}
+.step2-banner.first{background:#E9F5EE;border:1px solid #2A4030}
+.step2-banner.return{background:#F5F8F5;border:1px solid #3A2A00}
 </style>
 </head>
 <body>
@@ -3127,7 +3127,7 @@ select option{background:#1A1A1A}
     <p>Análise de Alocação por Indexador</p>
   </div>
   <div id="mkt-ticker" style="flex:1;min-width:0;overflow:hidden;white-space:nowrap;margin:0 8px" title="Últimas do mercado">
-    <div id="mkt-ticker-inner" style="display:inline-block;white-space:nowrap;will-change:transform;font-size:12px;color:#C9A96E"></div>
+    <div id="mkt-ticker-inner" style="display:inline-block;white-space:nowrap;will-change:transform;font-size:12px;color:#A8833C"></div>
   </div>
   <nav style="display:flex;gap:8px;align-items:center;flex-shrink:0" id="nav-assessor">
     <!-- Sino de notificações -->
@@ -3135,16 +3135,16 @@ select option{background:#1A1A1A}
       <span style="font-size:20px">🔔</span>
       <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#E53935;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center"></span>
     </div>
-    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#888'">Sair</button>
+    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#8A9A8E;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#3A2A2A';this.style.color='#8A9A8E'">Sair</button>
   </nav>
 
   <!-- Painel de notificações flutuante -->
-  <div id="notif-panel" style="display:none;position:fixed;top:60px;right:16px;width:380px;max-height:70vh;overflow-y:auto;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;z-index:9999;box-shadow:0 8px 32px #000a">
+  <div id="notif-panel" style="display:none;position:fixed;top:60px;right:16px;width:380px;max-height:70vh;overflow-y:auto;background:#F5F8F5;border:1px solid #2A2A2A;border-radius:12px;z-index:9999;box-shadow:0 8px 32px #000a">
     <div style="padding:12px 16px;border-bottom:1px solid #2A2A2A;display:flex;justify-content:space-between;align-items:center">
-      <span style="color:#C9A96E;font-weight:700;font-size:14px">🔔 Alertas do Head de Produtos</span>
+      <span style="color:#A8833C;font-weight:700;font-size:14px">🔔 Alertas do Head de Produtos</span>
       <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="marcarTodasLidas()" style="font-size:11px;color:#5DCAA5;background:none;border:none;cursor:pointer;padding:0">Marcar todas lidas</button>
-        <button onclick="toggleNotifPanel()" style="color:#666;background:none;border:none;cursor:pointer;font-size:18px;line-height:1">×</button>
+        <button onclick="marcarTodasLidas()" style="font-size:11px;color:#1F9D77;background:none;border:none;cursor:pointer;padding:0">Marcar todas lidas</button>
+        <button onclick="toggleNotifPanel()" style="color:#8A9A8E;background:none;border:none;cursor:pointer;font-size:18px;line-height:1">×</button>
       </div>
     </div>
     <div id="notif-lista" style="padding:8px 0"></div>
@@ -3155,12 +3155,12 @@ select option{background:#1A1A1A}
     if(role === "admin"){
       const nav = document.getElementById("nav-assessor");
       nav.innerHTML = `
-        <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #C9A96E;color:#C9A96E;text-decoration:none;font-weight:700">📊 Assessor</a>
-        <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">👥 Líder</a>
-        <a href="/head-produtos" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">🏛️ Head</a>
-        <a href="/painel" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">📋 Painel</a>
-        <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1C4A34;color:#3A6A48;text-decoration:none">⚙️ Admin</a>
-        <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#888;background:none;cursor:pointer">Sair</button>`;
+        <a href="/assessor" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #A8833C;color:#A8833C;text-decoration:none;font-weight:700">📊 Assessor</a>
+        <a href="/lider" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">👥 Líder</a>
+        <a href="/head-produtos" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">🏛️ Head</a>
+        <a href="/painel" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">📋 Painel</a>
+        <a href="/admin" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #D9E3DB;color:#5C7365;text-decoration:none">⚙️ Admin</a>
+        <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #3A2A2A;color:#8A9A8E;background:none;cursor:pointer">Sair</button>`;
     }
   })();
   </script>
@@ -3187,15 +3187,15 @@ select option{background:#1A1A1A}
 
 <!-- Formulário -->
 <!-- Mensagem do Admin (se houver) -->
-<div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:10px">
-  <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
-  <p id="msg-admin-txt" style="font-size:12px;color:#CCC;line-height:1.6"></p>
-  <p id="msg-admin-data" style="font-size:10px;color:#3A6A48;margin-top:4px"></p>
+<div id="msg-admin-box" style="display:none;margin-bottom:14px;padding:12px 16px;background:#F5F8F5;border:1px solid #A8833C;border-radius:10px">
+  <p style="font-size:10px;color:#A8833C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700">📢 Comunicado da Administração</p>
+  <p id="msg-admin-txt" style="font-size:12px;color:#5C7365;line-height:1.6"></p>
+  <p id="msg-admin-data" style="font-size:10px;color:#5C7365;margin-top:4px"></p>
 </div>
 
 <!-- Calls do Head — proativo: para cada call ativa, os clientes DESTE assessor -->
 <div id="calls-assessor-card" class="card" style="display:none">
-  <h2 style="display:flex;align-items:center;gap:8px">📣 Calls do Head <span id="calls-assessor-cont" style="font-size:11px;color:#3A6A48;font-weight:400"></span></h2>
+  <h2 style="display:flex;align-items:center;gap:8px">📣 Calls do Head <span id="calls-assessor-cont" style="font-size:11px;color:#5C7365;font-weight:400"></span></h2>
   <p style="font-size:11px;color:#7A8A80;margin:-4px 0 12px;line-height:1.5">Recomendações de renda variável publicadas pela mesa. Para cada ativo, seus clientes que já o possuem ou têm perfil compatível com a operação.</p>
   <div id="calls-assessor-lista"></div>
 </div>
@@ -3207,25 +3207,25 @@ select option{background:#1A1A1A}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
     <div>
       <label>Assessor</label>
-      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#1A1A1A;cursor:default;color:#C9A96E;display:none">
-      <select id="assessor-select" onchange="document.getElementById('assessor').value=this.value;buscarClientesSalvos()" style="display:none;width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#C9A96E;font-size:13px;outline:none">
+      <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#F5F8F5;cursor:default;color:#A8833C;display:none">
+      <select id="assessor-select" onchange="document.getElementById('assessor').value=this.value;buscarClientesSalvos()" style="display:none;width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#A8833C;font-size:13px;outline:none">
         <option value="">— Selecione o assessor —</option>
       </select>
     </div>
     <div>
-      <label>Código do cliente <span style="font-size:10px;color:#3A6A48;font-weight:400">— busca no sistema</span></label>
+      <label>Código do cliente <span style="font-size:10px;color:#5C7365;font-weight:400">— busca no sistema</span></label>
       <input type="text" id="codigo-cliente" placeholder="Ex: 7712906 — Enter para carregar" oninput="buscarPorCodigoCliente(this.value)" onkeydown="if(event.key==='Enter')buscarUltimoXpPorCodigo(this.value)" autocomplete="off"
-        style="width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:9px 12px;color:#E8D5A3;font-size:13px;outline:none;box-sizing:border-box">
+        style="width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#E8D5A3;font-size:13px;outline:none;box-sizing:border-box">
       <input type="text" id="nome" placeholder="" style="display:none">
-      <p id="cliente-encontrado-label" style="display:none;font-size:11px;color:#5DCAA5;margin-top:4px;font-weight:700"></p>
+      <p id="cliente-encontrado-label" style="display:none;font-size:11px;color:#1F9D77;margin-top:4px;font-weight:700"></p>
     </div>
   </div>
 
   <!-- Clientes salvos: resumo por perfil (expansível) + desenquadrados -->
-  <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#081F18;border-radius:10px;border:1px solid #1E1E1E">
-    <p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px;font-weight:700">📁 Clientes salvos <span id="cs-contador" style="color:#3A6A48;font-weight:400"></span></p>
+  <div id="clientes-salvos-box" style="display:none;margin-bottom:14px;padding:12px;background:#EFF3EF;border-radius:10px;border:1px solid #FFFFFF">
+    <p style="font-size:10px;color:#A8833C;text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px;font-weight:700">📁 Clientes salvos <span id="cs-contador" style="color:#5C7365;font-weight:400"></span></p>
     <div id="clientes-salvos-lista"></div>
-    <p id="xp-aviso-atualizar" style="display:none;font-size:11px;color:#E8A87C;margin-top:10px;line-height:1.5"></p>
+    <p id="xp-aviso-atualizar" style="display:none;font-size:11px;color:#C0673A;margin-top:10px;line-height:1.5"></p>
   </div>
 
   <!-- LINHA 2: Upload XPerformance -->
@@ -3237,16 +3237,16 @@ select option{background:#1A1A1A}
         onchange="onXpFileChange(this)">
       <div class="icon" style="font-size:22px;margin-bottom:4px">📊</div>
       <p id="upload-hint-text" style="font-size:12px;margin:0">XPerformance — clique para identificar o cliente</p>
-      <p style="font-size:10px;color:#3A6A48;margin:3px 0 0">ou solte um <b style="color:#C9A96E">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
+      <p style="font-size:10px;color:#5C7365;margin:3px 0 0">ou solte um <b style="color:#A8833C">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
       <p class="fname" id="fname-xp" style="font-size:11px;margin:2px 0 0"></p>
     </div>
     <!-- Progresso + resultado da importação em lote (ZIP) -->
     <div id="xp-lote-progress" style="display:none;margin-top:10px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#3A6A48;margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#5C7365;margin-bottom:4px">
         <span id="xp-lote-txt">Processando...</span><span id="xp-lote-pct">0%</span>
       </div>
-      <div style="height:6px;background:#12281C;border-radius:3px;overflow:hidden">
-        <div id="xp-lote-bar" style="height:100%;width:0%;background:#5DCAA5;border-radius:3px;transition:width .3s"></div>
+      <div style="height:6px;background:#EAF4EC;border-radius:3px;overflow:hidden">
+        <div id="xp-lote-bar" style="height:100%;width:0%;background:#1F9D77;border-radius:3px;transition:width .3s"></div>
       </div>
     </div>
     <div id="xp-lote-resultado" style="display:none;margin-top:10px"></div>
@@ -3259,7 +3259,7 @@ select option{background:#1A1A1A}
   <div style="margin-bottom:14px">
     <label style="margin-bottom:8px;display:block">Perfil do cliente</label>
     <!-- Aviso quando o perfil foi sugerido automaticamente pela carteira atual -->
-    <p id="perfil-sugerido-hint" style="display:none;font-size:11px;color:#C9A96E;margin:0 0 8px 0;font-weight:600"></p>
+    <p id="perfil-sugerido-hint" style="display:none;font-size:11px;color:#A8833C;margin:0 0 8px 0;font-weight:600"></p>
     <!-- Cards clicáveis por perfil — renderizados pelo servidor -->
     <div id="perfil-cards" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       {{ perfil_cards | safe }}
@@ -3278,7 +3278,7 @@ select option{background:#1A1A1A}
   <div style="margin-bottom:14px">
     <label style="display:block;margin-bottom:8px">
       Carteira de referência
-      <span id="perfil-lbl" style="color:#C9A96E;font-size:10px;font-weight:400;text-transform:uppercase;margin-left:6px"></span>
+      <span id="perfil-lbl" style="color:#A8833C;font-size:10px;font-weight:400;text-transform:uppercase;margin-left:6px"></span>
     </label>
 
     <!-- Toggle visual XP vs Levante -->
@@ -3293,11 +3293,11 @@ select option{background:#1A1A1A}
     <p id="gestora-vazia-hint" style="display:none"></p>
 
     <!-- Alocação detalhada do modelo selecionado -->
-    <div style="background:#060F0B;border:1px solid #1A2E1A;border-radius:8px;padding:10px 14px">
-      <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+    <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:10px 14px">
+      <div style="font-size:9px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
         Alocação do modelo
-        <span id="modelo-gestora-lbl" style="color:#C9A96E;margin-left:4px;font-weight:700"></span>
-        <span id="carta-ativa-nome" style="color:#3A6A48;margin-left:6px;font-size:9px"></span>
+        <span id="modelo-gestora-lbl" style="color:#A8833C;margin-left:4px;font-weight:700"></span>
+        <span id="carta-ativa-nome" style="color:#5C7365;margin-left:6px;font-size:9px"></span>
       </div>
       <div id="modelo-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 22px"></div>
     </div>
@@ -3313,7 +3313,7 @@ select option{background:#1A1A1A}
 
   <!-- Botão para avançar -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
-    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#C9A96E;color:#081F18;font-size:15px;padding:15px">
+    <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#A8833C;color:#EFF3EF;font-size:15px;padding:15px">
       Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →
     </button>
   </div>
@@ -3326,8 +3326,8 @@ select option{background:#1A1A1A}
 <div id="step2-banner" class="step2-banner first">
   <div id="step2-icon" style="font-size:28px">👤</div>
   <div style="flex:1">
-    <p id="step2-titulo" style="font-size:14px;font-weight:700;color:#F0F0F0;margin-bottom:2px"></p>
-    <p id="step2-sub" style="font-size:11px;color:#888"></p>
+    <p id="step2-titulo" style="font-size:14px;font-weight:700;color:#17271E;margin-bottom:2px"></p>
+    <p id="step2-sub" style="font-size:11px;color:#8A9A8E"></p>
   </div>
   <div id="step2-badges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
@@ -3344,12 +3344,12 @@ select option{background:#1A1A1A}
       <div style="position:relative;width:150px;margin:0 auto 0">
         <canvas id="chart-servir" width="150" height="150"></canvas>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;line-height:1">
-          <div id="servir-score-num" style="font-size:32px;font-weight:900;color:#C9A96E">0</div>
-          <div style="font-size:10px;color:#3A6A48;margin-top:2px">de 6 pilares</div>
+          <div id="servir-score-num" style="font-size:32px;font-weight:900;color:#A8833C">0</div>
+          <div style="font-size:10px;color:#5C7365;margin-top:2px">de 6 pilares</div>
         </div>
       </div>
       <div id="servir-legenda" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;text-align:left"></div>
-      <p style="font-size:10px;color:#2A5A3A;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
+      <p style="font-size:10px;color:#5C7365;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
     </div>
 
     <!-- Checklist de pilares — renderizado pelo servidor -->
@@ -3362,7 +3362,7 @@ select option{background:#1A1A1A}
 <!-- Cross Sell — card separado -->
 <div class="card">
   <h2>💼 Cross Sell — Produtos Ativos na Braúna</h2>
-  <p style="font-size:11px;color:#3A6A48;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#F0F0F0">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
+  <p style="font-size:11px;color:#5C7365;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#17271E">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
   <div id="cross-sell-form" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
   <button class="btn" id="btn-ana" onclick="analisar()">Analisar carteira</button>
 </div>
@@ -3375,8 +3375,8 @@ select option{background:#1A1A1A}
 <div id="results">
 
   <!-- ── Análise Head de Produtos (HP) ── -->
-  <div class="card" id="card-hp" style="display:none;border-color:#2A2A18">
-    <h2 style="color:#D4B483">⭐ Análise Head de Produtos — Modelo Levante</h2>
+  <div class="card" id="card-hp" style="display:none;border-color:#F7F1D8">
+    <h2 style="color:#A8833C">⭐ Análise Head de Produtos — Modelo Levante</h2>
 
     <!-- Cabeçalho da conta -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px" id="hp-header"></div>
@@ -3386,51 +3386,51 @@ select option{background:#1A1A1A}
 
     <!-- Modal: material da Base de Conhecimento -->
     <div id="material-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)fecharMaterial()">
-      <div style="background:#0A1A12;border:1px solid #1C4A34;border-radius:12px;max-width:820px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
+      <div style="background:#0A1A12;border:1px solid #D9E3DB;border-radius:12px;max-width:820px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #1C3A28">
-          <span id="material-modal-titulo" style="font-size:13px;font-weight:700;color:#C9A96E">Material</span>
-          <button onclick="fecharMaterial()" style="background:none;border:1px solid #1C4A34;color:#9BB0A0;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer">✕ Fechar</button>
+          <span id="material-modal-titulo" style="font-size:13px;font-weight:700;color:#A8833C">Material</span>
+          <button onclick="fecharMaterial()" style="background:none;border:1px solid #D9E3DB;color:#9BB0A0;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer">✕ Fechar</button>
         </div>
         <div id="material-modal-corpo" style="padding:14px 16px;overflow:auto;white-space:pre-wrap;font-size:12px;line-height:1.6;color:#CFE0D5"></div>
       </div>
     </div>
 
     <!-- Desvios vs Modelo HP -->
-    <div style="font-size:11px;color:#4A7055;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-      <span>Comparativo vs. <span id="hp-ref" style="color:#D4B483"></span></span>
-      <span id="hp-perfil-badge" style="background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700"></span>
+    <div style="font-size:11px;color:#5C7365;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+      <span>Comparativo vs. <span id="hp-ref" style="color:#A8833C"></span></span>
+      <span id="hp-perfil-badge" style="background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700"></span>
     </div>
     <div id="hp-desvios" style="margin-bottom:16px"></div>
 
     <!-- Ações individuais -->
     <div id="hp-acoes-bloco" style="display:none;margin-bottom:12px">
-      <div style="font-size:11px;color:#5DCAA5;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📈 Carteira de Ações</div>
+      <div style="font-size:11px;color:#1F9D77;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📈 Carteira de Ações</div>
       <div id="hp-acoes-table"></div>
     </div>
 
     <!-- FIIs individuais -->
     <div id="hp-fiis-bloco" style="display:none;margin-bottom:12px">
-      <div style="font-size:11px;color:#7DCFEF;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🏢 Carteira de FIIs</div>
+      <div style="font-size:11px;color:#2E86B8;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🏢 Carteira de FIIs</div>
       <div id="hp-fiis-table"></div>
     </div>
 
     <!-- Proteção de posições perto do preço-alvo -->
     <div id="hp-protecoes-bloco" style="display:none;margin-bottom:12px">
-      <div style="font-size:11px;color:#E8A87C;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🛡 Proteção de posições — perto do preço-alvo</div>
+      <div style="font-size:11px;color:#C0673A;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🛡 Proteção de posições — perto do preço-alvo</div>
       <div id="hp-protecoes-lista"></div>
     </div>
 
     <!-- Sugestões de produtos HP para fechar gaps -->
     <div id="hp-sugestoes" style="display:none">
-      <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
+      <div style="font-size:11px;color:#A8833C;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Produtos sugeridos pelo Head de Produtos para fechar os gaps</div>
       <div id="hp-sugestoes-lista"></div>
     </div>
 
     <!-- Cenário macro HP -->
     <div id="hp-cenario" style="display:none;margin-top:14px">
-      <div style="font-size:11px;color:#D4B483;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:11px;color:#A8833C;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between">
         <span>🌐 Cenário Macro — Head de Produtos</span>
-        <span id="hp-cenario-ref" style="font-size:10px;color:#2A5A3A;font-weight:400;text-transform:none"></span>
+        <span id="hp-cenario-ref" style="font-size:10px;color:#5C7365;font-weight:400;text-transform:none"></span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="hp-cenario-cards"></div>
       <div id="hp-cenario-vieses" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
@@ -3445,8 +3445,8 @@ select option{background:#1A1A1A}
   <div class="card">
     <h2>Composição atual vs. modelo</h2>
     <div style="display:flex;gap:16px;margin-bottom:8px;font-size:11px">
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#C9A96E;display:inline-block"></span>Carteira atual</span>
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#2A5A3A;display:inline-block"></span>Modelo Levante</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#A8833C;display:inline-block"></span>Carteira atual</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5C7365;display:inline-block"></span>Modelo Levante</span>
     </div>
     <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Comparativo de alocação"></canvas></div>
   </div>
@@ -3454,14 +3454,14 @@ select option{background:#1A1A1A}
   <!-- Rentabilidade: Cliente x Recomendada x CDI -->
   <div class="card" id="card-rent-comp" style="display:none">
     <h2>Rentabilidade — Cliente × Carteira Recomendada × CDI</h2>
-    <p style="font-size:11px;color:#3A6A48;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo — os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
+    <p style="font-size:11px;color:#5C7365;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo — os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
     <div style="display:flex;gap:16px;margin-bottom:8px;font-size:11px;flex-wrap:wrap">
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#C9A96E;display:inline-block"></span>Cliente</span>
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5DCAA5;display:inline-block"></span>Recomendada</span>
-      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#7DCFEF;display:inline-block"></span>CDI</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#A8833C;display:inline-block"></span>Cliente</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1F9D77;display:inline-block"></span>Recomendada</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#2E86B8;display:inline-block"></span>CDI</span>
     </div>
     <div class="chart-wrap"><canvas id="chart-rent" role="img" aria-label="Comparativo de rentabilidade"></canvas></div>
-    <p id="rent-comp-nota" style="font-size:10px;color:#2A5A3A;margin-top:6px"></p>
+    <p id="rent-comp-nota" style="font-size:10px;color:#5C7365;margin-top:6px"></p>
   </div>
 
   <!-- Diversificação por Classe de Ativos -->
@@ -3473,7 +3473,7 @@ select option{background:#1A1A1A}
         <div style="position:relative;width:220px;height:220px">
           <canvas id="chart-classes" width="220" height="220"></canvas>
           <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">
-            <div style="font-size:11px;color:#3A6A48;line-height:1.3">carteira<br>atual</div>
+            <div style="font-size:11px;color:#5C7365;line-height:1.3">carteira<br>atual</div>
           </div>
         </div>
         <!-- Legenda da pizza -->
@@ -3486,14 +3486,14 @@ select option{background:#1A1A1A}
 
   <!-- Plano de Ação para atingir o objetivo -->
   <div class="card" id="card-plano">
-    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#C9A96E;text-transform:capitalize"></span></h2>
-    <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:8px">
-      <p style="font-size:10px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
-      <p id="plano-objetivo-txt" style="font-size:13px;color:#F0F0F0"></p>
+    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#A8833C;text-transform:capitalize"></span></h2>
+    <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#F5F8F5;border:1px solid #A8833C;border-radius:8px">
+      <p style="font-size:10px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
+      <p id="plano-objetivo-txt" style="font-size:13px;color:#17271E"></p>
     </div>
     <!-- Carteira atual do cliente no Plano de Ação -->
-    <div id="plano-carteira-atual" style="display:none;margin-bottom:14px;background:#0A1A14;border:1px solid #1C4A34;border-radius:8px;padding:10px 14px">
-      <p style="font-size:10px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual do cliente</p>
+    <div id="plano-carteira-atual" style="display:none;margin-bottom:14px;background:#0A1A14;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px">
+      <p style="font-size:10px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual do cliente</p>
       <div id="plano-carteira-barras"></div>
     </div>
     <div id="plano-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"></div>
@@ -3518,8 +3518,8 @@ select option{background:#1A1A1A}
         <div id="desvios-list"></div>
         <div>
           <!-- Carteira atual ao lado dos desvios -->
-          <div id="desvios-carteira-atual" style="display:none;background:#0A1A14;border:1px solid #1C4A34;border-radius:8px;padding:10px 14px;margin-bottom:12px">
-            <p style="font-size:10px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual</p>
+          <div id="desvios-carteira-atual" style="display:none;background:#0A1A14;border:1px solid #D9E3DB;border-radius:8px;padding:10px 14px;margin-bottom:12px">
+            <p style="font-size:10px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Carteira atual</p>
             <div id="desvios-carteira-barras"></div>
           </div>
           <div id="diagnostico"></div>
@@ -3555,12 +3555,12 @@ select option{background:#1A1A1A}
   <!-- ── Exportar Análise — ao final ── -->
   <div class="card" style="text-align:center">
     <h2>Exportar Análise</h2>
-    <p style="font-size:12px;color:#3A6A48;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
+    <p style="font-size:12px;color:#5C7365;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#0D2333;color:#F3EFE7;border-color:#0D2333">◎ Abrir Braúna 360°</button>
+      <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#123047;color:#17271E;border-color:#123047">◎ Abrir Braúna 360°</button>
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
-    <p style="font-size:11px;color:#2A5A3A;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
+    <p style="font-size:11px;color:#5C7365;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
   </div>
 
 </div>
@@ -3651,20 +3651,20 @@ function renderNotifLista(){
   const lista = document.getElementById("notif-lista");
   if(!lista) return;
   if(!_notificacoes.length){
-    lista.innerHTML = '<div style="padding:24px;text-align:center;color:#555;font-size:13px">Nenhum alerta no momento</div>';
+    lista.innerHTML = '<div style="padding:24px;text-align:center;color:#8A9A8E;font-size:13px">Nenhum alerta no momento</div>';
     return;
   }
   lista.innerHTML = _notificacoes.map(function(n){
-    const cor = n.tipo==="call" ? "#5DCAA5" : n.mensagem.includes("URGENTE") ? "#E53935" : "#F59E0B";
+    const cor = n.tipo==="call" ? "#1F9D77" : n.mensagem.includes("URGENTE") ? "#E53935" : "#F59E0B";
     const icon = n.tipo==="call" ? "📈" : "⚠️";
-    const fundo = n.lido ? "#111" : "#1E1E1E";
-    const clientes = (n.clientes_afetados||[]).map(c=>`<span style="background:#1A3A2A;color:#5DCAA5;border-radius:4px;padding:1px 7px;font-size:11px;margin-right:4px">${c}</span>`).join("");
-    return `<div style="padding:12px 16px;border-bottom:1px solid #222;background:${fundo};cursor:pointer" onclick="marcarLida('${n.id}')">
+    const fundo = n.lido ? "#FFFFFF" : "#FFFFFF";
+    const clientes = (n.clientes_afetados||[]).map(c=>`<span style="background:#1A3A2A;color:#1F9D77;border-radius:4px;padding:1px 7px;font-size:11px;margin-right:4px">${c}</span>`).join("");
+    return `<div style="padding:12px 16px;border-bottom:1px solid #F5F8F5;background:${fundo};cursor:pointer" onclick="marcarLida('${n.id}')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div style="flex:1">
           <div style="font-size:13px;color:${cor};font-weight:${n.lido?'400':'700'};margin-bottom:4px">${icon} ${n.mensagem}</div>
           ${clientes ? `<div style="margin-top:5px">Clientes afetados: ${clientes}</div>` : ""}
-          <div style="font-size:11px;color:#555;margin-top:4px">${n.data}</div>
+          <div style="font-size:11px;color:#8A9A8E;margin-top:4px">${n.data}</div>
         </div>
         ${!n.lido ? `<div style="width:8px;height:8px;border-radius:50%;background:#E53935;flex-shrink:0;margin-top:4px"></div>` : ""}
       </div>
@@ -3740,37 +3740,37 @@ function renderCallsAssessor(){
   card.style.display = "block";
   if(cont) cont.textContent = "("+_callsAssessor.length+" ativa"+(_callsAssessor.length>1?"s":"")+")";
   const DIR = {
-    compra:{lbl:"COMPRA",cor:"#5DCAA5",bg:"#0E2A1E"},
-    venda: {lbl:"VENDA", cor:"#FF6B6B",bg:"#2A1010"},
-    neutro:{lbl:"NEUTRO",cor:"#C9A96E",bg:"#2A230E"}
+    compra:{lbl:"COMPRA",cor:"#1F9D77",bg:"#0E2A1E"},
+    venda: {lbl:"VENDA", cor:"#D93B3B",bg:"#FCEBEB"},
+    neutro:{lbl:"NEUTRO",cor:"#A8833C",bg:"#2A230E"}
   };
   lista.innerHTML = _callsAssessor.map(function(c,i){
     const dir = DIR[(c.direcao||"compra").toLowerCase()] || DIR.compra;
     const n = c.n_clientes||0;
-    const badgeCor = n>0 ? "#5DCAA5" : "#3A6A48";
+    const badgeCor = n>0 ? "#1F9D77" : "#5C7365";
     const badgeBg  = n>0 ? "#0E2A1E" : "#0A160F";
-    const up = (typeof c.upside==="number" && c.upside) ? `<span style="color:#5DCAA5;font-size:11px;margin-left:6px">▲ ${c.upside}%</span>` : "";
-    const perfis = (c.perfis||[]).map(p=>`<span style="background:#12281C;color:#8FBFA5;border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px">${p}</span>`).join("");
+    const up = (typeof c.upside==="number" && c.upside) ? `<span style="color:#1F9D77;font-size:11px;margin-left:6px">▲ ${c.upside}%</span>` : "";
+    const perfis = (c.perfis||[]).map(p=>`<span style="background:#EAF4EC;color:#8FBFA5;border-radius:4px;padding:1px 6px;font-size:10px;margin-left:4px">${p}</span>`).join("");
     const gid = "callcli-"+i;
     const chips = (c.clientes||[]).map(function(m){
-      const cor = m.detem ? "#5DCAA5" : "#C9A96E";
-      const bg  = m.detem ? "#0E2A1E" : "#111";
+      const cor = m.detem ? "#1F9D77" : "#A8833C";
+      const bg  = m.detem ? "#0E2A1E" : "#FFFFFF";
       const tag = m.detem ? "já detém" : ("perfil "+(m.perfil||"compatível"));
       const rot = m.nome || ("#"+(m.conta||""));
-      return `<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #1C4A34;border-radius:16px;background:${bg};color:${cor};padding:3px 10px;font-size:11px;margin:3px 4px 0 0">${rot} <span style="color:#5A6A60;font-size:9px">· ${tag}</span></span>`;
+      return `<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid #D9E3DB;border-radius:16px;background:${bg};color:${cor};padding:3px 10px;font-size:11px;margin:3px 4px 0 0">${rot} <span style="color:#5A6A60;font-size:9px">· ${tag}</span></span>`;
     }).join("");
     const resumo = n>0 ? `<span style="color:#5A6A60;font-size:11px;margin-left:6px">${c.n_detem||0} detêm · ${c.n_compat||0} por perfil</span>` : "";
     const clientesBlock = n>0
-      ? `<div id="${gid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #12281C">${resumo}<div style="margin-top:6px">${chips}</div></div>`
-      : `<div id="${gid}" style="display:none;margin-top:10px;color:#5A6A60;font-size:12px;padding-top:10px;border-top:1px solid #12281C">Nenhum cliente com este ativo ou perfil compatível ainda — oportunidade de prospecção.</div>`;
-    return `<div style="background:#081F18;border:1px solid #12281C;border-radius:10px;padding:12px 14px;margin-bottom:10px">
+      ? `<div id="${gid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #EAF4EC">${resumo}<div style="margin-top:6px">${chips}</div></div>`
+      : `<div id="${gid}" style="display:none;margin-top:10px;color:#5A6A60;font-size:12px;padding-top:10px;border-top:1px solid #EAF4EC">Nenhum cliente com este ativo ou perfil compatível ainda — oportunidade de prospecção.</div>`;
+    return `<div style="background:#EFF3EF;border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:10px">
       <div onclick="callAssessorToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span style="background:${dir.bg};color:${dir.cor};border:1px solid ${dir.cor}44;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700">${dir.lbl}</span>
         <span style="color:#E8D5A3;font-weight:700;font-size:15px;letter-spacing:.5px">${c.ticker||""}</span>
         ${up}
         <span style="flex:1"></span>
         <span style="background:${badgeBg};color:${badgeCor};border:1px solid ${badgeCor}55;border-radius:14px;padding:3px 11px;font-size:11px;font-weight:700">${n} cliente${n===1?"":"s"} para este ativo</span>
-        <span id="${gid}-ar" style="color:#3A6A48;font-size:11px">▸</span>
+        <span id="${gid}-ar" style="color:#5C7365;font-size:11px">▸</span>
       </div>
       ${perfis?`<div style="margin-top:6px;font-size:11px;color:#7A8A80">Perfis-alvo: ${perfis}</div>`:""}
       ${c.tese?`<div style="color:#9AAAA0;font-size:12px;margin-top:6px;line-height:1.5">${c.tese}</div>`:""}
@@ -3905,7 +3905,7 @@ fetch("/api/admin/mensagem").then(r=>r.json()).then(d=>{
 fetch("/api/admin/contexto-info").then(r=>r.json()).then(d=>{
   const nome=d.carta&&d.carta.nome?d.carta.nome+" ("+d.carta.atualizado+")":"Nenhuma carta carregada — contate o Admin";
   const el=document.getElementById("carta-ativa-nome");
-  if(el){ el.textContent=nome; el.style.color=d.carta&&d.carta.nome?"#5DCAA5":"#3A6A48"; }
+  if(el){ el.textContent=nome; el.style.color=d.carta&&d.carta.nome?"#1F9D77":"#5C7365"; }
 }).catch(()=>{});
 
 // ─── Modelo de Servir ──────────────────────────────────────────────────────────
@@ -3922,23 +3922,23 @@ function atualizarGraficoServir(){
 
   const legendaEl = document.getElementById("servir-legenda");
   if(legendaEl) legendaEl.innerHTML = [
-    completos ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5DCAA5;flex-shrink:0"></span>${completos} concluído(s)</span>` : "",
-    critPend  ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#FF4444;flex-shrink:0"></span>${critPend} crítico(s)</span>` : "",
-    highPend  ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#FFD966;flex-shrink:0"></span>${highPend} importante(s)</span>` : "",
-    medPend   ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#2A5A3A;flex-shrink:0"></span>${medPend} médio(s)</span>` : "",
+    completos ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1F9D77;flex-shrink:0"></span>${completos} concluído(s)</span>` : "",
+    critPend  ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#CF2E2E;flex-shrink:0"></span>${critPend} crítico(s)</span>` : "",
+    highPend  ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#A9800F;flex-shrink:0"></span>${highPend} importante(s)</span>` : "",
+    medPend   ? `<span style="font-size:11px;display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#5C7365;flex-shrink:0"></span>${medPend} médio(s)</span>` : "",
   ].filter(Boolean).join("");
 
   const canvas = document.getElementById("chart-servir");
   if(!canvas || typeof Chart === "undefined") return;
 
   const vals   = [completos, critPend, highPend, medPend];
-  const cores  = ["#5DCAA5","#FF4444","#FFD966","#2A5A3A"];
+  const cores  = ["#1F9D77","#CF2E2E","#A9800F","#5C7365"];
   const labels = ["Concluídos","Críticos","Importantes","Médios"];
   const filtDados  = vals.filter(v=>v>0);
   const filtCores  = cores.filter((_,i)=>vals[i]>0);
   const filtLabels = labels.filter((_,i)=>vals[i]>0);
   const chartData  = filtDados.length ? filtDados : [6];
-  const chartCores = filtDados.length ? filtCores : ["#1A4030"];
+  const chartCores = filtDados.length ? filtCores : ["#D9E3DB"];
   const chartLbls  = filtDados.length ? filtLabels : ["Nenhum"];
 
   if(_servirChart){ try{ _servirChart.destroy(); }catch(e){} }
@@ -3959,17 +3959,17 @@ function renderPilaresForm(){
 
   const html = PILARES.map(function(p){
     const feito  = !!checklist[p.id];
-    const impCor = p.importancia==="CRÍTICA" ? "#FF6B6B" : p.importancia==="ALTA" ? "#FFD966" : "#4A7055";
+    const impCor = p.importancia==="CRÍTICA" ? "#D93B3B" : p.importancia==="ALTA" ? "#A9800F" : "#5C7365";
     const impTxt = p.importancia==="CRÍTICA" ? "🔴 CRÍTICO" : p.importancia==="ALTA" ? "🟡 IMPORTANTE" : "⚪ MÉDIO";
-    const bg     = feito ? "#0A2A18" : p.importancia==="CRÍTICA" ? "#1A0A0A" : p.importancia==="ALTA" ? "#151500" : "#181818";
-    const border = feito ? "#2A5040" : p.importancia==="CRÍTICA" ? "#4A1212" : p.importancia==="ALTA" ? "#3A3A00" : "#282828";
+    const bg     = feito ? "#E9F5EE" : p.importancia==="CRÍTICA" ? "#FBE9E9" : p.importancia==="ALTA" ? "#151500" : "#181818";
+    const border = feito ? "#C6D6C9" : p.importancia==="CRÍTICA" ? "#4A1212" : p.importancia==="ALTA" ? "#3A3A00" : "#282828";
 
     return '<div onclick="togglePilar(\'' + p.id + '\')" style="' +
       'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;' +
       'background:' + bg + ';border:1.5px solid ' + border + ';cursor:pointer;transition:all .2s;user-select:none">' +
       // Checkbox
-      '<div style="width:24px;height:24px;border-radius:6px;border:2px solid ' + (feito?"#5DCAA5":"#2A5A3A") + ';' +
-      'background:' + (feito?"#5DCAA5":"transparent") + ';display:flex;align-items:center;justify-content:center;' +
+      '<div style="width:24px;height:24px;border-radius:6px;border:2px solid ' + (feito?"#1F9D77":"#5C7365") + ';' +
+      'background:' + (feito?"#1F9D77":"transparent") + ';display:flex;align-items:center;justify-content:center;' +
       'color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px">' +
       (feito ? "✓" : "") + '</div>' +
       // Ícone
@@ -3977,16 +3977,16 @@ function renderPilaresForm(){
       // Conteúdo
       '<div style="flex:1;min-width:0">' +
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">' +
-          '<span style="font-size:13px;font-weight:700;color:' + (feito?"#5DCAA5":"#F0F0F0") + '">' + p.nome + '</span>' +
-          '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1E1E1E;color:' + impCor + ';font-weight:700">' + impTxt + '</span>' +
-          (p.dir ? '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
+          '<span style="font-size:13px;font-weight:700;color:' + (feito?"#1F9D77":"#17271E") + '">' + p.nome + '</span>' +
+          '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#FFFFFF;color:' + impCor + ';font-weight:700">' + impTxt + '</span>' +
+          (p.dir ? '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C;font-weight:700">★ 1ª DIRETRIZ</span>' : "") +
         '</div>' +
-        '<div style="font-size:11px;color:#4A7055;line-height:1.4">' + p.desc + '</div>' +
+        '<div style="font-size:11px;color:#5C7365;line-height:1.4">' + p.desc + '</div>' +
         (!feito ?
-          '<div style="background:#111;border-radius:6px;padding:8px 10px;border-left:3px solid ' + impCor + ';margin-top:8px">' +
-            '<div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
-            '<div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A2E1A;border-radius:5px">→ ' + p.acao + '</div>' +
-            (p.dir ? '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A2E1A">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
+          '<div style="background:#FFFFFF;border-radius:6px;padding:8px 10px;border-left:3px solid ' + impCor + ';margin-top:8px">' +
+            '<div style="font-size:11px;color:#8A9A8E;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
+            '<div style="font-size:11px;color:#A8833C;padding:6px 8px;background:#F5F8F5;border-radius:5px">→ ' + p.acao + '</div>' +
+            (p.dir ? '<div style="font-size:10px;color:#A8833C;margin-top:6px;padding:5px 8px;border:1px solid #A8833C;border-radius:5px;background:#F5F8F5">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
           '</div>' : "") +
       '</div>' +
     '</div>';
@@ -4006,8 +4006,8 @@ function togglePilar(id){
   checklist[id] = !checklist[id];
   const feito = checklist[id];
   const imp   = (PILARES.find(p=>p.id===id)||{}).importancia||"MÉDIA";
-  const bg     = feito ? "#0A2A18" : imp==="CRÍTICA" ? "#1A0A0A" : imp==="ALTA" ? "#151500" : "#181818";
-  const border = feito ? "#2A5040" : imp==="CRÍTICA" ? "#4A1212" : imp==="ALTA" ? "#3A3A00" : "#282828";
+  const bg     = feito ? "#E9F5EE" : imp==="CRÍTICA" ? "#FBE9E9" : imp==="ALTA" ? "#151500" : "#181818";
+  const border = feito ? "#C6D6C9" : imp==="CRÍTICA" ? "#4A1212" : imp==="ALTA" ? "#3A3A00" : "#282828";
   const el = document.getElementById("pilar-"+id);
   if(el){
     el.style.background = bg;
@@ -4015,13 +4015,13 @@ function togglePilar(id){
   }
   const chk = document.getElementById("chk-"+id);
   if(chk){
-    chk.style.background   = feito ? "#5DCAA5" : "transparent";
-    chk.style.borderColor  = feito ? "#5DCAA5" : "#2A5A3A";
+    chk.style.background   = feito ? "#1F9D77" : "transparent";
+    chk.style.borderColor  = feito ? "#1F9D77" : "#5C7365";
     chk.textContent        = feito ? "✓" : "";
     chk.style.color        = "#000";
   }
   const nomeEl = document.getElementById("nome-"+id);
-  if(nomeEl) nomeEl.style.color = feito ? "#5DCAA5" : "#F0F0F0";
+  if(nomeEl) nomeEl.style.color = feito ? "#1F9D77" : "#17271E";
   const det = document.getElementById("det-"+id);
   if(det) det.style.display = feito ? "none" : "block";
   atualizarGraficoServir();
@@ -4066,7 +4066,7 @@ function _mapearPerfilJS(perfil, perfisDisp){
 // Ordem preferencial de exibição no toggle
 var _INST_ORDEM = ["xp", "levante_asset"];
 var _INST_ICON  = {xp:"🏦", levante_asset:"📊"};
-var _INST_COR   = {xp:"#7DCFEF", levante_asset:"#C9A96E"};
+var _INST_COR   = {xp:"#2E86B8", levante_asset:"#A8833C"};
 var _instAtiva  = "levante_asset";  // default
 
 function renderInstToggle(){
@@ -4081,18 +4081,18 @@ function renderInstToggle(){
   var itens = [];
   ids.forEach(function(id){
     var g = _gestoras[id];
-    itens.push({id:id, nome:g.nome||id, icon:_INST_ICON[id]||"🏛️", cor:_INST_COR[id]||"#888", ref:g.referencia||""});
+    itens.push({id:id, nome:g.nome||id, icon:_INST_ICON[id]||"🏛️", cor:_INST_COR[id]||"#8A9A8E", ref:g.referencia||""});
   });
   wrap.innerHTML = itens.map(function(it){
     var isAt = (it.id === _instAtiva);
     return '<div onclick="selecionarInstituicao(\''+it.id+'\')" style="'
       +'flex:1;min-width:120px;max-width:220px;cursor:pointer;border-radius:10px;padding:10px 14px;'
       +'border:2px solid '+(isAt?it.cor:"#1E2E28")+';'
-      +'background:'+(isAt?it.cor+'18':"#081F18")+';'
+      +'background:'+(isAt?it.cor+'18':"#EFF3EF")+';'
       +'transition:all .15s;box-sizing:border-box">'
       +'<div style="font-size:18px;margin-bottom:3px">'+it.icon+'</div>'
-      +'<div style="font-size:12px;font-weight:700;color:'+(isAt?it.cor:"#F0F0F0")+';margin-bottom:2px">'+it.nome+'</div>'
-      +'<div style="font-size:9px;color:#3A6A48">'+it.ref+'</div>'
+      +'<div style="font-size:12px;font-weight:700;color:'+(isAt?it.cor:"#17271E")+';margin-bottom:2px">'+it.nome+'</div>'
+      +'<div style="font-size:9px;color:#5C7365">'+it.ref+'</div>'
       +(isAt?'<div style="font-size:8px;color:'+it.cor+';font-weight:700;margin-top:4px">&#10003; SELECIONADA</div>':'')
       +'</div>';
   }).join("");
@@ -4152,7 +4152,7 @@ function carregarTickerMercado(){
   fetch("/api/mercado-ticker").then(r=>r.json()).then(d=>{
     var itens=(d&&d.itens)||[]; var inner=document.getElementById("mkt-ticker-inner");
     if(!inner||!itens.length) return;
-    var sep=' <span style="color:#3A6A48;margin:0 16px">•</span> ';
+    var sep=' <span style="color:#5C7365;margin:0 16px">•</span> ';
     var seq=itens.join(sep);
     inner.innerHTML=seq+sep+seq;   // duplicado para loop contínuo
     var dur=Math.max(24, itens.length*7);
@@ -4203,19 +4203,19 @@ function renderChartRent(){
   window._chartRentInst=new Chart(cv,{
     type:"line",
     data:{labels:labels,datasets:[
-      {label:"Cliente",     data:dCli, borderColor:"#C9A96E", backgroundColor:"#C9A96E", tension:0.3, pointRadius:4, pointHoverRadius:6, borderWidth:2, spanGaps:true, fill:false},
-      {label:"Recomendada", data:dRec, borderColor:"#5DCAA5", backgroundColor:"#5DCAA5", tension:0.3, pointRadius:4, pointHoverRadius:6, borderWidth:2, spanGaps:true, fill:false},
-      {label:"CDI",         data:dCdi, borderColor:"#7DCFEF", backgroundColor:"#7DCFEF", tension:0.3, pointRadius:3, pointHoverRadius:5, borderWidth:2, borderDash:[5,4], spanGaps:true, fill:false},
+      {label:"Cliente",     data:dCli, borderColor:"#A8833C", backgroundColor:"#A8833C", tension:0.3, pointRadius:4, pointHoverRadius:6, borderWidth:2, spanGaps:true, fill:false},
+      {label:"Recomendada", data:dRec, borderColor:"#1F9D77", backgroundColor:"#1F9D77", tension:0.3, pointRadius:4, pointHoverRadius:6, borderWidth:2, spanGaps:true, fill:false},
+      {label:"CDI",         data:dCdi, borderColor:"#2E86B8", backgroundColor:"#2E86B8", tension:0.3, pointRadius:3, pointHoverRadius:5, borderWidth:2, borderDash:[5,4], spanGaps:true, fill:false},
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+(ctx.parsed.y!=null?ctx.parsed.y.toFixed(2)+"%":"—");}}}},
-      scales:{y:{ticks:{color:"#7A9A88",callback:function(v){return v+"%";}},grid:{color:"#12281C"}},x:{ticks:{color:"#9BB0A0"},grid:{display:false}}}}
+      scales:{y:{ticks:{color:"#7A9A88",callback:function(v){return v+"%";}},grid:{color:"#EAF4EC"}},x:{ticks:{color:"#9BB0A0"},grid:{display:false}}}}
   });
 }
 function _sgNorm(r){ r=(r||"").toUpperCase(); if(r.indexOf("COMPRA")>=0)return "COMPRA"; if(r.indexOf("VENDA")>=0)return "VENDA"; if(r.indexOf("NEUTRO")>=0)return "NEUTRO"; return ""; }
-function _sgCor(r){ var n=_sgNorm(r); return n==="COMPRA"?"#5DCAA5":n==="VENDA"?"#FF6B6B":n==="NEUTRO"?"#D4B483":"#888"; }
-function _sgBadge(r){ if(!r) return '<span style="color:#3A6A48">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
-function _sgUp(v){ if(v==null) return ""; var p=v*100; return ' <span style="color:'+(p>=0?"#5DCAA5":"#FF6B6B")+';font-size:10px">'+(p>=0?"+":"")+p.toFixed(0)+'%</span>'; }
+function _sgCor(r){ var n=_sgNorm(r); return n==="COMPRA"?"#1F9D77":n==="VENDA"?"#D93B3B":n==="NEUTRO"?"#A8833C":"#8A9A8E"; }
+function _sgBadge(r){ if(!r) return '<span style="color:#5C7365">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
+function _sgUp(v){ if(v==null) return ""; var p=v*100; return ' <span style="color:'+(p>=0?"#1F9D77":"#D93B3B")+';font-size:10px">'+(p>=0?"+":"")+p.toFixed(0)+'%</span>'; }
 function _sgBrl(v){ return v!=null ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; }
 function _sgData(iso){ if(!iso) return "—"; var p=String(iso).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : iso; }
 function _sgRow(a){
@@ -4223,16 +4223,16 @@ function _sgRow(a){
   var lev = g && g.levante, xp = g && g.xp;
   var posHtml;
   if(lev){ posHtml=_sgBadge(lev.rating + (lev.nota?(" "+lev.nota):"")); }
-  else if(xp){ posHtml=_sgBadge(xp.rating)+' <span style="color:#4A7055;font-size:9px">(via XP)</span>'; }
-  else { posHtml='<span style="color:#3A6A48">sem cobertura</span>'; }
+  else if(xp){ posHtml=_sgBadge(xp.rating)+' <span style="color:#5C7365;font-size:9px">(via XP)</span>'; }
+  else { posHtml='<span style="color:#5C7365">sem cobertura</span>'; }
   var alvoSrc = lev || xp;
-  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#3A6A48">—</span>';
+  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#5C7365">—</span>';
   var xpHtml;
-  if(xp){ xpHtml=_sgBadge(xp.rating); if(xp.consenso) xpHtml+=' <span style="color:#4A7055;font-size:9px">'+xp.consenso+'</span>'; xpHtml+=_sgUp(xp.upside); }
-  else { xpHtml='<span style="color:#3A6A48">—</span>'; }
+  if(xp){ xpHtml=_sgBadge(xp.rating); if(xp.consenso) xpHtml+=' <span style="color:#5C7365;font-size:9px">'+xp.consenso+'</span>'; xpHtml+=_sgUp(xp.upside); }
+  else { xpHtml='<span style="color:#5C7365">—</span>'; }
   var flag="";
   if(lev && xp && _sgNorm(lev.rating) && _sgNorm(xp.rating) && _sgNorm(lev.rating)!==_sgNorm(xp.rating)){
-    flag=' <span title="Levante e XP divergem" style="color:#E8A87C">⚠</span>';
+    flag=' <span title="Levante e XP divergem" style="color:#C0673A">⚠</span>';
   }
   return {posHtml:posHtml+flag, alvoHtml:alvoHtml, xpHtml:xpHtml, nome:(g&&g.nome)||""};
 }
@@ -4240,10 +4240,10 @@ function _sgRow(a){
 // ── Proteção de posições perto do preço-alvo (upside restante <= 10%) ──
 var _PROT_LIMIAR = 0.10;
 var _PROT_STATUS = {
-  pendente:    {lbl:"Pendente",             cor:"#D4B483"},
-  recusada:    {lbl:"Cliente recusou",      cor:"#FF6B6B"},
-  estruturada: {lbl:"Estruturada aplicada", cor:"#5DCAA5"},
-  caixa:       {lbl:"Vendido p/ caixa",     cor:"#7DCFEF"},
+  pendente:    {lbl:"Pendente",             cor:"#A8833C"},
+  recusada:    {lbl:"Cliente recusou",      cor:"#D93B3B"},
+  estruturada: {lbl:"Estruturada aplicada", cor:"#1F9D77"},
+  caixa:       {lbl:"Vendido p/ caixa",     cor:"#2E86B8"},
 };
 var _protHist = [];
 function detectarProtecoes(acoes){
@@ -4294,22 +4294,22 @@ function renderProtecoes(lista){
     var botoes = p.id ? Object.keys(_PROT_STATUS).map(function(k){
         var on=(p.status===k); var c=_PROT_STATUS[k].cor;
         return '<button onclick="setProtecaoStatus(\''+p.id+'\',\''+k+'\')" style="cursor:pointer;font-size:9px;padding:3px 8px;border-radius:6px;'
-          +'border:1px solid '+(on?c:"#1E2E28")+';background:'+(on?c+"22":"#081F18")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
+          +'border:1px solid '+(on?c:"#1E2E28")+';background:'+(on?c+"22":"#EFF3EF")+';color:'+(on?c:"#5A7A68")+';font-weight:'+(on?"700":"400")+'">'+_PROT_STATUS[k].lbl+'</button>';
       }).join("") : '<span style="font-size:9px;color:#5A7A68">Identifique o cliente para salvar o histórico</span>';
     return '<div style="border:1px solid #2A1E12;background:#140D07;border-radius:8px;padding:10px 12px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">'
-        +'<div><span style="color:#D4B483;font-weight:700;font-size:12px">'+p.ticker+'</span> '
+        +'<div><span style="color:#A8833C;font-weight:700;font-size:12px">'+p.ticker+'</span> '
           +'<span style="color:'+_sgCor(p.rating)+';font-size:10px;font-weight:700">'+(p.rating||"")+'</span> '
-          +'<span style="color:#888;font-size:10px">· '+(p.fonte||"")+' · alvo '+alvo+' <span style="color:#E8A87C">('+up+' de upside)</span></span></div>'
+          +'<span style="color:#8A9A8E;font-size:10px">· '+(p.fonte||"")+' · alvo '+alvo+' <span style="color:#C0673A">('+up+' de upside)</span></span></div>'
         +'<span style="font-size:9px;color:'+st.cor+';font-weight:700">'+st.lbl+(p.data&&p.data!=="—"?' · '+p.data:"")+'</span>'
       +'</div>'
       +'<div style="font-size:10px;color:#B8A488;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
-        +'<b style="color:#D4B483">(a)</b> operação estruturada (collar / put de proteção / fence) · '
-        +'<b style="color:#D4B483">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>'
+        +'<b style="color:#A8833C">(a)</b> operação estruturada (collar / put de proteção / fence) · '
+        +'<b style="color:#A8833C">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'+botoes+'</div>'
     +'</div>';
   }).join("")
-  + '<div style="font-size:9px;color:#2A5A3A;margin-top:2px;line-height:1.5">Gatilho: preço a ≤10% do alvo (casa principal Levante). As recomendações ficam salvas no histórico do cliente — se recusadas, é só revisitar aqui numa próxima análise.</div>';
+  + '<div style="font-size:9px;color:#5C7365;margin-top:2px;line-height:1.5">Gatilho: preço a ≤10% do alvo (casa principal Levante). As recomendações ficam salvas no histórico do cliente — se recusadas, é só revisitar aqui numa próxima análise.</div>';
 }
 
 function atualizarModelo(){
@@ -4346,18 +4346,18 @@ function atualizarModelo(){
   if(!g) return;
 
   const COR_CLS = {
-    pos_fixado:"#C9A96E", inflacao:"#F0A830", pre_fixado:"#B8A0E8",
-    acoes:"#5DCAA5", fiis:"#7DCFEF", multimercado:"#D4B483",
-    internacional:"#FF8E8E", alternativos:"#4EC9B0", criptomoedas:"#888"
+    pos_fixado:"#A8833C", inflacao:"#F0A830", pre_fixado:"#B8A0E8",
+    acoes:"#1F9D77", fiis:"#2E86B8", multimercado:"#A8833C",
+    internacional:"#FF8E8E", alternativos:"#4EC9B0", criptomoedas:"#8A9A8E"
   };
   const itens = Object.entries(m)
     .filter(([k,v]) => typeof v==="number" && v>0 && k!=="label")
     .sort((a,b) => b[1]-a[1]);
   g.innerHTML = itens.map(([k,v])=>{
-    const cor = COR_CLS[k]||"#3A6A48";
+    const cor = COR_CLS[k]||"#5C7365";
     return '<div style="display:flex;align-items:center;gap:8px;min-width:0">' +
       '<span style="font-size:11px;color:#9BB0A0;flex:0 0 auto;white-space:nowrap">'+(LABELS[k]||k)+'</span>'+
-      '<div style="flex:1 1 auto;min-width:24px;height:6px;background:#12281C;border-radius:3px;overflow:hidden">'+
+      '<div style="flex:1 1 auto;min-width:24px;height:6px;background:#EAF4EC;border-radius:3px;overflow:hidden">'+
         '<div style="width:'+Math.min(v,100)+'%;height:100%;background:'+cor+';border-radius:3px;transition:width .4s"></div>'+
       '</div>'+
       '<span style="font-size:11px;font-weight:700;color:'+cor+';flex:0 0 auto;min-width:34px;text-align:right">'+v+'%</span>'+
@@ -4379,12 +4379,12 @@ function renderPerfilCards(){
   for(var i=0; i<cards.length; i++){
     var card  = cards[i];
     var key   = card.getAttribute("data-perfil");
-    var cor   = card.getAttribute("data-cor") || "#C9A96E";
+    var cor   = card.getAttribute("data-cor") || "#A8833C";
     var isAt  = (key === ativo);
     card.style.border      = "2px solid " + (isAt ? cor : "#1E2E28");
-    card.style.background  = isAt ? cor + "15" : "#081F18";
+    card.style.background  = isAt ? cor + "15" : "#EFF3EF";
     var nome  = card.querySelector(".perfil-card-nome");
-    if(nome)  nome.style.color = isAt ? cor : "#F0F0F0";
+    if(nome)  nome.style.color = isAt ? cor : "#17271E";
     var badge = card.querySelector(".perfil-sel-badge");
     if(badge) badge.style.display = isAt ? "block" : "none";
   }
@@ -4404,7 +4404,7 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
   const b=document.getElementById("macro-badges");
   if(d.selic_meta) b.innerHTML+=`<span class="macro-badge">Selic <span>${d.selic_meta.toFixed(2)}% a.a.</span></span>`;
   if(d.ipca_12m)   b.innerHTML+=`<span class="macro-badge">IPCA 12M <span>${d.ipca_12m.toFixed(2)}%</span></span>`;
-  if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#3A6A48">Gestores ref. <span style="color:#888">${d.ref_contexto}</span></span>`;
+  if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#5C7365">Gestores ref. <span style="color:#8A9A8E">${d.ref_contexto}</span></span>`;
 }).catch(()=>{});
 
 // Handler global do input XPerformance — chamado pelo onchange inline no HTML
@@ -4413,7 +4413,7 @@ function onXpFileChange(input){
   if(!file) return;
   const fname = document.getElementById("fname-xp");
   const drop  = document.getElementById("drop1");
-  if(drop)  drop.style.borderColor = "#C9A96E";
+  if(drop)  drop.style.borderColor = "#A8833C";
   // ZIP → importa vários clientes de uma vez (não abre análise de um único)
   if((file.name||"").toLowerCase().endsWith(".zip")){
     if(fname) fname.textContent = "📦 " + file.name;
@@ -4445,7 +4445,7 @@ async function processarLoteXP(file){
   const pct = document.getElementById("xp-lote-pct");
   const res = document.getElementById("xp-lote-resultado");
   progBox.style.display="block"; res.style.display="none";
-  bar.style.background="#5DCAA5"; bar.style.width="4%"; pct.textContent="4%";
+  bar.style.background="#1F9D77"; bar.style.width="4%"; pct.textContent="4%";
   txt.textContent = "Abrindo "+file.name+"...";
   const assessor = (document.getElementById("assessor")||{}).value || localStorage.getItem("brauna_nome") || "";
   try{
@@ -4481,25 +4481,25 @@ async function processarLoteXP(file){
     const fmtBrl = v => "R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
     const linhas = clientes.slice(0,25).map(c=>`
       <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #10241A;font-size:11px">
-        <span style="color:#5DCAA5">✓</span>
-        <span style="flex:1;color:#CCC">${c.nome||("#"+c.conta)}</span>
-        <span style="color:#3A6A48">${c.data_ref||""}</span>
-        <span style="color:#C9A96E">${fmtBrl(c.patrimonio)}</span>
+        <span style="color:#1F9D77">✓</span>
+        <span style="flex:1;color:#5C7365">${c.nome||("#"+c.conta)}</span>
+        <span style="color:#5C7365">${c.data_ref||""}</span>
+        <span style="color:#A8833C">${fmtBrl(c.patrimonio)}</span>
       </div>`).join("");
-    const mais = clientes.length>25 ? `<div style="font-size:10px;color:#3A6A48;margin-top:4px">... e mais ${clientes.length-25} clientes</div>` : "";
-    const errosHtml = erros.length ? `<div style="margin-top:8px;padding:8px 10px;background:#1A0808;border-radius:8px">`+erros.slice(0,15).map(e=>`<div style="font-size:10px;color:#FF6B6B">⚠ ${e.arquivo||""}: ${e.erro||""}</div>`).join("")+`</div>` : "";
+    const mais = clientes.length>25 ? `<div style="font-size:10px;color:#5C7365;margin-top:4px">... e mais ${clientes.length-25} clientes</div>` : "";
+    const errosHtml = erros.length ? `<div style="margin-top:8px;padding:8px 10px;background:#FBE9E9;border-radius:8px">`+erros.slice(0,15).map(e=>`<div style="font-size:10px;color:#D93B3B">⚠ ${e.arquivo||""}: ${e.erro||""}</div>`).join("")+`</div>` : "";
     res.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        <div style="background:#0F2A1F;border:1px solid #1A4030;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#5DCAA5">${ok}</div><div style="font-size:9px;color:#3A6A48">clientes salvos</div></div>
-        <div style="background:#0A0A0A;border:1px solid #1A1A1A;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#888">${pdfs.length}</div><div style="font-size:9px;color:#3A6A48">PDFs no ZIP</div></div>
-        ${erros.length?`<div style="background:#1A0808;border:1px solid #3A1010;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#FF6B6B">${erros.length}</div><div style="font-size:9px;color:#FF4444">erros</div></div>`:""}
+        <div style="background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#1F9D77">${ok}</div><div style="font-size:9px;color:#5C7365">clientes salvos</div></div>
+        <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#8A9A8E">${pdfs.length}</div><div style="font-size:9px;color:#5C7365">PDFs no ZIP</div></div>
+        ${erros.length?`<div style="background:#FBE9E9;border:1px solid #F7DADA;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:18px;font-weight:700;color:#D93B3B">${erros.length}</div><div style="font-size:9px;color:#CF2E2E">erros</div></div>`:""}
       </div>
       <div style="max-height:220px;overflow-y:auto">${linhas}${mais}</div>${errosHtml}
-      <p style="font-size:11px;color:#5DCAA5;margin-top:10px">✓ Clientes salvos na memória — role até <b>Clientes salvos</b> e clique para analisar.</p>`;
+      <p style="font-size:11px;color:#1F9D77;margin-top:10px">✓ Clientes salvos na memória — role até <b>Clientes salvos</b> e clique para analisar.</p>`;
     res.style.display="block";
     try{ buscarClientesSalvos(); }catch(e){}
   }catch(e){
-    bar.style.background="#FF6B6B"; txt.textContent="Erro: "+e.message; pct.textContent="";
+    bar.style.background="#D93B3B"; txt.textContent="Erro: "+e.message; pct.textContent="";
   }
 }
 
@@ -4528,10 +4528,10 @@ async function identificarCliente(file){
     const semComp  = !d.composicao_atual || Object.values(d.composicao_atual).every(v => v === 0);
     if(fname){
       if(semDados || semComp){
-        fname.style.color = "#E8A87C";
+        fname.style.color = "#C0673A";
         fname.textContent = "⚠️ PDF sem carteira — cliente sem posição na XP nesta data. Preencha os dados manualmente.";
       } else {
-        fname.style.color = "#5DCAA5";
+        fname.style.color = "#1F9D77";
         fname.textContent = `✓ Carteira lida — Conta ${d.conta} | R$ ${d.patrimonio?.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
       }
     }
@@ -4579,11 +4579,11 @@ async function identificarCliente(file){
         const feito = !!checklist[p.id];
         if(!feito) return;
         const el  = document.getElementById("pilar-"+p.id);
-        if(el){ el.style.background="#0A2A18"; el.style.border="1.5px solid #2A5040"; }
+        if(el){ el.style.background="#E9F5EE"; el.style.border="1.5px solid #C6D6C9"; }
         const chk = document.getElementById("chk-"+p.id);
-        if(chk){ chk.style.background="#5DCAA5"; chk.style.borderColor="#5DCAA5"; chk.textContent="✓"; chk.style.color="#000"; }
+        if(chk){ chk.style.background="#1F9D77"; chk.style.borderColor="#1F9D77"; chk.textContent="✓"; chk.style.color="#000"; }
         const nEl = document.getElementById("nome-"+p.id);
-        if(nEl) nEl.style.color="#5DCAA5";
+        if(nEl) nEl.style.color="#1F9D77";
         const det = document.getElementById("det-"+p.id);
         if(det) det.style.display="none";
       });
@@ -4618,7 +4618,7 @@ async function identificarCliente(file){
     const jaLeu = fname && fname.textContent.includes("Carteira lida");
     if(!jaLeu){
       const prev = document.getElementById("box-preview-pdf");
-      if(prev){ prev.style.display="block"; prev.innerHTML='<p style="color:#E8A87C;font-size:13px">⚠️ Não foi possível ler o PDF. Verifique se é um XPerformance válido.</p>'; }
+      if(prev){ prev.style.display="block"; prev.innerHTML='<p style="color:#C0673A;font-size:13px">⚠️ Não foi possível ler o PDF. Verifique se é um XPerformance válido.</p>'; }
       mostrarBotaoProximaEtapa(null);
     }
   }
@@ -4634,14 +4634,14 @@ function mostrarPreviewPDF(d){
 
   if(semDados){
     box.style.display = "block";
-    box.innerHTML = '<p style="color:#E8A87C;font-weight:700;font-size:13px;margin-bottom:4px">⚠️ PDF sem carteira detectada</p><p style="color:#888;font-size:12px">Preencha os dados manualmente na Etapa 2.</p>';
+    box.innerHTML = '<p style="color:#C0673A;font-weight:700;font-size:13px;margin-bottom:4px">⚠️ PDF sem carteira detectada</p><p style="color:#8A9A8E;font-size:12px">Preencha os dados manualmente na Etapa 2.</p>';
     return;
   }
   if(semComp){
     const fmtBrl = v => "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
     box.style.display = "block";
-    box.innerHTML = `<p style="color:#5DCAA5;font-weight:700;font-size:13px;margin-bottom:4px">✓ Conta ${d.conta} identificada — ${fmtBrl(d.patrimonio)}</p>
-      <p style="color:#888;font-size:12px">Composição por classe não disponível neste PDF. A análise continuará com os dados de perfil e carteira de referência selecionados.</p>`;
+    box.innerHTML = `<p style="color:#1F9D77;font-weight:700;font-size:13px;margin-bottom:4px">✓ Conta ${d.conta} identificada — ${fmtBrl(d.patrimonio)}</p>
+      <p style="color:#8A9A8E;font-size:12px">Composição por classe não disponível neste PDF. A análise continuará com os dados de perfil e carteira de referência selecionados.</p>`;
     return;
   }
 
@@ -4657,9 +4657,9 @@ function mostrarPreviewPDF(d){
   };
   // Cores por classe
   const CLS_COR = {
-    pos_fixado:"#3EB8A8", inflacao:"#C8A733", pre_fixado:"#5DCAA5",
-    acoes:"#E88038", fiis:"#9E8FE8", multimercado:"#5DAAD8",
-    alternativos:"#C0A878", internacional:"#5DDAA8", criptomoedas:"#FF8A65"
+    pos_fixado:"#1F9D77", inflacao:"#A9800F", pre_fixado:"#1F9D77",
+    acoes:"#C0673A", fiis:"#7A5FD0", multimercado:"#2E86B8",
+    alternativos:"#B99A55", internacional:"#1F9D77", criptomoedas:"#C0673A"
   };
 
   const rentMes = d.rentabilidade?.mes ?? d.rentabilidade_mes ?? null;
@@ -4669,14 +4669,14 @@ function mostrarPreviewPDF(d){
   // Monta barras de composição
   const clsEntries = Object.entries(comp).filter(([,v])=>Number(v)>0.1).sort((a,b)=>b[1]-a[1]);
   const barras = clsEntries.map(([k,v])=>{
-    const cor = CLS_COR[k] || "#C9A96E";
+    const cor = CLS_COR[k] || "#A8833C";
     const lbl = CLS_LBL[k] || k;
     return `<div style="margin-bottom:6px">
       <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-        <span style="font-size:11px;color:#CCC">${lbl}</span>
+        <span style="font-size:11px;color:#5C7365">${lbl}</span>
         <span style="font-size:11px;color:${cor};font-weight:700">${fmtPct(v)}</span>
       </div>
-      <div style="height:6px;background:#1A2E28;border-radius:3px;overflow:hidden">
+      <div style="height:6px;background:#F5F8F5;border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${Math.min(v,100)}%;background:${cor};border-radius:3px;transition:width .5s"></div>
       </div>
     </div>`;
@@ -4684,10 +4684,10 @@ function mostrarPreviewPDF(d){
 
   // Linha de rentabilidade
   const rentRow = [
-    rentMes  != null ? `<span>Mês: <b style="color:#5DCAA5">${rentMes}%</b></span>` : "",
-    rentAno  != null ? `<span>Ano: <b style="color:#5DCAA5">${rentAno}%</b></span>` : "",
-    rent12m  != null ? `<span>12m: <b style="color:#5DCAA5">${rent12m}%</b></span>` : "",
-  ].filter(Boolean).join('<span style="color:#444;margin:0 8px">|</span>');
+    rentMes  != null ? `<span>Mês: <b style="color:#1F9D77">${rentMes}%</b></span>` : "",
+    rentAno  != null ? `<span>Ano: <b style="color:#1F9D77">${rentAno}%</b></span>` : "",
+    rent12m  != null ? `<span>12m: <b style="color:#1F9D77">${rent12m}%</b></span>` : "",
+  ].filter(Boolean).join('<span style="color:#8A9A8E;margin:0 8px">|</span>');
 
   const assessorNome = d.assessor || "";
   const tipoConta   = d.tipo_conta || "";
@@ -4696,11 +4696,11 @@ function mostrarPreviewPDF(d){
   var alertas = d.alertas || [];
   var alertasHtml = "";
   if(alertas.length){
-    var COR_NIVEL = {alto:"#FF6B6B", medio:"#E8A87C", baixo:"#C9A96E"};
-    alertasHtml = '<div style="margin-top:14px;border-top:1px solid #1A2E28;padding-top:12px">'
-      +'<p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔍 Diagnósticos automáticos</p>'
+    var COR_NIVEL = {alto:"#D93B3B", medio:"#C0673A", baixo:"#A8833C"};
+    alertasHtml = '<div style="margin-top:14px;border-top:1px solid #F5F8F5;padding-top:12px">'
+      +'<p style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔍 Diagnósticos automáticos</p>'
       + alertas.map(function(a){
-          var cor = COR_NIVEL[a.nivel] || "#888";
+          var cor = COR_NIVEL[a.nivel] || "#8A9A8E";
           var icone = a.nivel==="alto" ? "⚠️" : "ℹ️";
           return '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">'
             +'<span style="font-size:11px;flex-shrink:0">'+icone+'</span>'
@@ -4714,20 +4714,20 @@ function mostrarPreviewPDF(d){
   var sugs = d.sugestoes_realocacao || [];
   var sugestoesHtml = "";
   if(sugs.length){
-    sugestoesHtml = '<div style="margin-top:14px;border-top:1px solid #2A2418;padding-top:12px">'
-      +'<p style="font-size:10px;color:#C9A96E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💡 Sugestões para fechar o gap</p>'
+    sugestoesHtml = '<div style="margin-top:14px;border-top:1px solid #F5EFD9;padding-top:12px">'
+      +'<p style="font-size:10px;color:#A8833C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💡 Sugestões para fechar o gap</p>'
       + sugs.map(function(s){
           var prods = (s.produtos||[]).map(function(p){
-            var fgc = p.fgc===true ? ' <span style="color:#5DCAA5;font-size:9px">FGC</span>'
+            var fgc = p.fgc===true ? ' <span style="color:#1F9D77;font-size:9px">FGC</span>'
                     : (p.fgc===false ? ' <span style="color:#8A6A2A;font-size:9px">s/FGC</span>' : '');
-            var rec = p.recomendado ? '<span style="color:#C9A96E;font-size:9px;font-weight:700">⭐ Recomendado XP</span> ' : '';
+            var rec = p.recomendado ? '<span style="color:#A8833C;font-size:9px;font-weight:700">⭐ Recomendado XP</span> ' : '';
             return '<div style="margin:3px 0 5px 12px">'
-              +'<div style="font-size:11px;color:#DDD">• '+rec+(p.nome||'')+' <span style="color:#8BCFEF">'+(p.detalhe||'')+'</span> <span style="color:#4A7055;font-size:9px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
+              +'<div style="font-size:11px;color:#D9E3DB">• '+rec+(p.nome||'')+' <span style="color:#2E86B8">'+(p.detalhe||'')+'</span> <span style="color:#5C7365;font-size:9px">'+(p.fonte||'')+'</span>'+fgc+'</div>'
               +'<div style="font-size:10px;color:#5A7A6A;margin-left:12px;line-height:1.35">'+(p.obs||'')+'</div>'
               +'</div>';
           }).join("");
           return '<div style="margin-bottom:10px">'
-            +'<div style="font-size:11px;color:#C9A96E;font-weight:700">'+s.label+' — faltam '+s.gap_pct+'% vs alvo Braúna</div>'
+            +'<div style="font-size:11px;color:#A8833C;font-weight:700">'+s.label+' — faltam '+s.gap_pct+'% vs alvo Braúna</div>'
             + prods +'</div>';
         }).join("")
       +'<div style="font-size:9px;color:#3A5A48;margin-top:2px;line-height:1.4">Prateleira XP (investidor geral). Confirmar preço, disponibilidade e suitability. DY/taxa não são promessa — comparar sempre no líquido.</div>'
@@ -4741,14 +4741,14 @@ function mostrarPreviewPDF(d){
       return "<tr>"+ cols.map(function(c){
         var v = it[c.key];
         var txt = c.fmt ? c.fmt(v) : (v||"");
-        return '<td style="padding:3px 8px 3px 0;font-size:10px;color:'+(c.cor||"#CCC")+';border-bottom:1px solid #0D2018">'+txt+'</td>';
+        return '<td style="padding:3px 8px 3px 0;font-size:10px;color:'+(c.cor||"#5C7365")+';border-bottom:1px solid #0D2018">'+txt+'</td>';
       }).join("") +"</tr>";
     }).join("");
     var headers = cols.map(function(c){
-      return '<th style="padding:4px 8px 4px 0;font-size:9px;color:#3A6A48;text-align:left;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #1A2E28">'+c.lbl+'</th>';
+      return '<th style="padding:4px 8px 4px 0;font-size:9px;color:#5C7365;text-align:left;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #F5F8F5">'+c.lbl+'</th>';
     }).join("");
     return '<div style="margin-top:12px">'
-      +'<p style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">'+titulo+'</p>'
+      +'<p style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">'+titulo+'</p>'
       +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+headers+'</tr></thead><tbody>'+linhas+'</tbody></table></div>'
       +'</div>';
   }
@@ -4757,32 +4757,32 @@ function mostrarPreviewPDF(d){
   var fmtPctS = function(v){ return v != null ? Number(v).toFixed(1)+"%" : "—"; };
 
   var rfHtml = tblAtivos("Renda Fixa — Posição Detalhada", d.rf_ativos || [], [
-    {key:"nome",      lbl:"Ativo",         cor:"#F0F0F0", fmt:function(v){ return v ? (v.length>38 ? v.slice(0,38)+"…" : v) : "—"; }},
-    {key:"classe",    lbl:"Classe",         cor:"#888"},
-    {key:"saldo",     lbl:"Saldo",          cor:"#C9A96E", fmt:fmtBrlS},
-    {key:"perc",      lbl:"% Carteira",     cor:"#5DCAA5", fmt:fmtPctS},
-    {key:"rent_mes",  lbl:"Rent. Mês",      cor:"#7DCFEF", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
-    {key:"rent_12m",  lbl:"Rent. 12m",      cor:"#7DCFEF", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
+    {key:"nome",      lbl:"Ativo",         cor:"#17271E", fmt:function(v){ return v ? (v.length>38 ? v.slice(0,38)+"…" : v) : "—"; }},
+    {key:"classe",    lbl:"Classe",         cor:"#8A9A8E"},
+    {key:"saldo",     lbl:"Saldo",          cor:"#A8833C", fmt:fmtBrlS},
+    {key:"perc",      lbl:"% Carteira",     cor:"#1F9D77", fmt:fmtPctS},
+    {key:"rent_mes",  lbl:"Rent. Mês",      cor:"#2E86B8", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
+    {key:"rent_12m",  lbl:"Rent. 12m",      cor:"#2E86B8", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
   ]);
 
   var rvHtml = tblAtivos("Renda Variável — Posição Detalhada", d.acoes || [], [
-    {key:"ticker", lbl:"Ticker",      cor:"#E88038"},
-    {key:"saldo",  lbl:"Saldo",       cor:"#C9A96E", fmt:fmtBrlS},
-    {key:"qtd",    lbl:"Qtd.",        cor:"#888"},
-    {key:"perc",   lbl:"% Carteira",  cor:"#5DCAA5", fmt:fmtPctS},
+    {key:"ticker", lbl:"Ticker",      cor:"#C0673A"},
+    {key:"saldo",  lbl:"Saldo",       cor:"#A8833C", fmt:fmtBrlS},
+    {key:"qtd",    lbl:"Qtd.",        cor:"#8A9A8E"},
+    {key:"perc",   lbl:"% Carteira",  cor:"#1F9D77", fmt:fmtPctS},
   ]);
 
   var fiisHtml = tblAtivos("FIIs — Posição Detalhada", d.fiis || [], [
-    {key:"ticker", lbl:"Ticker",      cor:"#9E8FE8"},
-    {key:"saldo",  lbl:"Saldo",       cor:"#C9A96E", fmt:fmtBrlS},
-    {key:"qtd",    lbl:"Qtd.",        cor:"#888"},
-    {key:"perc",   lbl:"% Carteira",  cor:"#5DCAA5", fmt:fmtPctS},
+    {key:"ticker", lbl:"Ticker",      cor:"#7A5FD0"},
+    {key:"saldo",  lbl:"Saldo",       cor:"#A8833C", fmt:fmtBrlS},
+    {key:"qtd",    lbl:"Qtd.",        cor:"#8A9A8E"},
+    {key:"perc",   lbl:"% Carteira",  cor:"#1F9D77", fmt:fmtPctS},
   ]);
 
   var temPosicoes = (d.rf_ativos&&d.rf_ativos.length)||(d.acoes&&d.acoes.length)||(d.fiis&&d.fiis.length);
   var posicoesHtml = "";
   if(temPosicoes){
-    posicoesHtml = '<div style="margin-top:14px;border-top:1px solid #1A2E28;padding-top:12px">'
+    posicoesHtml = '<div style="margin-top:14px;border-top:1px solid #F5F8F5;padding-top:12px">'
       + rfHtml + rvHtml + fiisHtml
       +'</div>';
   }
@@ -4792,18 +4792,18 @@ function mostrarPreviewPDF(d){
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
       <div style="font-size:22px">📋</div>
       <div>
-        <p style="font-size:14px;font-weight:700;color:#F0F0F0;margin:0">Carteira identificada — Conta ${d.conta} ${tipoConta ? '<span style="font-size:10px;background:#C8A733;color:#000;padding:2px 7px;border-radius:10px;margin-left:4px;font-weight:700">'+tipoConta+'</span>' : ""}</p>
-        <p style="font-size:11px;color:#888;margin:2px 0 0">${assessorNome ? "Assessor: " + assessorNome + "  ·  " : ""}${d.data_ref ? "Ref.: " + d.data_ref : ""}</p>
+        <p style="font-size:14px;font-weight:700;color:#17271E;margin:0">Carteira identificada — Conta ${d.conta} ${tipoConta ? '<span style="font-size:10px;background:#A9800F;color:#000;padding:2px 7px;border-radius:10px;margin-left:4px;font-weight:700">'+tipoConta+'</span>' : ""}</p>
+        <p style="font-size:11px;color:#8A9A8E;margin:2px 0 0">${assessorNome ? "Assessor: " + assessorNome + "  ·  " : ""}${d.data_ref ? "Ref.: " + d.data_ref : ""}</p>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div>
-        <p style="font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Patrimônio total</p>
-        <p style="font-size:20px;font-weight:700;color:#C8A733;margin:0">${fmtBrl(pat)}</p>
-        ${rentRow ? '<div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#AAA">' + rentRow + '</div>' : ""}
+        <p style="font-size:11px;color:#8A9A8E;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Patrimônio total</p>
+        <p style="font-size:20px;font-weight:700;color:#A9800F;margin:0">${fmtBrl(pat)}</p>
+        ${rentRow ? '<div style="margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#8A9A8E">' + rentRow + '</div>' : ""}
       </div>
       <div>
-        <p style="font-size:11px;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Composição atual</p>
+        <p style="font-size:11px;color:#8A9A8E;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Composição atual</p>
         ${barras}
       </div>
     </div>
@@ -4870,7 +4870,7 @@ function ativarEtapa2(d){
     if(iconEl) iconEl.textContent = "🆕";
     if(tituloEl) tituloEl.textContent = nomeCliente + " — Primeiro acesso";
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Preencha o Modelo de Servir e o Cross Sell abaixo";
-    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E;border-radius:20px;font-weight:700">Novo cliente</span>';
+    if(badgesEl) badgesEl.innerHTML = '<span style="font-size:11px;padding:4px 12px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C;border-radius:20px;font-weight:700">Novo cliente</span>';
   } else {
     if(banner){ banner.className="step2-banner return"; }
     if(iconEl) iconEl.textContent = "🔄";
@@ -4881,10 +4881,10 @@ function ativarEtapa2(d){
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Ref. " + d.data_ref + " · Patrimônio R$ " + pat;
     const chk = d.ficha_salva?.checklist || {};
     const nFeitos = PILARES.filter(p=>chk[p.id]).length;
-    const scoreCor = nFeitos >= 5 ? "#5DCAA5" : nFeitos >= 3 ? "#FFD966" : "#FF6B6B";
+    const scoreCor = nFeitos >= 5 ? "#1F9D77" : nFeitos >= 3 ? "#A9800F" : "#D93B3B";
     if(badgesEl) badgesEl.innerHTML =
-      `<span style="font-size:11px;padding:4px 12px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:20px;font-weight:700">Última reunião: ${ultData}</span>` +
-      `<span style="font-size:11px;padding:4px 12px;background:#081F18;color:${scoreCor};border:1px solid #1C4A34;border-radius:20px;font-weight:700">${nFeitos}/${PILARES.length} pilares</span>`;
+      `<span style="font-size:11px;padding:4px 12px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:20px;font-weight:700">Última reunião: ${ultData}</span>` +
+      `<span style="font-size:11px;padding:4px 12px;background:#EFF3EF;color:${scoreCor};border:1px solid #D9E3DB;border-radius:20px;font-weight:700">${nFeitos}/${PILARES.length} pilares</span>`;
   }
 
   // Exibe a etapa 2
@@ -4913,12 +4913,12 @@ function renderPainelCliente(d){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
     <div style="font-size:22px">📋</div>
     <div style="flex:1">
-      <div style="font-size:14px;font-weight:700;color:#C9A96E">${d.nome_cliente || "Cliente " + d.conta}</div>
-      <div style="font-size:11px;color:#3A6A48">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
+      <div style="font-size:14px;font-weight:700;color:#A8833C">${d.nome_cliente || "Cliente " + d.conta}</div>
+      <div style="font-size:11px;color:#5C7365">Conta ${d.conta} · ${d.assessor_xp || ""} · Ref. ${d.data_ref}</div>
     </div>
     <div style="text-align:right">
-      <div style="font-size:16px;font-weight:700;color:#F0F0F0">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</div>
-      ${rent["12m"] ? `<div style="font-size:11px;color:#5DCAA5">${rent["12m"].toFixed(2)}% em 12M</div>` : ""}
+      <div style="font-size:16px;font-weight:700;color:#17271E">R$ ${(d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0})}</div>
+      ${rent["12m"] ? `<div style="font-size:11px;color:#1F9D77">${rent["12m"].toFixed(2)}% em 12M</div>` : ""}
     </div>
   </div>`;
 
@@ -4926,32 +4926,32 @@ function renderPainelCliente(d){
   const chk = d.ficha_salva?.checklist || {};
   const nFeitos = PILARES.filter(p=>chk[p.id]).length;
   const nTotal  = PILARES.length;
-  const scoreCor = nFeitos >= 5 ? "#5DCAA5" : nFeitos >= 3 ? "#FFD966" : "#FF6B6B";
+  const scoreCor = nFeitos >= 5 ? "#1F9D77" : nFeitos >= 3 ? "#A9800F" : "#D93B3B";
 
   if(temFicha){
     html += `
-    <div style="background:#081F18;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #1E1E1E">
-      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
+    <div style="background:#EFF3EF;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #FFFFFF">
+      <div style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${PILARES.map(p=>{
           const feito = !!chk[p.id];
-          return `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:${feito?"#0A2018":"#1A0808"};color:${feito?"#5DCAA5":"#FF6B6B"};border:1px solid ${feito?"#2A5040":"#4A1010"}">
+          return `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:${feito?"#F5F8F5":"#FBE9E9"};color:${feito?"#1F9D77":"#D93B3B"};border:1px solid ${feito?"#C6D6C9":"#4A1010"}">
             ${feito?"✓":"✕"} ${p.icone} ${p.nome}
           </span>`;
         }).join("")}
       </div>
       <div style="margin-top:8px;font-size:11px;color:${scoreCor};font-weight:700">${nFeitos}/${nTotal} pilares completos</div>
       ${d.ficha_salva.cross_ativos?.length ? `
-        <div style="margin-top:8px;font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
+        <div style="margin-top:8px;font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">Cross Sell ativo</div>
         <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
           ${d.ficha_salva.cross_ativos.map(id=>{
             const a = CROSS_AREAS.find(x=>x.id===id);
-            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E">${a.icone} ${a.nome}</span>` : "";
+            return a ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C">${a.icone} ${a.nome}</span>` : "";
           }).join("")}
         </div>` : ""}
     </div>`;
   } else {
-    html += `<div style="font-size:12px;color:#3A6A48;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
+    html += `<div style="font-size:12px;color:#5C7365;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
   }
 
   // ── Painel 3 colunas: Recomendada | Histórico | Atual
@@ -4976,21 +4976,21 @@ function renderPainelCliente(d){
       const patDelta    = ult ? (d.patrimonio||0)-(ult.patrimonio||0) : null;
 
       html += `
-      <div style="background:#081F18;border-radius:10px;padding:12px 14px;border:1px solid #1E1E1E;margin-bottom:4px">
+      <div style="background:#EFF3EF;border-radius:10px;padding:12px 14px;border:1px solid #FFFFFF;margin-bottom:4px">
         <!-- Header colunas -->
         <div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;margin-bottom:10px;align-items:end">
           <div></div>
           <div style="text-align:center">
-            <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Recomendada</div>
-            <div style="font-size:10px;color:#8B9FE8;font-weight:700">${perfil ? perfil.replace("_"," ") : "HP Modelo"}</div>
+            <div style="font-size:9px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Recomendada</div>
+            <div style="font-size:10px;color:#4E63C8;font-weight:700">${perfil ? perfil.replace("_"," ") : "HP Modelo"}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Histórico</div>
-            <div style="font-size:10px;color:#D4B483;font-weight:700">${ultData || "—"}</div>
+            <div style="font-size:9px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Histórico</div>
+            <div style="font-size:10px;color:#A8833C;font-weight:700">${ultData || "—"}</div>
           </div>
           <div style="text-align:center">
-            <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Atual (XP)</div>
-            <div style="font-size:10px;color:#5DCAA5;font-weight:700">${d.data_ref || "Hoje"}</div>
+            <div style="font-size:9px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Atual (XP)</div>
+            <div style="font-size:10px;color:#1F9D77;font-weight:700">${d.data_ref || "Hoje"}</div>
           </div>
         </div>
 
@@ -5002,54 +5002,54 @@ function renderPainelCliente(d){
           const valAt  = compAtual[cat]||0;
           const deltaHist = (valHist !== null && valAt !== null) ? valAt - valHist : null;
           const deltaMod  = (valMod  !== null && valAt !== null) ? valAt - valMod  : null;
-          const dCorHist  = deltaHist === null ? "" : deltaHist > 1 ? "#FF6B6B" : deltaHist < -1 ? "#5DCAA5" : "#3A6A48";
+          const dCorHist  = deltaHist === null ? "" : deltaHist > 1 ? "#D93B3B" : deltaHist < -1 ? "#1F9D77" : "#5C7365";
           const sHist     = deltaHist === null ? "" : (deltaHist > 0 ? "▲" : deltaHist < 0 ? "▼" : "→");
           // barra de progresso: max 100%, escala visual
           const barMod  = valMod  !== null ? Math.min(valMod,100)  : 0;
           const barHist = valHist !== null ? Math.min(valHist,100) : 0;
           const barAt   = Math.min(valAt,100);
-          return `<div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;align-items:center;padding:5px 0;border-top:1px solid #0F2A1F">
-            <span style="font-size:11px;color:#AAA">${label}</span>
+          return `<div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;align-items:center;padding:5px 0;border-top:1px solid #F5F8F5">
+            <span style="font-size:11px;color:#8A9A8E">${label}</span>
             <!-- Recomendada -->
             <div style="text-align:center">
               ${valMod !== null ? `
-              <div style="font-size:12px;font-weight:700;color:#8B9FE8">${valMod.toFixed(1)}%</div>
-              <div style="height:4px;background:#1A1A2E;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#8B9FE8;border-radius:2px;width:${barMod}%"></div></div>
-              ` : `<span style="font-size:10px;color:#2A5A3A">—</span>`}
+              <div style="font-size:12px;font-weight:700;color:#4E63C8">${valMod.toFixed(1)}%</div>
+              <div style="height:4px;background:#ECEFFB;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#4E63C8;border-radius:2px;width:${barMod}%"></div></div>
+              ` : `<span style="font-size:10px;color:#5C7365">—</span>`}
             </div>
             <!-- Histórico -->
             <div style="text-align:center">
               ${valHist !== null ? `
-              <div style="font-size:12px;font-weight:700;color:#D4B483">${valHist.toFixed(1)}%</div>
-              <div style="height:4px;background:#1E1A0A;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#D4B483;border-radius:2px;width:${barHist}%"></div></div>
-              ` : `<span style="font-size:10px;color:#2A5A3A">sem dados</span>`}
+              <div style="font-size:12px;font-weight:700;color:#A8833C">${valHist.toFixed(1)}%</div>
+              <div style="height:4px;background:#1E1A0A;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#A8833C;border-radius:2px;width:${barHist}%"></div></div>
+              ` : `<span style="font-size:10px;color:#5C7365">sem dados</span>`}
             </div>
             <!-- Atual -->
             <div style="text-align:center">
               <div style="display:flex;align-items:center;justify-content:center;gap:4px">
-                <span style="font-size:12px;font-weight:700;color:#5DCAA5">${valAt.toFixed(1)}%</span>
+                <span style="font-size:12px;font-weight:700;color:#1F9D77">${valAt.toFixed(1)}%</span>
                 ${deltaHist !== null && Math.abs(deltaHist) >= 0.5 ? `<span style="font-size:10px;color:${dCorHist};font-weight:700">${sHist}${Math.abs(deltaHist).toFixed(1)}</span>` : ""}
               </div>
-              <div style="height:4px;background:#0A1E0F;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#5DCAA5;border-radius:2px;width:${barAt}%"></div></div>
+              <div style="height:4px;background:#0A1E0F;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#1F9D77;border-radius:2px;width:${barAt}%"></div></div>
             </div>
           </div>`;
         }).join("")}
 
         <!-- Rodapé patrimônio -->
-        <div style="margin-top:10px;padding-top:8px;border-top:1px solid #1E1E1E;display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;font-size:11px">
-          <span style="color:#3A6A48">Patrimônio</span>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid #FFFFFF;display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;font-size:11px">
+          <span style="color:#5C7365">Patrimônio</span>
           <div></div>
-          <div style="text-align:center;color:#D4B483">${patAnterior ? "R$ "+patAnterior : "—"}</div>
+          <div style="text-align:center;color:#A8833C">${patAnterior ? "R$ "+patAnterior : "—"}</div>
           <div style="text-align:center">
-            <span style="color:#5DCAA5;font-weight:700">R$ ${patAtual}</span>
-            ${patDelta !== null && Math.abs(patDelta) > 0 ? `<span style="color:${patDelta>0?"#5DCAA5":"#FF6B6B"};margin-left:4px">${patDelta>0?"+":""}R$ ${Math.abs(patDelta).toLocaleString("pt-BR",{maximumFractionDigits:0})}</span>` : ""}
+            <span style="color:#1F9D77;font-weight:700">R$ ${patAtual}</span>
+            ${patDelta !== null && Math.abs(patDelta) > 0 ? `<span style="color:${patDelta>0?"#1F9D77":"#D93B3B"};margin-left:4px">${patDelta>0?"+":""}R$ ${Math.abs(patDelta).toLocaleString("pt-BR",{maximumFractionDigits:0})}</span>` : ""}
           </div>
         </div>
       </div>`;
     }
   }
   if(!temHist){
-    html += `<div style="font-size:11px;color:#2A5A3A;padding:4px 0">📌 Após analisar, esta carteira será salva como referência para o próximo comparativo.</div>`;
+    html += `<div style="font-size:11px;color:#5C7365;padding:4px 0">📌 Após analisar, esta carteira será salva como referência para o próximo comparativo.</div>`;
   }
 
   box.innerHTML = html;
@@ -5099,7 +5099,7 @@ async function buscarUltimoXpPorCodigo(conta){
   if(!conta) return;
   const lbl = document.getElementById("cliente-encontrado-label");
   const box = document.getElementById("box-preview-pdf");
-  if(lbl){ lbl.textContent="⏳ Buscando..."; lbl.style.display="block"; lbl.style.color="#C9A96E"; }
+  if(lbl){ lbl.textContent="⏳ Buscando..."; lbl.style.display="block"; lbl.style.color="#A8833C"; }
   // Avisa se demorar mais de 5s (servidor frio)
   var _lblTimer = setTimeout(function(){
     if(lbl && lbl.textContent.startsWith("⏳")) lbl.textContent="⏳ Conectando ao servidor... aguarde";
@@ -5124,7 +5124,7 @@ async function buscarUltimoXpPorCodigo(conta){
     }
 
     if(!ficha && !ultimo){
-      if(lbl){ lbl.textContent="Cliente não encontrado no sistema"; lbl.style.color="#FF6B6B"; }
+      if(lbl){ lbl.textContent="Cliente não encontrado no sistema"; lbl.style.color="#D93B3B"; }
       return;
     }
 
@@ -5159,12 +5159,12 @@ async function buscarUltimoXpPorCodigo(conta){
       const dataRef = ultimo.data_ref || ultimo.salvo_em?.split(" ")[0] || "";
       if(box){
         box.style.display="block";
-        box.innerHTML=`<p style="color:#5DCAA5;font-weight:700;font-size:13px;margin-bottom:4px">✓ Último XPerformance carregado — Conta ${conta}${dataRef?" · "+dataRef:""}</p>
-          <p style="color:#C9A96E;font-size:13px;margin-bottom:8px;font-weight:700">${pat?fmtBrl(pat):""}</p>
-          <p style="color:#888;font-size:11px">Composição do último relatório salvo. Faça o upload do XPerformance atual para dados em tempo real.</p>`;
+        box.innerHTML=`<p style="color:#1F9D77;font-weight:700;font-size:13px;margin-bottom:4px">✓ Último XPerformance carregado — Conta ${conta}${dataRef?" · "+dataRef:""}</p>
+          <p style="color:#A8833C;font-size:13px;margin-bottom:8px;font-weight:700">${pat?fmtBrl(pat):""}</p>
+          <p style="color:#8A9A8E;font-size:11px">Composição do último relatório salvo. Faça o upload do XPerformance atual para dados em tempo real.</p>`;
       }
       const fname = document.getElementById("fname-xp");
-      if(fname){ fname.style.color="#C9A96E"; fname.textContent="Último XP salvo — "+dataRef; }
+      if(fname){ fname.style.color="#A8833C"; fname.textContent="Último XP salvo — "+dataRef; }
 
       const wBtn = document.getElementById("btn-proxima-etapa-wrap");
       const btn  = document.getElementById("btn-proxima-etapa");
@@ -5174,10 +5174,10 @@ async function buscarUltimoXpPorCodigo(conta){
 
     if(lbl){
       lbl.textContent = ficha ? "✓ "+(ficha.nome||conta) : "✓ Conta "+conta+" encontrada";
-      lbl.style.color="#5DCAA5";
+      lbl.style.color="#1F9D77";
     }
   }catch(e){
-    if(lbl){ lbl.textContent="Erro ao buscar cliente"; lbl.style.color="#FF6B6B"; }
+    if(lbl){ lbl.textContent="Erro ao buscar cliente"; lbl.style.color="#D93B3B"; }
   }
 }
 
@@ -5237,22 +5237,22 @@ async function buscarClientesSalvos(){
     if(_cont) _cont.textContent = "("+_clientesSalvos.length+")";
 
     const PERFIL_LBL = {super_conservadora:"Super Conservadora",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva",_:"Sem perfil"};
-    const PERFIL_COR = {super_conservadora:"#7DCFEF",conservadora:"#5DCAA5",moderada:"#C9A96E",arrojada:"#E8A87C",agressiva:"#FF6B6B",_:"#3A6A48"};
+    const PERFIL_COR = {super_conservadora:"#2E86B8",conservadora:"#1F9D77",moderada:"#A8833C",arrojada:"#C0673A",agressiva:"#D93B3B",_:"#5C7365"};
     const PERFIL_ORDEM = ["super_conservadora","conservadora","moderada","arrojada","agressiva"];
 
     function _chip(c){
       const idx = _clientesSalvos.indexOf(c);
       const dias = _diasDesdeXP(c.data_ultimo_xp);
       const vencido = (dias===null) || (dias>60);
-      const borda = vencido ? "#E8A87C55" : "#1C4A34";
+      const borda = vencido ? "#E8A87C55" : "#D9E3DB";
       const selo = vencido
-        ? `<span style="background:#2A1A0A;color:#E8A87C;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
-        : `<span style="color:#3A6A48;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
-      const detTag = c.desenquadrado ? `<span style="color:#E8A87C;font-size:9px;margin-left:5px">→ parece ${PERFIL_LBL[c.perfil_detectado]||c.perfil_detectado||"outro"}</span>` : "";
-      const info = `${c.nome||("#"+(c.conta||""))}${(c.nome&&c.conta)?` <span style="color:#C9A96E;font-size:10px">#${c.conta}</span>`:""}${c.gestora_nome?` <span style="color:#7DCFEF;font-size:10px">· ${c.gestora_nome}</span>`:""}${selo}${detTag}`;
-      return `<span class="cs-chip" style="display:inline-flex;align-items:center;border:1px solid ${borda};border-radius:20px;background:#111;overflow:hidden">
-        <button onclick="carregarClienteIdx(${idx})" style="border:none;background:none;color:#C9A96E;font-size:12px;cursor:pointer;padding:6px 4px 6px 12px;white-space:nowrap">${info}</button>
-        <button onclick="excluirClienteIdx(event,${idx})" title="Excluir cliente" style="border:none;background:none;color:#7A4A4A;font-size:11px;cursor:pointer;padding:6px 10px 6px 6px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#7A4A4A'">🗑</button>
+        ? `<span style="background:#2A1A0A;color:#C0673A;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:9px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
+        : `<span style="color:#5C7365;font-size:9px;margin-left:5px">XP há ${dias}d</span>`;
+      const detTag = c.desenquadrado ? `<span style="color:#C0673A;font-size:9px;margin-left:5px">→ parece ${PERFIL_LBL[c.perfil_detectado]||c.perfil_detectado||"outro"}</span>` : "";
+      const info = `${c.nome||("#"+(c.conta||""))}${(c.nome&&c.conta)?` <span style="color:#A8833C;font-size:10px">#${c.conta}</span>`:""}${c.gestora_nome?` <span style="color:#2E86B8;font-size:10px">· ${c.gestora_nome}</span>`:""}${selo}${detTag}`;
+      return `<span class="cs-chip" style="display:inline-flex;align-items:center;border:1px solid ${borda};border-radius:20px;background:#FFFFFF;overflow:hidden">
+        <button onclick="carregarClienteIdx(${idx})" style="border:none;background:none;color:#A8833C;font-size:12px;cursor:pointer;padding:6px 4px 6px 12px;white-space:nowrap">${info}</button>
+        <button onclick="excluirClienteIdx(event,${idx})" title="Excluir cliente" style="border:none;background:none;color:#7A4A4A;font-size:11px;cursor:pointer;padding:6px 10px 6px 6px" onmouseover="this.style.color='#D93B3B'" onmouseout="this.style.color='#7A4A4A'">🗑</button>
       </span>`;
     }
 
@@ -5265,8 +5265,8 @@ async function buscarClientesSalvos(){
     ordem.forEach(function(k){
       const arr = grupos[k]||[]; const lbl=PERFIL_LBL[k]||PERFIL_LBL._; const cor=PERFIL_COR[k]||PERFIL_COR._; const gid="csg-"+k;
       h += `<div style="margin-bottom:6px">
-        <div onclick="csToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#0A1A10;border:1px solid #12281C;border-radius:8px">
-          <span id="${gid}-ar" style="color:#3A6A48;font-size:11px">▸</span>
+        <div onclick="csToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#EFF3EF;border:1px solid #EAF4EC;border-radius:8px">
+          <span id="${gid}-ar" style="color:#5C7365;font-size:11px">▸</span>
           <span style="font-size:11px;color:${cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1">${lbl}</span>
           <span style="font-size:13px;color:${cor};font-weight:700">${arr.length}</span>
         </div>
@@ -5274,11 +5274,11 @@ async function buscarClientesSalvos(){
       </div>`;
     });
     if(desenq.length){
-      h += `<div style="margin-top:10px;border-top:1px solid #12281C;padding-top:10px">
-        <div onclick="csToggle('csg-desenq')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#1A0E08;border:1px solid #3A1E10;border-radius:8px">
+      h += `<div style="margin-top:10px;border-top:1px solid #EAF4EC;padding-top:10px">
+        <div onclick="csToggle('csg-desenq')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F5EAE0;border:1px solid #3A1E10;border-radius:8px">
           <span id="csg-desenq-ar" style="color:#7A4A2A;font-size:11px">▸</span>
-          <span style="font-size:11px;color:#E8A87C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1">⚠ Desenquadrados do perfil</span>
-          <span style="font-size:13px;color:#E8A87C;font-weight:700">${desenq.length}</span>
+          <span style="font-size:11px;color:#C0673A;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1">⚠ Desenquadrados do perfil</span>
+          <span style="font-size:13px;color:#C0673A;font-weight:700">${desenq.length}</span>
         </div>
         <div id="csg-desenq" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 4px 4px">${desenq.map(_chip).join("")}</div>
       </div>`;
@@ -5367,11 +5367,11 @@ function carregarFicha(jsonStr){
       if(!feito) return; // estado inicial já é "não feito"
       const imp  = p.importancia || "MÉDIA";
       const el   = document.getElementById("pilar-"+p.id);
-      if(el){ el.style.background="#0A2A18"; el.style.border="1.5px solid #2A5040"; }
+      if(el){ el.style.background="#E9F5EE"; el.style.border="1.5px solid #C6D6C9"; }
       const chk  = document.getElementById("chk-"+p.id);
-      if(chk){ chk.style.background="#5DCAA5"; chk.style.borderColor="#5DCAA5"; chk.textContent="✓"; chk.style.color="#000"; }
+      if(chk){ chk.style.background="#1F9D77"; chk.style.borderColor="#1F9D77"; chk.textContent="✓"; chk.style.color="#000"; }
       const nEl  = document.getElementById("nome-"+p.id);
-      if(nEl) nEl.style.color="#5DCAA5";
+      if(nEl) nEl.style.color="#1F9D77";
       const det  = document.getElementById("det-"+p.id);
       if(det) det.style.display="none";
     });
@@ -5387,7 +5387,7 @@ function carregarFicha(jsonStr){
 
   // Aviso visual
   const nome = document.getElementById("nome");
-  nome.style.borderColor="#C9A96E";
+  nome.style.borderColor="#A8833C";
   setTimeout(()=>nome.style.borderColor="", 1500);
 }
 
@@ -5405,9 +5405,9 @@ function renderAnaliseHP(xp){
     ["Rent. Mês",  xp.rent?.portfolio?.mes  ? xp.rent.portfolio.mes.toFixed(2)+"%" : "—"],
     ["Rent. 12M",  xp.rent?.portfolio?.["12m"] ? xp.rent.portfolio["12m"].toFixed(2)+"%" : "—"],
   ].map(([lbl,val])=>`
-    <div style="background:#071E17;border:1px solid #2A2A18;border-radius:8px;padding:8px 14px;min-width:90px">
-      <div style="font-size:9px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
-      <div style="font-size:13px;color:#D4B483;font-weight:700;margin-top:2px">${val}</div>
+    <div style="background:#EFF3EF;border:1px solid #F7F1D8;border-radius:8px;padding:8px 14px;min-width:90px">
+      <div style="font-size:9px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
+      <div style="font-size:13px;color:#A8833C;font-weight:700;margin-top:2px">${val}</div>
     </div>
   `).join("");
 
@@ -5420,7 +5420,7 @@ function renderAnaliseHP(xp){
   const hpHeader = document.getElementById("hp-header");
   if(xp.carteira_salva && hpHeader){
     const salvo = document.createElement("span");
-    salvo.style.cssText = "font-size:10px;background:#0A2018;color:#5DCAA5;border:1px solid #1A4A2A;padding:3px 10px;border-radius:10px;display:inline-flex;align-items:center;gap:4px";
+    salvo.style.cssText = "font-size:10px;background:#F5F8F5;color:#1F9D77;border:1px solid #1A4A2A;padding:3px 10px;border-radius:10px;display:inline-flex;align-items:center;gap:4px";
     salvo.innerHTML = "💾 Carteira registrada";
     hpHeader.prepend(salvo);
   }
@@ -5430,14 +5430,14 @@ function renderAnaliseHP(xp){
   const nMercado   = (xp.alertas_mercado || []).length;
 
   if(alertas.length){
-    const ACOR  = {info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B"};
+    const ACOR  = {info:"#1F9D77", atencao:"#A8833C", urgente:"#D93B3B"};
     const AICON = {info:"ℹ️", atencao:"⚠️", urgente:"🚨"};
     const ORIG  = {hp_manual:"HP", knowledge_base:"📚 Base", auto:"🤖 Auto", mercado:"📰 Mercado"};
-    const OBKG  = {hp_manual:"#1A1A08", knowledge_base:"#0A200A", auto:"#0A0A1A", mercado:"#0A1A28"};
-    const OCOR  = {hp_manual:"#888", knowledge_base:"#5DCAA5", auto:"#7777DD", mercado:"#5BA8D4"};
+    const OBKG  = {hp_manual:"#FBF3D2", knowledge_base:"#0A200A", auto:"#ECEFFB", mercado:"#0A1A28"};
+    const OCOR  = {hp_manual:"#8A9A8E", knowledge_base:"#1F9D77", auto:"#7777DD", mercado:"#5BA8D4"};
 
     const urgentes = alertas.filter(a=>a.tipo==="urgente");
-    const bordaCor = urgentes.length ? "#FF6B6B" : "#D4B483";
+    const bordaCor = urgentes.length ? "#D93B3B" : "#A8833C";
 
     alertasDiv.innerHTML = `
       <div style="border:2px solid ${bordaCor};border-radius:10px;overflow:hidden;margin-bottom:14px">
@@ -5446,48 +5446,48 @@ function renderAnaliseHP(xp){
             ${urgentes.length ? "🚨" : "⚠️"} ${alertas.length} ponto${alertas.length>1?"s":""} para atenção
           </span>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            ${urgentes.length ? `<span style="font-size:10px;background:#FF6B6B22;color:#FF6B6B;border:1px solid #FF6B6B44;padding:2px 8px;border-radius:10px">${urgentes.length} urgente${urgentes.length>1?"s":""}</span>` : ""}
+            ${urgentes.length ? `<span style="font-size:10px;background:#FF6B6B22;color:#D93B3B;border:1px solid #FF6B6B44;padding:2px 8px;border-radius:10px">${urgentes.length} urgente${urgentes.length>1?"s":""}</span>` : ""}
             ${nMercado ? `<span style="font-size:10px;background:#0A1A2822;color:#5BA8D4;border:1px solid #5BA8D444;padding:2px 8px;border-radius:10px">📰 ${nMercado} do mercado</span>` : ""}
           </div>
         </div>
         <div style="padding:8px 14px 10px">
           ${alertas.map(a=>{
-            const cor   = ACOR[a.tipo] || "#888";
+            const cor   = ACOR[a.tipo] || "#8A9A8E";
             const ot    = a.origem_tipo || "auto";
             const orig  = a.origem || ORIG[ot] || "";
-            const obkg  = OBKG[ot] || "#1A1A08";
-            const ocor  = OCOR[ot] || "#888";
+            const obkg  = OBKG[ot] || "#FBF3D2";
+            const ocor  = OCOR[ot] || "#8A9A8E";
             const isMercado = ot === "mercado";
-            return `<div style="border-left:3px solid ${cor};background:${isMercado?"#060F18":"#060F0B"};border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
+            return `<div style="border-left:3px solid ${cor};background:${isMercado?"#060F18":"#EFF3EF"};border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
                 <span style="font-size:12px;font-weight:700;color:${cor}">${AICON[a.tipo]||"🔔"} ${a.produto||a.classe||""}</span>
                 ${orig ? `<span style="font-size:10px;background:${obkg};color:${ocor};padding:2px 7px;border-radius:10px;border:1px solid ${ocor}33">${orig}</span>` : ""}
-                <span style="font-size:10px;color:#2A5A3A;margin-left:auto">${a.data||""}</span>
+                <span style="font-size:10px;color:#5C7365;margin-left:auto">${a.data||""}</span>
               </div>
-              <p style="font-size:11px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
-              ${(a.docs&&a.docs.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`+a.docs.map(dd=>`<button onclick="abrirMaterial('${dd.id}','${encodeURIComponent(dd.nome||"")}')" style="font-size:9px;padding:3px 9px;border-radius:8px;border:1px solid #5DCAA555;background:#0A200A;color:#5DCAA5;cursor:pointer">👁 Abrir: ${(dd.nome||"material").replace(/</g,"&lt;")}</button>`).join("")+`</div>`:""}
+              <p style="font-size:11px;color:#8A9A8E;margin:0;line-height:1.5">${a.mensagem||""}</p>
+              ${(a.docs&&a.docs.length)?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`+a.docs.map(dd=>`<button onclick="abrirMaterial('${dd.id}','${encodeURIComponent(dd.nome||"")}')" style="font-size:9px;padding:3px 9px;border-radius:8px;border:1px solid #5DCAA555;background:#0A200A;color:#1F9D77;cursor:pointer">👁 Abrir: ${(dd.nome||"material").replace(/</g,"&lt;")}</button>`).join("")+`</div>`:""}
             </div>`;
           }).join("")}
         </div>
       </div>`;
   } else {
-    alertasDiv.innerHTML = `<div style="font-size:11px;color:#1E4A30;padding:8px 0;display:flex;align-items:center;gap:6px">✅ Nenhum alerta identificado para esta carteira.</div>`;
+    alertasDiv.innerHTML = `<div style="font-size:11px;color:#5C7365;padding:8px 0;display:flex;align-items:center;gap:6px">✅ Nenhum alerta identificado para esta carteira.</div>`;
   }
 
   // Desvios
-  const STATUS_COLOR = {ok:"#5DCAA5", atencao:"#D4B483", fora:"#FF6B6B"};
+  const STATUS_COLOR = {ok:"#1F9D77", atencao:"#A8833C", fora:"#D93B3B"};
   const STATUS_ICON  = {ok:"✅", atencao:"⚠️", fora:"❌"};
   const devDiv = document.getElementById("hp-desvios");
   devDiv.innerHTML = (xp.desvios||[]).map(d=>`
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #111;font-size:12px">
-      <span style="width:130px;color:#CCC">${d.label}</span>
-      <span style="width:44px;color:#D4B483;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #FFFFFF;font-size:12px">
+      <span style="width:130px;color:#5C7365">${d.label}</span>
+      <span style="width:44px;color:#A8833C;font-weight:700;text-align:right">${d.atual.toFixed(1)}%</span>
       <div style="flex:1;background:#0F3525;border-radius:3px;height:5px;overflow:hidden;position:relative">
-        <div style="position:absolute;height:100%;background:#2A5A3A;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
+        <div style="position:absolute;height:100%;background:#5C7365;border-radius:3px;width:${Math.min(d.alvo,100)}%"></div>
         <div style="position:absolute;height:100%;background:${STATUS_COLOR[d.status]};border-radius:3px;width:${Math.min(d.atual,100)}%"></div>
       </div>
-      <span style="width:44px;color:#3A6A48;font-size:10px;text-align:right">meta ${d.alvo.toFixed(1)}%</span>
-      <span style="width:56px;font-weight:700;font-size:11px;color:${d.desvio>0?"#FF6B6B":"#5DCAA5"};text-align:right">${d.desvio>0?"+":""}${d.desvio.toFixed(1)}%</span>
+      <span style="width:44px;color:#5C7365;font-size:10px;text-align:right">meta ${d.alvo.toFixed(1)}%</span>
+      <span style="width:56px;font-weight:700;font-size:11px;color:${d.desvio>0?"#D93B3B":"#1F9D77"};text-align:right">${d.desvio>0?"+":""}${d.desvio.toFixed(1)}%</span>
       <span style="font-size:13px">${STATUS_ICON[d.status]||""}</span>
     </div>
   `).join("");
@@ -5500,29 +5500,29 @@ function renderAnaliseHP(xp){
     var _sgMeta = _STOCK_GUIDE._meta || {};
     document.getElementById("hp-acoes-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:#071E17">
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ativo</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Posição Braúna (Levante)</th>
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Alvo / Upside</th>
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Mercado (XP)</th>
+        <thead><tr style="background:#EFF3EF">
+          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:10px">Ativo</th>
+          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:10px">% Cart.</th>
+          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:10px">Posição Braúna (Levante)</th>
+          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:10px">Alvo / Upside</th>
+          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:10px">Mercado (XP)</th>
         </tr></thead>
         <tbody>${xp.acoes.map((a,i)=>{ var sv=_sgRow(a); return `
-          <tr style="background:${i%2?"#070707":"#071E17"}">
+          <tr style="background:${i%2?"#070707":"#EFF3EF"}">
             <td style="padding:6px 8px">
-              <span style="color:#D4B483;font-weight:700">${a.ticker}</span>
-              ${sv.nome?`<span style="color:#4A7055;font-size:9px;display:block">${sv.nome}</span>`:""}
-              <span style="color:#666;font-size:9px">${a.qtd?("Qtd "+a.qtd+" · "):""}R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
+              <span style="color:#A8833C;font-weight:700">${a.ticker}</span>
+              ${sv.nome?`<span style="color:#5C7365;font-size:9px;display:block">${sv.nome}</span>`:""}
+              <span style="color:#8A9A8E;font-size:9px">${a.qtd?("Qtd "+a.qtd+" · "):""}R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
             </td>
-            <td style="padding:6px 8px;text-align:right;color:#5DCAA5">${(a.perc||0).toFixed(2)}%</td>
+            <td style="padding:6px 8px;text-align:right;color:#1F9D77">${(a.perc||0).toFixed(2)}%</td>
             <td style="padding:6px 8px">${sv.posHtml}</td>
-            <td style="padding:6px 8px;color:#CCC">${sv.alvoHtml}</td>
+            <td style="padding:6px 8px;color:#5C7365">${sv.alvoHtml}</td>
             <td style="padding:6px 8px">${sv.xpHtml}</td>
           </tr>`}).join("")}
         </tbody>
       </table>
-      <div style="font-size:9px;color:#2A5A3A;margin-top:6px;line-height:1.5">
-        <b style="color:#C9A96E">Levante</b> = casa principal do posicionamento (${_sgData(_sgMeta.fonte_levante_data)}) · <b style="color:#7DCFEF">XP</b> = como o mercado está vendo (${_sgData(_sgMeta.fonte_xp_data)}). O preço-alvo é referência; o preço vivo vem do XPerformance. <span style="color:#E8A87C">⚠</span> = Levante e XP divergem.
+      <div style="font-size:9px;color:#5C7365;margin-top:6px;line-height:1.5">
+        <b style="color:#A8833C">Levante</b> = casa principal do posicionamento (${_sgData(_sgMeta.fonte_levante_data)}) · <b style="color:#2E86B8">XP</b> = como o mercado está vendo (${_sgData(_sgMeta.fonte_xp_data)}). O preço-alvo é referência; o preço vivo vem do XPerformance. <span style="color:#C0673A">⚠</span> = Levante e XP divergem.
       </div>`;
   }
 
@@ -5534,17 +5534,17 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-fiis-bloco").style.display = "";
     document.getElementById("hp-fiis-table").innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <thead><tr style="background:#071E17">
-          <th style="text-align:left;padding:6px 8px;color:#4A7055;font-size:10px">Ticker</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Qtd.</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">Saldo</th>
-          <th style="text-align:right;padding:6px 8px;color:#4A7055;font-size:10px">% Cart.</th>
+        <thead><tr style="background:#EFF3EF">
+          <th style="text-align:left;padding:6px 8px;color:#5C7365;font-size:10px">Ticker</th>
+          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:10px">Qtd.</th>
+          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:10px">Saldo</th>
+          <th style="text-align:right;padding:6px 8px;color:#5C7365;font-size:10px">% Cart.</th>
         </tr></thead>
         <tbody>${xp.fiis.map((f,i)=>`
-          <tr style="background:${i%2?"#070707":"#071E17"}">
-            <td style="padding:6px 8px;color:#7DCFEF;font-weight:700">${f.ticker}</td>
-            <td style="padding:6px 8px;color:#888;text-align:right">${f.qtd||"—"}</td>
-            <td style="padding:6px 8px;color:#CCC;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
+          <tr style="background:${i%2?"#070707":"#EFF3EF"}">
+            <td style="padding:6px 8px;color:#2E86B8;font-weight:700">${f.ticker}</td>
+            <td style="padding:6px 8px;color:#8A9A8E;text-align:right">${f.qtd||"—"}</td>
+            <td style="padding:6px 8px;color:#5C7365;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
             <td style="padding:6px 8px;text-align:right">${(f.perc||0).toFixed(2)}%</td>
           </tr>`).join("")}
         </tbody>
@@ -5558,15 +5558,15 @@ function renderAnaliseHP(xp){
     document.getElementById("hp-sugestoes-lista").innerHTML = sugs.map(s=>{
       const p = s.produto || {};
       return `
-        <div style="background:#071E17;border:1px solid #2A2A18;border-left:3px solid #D4B483;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
+        <div style="background:#EFF3EF;border:1px solid #F7F1D8;border-left:3px solid #A8833C;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-            <span style="font-size:10px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
-            <span style="font-size:12px;color:#FF6B6B;font-weight:700">gap ${s.gap.toFixed(1)}%</span>
-            <span style="font-size:13px;font-weight:700;color:#F0F0F0">${p.nome||"—"}</span>
-            ${p.taxa ? `<span style="font-size:11px;color:#5DCAA5">${p.taxa}</span>` : ""}
+            <span style="font-size:10px;background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
+            <span style="font-size:12px;color:#D93B3B;font-weight:700">gap ${s.gap.toFixed(1)}%</span>
+            <span style="font-size:13px;font-weight:700;color:#17271E">${p.nome||"—"}</span>
+            ${p.taxa ? `<span style="font-size:11px;color:#1F9D77">${p.taxa}</span>` : ""}
           </div>
-          ${p.motivo ? `<p style="font-size:11px;color:#888;line-height:1.5;margin:0">${p.motivo}</p>` : ""}
-          ${p.indicado_por ? `<p style="font-size:10px;color:#2A5A3A;margin-top:4px">Indicado por: ${p.indicado_por} ${p.indicado_em ? "· "+p.indicado_em : ""}</p>` : ""}
+          ${p.motivo ? `<p style="font-size:11px;color:#8A9A8E;line-height:1.5;margin:0">${p.motivo}</p>` : ""}
+          ${p.indicado_por ? `<p style="font-size:10px;color:#5C7365;margin-top:4px">Indicado por: ${p.indicado_por} ${p.indicado_em ? "· "+p.indicado_em : ""}</p>` : ""}
         </div>`;
     }).join("");
   }
@@ -5579,22 +5579,22 @@ function renderAnaliseHP(xp){
     if(ref && c.referencia) ref.textContent = c.referencia;
 
     const cards = [
-      {titulo:"🌍 Global",         texto: c.global,         cor:"#8B9FE8"},
-      {titulo:"🇧🇷 Brasil",        texto: c.brasil,         cor:"#5DCAA5"},
-      {titulo:"📌 Posicionamento", texto: c.posicionamento, cor:"#D4B483"},
+      {titulo:"🌍 Global",         texto: c.global,         cor:"#4E63C8"},
+      {titulo:"🇧🇷 Brasil",        texto: c.brasil,         cor:"#1F9D77"},
+      {titulo:"📌 Posicionamento", texto: c.posicionamento, cor:"#A8833C"},
     ];
     document.getElementById("hp-cenario-cards").innerHTML = cards.map(card => card.texto ? `
-      <div style="background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:12px;border-top:2px solid ${card.cor}">
+      <div style="background:#EFF3EF;border:1px solid #1A1A10;border-radius:10px;padding:12px;border-top:2px solid ${card.cor}">
         <div style="font-size:10px;color:${card.cor};font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">${card.titulo}</div>
-        <p style="font-size:11px;color:#CCC;line-height:1.7">${card.texto}</p>
+        <p style="font-size:11px;color:#5C7365;line-height:1.7">${card.texto}</p>
       </div>` : "").join("");
 
     const vieses = c.vieses || {};
-    const VCOR = {positivo:"#5DCAA5", neutro:"#D4B483", negativo:"#FF6B6B"};
+    const VCOR = {positivo:"#1F9D77", neutro:"#A8833C", negativo:"#D93B3B"};
     const VLBL = {pos_fixado:"Pós Fix",inflacao:"Inflação",pre_fixado:"Pré Fix",acoes:"Ações",fiis:"FIIs",multimercado:"Multi",internacional:"Intl",alternativos:"Altern",criptomoedas:"Cripto"};
     document.getElementById("hp-cenario-vieses").innerHTML = Object.entries(vieses)
       .filter(([,v])=>v)
-      .map(([cls,v])=>`<span style="font-size:10px;background:#0A1A0A;border:1px solid ${VCOR[v]||"#333"}44;border-radius:10px;padding:3px 9px;color:${VCOR[v]||"#888"}">${VLBL[cls]||cls}: ${v}</span>`)
+      .map(([cls,v])=>`<span style="font-size:10px;background:#EFF3EF;border:1px solid ${VCOR[v]||"#C6D6C9"}44;border-radius:10px;padding:3px 9px;color:${VCOR[v]||"#8A9A8E"}">${VLBL[cls]||cls}: ${v}</span>`)
       .join("");
   }
 
@@ -5726,8 +5726,8 @@ function renderSugestoes(sg){
   let html = `<div class="sg-header-box">
     <span style="font-size:20px">💡</span>
     <div>
-      <div style="font-size:12px;font-weight:700;color:#C9A96E">${sg.titulo||"Sugestões do Gestor"}</div>
-      <div style="font-size:10px;color:#3A6A48">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
+      <div style="font-size:12px;font-weight:700;color:#A8833C">${sg.titulo||"Sugestões do Gestor"}</div>
+      <div style="font-size:10px;color:#5C7365">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
     </div>
   </div>`;
 
@@ -5742,7 +5742,7 @@ function renderSugestoes(sg){
           <span class="sg-acao">${item.acao==="substituir"?"↔ Substituir":"+ Alocar"}</span>
           <span class="sg-produto">${item.para||"—"}</span>
           ${item.indexador?`<span class="sg-idx">${item.indexador}</span>`:""}
-          <span style="font-size:10px;color:#3A6A48">${urgTxt}</span>
+          <span style="font-size:10px;color:#5C7365">${urgTxt}</span>
         </div>
         ${item.de?`<div class="sg-de">↓ Sair / reduzir: ${item.de}</div>`:""}
         <div class="sg-motivo">${item.motivo||""}</div>
@@ -5756,12 +5756,12 @@ function renderSugestoes(sg){
     html += `<div class="sg-bloco"><div class="sg-bloco-title">📈 Renda Variável — ${sg.renda_variavel.length} sugestão(ões)</div>`;
     sg.renda_variavel.forEach(item=>{
       const acaoTxt = item.acao==="comprar"?"▲ Comprar":item.acao==="vender"?"▼ Vender":"↔ Trocar";
-      const acaoCor = item.acao==="comprar"?"#5DCAA5":item.acao==="vender"?"#FF6B6B":"#FFD966";
+      const acaoCor = item.acao==="comprar"?"#1F9D77":item.acao==="vender"?"#D93B3B":"#A9800F";
       html += `<div class="sg-card">
         <div class="sg-topo">
           <span class="sg-acao" style="color:${acaoCor}">${acaoTxt}</span>
           ${item.de?`<span class="sg-produto">${item.de}</span>`:""}
-          ${item.para?`<span style="font-size:12px;color:#5DCAA5">→ ${item.para}</span>`:""}
+          ${item.para?`<span style="font-size:12px;color:#1F9D77">→ ${item.para}</span>`:""}
         </div>
         <div class="sg-motivo">${item.motivo||""}</div>
         ${item.fonte?`<div class="sg-fonte">Fonte: ${item.fonte}</div>`:""}
@@ -5773,7 +5773,7 @@ function renderSugestoes(sg){
   // ── Estruturadas ──────────────────────────────────────────
   if(sg.estruturadas){
     html += `<div class="sg-bloco">
-      <div class="sg-bloco-title">⚙️ Operações Estruturadas <span style="font-size:10px;font-weight:400;color:#3A6A48;text-transform:none;letter-spacing:0">(cliente tem ações na carteira)</span></div>
+      <div class="sg-bloco-title">⚙️ Operações Estruturadas <span style="font-size:10px;font-weight:400;color:#5C7365;text-transform:none;letter-spacing:0">(cliente tem ações na carteira)</span></div>
       <div class="sg-est-box">${sg.estruturadas}</div>
     </div>`;
   }
@@ -5783,7 +5783,7 @@ function renderSugestoes(sg){
     const jaTem = sg.tem_intl;
     html += `<div class="sg-bloco">
       <div class="sg-bloco-title">🌎 Internacional — ${sg.internacional.length} sugestão(ões)</div>
-      ${jaTem?`<div style="font-size:11px;color:#5DCAA5;margin-bottom:8px;padding:6px 10px;background:#0A2018;border-radius:6px">✓ Cliente já possui alocação internacional — sugestões abaixo para otimização/reposicionamento</div>`:""}`;
+      ${jaTem?`<div style="font-size:11px;color:#1F9D77;margin-bottom:8px;padding:6px 10px;background:#F5F8F5;border-radius:6px">✓ Cliente já possui alocação internacional — sugestões abaixo para otimização/reposicionamento</div>`:""}`;
     sg.internacional.forEach(item=>{
       html += `<div class="sg-card ${jaTem?"sg-ja-tem":""}">
         ${jaTem?`<div class="sg-ja-tem-badge">✓ Já possui internacional — otimizar</div>`:""}
@@ -5802,14 +5802,14 @@ function renderSugestoes(sg){
     const jaTem = sg.tem_fiis;
     html += `<div class="sg-bloco">
       <div class="sg-bloco-title">🏢 Fundos Imobiliários — Carteira sugerida</div>
-      ${jaTem?`<div style="font-size:11px;color:#5DCAA5;margin-bottom:8px;padding:6px 10px;background:#0A2018;border-radius:6px">✓ Cliente já possui FIIs — use as sugestões abaixo para rebalancear a posição</div>`:""}
+      ${jaTem?`<div style="font-size:11px;color:#1F9D77;margin-bottom:8px;padding:6px 10px;background:#F5F8F5;border-radius:6px">✓ Cliente já possui FIIs — use as sugestões abaixo para rebalancear a posição</div>`:""}
       <table class="sg-fii-table">
         <thead><tr><th>Ticker</th><th>Segmento</th><th>% sugerido</th><th>Motivo</th></tr></thead>
         <tbody>${sg.fiis.map(f=>`<tr>
           <td class="fii-ticker">${f.ticker}</td>
           <td>${f.segmento||"—"}</td>
           <td>${f.alocacao||"—"}</td>
-          <td style="color:#888">${f.motivo||""}</td>
+          <td style="color:#8A9A8E">${f.motivo||""}</td>
         </tr>`).join("")}</tbody>
       </table>
     </div>`;
@@ -5820,9 +5820,9 @@ function renderSugestoes(sg){
 
 function renderClassesAtivos(desvios, patrimonio){
   const grupos = [
-    { nome:"Renda Fixa",     cor:"#C9A96E", icone:"🏦", chaves:["pos_fixado","inflacao","pre_fixado"] },
-    { nome:"Renda Variável", cor:"#8B9FE8", icone:"📈", chaves:["acoes","fiis"] },
-    { nome:"Multimercado",   cor:"#5DCAA5", icone:"⚖️", chaves:["multimercado"] },
+    { nome:"Renda Fixa",     cor:"#A8833C", icone:"🏦", chaves:["pos_fixado","inflacao","pre_fixado"] },
+    { nome:"Renda Variável", cor:"#4E63C8", icone:"📈", chaves:["acoes","fiis"] },
+    { nome:"Multimercado",   cor:"#1F9D77", icone:"⚖️", chaves:["multimercado"] },
     { nome:"Internacional",  cor:"#E88B8B", icone:"🌎", chaves:["internacional"] },
     { nome:"Alternativos",   cor:"#B8A0E8", icone:"💎", chaves:["alternativos","criptomoedas"] },
   ];
@@ -5855,7 +5855,7 @@ function renderClassesAtivos(desvios, patrimonio){
         datasets: [{
           data: pizzaData,
           backgroundColor: pizzaCores,
-          borderColor: "#081F18",
+          borderColor: "#EFF3EF",
           borderWidth: 3,
           hoverOffset: 10,
         }]
@@ -5879,10 +5879,10 @@ function renderClassesAtivos(desvios, patrimonio){
     if(legEl) legEl.innerHTML = dados.map(g=>{
       if(g.real < 0.1) return "";
       const desvio = g.real - g.alvo;
-      const dCor = Math.abs(desvio)<1.5?"#3A6A48":desvio>0?"#FFD966":"#FF6B6B";
+      const dCor = Math.abs(desvio)<1.5?"#5C7365":desvio>0?"#A9800F":"#D93B3B";
       return `<div style="display:flex;align-items:center;gap:7px">
         <span style="width:12px;height:12px;border-radius:3px;background:${g.cor};flex-shrink:0;display:inline-block"></span>
-        <span style="font-size:11px;color:#AAA;flex:1">${g.nome}</span>
+        <span style="font-size:11px;color:#8A9A8E;flex:1">${g.nome}</span>
         <span style="font-size:12px;font-weight:700;color:${g.cor}">${g.real.toFixed(1)}%</span>
         <span style="font-size:10px;color:${dCor};min-width:40px;text-align:right">${desvio>=0?"+":""}${desvio.toFixed(1)}%</span>
       </div>`;
@@ -5894,28 +5894,28 @@ function renderClassesAtivos(desvios, patrimonio){
   el.innerHTML = dados.map(g=>{
     const desvio = g.real - g.alvo;
     const sinal  = desvio > 0 ? "+" : "";
-    const dCor   = Math.abs(desvio)<1.5 ? "#3A6A48" : desvio>0 ? "#FFD966" : "#FF6B6B";
+    const dCor   = Math.abs(desvio)<1.5 ? "#5C7365" : desvio>0 ? "#A9800F" : "#D93B3B";
     const realVal = patrimonio>0 ? `R$ ${(patrimonio*g.real/100).toLocaleString("pt-BR",{maximumFractionDigits:0})}` : "—";
-    return `<div style="background:#111;border-radius:10px;padding:12px 14px;border:1px solid #1E1E1E">
+    return `<div style="background:#FFFFFF;border-radius:10px;padding:12px 14px;border:1px solid #FFFFFF">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:18px">${g.icone}</span>
         <div style="flex:1;min-width:0">
-          <div style="font-size:11px;font-weight:700;color:#F0F0F0">${g.nome}</div>
-          <div style="font-size:10px;color:#2A5A3A">${realVal}</div>
+          <div style="font-size:11px;font-weight:700;color:#17271E">${g.nome}</div>
+          <div style="font-size:10px;color:#5C7365">${realVal}</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:17px;font-weight:800;color:${g.cor}">${g.real.toFixed(1)}%</div>
           <div style="font-size:10px;color:${dCor}">${sinal}${desvio.toFixed(1)}% meta</div>
         </div>
       </div>
-      <div style="height:5px;background:#1A1A1A;border-radius:3px;margin-bottom:3px;overflow:hidden">
+      <div style="height:5px;background:#F5F8F5;border-radius:3px;margin-bottom:3px;overflow:hidden">
         <div style="height:100%;background:${g.cor};border-radius:3px;width:${Math.min(g.real/70*100,100)}%;transition:width .6s ease"></div>
       </div>
-      <div style="height:3px;background:#1A1A1A;border-radius:3px;overflow:hidden">
-        <div style="height:100%;background:#1C4A34;border-radius:3px;width:${Math.min(g.alvo/70*100,100)}%"></div>
+      <div style="height:3px;background:#F5F8F5;border-radius:3px;overflow:hidden">
+        <div style="height:100%;background:#D9E3DB;border-radius:3px;width:${Math.min(g.alvo/70*100,100)}%"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:10px">
-        <span style="color:${g.cor}">atual</span><span style="color:#1E4A30">meta ${g.alvo.toFixed(1)}%</span>
+        <span style="color:${g.cor}">atual</span><span style="color:#5C7365">meta ${g.alvo.toFixed(1)}%</span>
       </div>
     </div>`;
   }).join("");
@@ -5927,9 +5927,9 @@ var CLS_LBL_JS = {
   alternativos:"Alternativos", internacional:"Internacional", criptomoedas:"Cripto"
 };
 var CLS_COR_JS = {
-  pos_fixado:"#3EB8A8", inflacao:"#C8A733", pre_fixado:"#5DCAA5",
-  acoes:"#E88038", fiis:"#9E8FE8", multimercado:"#5DAAD8",
-  alternativos:"#C0A878", internacional:"#5DDAA8", criptomoedas:"#FF8A65"
+  pos_fixado:"#1F9D77", inflacao:"#A9800F", pre_fixado:"#1F9D77",
+  acoes:"#C0673A", fiis:"#7A5FD0", multimercado:"#2E86B8",
+  alternativos:"#B99A55", internacional:"#1F9D77", criptomoedas:"#C0673A"
 };
 
 function renderCarteiraAtual(comp, patrimonio, containerBarrasId, containerWrapId){
@@ -5940,15 +5940,15 @@ function renderCarteiraAtual(comp, patrimonio, containerBarrasId, containerWrapI
   if(!entries.length){ wrapEl.style.display="none"; return; }
   const pat = patrimonio||0;
   barrasEl.innerHTML = entries.map(([k,v])=>{
-    const cor = CLS_COR_JS[k]||"#C9A96E";
+    const cor = CLS_COR_JS[k]||"#A8833C";
     const lbl = CLS_LBL_JS[k]||k;
     const valBrl = pat>0 ? "R$ "+(pat*v/100).toLocaleString("pt-BR",{maximumFractionDigits:0}) : "";
     return `<div style="margin-bottom:7px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
-        <span style="font-size:11px;color:#CCC">${lbl}</span>
-        <span style="font-size:11px;color:${cor};font-weight:700">${Number(v).toFixed(1)}%${valBrl?' <span style="font-size:10px;color:#3A6A48;font-weight:400">'+valBrl+'</span>':''}</span>
+        <span style="font-size:11px;color:#5C7365">${lbl}</span>
+        <span style="font-size:11px;color:${cor};font-weight:700">${Number(v).toFixed(1)}%${valBrl?' <span style="font-size:10px;color:#5C7365;font-weight:400">'+valBrl+'</span>':''}</span>
       </div>
-      <div style="height:5px;background:#1A2E28;border-radius:3px;overflow:hidden">
+      <div style="height:5px;background:#F5F8F5;border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${Math.min(v,100)}%;background:${cor};border-radius:3px"></div>
       </div>
     </div>`;
@@ -5970,13 +5970,13 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   const makeItem=(d,tipo)=>{
     const abs=Math.abs(d.desvio);
     const val=patrimonio>0?` ≈ R$ ${(patrimonio*abs/100).toLocaleString("pt-BR",{maximumFractionDigits:0})}`:"";
-    const col=tipo==="aumentar"?"#5DCAA5":"#FF6B6B";
+    const col=tipo==="aumentar"?"#1F9D77":"#D93B3B";
     const seta=tipo==="aumentar"?"▲":"▼";
-    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#081F18;border-radius:8px;margin-bottom:6px;border:1px solid #1E1E1E">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#EFF3EF;border-radius:8px;margin-bottom:6px;border:1px solid #FFFFFF">
       <span style="color:${col};font-size:16px;font-weight:700">${seta}</span>
       <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:#F0F0F0">${d.label}</div>
-        <div style="font-size:10px;color:#3A6A48">${d.real.toFixed(1)}% atual → meta ${d.alvo.toFixed(1)}%${val}</div>
+        <div style="font-size:12px;font-weight:700;color:#17271E">${d.label}</div>
+        <div style="font-size:10px;color:#5C7365">${d.real.toFixed(1)}% atual → meta ${d.alvo.toFixed(1)}%${val}</div>
       </div>
       <span style="font-size:13px;font-weight:800;color:${col}">${tipo==="aumentar"?"+":""}${(-d.desvio).toFixed(1)}%</span>
     </div>`;
@@ -5985,18 +5985,18 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   const pg=document.getElementById("plano-grid");
   pg.innerHTML=`
     <div>
-      <p style="font-size:10px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▲ Aumentar / Comprar</p>
-      ${aumentar.length?aumentar.map(d=>makeItem(d,"aumentar")).join(""):'<p style="font-size:12px;color:#2A5A3A">Nenhum ativo abaixo da meta</p>'}
+      <p style="font-size:10px;color:#1F9D77;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▲ Aumentar / Comprar</p>
+      ${aumentar.length?aumentar.map(d=>makeItem(d,"aumentar")).join(""):'<p style="font-size:12px;color:#5C7365">Nenhum ativo abaixo da meta</p>'}
     </div>
     <div>
-      <p style="font-size:10px;color:#FF6B6B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▼ Reduzir / Resgatar</p>
-      ${reduzir.length?reduzir.map(d=>makeItem(d,"reduzir")).join(""):'<p style="font-size:12px;color:#2A5A3A">Nenhum ativo acima da meta</p>'}
+      <p style="font-size:10px;color:#D93B3B;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">▼ Reduzir / Resgatar</p>
+      ${reduzir.length?reduzir.map(d=>makeItem(d,"reduzir")).join(""):'<p style="font-size:12px;color:#5C7365">Nenhum ativo acima da meta</p>'}
     </div>`;
 
   const pv=document.getElementById("plano-valores");
   if(alinhado.length){
-    pv.innerHTML=`<p style="font-size:10px;color:#3A6A48;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">✓ Classes alinhadas ao modelo</p>`
-      +alinhado.map(d=>`<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:12px;background:#1A1A1A;border:1px solid #1C4A34;font-size:11px;color:#3A6A48">${d.label} ${d.real.toFixed(1)}%</span>`).join("");
+    pv.innerHTML=`<p style="font-size:10px;color:#5C7365;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">✓ Classes alinhadas ao modelo</p>`
+      +alinhado.map(d=>`<span style="display:inline-block;margin:3px 4px;padding:4px 10px;border-radius:12px;background:#F5F8F5;border:1px solid #D9E3DB;font-size:11px;color:#5C7365">${d.label} ${d.real.toFixed(1)}%</span>`).join("");
   } else { pv.innerHTML=""; }
 }
 
@@ -6008,94 +6008,94 @@ function renderPlanoTroca(sugs, plano){
   // ── Plano concreto venda→compra (com deságio da posição) ──────────────────────
   if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
-    let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
-    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Venda: os de <b>pior rentabilidade</b> primeiro (trim dos laggards), <b>espalhada</b>; trava de <b>deságio > '+lim+'%</b> só em <b>renda fixa/crédito privado</b> (ações e FIIs livres); previdência fica de fora (só portabilidade). Compra: <b>ações e FIIs por Markowitz</b> (peso risco-retorno); <b>renda fixa</b> em títulos diretos respeitando o <b>FGC (R$ 250k/emissor)</b>, até 3 bancários + 3 crédito privado e o excedente em fundos; multi/alternativos em até 5 fundos.</p>';
-    if(plano.total_mover>0) h+='<div style="font-size:12px;color:#8B9FE8;margin-bottom:10px">Total a realocar: <b style="color:#F0F0F0">'+fmt0(plano.total_mover)+'</b></div>';
+    let h='<p style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
+    h+='<p style="font-size:11px;color:#5C7365;margin:0 0 12px">Venda: os de <b>pior rentabilidade</b> primeiro (trim dos laggards), <b>espalhada</b>; trava de <b>deságio > '+lim+'%</b> só em <b>renda fixa/crédito privado</b> (ações e FIIs livres); previdência fica de fora (só portabilidade). Compra: <b>ações e FIIs por Markowitz</b> (peso risco-retorno); <b>renda fixa</b> em títulos diretos respeitando o <b>FGC (R$ 250k/emissor)</b>, até 3 bancários + 3 crédito privado e o excedente em fundos; multi/alternativos em até 5 fundos.</p>';
+    if(plano.total_mover>0) h+='<div style="font-size:12px;color:#4E63C8;margin-bottom:10px">Total a realocar: <b style="color:#17271E">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
       const des=m.origem_desagio;
       const desTxt = (des==null) ? '' :
-        (des<0 ? '<span style="color:#E8A87C">no ano '+des.toFixed(1)+'%</span>'
-               : '<span style="color:#5DCAA5">no ano +'+des.toFixed(1)+'%</span>');
-      const fgc=m.destino_fgc?'<span style="font-size:9px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
-      h+='<div style="border:1px solid #1C3A24;border-radius:10px;padding:11px 13px;margin-bottom:8px;background:#0B1410">'
+        (des<0 ? '<span style="color:#C0673A">no ano '+des.toFixed(1)+'%</span>'
+               : '<span style="color:#1F9D77">no ano +'+des.toFixed(1)+'%</span>');
+      const fgc=m.destino_fgc?'<span style="font-size:9px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
+      h+='<div style="border:1px solid #1C3A24;border-radius:10px;padding:11px 13px;margin-bottom:8px;background:#FFFFFF">'
         +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-        +'<div style="flex:1;min-width:150px"><span style="font-size:10px;color:#FF6B6B;font-weight:700">↓ VENDER</span> '
-        +'<span style="font-size:13px;font-weight:800;color:#F0F0F0">'+fmt0(m.valor)+'</span> '
-        +'<span style="font-size:11px;color:#AAA">de <b>'+m.origem_nome+'</b> <span style="color:#6A7A6A">('+m.origem_label+')</span></span> '+desTxt+'</div>'
-        +'<div style="font-size:16px;color:#3A6A48">→</div>'
-        +'<div style="flex:1;min-width:150px;text-align:right"><span style="font-size:10px;color:#5DCAA5;font-weight:700">↑ COMPRAR</span> '
-        +'<span style="font-size:13px;font-weight:800;color:#F0F0F0">'+fmt0(m.valor)+'</span> '
-        +'<span style="font-size:11px;color:#AAA">em <b>'+m.destino_produto+'</b>'+fgc+' <span style="color:#6A7A6A">('+m.destino_label+')</span></span>'
-        +(m.destino_detalhe?' <span style="font-size:10px;color:#C9A96E">'+m.destino_detalhe+'</span>':'')+'</div>'
+        +'<div style="flex:1;min-width:150px"><span style="font-size:10px;color:#D93B3B;font-weight:700">↓ VENDER</span> '
+        +'<span style="font-size:13px;font-weight:800;color:#17271E">'+fmt0(m.valor)+'</span> '
+        +'<span style="font-size:11px;color:#8A9A8E">de <b>'+m.origem_nome+'</b> <span style="color:#5C7365">('+m.origem_label+')</span></span> '+desTxt+'</div>'
+        +'<div style="font-size:16px;color:#5C7365">→</div>'
+        +'<div style="flex:1;min-width:150px;text-align:right"><span style="font-size:10px;color:#1F9D77;font-weight:700">↑ COMPRAR</span> '
+        +'<span style="font-size:13px;font-weight:800;color:#17271E">'+fmt0(m.valor)+'</span> '
+        +'<span style="font-size:11px;color:#8A9A8E">em <b>'+m.destino_produto+'</b>'+fgc+' <span style="color:#5C7365">('+m.destino_label+')</span></span>'
+        +(m.destino_detalhe?' <span style="font-size:10px;color:#A8833C">'+m.destino_detalhe+'</span>':'')+'</div>'
         +'</div></div>';
     });
     if(plano.bloqueados&&plano.bloqueados.length){
-      h+='<div style="margin-top:12px;border:1px solid #3A1010;border-radius:10px;padding:11px 13px;background:#150808">';
-      h+='<div style="font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:7px">⚠ Renda fixa / crédito privado — não vender agora (deságio acima de '+lim+'%)</div>';
+      h+='<div style="margin-top:12px;border:1px solid #F7DADA;border-radius:10px;padding:11px 13px;background:#FCEBEB">';
+      h+='<div style="font-size:11px;color:#D93B3B;font-weight:700;margin-bottom:7px">⚠ Renda fixa / crédito privado — não vender agora (deságio acima de '+lim+'%)</div>';
       plano.bloqueados.forEach(function(b){
         h+='<div style="font-size:11.5px;color:#E0C8C8;margin-bottom:5px;line-height:1.5">'
-          +'<b style="color:#F0F0F0">'+b.nome+'</b> <span style="color:#6A7A6A">('+b.label+')</span> — deságio de <b style="color:#FF9B7B">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
+          +'<b style="color:#17271E">'+b.nome+'</b> <span style="color:#5C7365">('+b.label+')</span> — deságio de <b style="color:#C0673A">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
           +'Ainda que fosse o ativo escolhido para a venda, <b>não realizamos a troca</b> para não cristalizar o prejuízo. '
           +'A partir de hoje monitoramos e sinalizamos a troca quando recuperar (deságio abaixo de '+lim+'%).</div>';
       });
       h+='</div>';
     }
     if(plano.monitorar_classes&&plano.monitorar_classes.length){
-      h+='<div style="margin-top:10px;border:1px solid #3A2E00;border-radius:10px;padding:11px 13px;background:#151100">';
+      h+='<div style="margin-top:10px;border:1px solid #3A2E00;border-radius:10px;padding:11px 13px;background:#FBF3D2">';
       plano.monitorar_classes.forEach(function(mc){
-        h+='<div style="font-size:11.5px;color:#FFD966;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
+        h+='<div style="font-size:11.5px;color:#A9800F;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
           +'Sem opção de venda sem prejuízo — a partir de hoje monitoramos e sinalizamos a troca quando os ativos recuperarem.</div>';
       });
       h+='</div>';
     }
     if(plano.previdencia&&plano.previdencia.length){
-      h+='<div style="margin-top:10px;border:1px solid #24304A;border-radius:10px;padding:11px 13px;background:#0B1020">';
-      h+='<div style="font-size:11px;color:#8B9FE8;font-weight:700;margin-bottom:7px">🛡️ Previdência — não entra na venda automática</div>';
+      h+='<div style="margin-top:10px;border:1px solid #D7DEF5;border-radius:10px;padding:11px 13px;background:#ECEFFB">';
+      h+='<div style="font-size:11px;color:#4E63C8;font-weight:700;margin-bottom:7px">🛡️ Previdência — não entra na venda automática</div>';
       plano.previdencia.forEach(function(p){
-        const val=p.saldo!=null?' <span style="color:#6A7A6A">('+fmt0(p.saldo)+')</span>':'';
-        h+='<div style="font-size:11.5px;color:#C8D0E0;margin-bottom:5px;line-height:1.5">'
-          +'<b style="color:#F0F0F0">'+p.nome+'</b>'+val+' <span style="color:#6A7A6A">('+p.label+')</span> — '
+        const val=p.saldo!=null?' <span style="color:#5C7365">('+fmt0(p.saldo)+')</span>':'';
+        h+='<div style="font-size:11.5px;color:#5C7365;margin-bottom:5px;line-height:1.5">'
+          +'<b style="color:#17271E">'+p.nome+'</b>'+val+' <span style="color:#5C7365">('+p.label+')</span> — '
           +'previdência não se resgata como fundo comum: avaliar <b>portabilidade</b>, regime tributário (regressivo/progressivo), carência e IR antes de qualquer movimento.</div>';
       });
       h+='</div>';
     }
-    h+='<div style="font-size:10px;color:#6A7A6A;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
+    h+='<div style="font-size:10px;color:#5C7365;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
     el.innerHTML=h;
     return;
   }
   sugs=(sugs||[]).filter(s=>Array.isArray(s.produtos_prateleira)&&s.produtos_prateleira.length);
   if(!sugs.length){ el.innerHTML=""; return; }
-  const PRIO={alta:["#FF6B6B","🔴 Alta"],media:["#FFD966","🟡 Média"],baixa:["#5DCAA5","🟢 Baixa"]};
+  const PRIO={alta:["#D93B3B","🔴 Alta"],media:["#A9800F","🟡 Média"],baixa:["#1F9D77","🟢 Baixa"]};
   const fmt=v=>"R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
-  let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca — venda → compra</p>';
+  let h='<p style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca — venda → compra</p>';
   sugs.forEach(function(s){
     const pr=PRIO[s.prioridade]||PRIO.media;
     const fonte=(s.fonte_recurso&&s.fonte_recurso.length)
       ? s.fonte_recurso.map(f=>`${f.label} (+${f.excesso_pp}pp)`).join(" · ")
       : (s.fonte_txt||"aporte novo / caixa");
     const prods=s.produtos_prateleira.map(function(p){
-      const fgc=p.fgc?'<span style="font-size:9px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
-      return `<div style="padding:7px 10px;background:#0A0F0B;border:1px solid #1A2E1A;border-left:3px solid #5DCAA5;border-radius:0 6px 6px 0;margin-bottom:5px">
-        <div style="font-size:12px;font-weight:700;color:#F0F0F0">${p.nome||"—"}${fgc}
-          <span style="font-size:10px;color:#3A6A48;font-weight:400;margin-left:6px">${p.fonte||""}</span></div>
-        <div style="font-size:11px;color:#C9A96E">${p.detalhe||""}</div>
-        ${p.obs?`<div style="font-size:10px;color:#6A7A6A;margin-top:2px">${p.obs}</div>`:""}
+      const fgc=p.fgc?'<span style="font-size:9px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
+      return `<div style="padding:7px 10px;background:#F5F8F5;border:1px solid #F5F8F5;border-left:3px solid #1F9D77;border-radius:0 6px 6px 0;margin-bottom:5px">
+        <div style="font-size:12px;font-weight:700;color:#17271E">${p.nome||"—"}${fgc}
+          <span style="font-size:10px;color:#5C7365;font-weight:400;margin-left:6px">${p.fonte||""}</span></div>
+        <div style="font-size:11px;color:#A8833C">${p.detalhe||""}</div>
+        ${p.obs?`<div style="font-size:10px;color:#5C7365;margin-top:2px">${p.obs}</div>`:""}
       </div>`;
     }).join("");
-    const travas=(s.travas||[]).map(t=>`<div style="font-size:10px;color:#FFD966;background:#211B00;border:1px solid #4A3A00;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
-    h+=`<div style="border:1px solid #1C3A24;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#0B1410">
+    const travas=(s.travas||[]).map(t=>`<div style="font-size:10px;color:#A9800F;background:#FBF3D2;border:1px solid #4A3A00;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
+    h+=`<div style="border:1px solid #1C3A24;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#FFFFFF">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:800;color:#F0F0F0">${s.label_classe}</span>
+        <span style="font-size:13px;font-weight:800;color:#17271E">${s.label_classe}</span>
         <span style="font-size:10px;font-weight:700;color:${pr[0]}">${pr[1]}</span>
-        <span style="font-size:11px;color:#8B9FE8">falta ${Math.abs(s.gap_pp).toFixed(1)}pp ≈ ${fmt(s.gap_valor)}</span>
+        <span style="font-size:11px;color:#4E63C8">falta ${Math.abs(s.gap_pp).toFixed(1)}pp ≈ ${fmt(s.gap_valor)}</span>
       </div>
-      <div style="font-size:11px;color:#FF6B6B;margin-bottom:8px">▼ Fonte do recurso (reduzir): <b>${fonte}</b></div>
+      <div style="font-size:11px;color:#D93B3B;margin-bottom:8px">▼ Fonte do recurso (reduzir): <b>${fonte}</b></div>
       ${travas}
-      <div style="font-size:10px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:5px 0 5px">▲ Comprar</div>
+      <div style="font-size:10px;color:#1F9D77;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:5px 0 5px">▲ Comprar</div>
       ${prods}
     </div>`;
   });
-  h+=`<div style="font-size:10px;color:#6A7A6A;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy — o oficial soma todas as marcas XP + OPIN.</div>`;
+  h+=`<div style="font-size:10px;color:#5C7365;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy — o oficial soma todas as marcas XP + OPIN.</div>`;
   el.innerHTML=h;
 }
 
@@ -6106,7 +6106,7 @@ function renderPosicaoConsolidada(data){
   var acoes = data.acoes       || [];
   var fiis  = data.fiis        || [];
   var diags = data.diagnosticos|| [];
-  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#3A6A48'>Nenhuma posição detalhada disponível — suba o PDF do XPerformance.</p>"; return; }
+  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#5C7365'>Nenhuma posição detalhada disponível — suba o PDF do XPerformance.</p>"; return; }
 
   // Mostra aba
   var tabBtn = document.getElementById("tab-btn-posicao");
@@ -6118,14 +6118,14 @@ function renderPosicaoConsolidada(data){
   // Alertas de diagnóstico
   var diagHtml = "";
   if(diags.length){
-    var COR = {alto:"#FF6B6B", medio:"#FFD966", baixo:"#7DCFEF"};
+    var COR = {alto:"#D93B3B", medio:"#A9800F", baixo:"#2E86B8"};
     diagHtml = '<div style="margin-bottom:18px">';
-    diagHtml += '<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Diagnósticos Automáticos</p>';
+    diagHtml += '<p style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Diagnósticos Automáticos</p>';
     diags.forEach(function(a){
-      var cor = COR[a.nivel]||"#AAA";
-      diagHtml += '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:#0A1A10;border-left:3px solid '+cor+';border-radius:0 6px 6px 0;margin-bottom:6px">';
+      var cor = COR[a.nivel]||"#8A9A8E";
+      diagHtml += '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:#EFF3EF;border-left:3px solid '+cor+';border-radius:0 6px 6px 0;margin-bottom:6px">';
       diagHtml += '<span style="font-size:14px">'+(a.nivel==="alto"?"🔴":a.nivel==="medio"?"🟡":"🔵")+'</span>';
-      diagHtml += '<span style="font-size:12px;color:#F0F0F0">'+a.msg+'</span>';
+      diagHtml += '<span style="font-size:12px;color:#17271E">'+a.msg+'</span>';
       diagHtml += '</div>';
     });
     diagHtml += '</div>';
@@ -6135,22 +6135,22 @@ function renderPosicaoConsolidada(data){
   var rfHtml = "";
   if(rf.length){
     rfHtml = '<div style="margin-bottom:20px">';
-    rfHtml += '<p style="font-size:11px;color:#7DCFEF;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Renda Fixa ('+rf.length+' ativos)</p>';
+    rfHtml += '<p style="font-size:11px;color:#2E86B8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📄 Renda Fixa ('+rf.length+' ativos)</p>';
     rfHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
-    rfHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
+    rfHtml += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB">';
     rfHtml += '<th style="text-align:left;padding:6px 8px">Ativo</th><th style="text-align:left;padding:6px 8px">Classe</th>';
     rfHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
     rfHtml += '<th style="text-align:right;padding:6px 8px">Rent. Mês</th><th style="text-align:right;padding:6px 8px">Rent. Ano</th>';
     rfHtml += '</tr></thead><tbody>';
     rf.forEach(function(a,i){
-      var bg = i%2===0?"#071E17":"#081F18";
-      var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#5DCAA5">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#FF6B6B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "—";
-      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#FF6B6B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#AAA">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "—";
-      rfHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
-      rfHtml += '<td style="padding:6px 8px;color:#F0F0F0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.nome+'">'+a.nome+'</td>';
-      rfHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.classe||"—")+'</td>';
-      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
-      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
+      var bg = i%2===0?"#EFF3EF":"#EFF3EF";
+      var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#1F9D77">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#D93B3B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "—";
+      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#D93B3B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#8A9A8E">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "—";
+      rfHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
+      rfHtml += '<td style="padding:6px 8px;color:#17271E;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.nome+'">'+a.nome+'</td>';
+      rfHtml += '<td style="padding:6px 8px;color:#8A9A8E">'+( a.classe||"—")+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+fmt(a.saldo)+'</td>';
+      rfHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+pct(a.perc)+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right">'+rm+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right">'+ra+'</td>';
       rfHtml += '</tr>';
@@ -6162,24 +6162,24 @@ function renderPosicaoConsolidada(data){
   var acoesHtml = "";
   if(acoes.length){
     acoesHtml = '<div style="margin-bottom:20px">';
-    acoesHtml += '<p style="font-size:11px;color:#5DCAA5;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📈 Ações / Renda Variável ('+acoes.length+' ativos)</p>';
+    acoesHtml += '<p style="font-size:11px;color:#1F9D77;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📈 Ações / Renda Variável ('+acoes.length+' ativos)</p>';
     acoesHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
-    acoesHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
+    acoesHtml += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB">';
     acoesHtml += '<th style="text-align:left;padding:6px 8px">Ticker</th><th style="text-align:left;padding:6px 8px">Nome</th>';
     acoesHtml += '<th style="text-align:right;padding:6px 8px">Qtd</th><th style="text-align:right;padding:6px 8px">Preço Médio</th>';
     acoesHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
     acoesHtml += '<th style="text-align:right;padding:6px 8px">Resultado</th>';
     acoesHtml += '</tr></thead><tbody>';
     acoes.forEach(function(a,i){
-      var bg = i%2===0?"#071E17":"#081F18";
-      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#5DCAA5">'+fmt(a.resultado)+'</span>':'<span style="color:#FF6B6B">'+fmt(a.resultado)+'</span>') : "—";
-      acoesHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
-      acoesHtml += '<td style="padding:6px 8px;color:#7DCFEF;font-weight:700">'+a.ticker+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.nome||"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#F0F0F0">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#AAA">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
+      var bg = i%2===0?"#EFF3EF":"#EFF3EF";
+      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "—";
+      acoesHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
+      acoesHtml += '<td style="padding:6px 8px;color:#2E86B8;font-weight:700">'+a.ticker+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;color:#8A9A8E">'+( a.nome||"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#17271E">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#8A9A8E">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+fmt(a.saldo)+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+pct(a.perc)+'</td>';
       acoesHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
       acoesHtml += '</tr>';
     });
@@ -6190,24 +6190,24 @@ function renderPosicaoConsolidada(data){
   var fiisHtml = "";
   if(fiis.length){
     fiisHtml = '<div style="margin-bottom:20px">';
-    fiisHtml += '<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏢 Fundos Imobiliários ('+fiis.length+' ativos)</p>';
+    fiisHtml += '<p style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🏢 Fundos Imobiliários ('+fiis.length+' ativos)</p>';
     fiisHtml += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
-    fiisHtml += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34">';
+    fiisHtml += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB">';
     fiisHtml += '<th style="text-align:left;padding:6px 8px">Ticker</th><th style="text-align:left;padding:6px 8px">Nome</th>';
     fiisHtml += '<th style="text-align:right;padding:6px 8px">Qtd</th><th style="text-align:right;padding:6px 8px">Preço Médio</th>';
     fiisHtml += '<th style="text-align:right;padding:6px 8px">Saldo</th><th style="text-align:right;padding:6px 8px">% Cart.</th>';
     fiisHtml += '<th style="text-align:right;padding:6px 8px">Resultado</th>';
     fiisHtml += '</tr></thead><tbody>';
     fiis.forEach(function(a,i){
-      var bg = i%2===0?"#071E17":"#081F18";
-      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#5DCAA5">'+fmt(a.resultado)+'</span>':'<span style="color:#FF6B6B">'+fmt(a.resultado)+'</span>') : "—";
-      fiisHtml += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
-      fiisHtml += '<td style="padding:6px 8px;color:#C9A96E;font-weight:700">'+a.ticker+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;color:#AAA">'+( a.nome||"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#F0F0F0">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#AAA">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+fmt(a.saldo)+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#C9A96E">'+pct(a.perc)+'</td>';
+      var bg = i%2===0?"#EFF3EF":"#EFF3EF";
+      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "—";
+      fiisHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
+      fiisHtml += '<td style="padding:6px 8px;color:#A8833C;font-weight:700">'+a.ticker+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;color:#8A9A8E">'+( a.nome||"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#17271E">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#8A9A8E">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+fmt(a.saldo)+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#A8833C">'+pct(a.perc)+'</td>';
       fiisHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
       fiisHtml += '</tr>';
     });
@@ -6241,8 +6241,8 @@ function renderizar(data){
   if(chartInst) chartInst.destroy();
   chartInst=new Chart(document.getElementById("chart"),{
     type:"bar",
-    data:{labels:lbs,datasets:[{label:"Atual",data:rea,backgroundColor:"#C9A96E",borderRadius:4},{label:"Modelo",data:alv,backgroundColor:"rgba(100,100,100,0.4)",borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+": "+ctx.parsed.y.toFixed(2)+"%"}}},scales:{x:{ticks:{color:"#4A7055",font:{size:10}}},y:{ticks:{color:"#4A7055",callback:v=>v+"%"},beginAtZero:true}}}
+    data:{labels:lbs,datasets:[{label:"Atual",data:rea,backgroundColor:"#A8833C",borderRadius:4},{label:"Modelo",data:alv,backgroundColor:"rgba(100,100,100,0.4)",borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+": "+ctx.parsed.y.toFixed(2)+"%"}}},scales:{x:{ticks:{color:"#5C7365",font:{size:10}}},y:{ticks:{color:"#5C7365",callback:v=>v+"%"},beginAtZero:true}}}
   });
 
   // Diversificação por classe e plano de ação
@@ -6269,9 +6269,9 @@ function renderizar(data){
   const frags=desvios.filter(d=>d.desvio<-1.5), opors=desvios.filter(d=>d.desvio>1.5);
   let diag="";
   if(alertas&&alertas.length){ alertas.forEach(a=>{diag+=`<div class="alert warn">${a}</div>`;}); }
-  if(frags.length){ diag+=`<p style="font-size:10px;color:#3A6A48;margin:8px 0 4px;text-transform:uppercase">Fragilidades</p>`; frags.forEach(f=>{diag+=`<div class="alert danger">▸ <b>${f.label}</b>: falta ${Math.abs(f.desvio).toFixed(1)}%</div>`;}); }
-  if(opors.length){ diag+=`<p style="font-size:10px;color:#3A6A48;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
-  document.getElementById("diagnostico").innerHTML=diag||`<p style="color:#5DCAA5">✓ Carteira alinhada ao modelo.</p>`;
+  if(frags.length){ diag+=`<p style="font-size:10px;color:#5C7365;margin:8px 0 4px;text-transform:uppercase">Fragilidades</p>`; frags.forEach(f=>{diag+=`<div class="alert danger">▸ <b>${f.label}</b>: falta ${Math.abs(f.desvio).toFixed(1)}%</div>`;}); }
+  if(opors.length){ diag+=`<p style="font-size:10px;color:#5C7365;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
+  document.getElementById("diagnostico").innerHTML=diag||`<p style="color:#1F9D77">✓ Carteira alinhada ao modelo.</p>`;
 
   // Recomendações — inclui painel de calls HP
   const rl=document.getElementById("recomendacoes-list");
@@ -6280,38 +6280,38 @@ function renderizar(data){
   // Painel de calls HP relevantes (vem de analiseData._xp.calls_relevantes)
   const callsRel = analiseData._xp?.calls_relevantes || [];
   if(callsRel.length){
-    const DIR_COR   = {compra:"#5DCAA5", neutro:"#AAA", venda:"#FF6B6B"};
+    const DIR_COR   = {compra:"#1F9D77", neutro:"#8A9A8E", venda:"#D93B3B"};
     const DIR_LABEL = {compra:"▲ COMPRA", neutro:"→ NEUTRO", venda:"▼ VENDA"};
-    recHtml += `<div style="border:2px solid #5DCAA5;border-radius:10px;overflow:hidden;margin-bottom:16px">
-      <div style="background:#0A2018;padding:10px 14px;display:flex;align-items:center;gap:8px">
+    recHtml += `<div style="border:2px solid #1F9D77;border-radius:10px;overflow:hidden;margin-bottom:16px">
+      <div style="background:#F5F8F5;padding:10px 14px;display:flex;align-items:center;gap:8px">
         <span style="font-size:15px">📈</span>
-        <span style="font-size:13px;font-weight:700;color:#5DCAA5">Calls do HP para este cliente</span>
-        <span style="font-size:11px;color:#2A5A3A;margin-left:4px">${callsRel.length} call(s) relevante(s)</span>
+        <span style="font-size:13px;font-weight:700;color:#1F9D77">Calls do HP para este cliente</span>
+        <span style="font-size:11px;color:#5C7365;margin-left:4px">${callsRel.length} call(s) relevante(s)</span>
       </div>
       <div style="padding:10px 14px;display:flex;flex-direction:column;gap:8px">
         ${callsRel.map(c=>{
-          const cor = DIR_COR[c.direcao]||"#AAA";
-          const upCor = (c.upside||0) >= 0 ? "#5DCAA5" : "#FF6B6B";
+          const cor = DIR_COR[c.direcao]||"#8A9A8E";
+          const upCor = (c.upside||0) >= 0 ? "#1F9D77" : "#D93B3B";
           const naCarteira = (analiseData._xp?.acoes||[]).some(a=>a.ticker===c.ticker) || (analiseData._xp?.fiis||[]).some(f=>f.ticker===c.ticker);
           const badge = naCarteira
-            ? `<span style="font-size:10px;background:#0A2018;color:#5DCAA5;border:1px solid #2A5040;padding:2px 8px;border-radius:10px">✓ já na carteira</span>`
-            : `<span style="font-size:10px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E44;padding:2px 8px;border-radius:10px">oportunidade de entrada</span>`;
-          return `<div style="background:#0A0F0B;border:1px solid #1A2E3A;border-left:3px solid ${cor};border-radius:0 8px 8px 0;padding:10px 12px">
+            ? `<span style="font-size:10px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;padding:2px 8px;border-radius:10px">✓ já na carteira</span>`
+            : `<span style="font-size:10px;background:#F5F8F5;color:#A8833C;border:1px solid #C9A96E44;padding:2px 8px;border-radius:10px">oportunidade de entrada</span>`;
+          return `<div style="background:#F5F8F5;border:1px solid #EAF1F6;border-left:3px solid ${cor};border-radius:0 8px 8px 0;padding:10px 12px">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
               <span style="font-size:14px;font-weight:900;color:${cor}">${c.ticker}</span>
               <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${cor}22;color:${cor}">${DIR_LABEL[c.direcao]||c.direcao}</span>
-              ${c.nome ? `<span style="font-size:12px;color:#CCC">${c.nome}</span>` : ""}
+              ${c.nome ? `<span style="font-size:12px;color:#5C7365">${c.nome}</span>` : ""}
               ${badge}
             </div>
             <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:4px">
-              ${c.preco_entrada ? `<span style="color:#888">Entrada: <b style="color:#F0F0F0">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
-              ${c.preco_alvo ? `<span style="color:#888">→ Alvo: <b style="color:#F0F0F0">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.preco_entrada ? `<span style="color:#8A9A8E">Entrada: <b style="color:#17271E">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.preco_alvo ? `<span style="color:#8A9A8E">→ Alvo: <b style="color:#17271E">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
               ${c.upside !== undefined ? `<span style="color:${upCor};font-weight:700">Upside ${c.upside>=0?"+":""}${c.upside}%</span>` : ""}
-              ${c.stop ? `<span style="color:#888">Stop: <b style="color:#FF6B6B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
-              ${c.prazo ? `<span style="color:#888">Prazo: ${c.prazo}</span>` : ""}
+              ${c.stop ? `<span style="color:#8A9A8E">Stop: <b style="color:#D93B3B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+              ${c.prazo ? `<span style="color:#8A9A8E">Prazo: ${c.prazo}</span>` : ""}
             </div>
-            ${c.tese ? `<p style="font-size:11px;color:#888;margin:0 0 3px;line-height:1.5;font-style:italic">"${c.tese.length>160?c.tese.slice(0,160)+"...":c.tese}"</p>` : ""}
-            ${c.fonte ? `<div style="font-size:10px;color:#2A5A3A">${c.fonte}</div>` : ""}
+            ${c.tese ? `<p style="font-size:11px;color:#8A9A8E;margin:0 0 3px;line-height:1.5;font-style:italic">"${c.tese.length>160?c.tese.slice(0,160)+"...":c.tese}"</p>` : ""}
+            ${c.fonte ? `<div style="font-size:10px;color:#5C7365">${c.fonte}</div>` : ""}
           </div>`;
         }).join("")}
       </div>
@@ -6321,13 +6321,13 @@ function renderizar(data){
   if(recomendacoes&&recomendacoes.length){
     recHtml+=recomendacoes.map(r=>`
       <div class="rec-card">
-        <div class="rec-header">${r.urgencia} <span style="color:#C9A96E">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
+        <div class="rec-header">${r.urgencia} <span style="color:#A8833C">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
         <div class="rec-ctx">${r.explicacao}</div>
         ${r.carta_insight?`<div class="rec-carta">📄 Carta da gestão: "${r.carta_insight}"</div>`:""}
         <div class="rec-prods">${(r.produtos||[]).map(p=>`<span class="prod-tag">${p}</span>`).join("")}</div>
       </div>`).join("");
   } else if(!callsRel.length){
-    recHtml+=`<p style="color:#5DCAA5;font-size:14px">✓ Nenhuma recomendação necessária — carteira alinhada.</p>`;
+    recHtml+=`<p style="color:#1F9D77;font-size:14px">✓ Nenhuma recomendação necessária — carteira alinhada.</p>`;
   }
   rl.innerHTML = recHtml;
 
@@ -6336,7 +6336,7 @@ function renderizar(data){
   if(checklist_servir){
     const pendentes=checklist_servir.filter(p=>p.status==="pendente");
     const concluidos=checklist_servir.filter(p=>p.status==="ok");
-    const barColor=score_servir>=5?"#5DCAA5":score_servir>=3?"#FFD966":"#FF6B6B";
+    const barColor=score_servir>=5?"#1F9D77":score_servir>=3?"#A9800F":"#D93B3B";
     let sh=`<div class="servir-score">
       <div class="score-num" style="color:${barColor}">${score_servir}/6</div>
       <div class="score-info">
@@ -6347,7 +6347,7 @@ function renderizar(data){
     </div>`;
 
     if(pendentes.length>0){
-      sh+=`<p style="font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">⚠ O que está faltando para este cliente</p>`;
+      sh+=`<p style="font-size:11px;color:#D93B3B;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">⚠ O que está faltando para este cliente</p>`;
       pendentes.forEach(p=>{
         const cls=p.importancia.startsWith("CRÍTICA")?"crit":p.importancia==="ALTA"?"high":"med";
         sh+=`<div class="pilar-result ${cls}">
@@ -6360,7 +6360,7 @@ function renderizar(data){
           </div>
           <div class="pilar-result-impacto">${p.impacto_falta}</div>
           <div class="pilar-result-acao">→ ${p.acao}</div>
-          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#1A2E1A;border:1px solid #C9A96E;border-radius:6px;font-size:11px;color:#C9A96E">
+          ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:6px;font-size:11px;color:#A8833C">
             <b>★ 1ª DIRETRIZ BRAÚNA — QUALIDADE</b><br>Provocar o cliente sobre o Financial Planning. Perguntar ao assessor: O FP deste cliente já foi feito? Quando? Isso é primordial para traçar o caminho do destino que o cliente deseja alcançar.
           </div>`:""}
         </div>`;
@@ -6368,12 +6368,12 @@ function renderizar(data){
     }
 
     if(concluidos.length>0){
-      sh+=`<p style="font-size:11px;color:#5DCAA5;font-weight:700;margin:14px 0 8px;text-transform:uppercase;letter-spacing:.5px">✓ Pilares concluídos</p>`;
+      sh+=`<p style="font-size:11px;color:#1F9D77;font-weight:700;margin:14px 0 8px;text-transform:uppercase;letter-spacing:.5px">✓ Pilares concluídos</p>`;
       concluidos.forEach(p=>{
         sh+=`<div class="pilar-result ok" style="padding:10px 14px">
           <div class="pilar-result-header" style="margin:0">
             <span>${p.icone}</span>
-            <span class="pilar-result-nome" style="color:#5DCAA5">${p.nome}</span>
+            <span class="pilar-result-nome" style="color:#1F9D77">${p.nome}</span>
             <span class="pilar-result-status status-ok">✓ COMPLETO</span>
           </div>
         </div>`;
@@ -6390,7 +6390,7 @@ function renderizar(data){
         <div class="gestor-nome">${g.gestor} — ${g.tema}</div>
         <div class="gestor-msg">${g.mensagem}</div>
         <div class="gestor-impl">→ ${g.implicacao_alocacao}</div>
-        <div style="font-size:10px;color:#1E4A30;margin-top:4px">${g.fonte}</div>
+        <div style="font-size:10px;color:#5C7365;margin-top:4px">${g.fonte}</div>
       </div>`).join("");
   }
 
@@ -6427,13 +6427,13 @@ function renderCrossSellResult(areas, tem, naoTem){
   const ficha = _clienteIdentificado?.ficha_salva || {};
   const crossHist = ficha.cross_historico || [];
 
-  const barColor=score>=4?"#5DCAA5":score>=2?"#C9A96E":"#FF6B6B";
+  const barColor=score>=4?"#1F9D77":score>=2?"#A8833C":"#D93B3B";
   let html=`<div class="cs-score-bar">
     <span style="font-size:28px;font-weight:700;color:${barColor};min-width:44px;text-align:center">${score}/5</span>
     <div style="flex:1">
-      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Áreas ativas na Braúna</div>
-      <div style="height:6px;background:#1A4030;border-radius:3px;overflow:hidden"><div style="width:${score/5*100}%;height:100%;background:${barColor};border-radius:3px"></div></div>
-      <div style="font-size:11px;color:#888;margin-top:5px">${naoTem.length} oportunidade(s) de negócio em aberto</div>
+      <div style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Áreas ativas na Braúna</div>
+      <div style="height:6px;background:#D9E3DB;border-radius:3px;overflow:hidden"><div style="width:${score/5*100}%;height:100%;background:${barColor};border-radius:3px"></div></div>
+      <div style="font-size:11px;color:#8A9A8E;margin-top:5px">${naoTem.length} oportunidade(s) de negócio em aberto</div>
     </div>
   </div>`;
 
@@ -6448,22 +6448,22 @@ function renderCrossSellResult(areas, tem, naoTem){
     const rendaMes= patC*((compC.fiis||0)/100)*0.008 + patC*((compC.acoes||0)/100)*0.003; // dividendos estimados (conservador)
     const cob     = rendaMes>0 ? Math.round(rendaMes/parcela*100) : 0;
     const aqAtivo = !!crossSell["aquisicao_bens"];
-    html += `<div style="border:1px solid #C9A96E;background:linear-gradient(180deg,#171204,#0B1410);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    html += `<div style="border:1px solid #A8833C;background:linear-gradient(180deg,#F6EFDA,#FFFFFF);border-radius:12px;padding:14px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:18px">💎</span>
-        <span style="font-size:12px;font-weight:800;color:#E7C989;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
+        <span style="font-size:12px;font-weight:800;color:#A8833C;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
       </div>
-      <div style="font-size:12px;color:#E8DFC8;line-height:1.6">
+      <div style="font-size:12px;color:#3A2E12;line-height:1.6">
         Cliente com <b>${brl0(patC)}</b> (acima de R$ 1 mi): dá para estruturar uma <b>carta de consórcio de ${brl0(carta)}</b> (imóvel ou veículo) <b>sustentada pelos dividendos da carteira</b>, sem descapitalizar o principal.
-        <div style="margin-top:8px;padding:8px 10px;background:#0A1A10;border-radius:8px">
-          Parcela estimada <b>≈ ${brl0(parcela)}/mês</b> · Dividendos estimados da carteira <b>≈ ${brl0(rendaMes)}/mês</b>${rendaMes>0?` (cobrem <b style="color:${cob>=100?'#5DCAA5':'#E8A87C'}">${cob}%</b> da parcela)`:''}
-          <div style="font-size:10px;color:#6A7A6A;margin-top:3px">Estimativas conservadoras (taxa adm ~17%, ~200 meses; DY de FIIs ~9,6% a.a. e ações ~3,6% a.a.). Confirmar com a administradora e com os proventos reais do cliente.</div>
+        <div style="margin-top:8px;padding:8px 10px;background:#EFF3EF;border-radius:8px">
+          Parcela estimada <b>≈ ${brl0(parcela)}/mês</b> · Dividendos estimados da carteira <b>≈ ${brl0(rendaMes)}/mês</b>${rendaMes>0?` (cobrem <b style="color:${cob>=100?'#1F9D77':'#C0673A'}">${cob}%</b> da parcela)`:''}
+          <div style="font-size:10px;color:#5C7365;margin-top:3px">Estimativas conservadoras (taxa adm ~17%, ~200 meses; DY de FIIs ~9,6% a.a. e ações ~3,6% a.a.). Confirmar com a administradora e com os proventos reais do cliente.</div>
         </div>
-        <div style="margin-top:8px;font-size:11px;color:#C8D0C0">
+        <div style="margin-top:8px;font-size:11px;color:#5C7365">
           <b>Como conduzir (sem promessas):</b> consórcio é aquisição planejada, <b>sem juros</b> — mas há taxa de administração, fundo de reserva e seguro; a <b>contemplação é por sorteio ou lance</b>, sem data garantida; a parcela é reajustada pelo índice do contrato. O capital segue investido e apenas os proventos sustentam a parcela.
         </div>
-        ${aqAtivo?'<div style="margin-top:8px;font-size:11px;color:#5DCAA5">✓ Aquisição de Bens já ativa — reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
-                 :'<div style="margin-top:8px;font-size:11px;color:#E7C989">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
+        ${aqAtivo?'<div style="margin-top:8px;font-size:11px;color:#1F9D77">✓ Aquisição de Bens já ativa — reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
+                 :'<div style="margin-top:8px;font-size:11px;color:#A8833C">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
       </div>
     </div>`;
   }
@@ -6505,20 +6505,20 @@ function renderCrossSellResult(areas, tem, naoTem){
   }
 
   if(insights.length){
-    const COR = {oportunidade:"#D4B483", atencao:"#FF9F40", urgente:"#FF6B6B", novidade:"#5DCAA5"};
-    html += `<div style="background:#0A1A10;border:1px solid #1A3A20;border-radius:10px;padding:12px 14px;margin-bottom:14px">
-      <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🧠 Insights para esta reunião</div>
+    const COR = {oportunidade:"#A8833C", atencao:"#C0673A", urgente:"#D93B3B", novidade:"#1F9D77"};
+    html += `<div style="background:#EFF3EF;border:1px solid #1A3A20;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🧠 Insights para esta reunião</div>
       ${insights.map(i=>`
         <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #0F2A18">
           <span style="font-size:14px;flex-shrink:0">${i.icone}</span>
-          <span style="font-size:12px;color:#CCC;line-height:1.5">${i.texto}</span>
+          <span style="font-size:12px;color:#5C7365;line-height:1.5">${i.texto}</span>
         </div>`).join("")}
-      ${crossHist.length ? `<div style="margin-top:8px;font-size:10px;color:#2A5A3A">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"—"}</div>` : ""}
+      ${crossHist.length ? `<div style="margin-top:8px;font-size:10px;color:#5C7365">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"—"}</div>` : ""}
     </div>`;
   }
 
   if(naoTemAreas.length){
-    html+=`<p style="font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
+    html+=`<p style="font-size:11px;color:#A8833C;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">💼 Oportunidades em aberto para este cliente</p>`;
     naoTemAreas.forEach(a=>{
       html+=`<div class="cs-area nao-tem">
         <div class="cs-area-header">
@@ -6531,7 +6531,7 @@ function renderCrossSellResult(areas, tem, naoTem){
       // Área especial: Planejamento Financeiro
       if(a.id==="planejamento_financeiro" && a.especialista){
         const esp=a.especialista;
-        html+=`<p style="font-size:11px;color:#888;margin-bottom:8px">Como especialista, estas são as três frentes prioritárias:</p>`;
+        html+=`<p style="font-size:11px;color:#8A9A8E;margin-bottom:8px">Como especialista, estas são as três frentes prioritárias:</p>`;
 
         // Previdência
         const prev=esp.previdencia;
@@ -6575,12 +6575,12 @@ function renderCrossSellResult(areas, tem, naoTem){
   }
 
   if(temAreas.length){
-    html+=`<p style="font-size:11px;color:#5DCAA5;font-weight:700;margin:14px 0 8px;text-transform:uppercase;letter-spacing:.5px">✓ Áreas já ativas</p>`;
+    html+=`<p style="font-size:11px;color:#1F9D77;font-weight:700;margin:14px 0 8px;text-transform:uppercase;letter-spacing:.5px">✓ Áreas já ativas</p>`;
     html+=`<div style="display:flex;flex-wrap:wrap;gap:8px">`;
     temAreas.forEach(a=>{
       html+=`<div class="cs-area tem" style="padding:10px 14px;display:inline-flex;align-items:center;gap:8px;border-radius:10px;flex:0 0 auto">
         <span style="font-size:18px">${a.icone}</span>
-        <span style="font-size:13px;font-weight:700;color:#5DCAA5">${a.nome}</span>
+        <span style="font-size:13px;font-weight:700;color:#1F9D77">${a.nome}</span>
         <span class="cs-status-tag cs-tem-tag">✓ ATIVO</span>
       </div>`;
     });
@@ -6683,9 +6683,9 @@ def login_page():
 
 def _pilar_html_inicial(p):
     imp = p.get("importancia", "CRÍTICA")
-    imp_cor  = "#FF6B6B" if imp=="CRÍTICA" else "#FFD966" if imp=="ALTA" else "#4A7055"
+    imp_cor  = "#D93B3B" if imp=="CRÍTICA" else "#A9800F" if imp=="ALTA" else "#5C7365"
     imp_txt  = "🔴 CRÍTICO" if imp=="CRÍTICA" else "🟡 IMPORTANTE" if imp=="ALTA" else "⚪ MÉDIO"
-    bg       = "#1A0A0A" if imp=="CRÍTICA" else "#151500" if imp=="ALTA" else "#181818"
+    bg       = "#FBE9E9" if imp=="CRÍTICA" else "#151500" if imp=="ALTA" else "#181818"
     border   = "#4A1212" if imp=="CRÍTICA" else "#3A3A00" if imp=="ALTA" else "#282828"
     eh_dir   = p.get("importancia_diretriz", False)
     pid      = p["id"]
@@ -6694,21 +6694,21 @@ def _pilar_html_inicial(p):
     desc     = p.get("descricao", p.get("desc",""))
     impacto  = p.get("impacto_falta", p.get("impacto",""))
     acao     = p.get("acao","")
-    dir_tag  = '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E;font-weight:700">★ 1ª DIRETRIZ</span>' if eh_dir else ""
-    dir_note = '<div style="font-size:10px;color:#C9A96E;margin-top:6px;padding:5px 8px;border:1px solid #C9A96E;border-radius:5px;background:#1A2E1A">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' if eh_dir else ""
+    dir_tag  = '<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#F5F8F5;color:#A8833C;border:1px solid #A8833C;font-weight:700">★ 1ª DIRETRIZ</span>' if eh_dir else ""
+    dir_note = '<div style="font-size:10px;color:#A8833C;margin-top:6px;padding:5px 8px;border:1px solid #A8833C;border-radius:5px;background:#F5F8F5">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' if eh_dir else ""
     return f'''<div onclick="togglePilar('{pid}')" id="pilar-{pid}" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;background:{bg};border:1.5px solid {border};cursor:pointer;transition:all .2s;user-select:none">
-  <div id="chk-{pid}" style="width:24px;height:24px;border-radius:6px;border:2px solid #2A5A3A;background:transparent;display:flex;align-items:center;justify-content:center;color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px"></div>
+  <div id="chk-{pid}" style="width:24px;height:24px;border-radius:6px;border:2px solid #5C7365;background:transparent;display:flex;align-items:center;justify-content:center;color:#000;font-size:15px;font-weight:900;flex-shrink:0;margin-top:2px"></div>
   <div style="font-size:20px;flex-shrink:0;margin-top:2px">{icone}</div>
   <div style="flex:1;min-width:0">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-      <span id="nome-{pid}" style="font-size:13px;font-weight:700;color:#F0F0F0">{nome}</span>
-      <span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#1E1E1E;color:{imp_cor};font-weight:700">{imp_txt}</span>
+      <span id="nome-{pid}" style="font-size:13px;font-weight:700;color:#17271E">{nome}</span>
+      <span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#FFFFFF;color:{imp_cor};font-weight:700">{imp_txt}</span>
       {dir_tag}
     </div>
-    <div style="font-size:11px;color:#4A7055;line-height:1.4">{desc}</div>
-    <div id="det-{pid}" style="background:#111;border-radius:6px;padding:8px 10px;border-left:3px solid {imp_cor};margin-top:8px">
-      <div style="font-size:11px;color:#888;line-height:1.5;margin-bottom:6px">{impacto}</div>
-      <div style="font-size:11px;color:#C9A96E;padding:6px 8px;background:#1A2E1A;border-radius:5px">→ {acao}</div>
+    <div style="font-size:11px;color:#5C7365;line-height:1.4">{desc}</div>
+    <div id="det-{pid}" style="background:#FFFFFF;border-radius:6px;padding:8px 10px;border-left:3px solid {imp_cor};margin-top:8px">
+      <div style="font-size:11px;color:#8A9A8E;line-height:1.5;margin-bottom:6px">{impacto}</div>
+      <div style="font-size:11px;color:#A8833C;padding:6px 8px;background:#F5F8F5;border-radius:5px">→ {acao}</div>
       {dir_note}
     </div>
   </div>
@@ -6873,16 +6873,16 @@ def gerar_diagnosticos(xp_parsed, perfil=""):
 def _perfil_cards_html():
     """Gera os cards de seleção de perfil renderizados no servidor."""
     PERFIS_UI = [
-        {"key":"super_conservadora","lbl":"Super Conservadora","emoji":"&#128737;","cor":"#5DCAA5","desc":"Preservação de capital"},
-        {"key":"conservadora",      "lbl":"Conservadora",      "emoji":"&#127974;","cor":"#C9A96E","desc":"Renda segura"},
-        {"key":"moderada",          "lbl":"Moderada",          "emoji":"&#9878;",  "cor":"#7DCFEF","desc":"Equilíbrio"},
-        {"key":"arrojada",          "lbl":"Arrojada",          "emoji":"&#128200;","cor":"#E88038","desc":"Crescimento"},
-        {"key":"agressiva",         "lbl":"Agressiva",         "emoji":"&#128640;","cor":"#FF6B6B","desc":"Alto crescimento"},
+        {"key":"super_conservadora","lbl":"Super Conservadora","emoji":"&#128737;","cor":"#1F9D77","desc":"Preservação de capital"},
+        {"key":"conservadora",      "lbl":"Conservadora",      "emoji":"&#127974;","cor":"#A8833C","desc":"Renda segura"},
+        {"key":"moderada",          "lbl":"Moderada",          "emoji":"&#9878;",  "cor":"#2E86B8","desc":"Equilíbrio"},
+        {"key":"arrojada",          "lbl":"Arrojada",          "emoji":"&#128200;","cor":"#C0673A","desc":"Crescimento"},
+        {"key":"agressiva",         "lbl":"Agressiva",         "emoji":"&#128640;","cor":"#D93B3B","desc":"Alto crescimento"},
     ]
     GRUPOS = [
-        {"chaves":["pos_fixado","inflacao","pre_fixado"],"cor":"#C9A96E","lbl":"RF"},
-        {"chaves":["acoes","fiis"],                      "cor":"#8B9FE8","lbl":"RV"},
-        {"chaves":["multimercado"],                      "cor":"#5DCAA5","lbl":"Multi"},
+        {"chaves":["pos_fixado","inflacao","pre_fixado"],"cor":"#A8833C","lbl":"RF"},
+        {"chaves":["acoes","fiis"],                      "cor":"#4E63C8","lbl":"RV"},
+        {"chaves":["multimercado"],                      "cor":"#1F9D77","lbl":"Multi"},
         {"chaves":["internacional"],                     "cor":"#E88B8B","lbl":"Intl"},
         {"chaves":["alternativos","criptomoedas"],        "cor":"#B8A0E8","lbl":"Alt"},
     ]
@@ -6899,7 +6899,7 @@ def _perfil_cards_html():
         itens = sorted([(k,v) for k,v in m.items() if isinstance(v,(int,float)) and v>0 and k!="label"], key=lambda x: -x[1])
         top_html = "".join(
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">'
-            f'<span style="font-size:9px;color:#888">{LABELS.get(k,k)}</span>'
+            f'<span style="font-size:9px;color:#8A9A8E">{LABELS.get(k,k)}</span>'
             f'<span style="font-size:9px;font-weight:700;color:#E0C878">{v}%</span>'
             f'</div>'
             for k,v in itens[:4]
@@ -6907,7 +6907,7 @@ def _perfil_cards_html():
         # "moderada" é o default selecionado
         is_default = (p["key"] == "moderada")
         border_style = f'2px solid {p["cor"]}' if is_default else '2px solid #1E2E28'
-        bg_style = f'{p["cor"]}15' if is_default else '#081F18'
+        bg_style = f'{p["cor"]}15' if is_default else '#EFF3EF'
         badge = f'<div class="perfil-sel-badge" style="position:absolute;top:5px;right:6px;font-size:8px;color:{p["cor"]};font-weight:700;display:{"block" if is_default else "none"}">&#10003; SELECIONADO</div>'
         card = (
             f'<div onclick="selecionarPerfil(\'{p["key"]}\')" data-perfil="{p["key"]}" data-cor="{p["cor"]}" class="perfil-card-item" style="'
@@ -6915,9 +6915,9 @@ def _perfil_cards_html():
             f'cursor:pointer;flex:1;min-width:115px;max-width:190px;position:relative;overflow:hidden;transition:all .15s;box-sizing:border-box">'
             f'{badge}'
             f'<div style="font-size:20px;margin-bottom:4px">{p["emoji"]}</div>'
-            f'<div class="perfil-card-nome" style="font-size:11px;font-weight:700;color:{"" + p["cor"] if is_default else "#F0F0F0"};margin-bottom:2px;line-height:1.2">{p["lbl"]}</div>'
-            f'<div style="font-size:9px;color:#3A6A48;margin-bottom:8px">{p["desc"]}</div>'
-            f'<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#0A0A0A;margin-bottom:8px;gap:1px">{bar_segs}</div>'
+            f'<div class="perfil-card-nome" style="font-size:11px;font-weight:700;color:{"" + p["cor"] if is_default else "#17271E"};margin-bottom:2px;line-height:1.2">{p["lbl"]}</div>'
+            f'<div style="font-size:9px;color:#5C7365;margin-bottom:8px">{p["desc"]}</div>'
+            f'<div style="display:flex;height:5px;border-radius:3px;overflow:hidden;background:#EFF3EF;margin-bottom:8px;gap:1px">{bar_segs}</div>'
             f'<div>{top_html}</div>'
             f'</div>'
         )
@@ -11570,26 +11570,26 @@ HTML_RESET_SENHA = r"""<!DOCTYPE html>
 <title>Braúna — Redefinir Senha</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#081F18;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+html,body{height:100%;background:#EFF3EF;font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.card{background:#111;border:1px solid #1A4030;border-radius:16px;padding:36px 32px;width:100%;max-width:400px}
+.card{background:#FFFFFF;border:1px solid #D9E3DB;border-radius:16px;padding:36px 32px;width:100%;max-width:400px}
 .logo{text-align:center;margin-bottom:28px}
-.logo-title{font-size:20px;font-weight:800;color:#C9A96E;letter-spacing:2px}
-.logo-sub{font-size:11px;color:#3A6A48;margin-top:4px}
-h2{font-size:15px;color:#F0F0F0;margin-bottom:6px}
-p.desc{font-size:12px;color:#3A6A48;margin-bottom:22px;line-height:1.5}
-label{font-size:11px;color:#3A6A48;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-input{width:100%;background:#0B2A1F;border:1px solid #1A4030;border-radius:8px;padding:11px 14px;color:#F0F0F0;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
-input:focus{border-color:#C9A96E}
-.btn{width:100%;background:#C9A96E;color:#081F18;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.logo-title{font-size:20px;font-weight:800;color:#A8833C;letter-spacing:2px}
+.logo-sub{font-size:11px;color:#5C7365;margin-top:4px}
+h2{font-size:15px;color:#17271E;margin-bottom:6px}
+p.desc{font-size:12px;color:#5C7365;margin-bottom:22px;line-height:1.5}
+label{font-size:11px;color:#5C7365;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:11px 14px;color:#17271E;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
+input:focus{border-color:#A8833C}
+.btn{width:100%;background:#A8833C;color:#EFF3EF;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.85}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .msg{font-size:12px;margin-top:12px;text-align:center;min-height:18px}
-.msg.ok{color:#5DCAA5}
-.msg.err{color:#FF6B6B}
-.back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#3A6A48;text-decoration:none}
-.back:hover{color:#C9A96E}
-.loading{display:inline-block;width:16px;height:16px;border:2px solid #081F18;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.msg.ok{color:#1F9D77}
+.msg.err{color:#D93B3B}
+.back{display:block;text-align:center;margin-top:18px;font-size:12px;color:#5C7365;text-decoration:none}
+.back:hover{color:#A8833C}
+.loading{display:inline-block;width:16px;height:16px;border:2px solid #EFF3EF;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -11602,15 +11602,15 @@ input:focus{border-color:#C9A96E}
 
   <!-- Estado: verificando token -->
   <div id="state-loading" style="text-align:center;padding:20px 0">
-    <div class="loading" style="width:24px;height:24px;border-color:#C9A96E;border-top-color:transparent;display:inline-block"></div>
-    <p style="color:#3A6A48;font-size:13px;margin-top:12px">Verificando link...</p>
+    <div class="loading" style="width:24px;height:24px;border-color:#A8833C;border-top-color:transparent;display:inline-block"></div>
+    <p style="color:#5C7365;font-size:13px;margin-top:12px">Verificando link...</p>
   </div>
 
   <!-- Estado: token inválido -->
   <div id="state-invalido" style="display:none;text-align:center;padding:10px 0">
     <div style="font-size:36px;margin-bottom:12px">⚠️</div>
-    <h2 style="color:#FF6B6B;margin-bottom:8px">Link inválido ou expirado</h2>
-    <p style="font-size:12px;color:#888;line-height:1.5;margin-bottom:20px">Este link de redefinição já foi utilizado ou expirou.<br>Solicite um novo na tela de login.</p>
+    <h2 style="color:#D93B3B;margin-bottom:8px">Link inválido ou expirado</h2>
+    <p style="font-size:12px;color:#8A9A8E;line-height:1.5;margin-bottom:20px">Este link de redefinição já foi utilizado ou expirou.<br>Solicite um novo na tela de login.</p>
     <a href="/" class="btn" style="display:block;text-align:center;text-decoration:none;padding:13px">Voltar ao login</a>
   </div>
 
@@ -11633,8 +11633,8 @@ input:focus{border-color:#C9A96E}
   <!-- Estado: sucesso -->
   <div id="state-sucesso" style="display:none;text-align:center;padding:10px 0">
     <div style="font-size:36px;margin-bottom:12px">✅</div>
-    <h2 style="color:#5DCAA5;margin-bottom:8px">Senha redefinida!</h2>
-    <p style="font-size:12px;color:#888;margin-bottom:20px">Sua nova senha foi salva com sucesso. Você já pode fazer login.</p>
+    <h2 style="color:#1F9D77;margin-bottom:8px">Senha redefinida!</h2>
+    <p style="font-size:12px;color:#8A9A8E;margin-bottom:20px">Sua nova senha foi salva com sucesso. Você já pode fazer login.</p>
     <a href="/" class="btn" style="display:block;text-align:center;text-decoration:none;padding:13px">Ir para o login</a>
   </div>
 </div>
@@ -11701,46 +11701,46 @@ HTML_LOGIN = r"""<!DOCTYPE html>
 <title>Braúna Investimentos — Acesso</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#081F18;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+html,body{height:100%;background:#EFF3EF;font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 
 /* Logo */
 .logo-area{text-align:center;margin-bottom:40px}
-.logo-title{font-size:28px;font-weight:800;color:#C9A96E;letter-spacing:2px;text-transform:uppercase}
-.logo-sub{font-size:13px;color:#2A5A3A;margin-top:6px;letter-spacing:1px}
-.logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#C9A96E,transparent);margin:14px auto 0}
+.logo-title{font-size:28px;font-weight:800;color:#A8833C;letter-spacing:2px;text-transform:uppercase}
+.logo-sub{font-size:13px;color:#5C7365;margin-top:6px;letter-spacing:1px}
+.logo-line{width:60px;height:2px;background:linear-gradient(to right,transparent,#A8833C,transparent);margin:14px auto 0}
 
 /* Cards de papel */
 .roles{display:flex;gap:16px;margin-bottom:36px;flex-wrap:wrap;justify-content:center}
 .role-card{
   width:200px;padding:28px 20px;border-radius:16px;
-  border:1.5px solid #1A4030;background:#111;
+  border:1.5px solid #D9E3DB;background:#FFFFFF;
   cursor:pointer;text-align:center;transition:all .25s;
   position:relative;overflow:hidden;
 }
 .role-card::before{
   content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;
 }
-.role-card:hover{border-color:#C9A96E;transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
+.role-card:hover{border-color:#A8833C;transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
 .role-card.selected{transform:translateY(-3px)}
 
 /* Assessor */
-.role-card.assessor.selected{border-color:#C9A96E;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#1A2E1A}
-.role-card.assessor:hover{border-color:#C9A96E}
+.role-card.assessor.selected{border-color:#A8833C;box-shadow:0 8px 32px rgba(214,178,122,.18);background:#F5F8F5}
+.role-card.assessor:hover{border-color:#A8833C}
 /* Líder */
-.role-card.lider.selected{border-color:#8B9FE8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#0D0D1F}
-.role-card.lider:hover{border-color:#8B9FE8}
+.role-card.lider.selected{border-color:#4E63C8;box-shadow:0 8px 32px rgba(139,159,232,.18);background:#0D0D1F}
+.role-card.lider:hover{border-color:#4E63C8}
 /* Head */
-.role-card.head.selected{border-color:#D4B483;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#1A1500}
-.role-card.head:hover{border-color:#D4B483}
-.head .role-check{background:#D4B483;color:#000}
+.role-card.head.selected{border-color:#A8833C;box-shadow:0 8px 32px rgba(232,201,107,.18);background:#FBF3D2}
+.role-card.head:hover{border-color:#A8833C}
+.head .role-check{background:#A8833C;color:#000}
 /* Admin */
-.role-card.admin.selected{border-color:#5DCAA5;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#081410}
-.role-card.admin:hover{border-color:#5DCAA5}
+.role-card.admin.selected{border-color:#1F9D77;box-shadow:0 8px 32px rgba(93,202,165,.18);background:#081410}
+.role-card.admin:hover{border-color:#1F9D77}
 
 .role-icon{font-size:36px;margin-bottom:12px;display:block}
 .role-name{font-size:15px;font-weight:700;margin-bottom:4px}
-.role-desc{font-size:11px;color:#3A6A48;line-height:1.4}
+.role-desc{font-size:11px;color:#5C7365;line-height:1.4}
 .role-check{
   position:absolute;top:10px;right:10px;
   width:18px;height:18px;border-radius:50%;
@@ -11748,16 +11748,16 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   font-size:10px;font-weight:900;
   opacity:0;transition:opacity .2s;
 }
-.assessor .role-check{background:#C9A96E;color:#000}
-.lider .role-check{background:#8B9FE8;color:#000}
-.admin .role-check{background:#5DCAA5;color:#000}
+.assessor .role-check{background:#A8833C;color:#000}
+.lider .role-check{background:#4E63C8;color:#000}
+.admin .role-check{background:#1F9D77;color:#000}
 .role-card.selected .role-check{opacity:1}
 
 /* Caixa de senha */
 .senha-box{
   width:100%;max-width:380px;
-  background:#111;border-radius:14px;padding:28px;
-  border:1px solid #1A4030;
+  background:#FFFFFF;border-radius:14px;padding:28px;
+  border:1px solid #D9E3DB;
   animation:fadeUp .25s ease;
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -11765,30 +11765,30 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .senha-label span{font-size:16px}
 .senha-input-wrap{position:relative;margin-bottom:14px}
 .senha-input{
-  width:100%;background:#0A0A0A;border:1.5px solid #1C4A34;
+  width:100%;background:#EFF3EF;border:1.5px solid #D9E3DB;
   border-radius:10px;padding:13px 44px 13px 16px;
-  color:#F0F0F0;font-size:16px;letter-spacing:4px;outline:none;
+  color:#17271E;font-size:16px;letter-spacing:4px;outline:none;
   transition:border .2s;
 }
-.senha-input::placeholder{letter-spacing:1px;font-size:13px;color:#1E4A30}
+.senha-input::placeholder{letter-spacing:1px;font-size:13px;color:#5C7365}
 .senha-input:focus{border-color:var(--role-color)}
 .toggle-pw{
   position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  background:none;border:none;color:#2A5A3A;cursor:pointer;font-size:16px;padding:0;
+  background:none;border:none;color:#5C7365;cursor:pointer;font-size:16px;padding:0;
 }
 .btn-entrar{
   width:100%;padding:14px;border:none;border-radius:10px;
   font-size:14px;font-weight:800;cursor:pointer;
   letter-spacing:.5px;text-transform:uppercase;
-  transition:all .2s;background:var(--role-color);color:#081F18;
+  transition:all .2s;background:var(--role-color);color:#EFF3EF;
 }
 .btn-entrar:hover{opacity:.88;transform:translateY(-1px)}
 .btn-entrar:disabled{opacity:.3;cursor:not-allowed;transform:none}
 .erro-msg{
-  font-size:12px;color:#FF6B6B;text-align:center;margin-top:10px;
+  font-size:12px;color:#D93B3B;text-align:center;margin-top:10px;
   height:18px;transition:opacity .2s;
 }
-.rodape{font-size:11px;color:#1C4A34;margin-top:32px;text-align:center}
+.rodape{font-size:11px;color:#D9E3DB;margin-top:32px;text-align:center}
 </style>
 </head>
 <body>
@@ -11804,25 +11804,25 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   <div class="role-card assessor" onclick="selRole('assessor')" id="card-assessor">
     <div class="role-check">✓</div>
     <span class="role-icon">📊</span>
-    <div class="role-name" style="color:#C9A96E">Assessor</div>
+    <div class="role-name" style="color:#A8833C">Assessor</div>
     <div class="role-desc">Análise de carteiras e atendimento ao cliente</div>
   </div>
   <div class="role-card lider" onclick="selRole('lider')" id="card-lider">
     <div class="role-check">✓</div>
     <span class="role-icon">👥</span>
-    <div class="role-name" style="color:#8B9FE8">Líder</div>
+    <div class="role-name" style="color:#4E63C8">Líder</div>
     <div class="role-desc">Visão da equipe, OKRs e orientação aos assessores</div>
   </div>
   <div class="role-card head" onclick="selRole('head')" id="card-head">
     <div class="role-check">✓</div>
     <span class="role-icon">🏛️</span>
-    <div class="role-name" style="color:#D4B483">Head de Produtos</div>
+    <div class="role-name" style="color:#A8833C">Head de Produtos</div>
     <div class="role-desc">Portfólios modelo, cenário macro e produtos em destaque</div>
   </div>
   <div class="role-card admin" onclick="selRole('admin')" id="card-admin">
     <div class="role-check">✓</div>
     <span class="role-icon">⚙️</span>
-    <div class="role-name" style="color:#5DCAA5">Administração</div>
+    <div class="role-name" style="color:#1F9D77">Administração</div>
     <div class="role-desc">Documentos estratégicos, cartas e configurações</div>
   </div>
 </div>
@@ -11847,7 +11847,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
     <span>🔐</span>
     <span id="pessoal-titulo" style="color:var(--role-color)">Senha pessoal</span>
   </div>
-  <div id="pessoal-aviso" style="font-size:11px;color:#888;margin-bottom:10px;line-height:1.5"></div>
+  <div id="pessoal-aviso" style="font-size:11px;color:#8A9A8E;margin-bottom:10px;line-height:1.5"></div>
   <div class="senha-input-wrap">
     <input type="password" id="senha-pessoal" class="senha-input" placeholder="Sua senha pessoal" onkeydown="if(event.key==='Enter')entrarPessoal()">
     <button class="toggle-pw" onclick="togglePessoal('senha-pessoal')" type="button">👁</button>
@@ -11862,22 +11862,22 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
       style="letter-spacing:normal;font-size:13px" onkeydown="if(event.key==='Enter')entrarPessoal()">
   </div>
   <button class="btn-entrar" id="btn-pessoal" onclick="entrarPessoal()">Entrar</button>
-  <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #333;color:#888;margin-top:8px">Voltar</button>
+  <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #C6D6C9;color:#8A9A8E;margin-top:8px">Voltar</button>
   <div class="erro-msg" id="erro-pessoal"></div>
   <!-- Esqueci minha senha -->
   <div id="esqueci-wrap" style="display:none;text-align:center;margin-top:14px">
-    <button onclick="esqueceuSenha()" style="background:none;border:none;color:#3A6A48;font-size:12px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
+    <button onclick="esqueceuSenha()" style="background:none;border:none;color:#5C7365;font-size:12px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
   </div>
 </div>
 
 <!-- Caixa de reset de senha (esqueci) -->
 <div class="senha-box" id="reset-box" style="display:none">
   <div class="senha-label"><span>📧</span><span style="color:var(--role-color)">Redefinir senha</span></div>
-  <div style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.5" id="reset-aviso">
+  <div style="font-size:11px;color:#8A9A8E;margin-bottom:12px;line-height:1.5" id="reset-aviso">
     Enviaremos um link de redefinição para o e-mail cadastrado no seu perfil.
   </div>
   <button class="btn-entrar" id="btn-reset" onclick="solicitarReset()">Enviar link por e-mail</button>
-  <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #333;color:#888;margin-top:8px">Voltar</button>
+  <button class="btn-entrar" onclick="voltarLogin()" style="background:none;border:1px solid #C6D6C9;color:#8A9A8E;margin-top:8px">Voltar</button>
   <div class="erro-msg" id="erro-reset"></div>
 </div>
 
@@ -11886,10 +11886,10 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 <script>
 let roleAtual = null;
 const ROLES = {
-  assessor: {nome:"Assessor",        icon:"📊", color:"#C9A96E", dest:"/assessor"},
-  lider:    {nome:"Líder",           icon:"👥", color:"#8B9FE8", dest:"/lider"},
-  head:     {nome:"Head de Produtos",icon:"🏛️", color:"#D4B483", dest:"/head-produtos"},
-  admin:    {nome:"Administração",   icon:"⚙️", color:"#5DCAA5", dest:"/admin"},
+  assessor: {nome:"Assessor",        icon:"📊", color:"#A8833C", dest:"/assessor"},
+  lider:    {nome:"Líder",           icon:"👥", color:"#4E63C8", dest:"/lider"},
+  head:     {nome:"Head de Produtos",icon:"🏛️", color:"#A8833C", dest:"/head-produtos"},
+  admin:    {nome:"Administração",   icon:"⚙️", color:"#1F9D77", dest:"/admin"},
 };
 
 function selRole(role){
@@ -12082,7 +12082,7 @@ async function solicitarReset(){
     const d = await r.json();
     if(d.ok){
       document.getElementById("reset-aviso").innerHTML =
-        `✅ Link enviado para <b>${d.email_mascarado}</b>.<br><span style="color:#3A6A48">Verifique sua caixa de entrada e clique no link para criar nova senha.</span>`;
+        `✅ Link enviado para <b>${d.email_mascarado}</b>.<br><span style="color:#5C7365">Verifique sua caixa de entrada e clique no link para criar nova senha.</span>`;
       btn.style.display = "none";
     } else {
       erro.textContent = d.msg || "Não foi possível enviar o e-mail.";
@@ -12125,88 +12125,88 @@ HTML_LIDER = r"""<!DOCTYPE html>
 <title>Braúna — Painel do Líder</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0A0A14;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#0D0D1F;border-bottom:1px solid #1E1E3A;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
-header h1{font-size:17px;color:#8B9FE8;font-weight:700}
-header p{font-size:11px;color:#2A5A3A;margin-top:2px}
+body{background:#0A0A14;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#0D0D1F;border-bottom:1px solid #ECEFFB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:17px;color:#4E63C8;font-weight:700}
+header p{font-size:11px;color:#5C7365;margin-top:2px}
 .nav{display:flex;gap:8px;align-items:center}
-.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A4A;color:#4A7055;text-decoration:none;transition:all .2s}
-.nav a:hover{border-color:#8B9FE8;color:#8B9FE8}
-.nav a.active{background:#8B9FE8;color:#000;border-color:#8B9FE8;font-weight:700}
+.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #ECEFFB;color:#5C7365;text-decoration:none;transition:all .2s}
+.nav a:hover{border-color:#4E63C8;color:#4E63C8}
+.nav a.active{background:#4E63C8;color:#000;border-color:#4E63C8;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
-.card{background:#0F0F22;border:1px solid #1E1E3A;border-radius:12px;padding:20px;margin-bottom:16px}
-.card h2{font-size:11px;color:#8B9FE8;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px}
+.card{background:#0F0F22;border:1px solid #ECEFFB;border-radius:12px;padding:20px;margin-bottom:16px}
+.card h2{font-size:11px;color:#4E63C8;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px}
 /* KPIs 6 colunas */
 .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
-.kpi{background:#0A0A1A;border-radius:10px;padding:12px 14px;text-align:center;border:1px solid #1E1E3A;transition:border-color .2s}
-.kpi:hover{border-color:#8B9FE8}
-.kpi .n{font-size:22px;font-weight:700;color:#8B9FE8}
-.kpi .n.red{color:#FF6B6B}
-.kpi .n.green{color:#5DCAA5}
-.kpi .n.gold{color:#C9A96E}
-.kpi .l{font-size:10px;color:#3A6A48;margin-top:3px}
+.kpi{background:#ECEFFB;border-radius:10px;padding:12px 14px;text-align:center;border:1px solid #ECEFFB;transition:border-color .2s}
+.kpi:hover{border-color:#4E63C8}
+.kpi .n{font-size:22px;font-weight:700;color:#4E63C8}
+.kpi .n.red{color:#D93B3B}
+.kpi .n.green{color:#1F9D77}
+.kpi .n.gold{color:#A8833C}
+.kpi .l{font-size:10px;color:#5C7365;margin-top:3px}
 /* Filtros */
-.filtros-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:#0A0A1A;border:1px solid #1E1E3A;border-radius:10px}
-.filtros-bar label{font-size:11px;color:#3A6A48;margin-right:4px}
-.filtros-bar select{background:#0D0D22;border:1px solid #2A2A4A;color:#C0C0D0;font-size:11px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer}
-.filtros-bar select:focus{border-color:#8B9FE8}
-.btn-limpar{font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #2A2A4A;color:#4A7055;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
-.btn-limpar:hover{border-color:#FF6B6B;color:#FF6B6B}
+.filtros-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:#ECEFFB;border:1px solid #ECEFFB;border-radius:10px}
+.filtros-bar label{font-size:11px;color:#5C7365;margin-right:4px}
+.filtros-bar select{background:#0D0D22;border:1px solid #ECEFFB;color:#C0C0D0;font-size:11px;padding:4px 8px;border-radius:6px;outline:none;cursor:pointer}
+.filtros-bar select:focus{border-color:#4E63C8}
+.btn-limpar{font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid #ECEFFB;color:#5C7365;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
+.btn-limpar:hover{border-color:#D93B3B;color:#D93B3B}
 /* Card risco */
 .card-risco{background:#140A0A;border:1px solid #3A1A1A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
-.card-risco h2{font-size:11px;color:#FF6B6B;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
-.risco-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;background:#1A0A0A;border:1px solid #2A1010;margin-bottom:8px;flex-wrap:wrap}
-.risco-nome{font-size:13px;font-weight:700;color:#F0F0F0;flex:1;min-width:120px}
-.risco-assessor{font-size:11px;color:#3A6A48}
-.risco-pat{font-size:11px;color:#8B9FE8}
-.risco-motivo{font-size:11px;color:#FFD966;padding:2px 8px;background:#1A1500;border-radius:6px;border:1px solid #2A2000}
-.btn-ver{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #3A1010;color:#FF6B6B;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
-.btn-ver:hover{background:#2A1010;border-color:#FF6B6B}
-.risco-ok{padding:12px 16px;color:#5DCAA5;font-size:13px;background:#0A2018;border-radius:8px;border:1px solid #0A3020}
-.risco-grupo{margin-bottom:8px;border:1px solid #2A1010;border-radius:8px;overflow:hidden;background:#140808}
+.card-risco h2{font-size:11px;color:#D93B3B;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.risco-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;background:#FBE9E9;border:1px solid #FCEBEB;margin-bottom:8px;flex-wrap:wrap}
+.risco-nome{font-size:13px;font-weight:700;color:#17271E;flex:1;min-width:120px}
+.risco-assessor{font-size:11px;color:#5C7365}
+.risco-pat{font-size:11px;color:#4E63C8}
+.risco-motivo{font-size:11px;color:#A9800F;padding:2px 8px;background:#FBF3D2;border-radius:6px;border:1px solid #2A2000}
+.btn-ver{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #F7DADA;color:#D93B3B;background:none;cursor:pointer;transition:all .2s;margin-left:auto}
+.btn-ver:hover{background:#FCEBEB;border-color:#D93B3B}
+.risco-ok{padding:12px 16px;color:#1F9D77;font-size:13px;background:#F5F8F5;border-radius:8px;border:1px solid #0A3020}
+.risco-grupo{margin-bottom:8px;border:1px solid #FCEBEB;border-radius:8px;overflow:hidden;background:#140808}
 .risco-grupo-head{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;user-select:none}
-.risco-grupo-head:hover{background:#1A0A0A}
-.risco-grupo-nome{font-size:13px;font-weight:700;color:#F0F0F0;flex:1;min-width:120px}
-.risco-grupo-count{font-size:11px;color:#FF6B6B;background:#2A1010;padding:2px 9px;border-radius:10px;font-weight:700;white-space:nowrap}
-.risco-grupo-pat{font-size:11px;color:#8B9FE8;white-space:nowrap}
+.risco-grupo-head:hover{background:#FBE9E9}
+.risco-grupo-nome{font-size:13px;font-weight:700;color:#17271E;flex:1;min-width:120px}
+.risco-grupo-count{font-size:11px;color:#D93B3B;background:#FCEBEB;padding:2px 9px;border-radius:10px;font-weight:700;white-space:nowrap}
+.risco-grupo-pat{font-size:11px;color:#4E63C8;white-space:nowrap}
 .risco-grupo-chev{font-size:14px;color:#8A5A5A;transition:transform .2s;width:16px;text-align:center}
 .risco-grupo-body{padding:2px 10px 10px}
 /* Card alertas */
 .card-alertas{background:#0D0A14;border:1px solid #2A1E3A;border-radius:12px;padding:18px 20px;margin-bottom:16px}
-.card-alertas h2{font-size:11px;color:#C9A96E;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
-.alerta-acordeao{border:1px solid #2A2A4A;border-radius:8px;margin-bottom:6px;overflow:hidden}
-.alerta-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#0A0A1A;transition:background .2s}
+.card-alertas h2{font-size:11px;color:#A8833C;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px}
+.alerta-acordeao{border:1px solid #ECEFFB;border-radius:8px;margin-bottom:6px;overflow:hidden}
+.alerta-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#ECEFFB;transition:background .2s}
 .alerta-header:hover{background:#0D0D22}
-.alerta-header-nome{font-size:13px;font-weight:700;color:#F0F0F0;flex:1}
-.alerta-count{font-size:11px;color:#C9A96E;padding:2px 8px;background:#1A1200;border-radius:8px}
+.alerta-header-nome{font-size:13px;font-weight:700;color:#17271E;flex:1}
+.alerta-count{font-size:11px;color:#A8833C;padding:2px 8px;background:#1A1200;border-radius:8px}
 .alerta-body{display:none;padding:10px 14px;background:#080814}
 .alerta-body.aberto{display:block}
-.alerta-linha{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1A1A2E;flex-wrap:wrap}
+.alerta-linha{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #ECEFFB;flex-wrap:wrap}
 .alerta-linha:last-child{border-bottom:none}
-.alerta-ticker{font-size:12px;font-weight:700;color:#8B9FE8;min-width:60px}
+.alerta-ticker{font-size:12px;font-weight:700;color:#4E63C8;min-width:60px}
 .alerta-titulo{font-size:12px;color:#D0D0E0;flex:1}
 .alerta-tipo{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px}
-.alerta-compra{background:#0A2018;color:#5DCAA5;border:1px solid #0A3020}
-.alerta-venda{background:#2A1010;color:#FF6B6B;border:1px solid #3A1010}
-.alerta-atencao{background:#1A1500;color:#FFD966;border:1px solid #2A2000}
+.alerta-compra{background:#F5F8F5;color:#1F9D77;border:1px solid #0A3020}
+.alerta-venda{background:#FCEBEB;color:#D93B3B;border:1px solid #F7DADA}
+.alerta-atencao{background:#FBF3D2;color:#A9800F;border:1px solid #2A2000}
 /* Ranking assessores */
 .rank-item{
   display:flex;align-items:center;gap:14px;
   padding:14px 16px;border-radius:10px;
-  background:#0A0A1A;border:1px solid #1E1E3A;
+  background:#ECEFFB;border:1px solid #ECEFFB;
   margin-bottom:8px;cursor:pointer;transition:all .2s;
 }
-.rank-item:hover,.rank-item.aberto{border-color:#8B9FE8;background:#0D0D22}
-.rank-pos{font-size:20px;font-weight:900;color:#2A2A4A;min-width:28px;text-align:center}
-.rank-pos.top1{color:#C9A96E}
-.rank-pos.top2{color:#8B9FE8}
-.rank-pos.top3{color:#5DCAA5}
-.rank-nome{font-size:14px;font-weight:700;color:#F0F0F0;flex:1}
-.rank-meta{font-size:11px;color:#3A6A48}
+.rank-item:hover,.rank-item.aberto{border-color:#4E63C8;background:#0D0D22}
+.rank-pos{font-size:20px;font-weight:900;color:#ECEFFB;min-width:28px;text-align:center}
+.rank-pos.top1{color:#A8833C}
+.rank-pos.top2{color:#4E63C8}
+.rank-pos.top3{color:#1F9D77}
+.rank-nome{font-size:14px;font-weight:700;color:#17271E;flex:1}
+.rank-meta{font-size:11px;color:#5C7365}
 .rank-bars{flex:2;display:flex;flex-direction:column;gap:5px}
 .rank-bar-row{display:flex;align-items:center;gap:8px;font-size:11px}
-.rank-bar-row .lbl{width:90px;color:#3A6A48;text-align:right;flex-shrink:0}
-.rank-bar-bg{flex:1;height:5px;background:#1A1A2E;border-radius:3px;overflow:hidden}
+.rank-bar-row .lbl{width:90px;color:#5C7365;text-align:right;flex-shrink:0}
+.rank-bar-bg{flex:1;height:5px;background:#ECEFFB;border-radius:3px;overflow:hidden}
 .rank-bar-fill{height:100%;border-radius:3px;transition:width .6s}
 .rank-badges{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
 .rbadge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700}
@@ -12215,26 +12215,26 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 .detalhe-assessor.aberto{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 /* Métricas assessor */
-.metricas-assessor{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;margin-bottom:8px;background:#080814;border-radius:8px;border:1px solid #1A1A2E}
+.metricas-assessor{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;margin-bottom:8px;background:#080814;border-radius:8px;border:1px solid #ECEFFB}
 .met-item{text-align:center;padding:8px}
-.met-n{font-size:18px;font-weight:700;color:#8B9FE8}
-.met-l{font-size:10px;color:#2A5A3A;margin-top:2px}
+.met-n{font-size:18px;font-weight:700;color:#4E63C8}
+.met-l{font-size:10px;color:#5C7365;margin-top:2px}
 .meta-bar{height:4px;border-radius:2px;margin-top:6px}
-.meta-ok{background:#5DCAA5}
-.meta-nok{background:#FF6B6B}
+.meta-ok{background:#1F9D77}
+.meta-nok{background:#D93B3B}
 /* Cards de cliente */
 .cliente-card{
   background:#080816;border:1px solid #1A1A30;border-radius:10px;
   padding:14px 16px;margin-bottom:10px;
 }
 .cliente-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
-.cliente-nome{font-size:14px;font-weight:700;color:#F0F0F0}
-.cliente-perfil{font-size:11px;padding:2px 10px;border-radius:10px;background:#1A1A3A;color:#8B9FE8;font-weight:700}
-.cliente-objetivo{font-size:11px;color:#3A6A48;flex:1}
+.cliente-nome{font-size:14px;font-weight:700;color:#17271E}
+.cliente-perfil{font-size:11px;padding:2px 10px;border-radius:10px;background:#1A1A3A;color:#4E63C8;font-weight:700}
+.cliente-objetivo{font-size:11px;color:#5C7365;flex:1}
 .c-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700}
-.c-ok{background:#0A2018;color:#5DCAA5}
-.c-atencao{background:#1A1500;color:#FFD966}
-.c-critico{background:#2A1010;color:#FF6B6B}
+.c-ok{background:#F5F8F5;color:#1F9D77}
+.c-atencao{background:#FBF3D2;color:#A9800F}
+.c-critico{background:#FCEBEB;color:#D93B3B}
 /* Timeline de análises */
 .timeline{position:relative;padding-left:20px}
 .timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:#1A1A30}
@@ -12243,60 +12243,60 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
   position:absolute;left:-17px;top:4px;
   width:10px;height:10px;border-radius:50%;border:2px solid #0A0A14;
 }
-.tl-dot.ok{background:#5DCAA5}
-.tl-dot.atencao{background:#FFD966}
-.tl-dot.critico{background:#FF6B6B}
+.tl-dot.ok{background:#1F9D77}
+.tl-dot.atencao{background:#A9800F}
+.tl-dot.critico{background:#D93B3B}
 .tl-dot.first{width:13px;height:13px;left:-18px;top:3px}
-.tl-content{background:#0D0D20;border:1px solid #1E1E3A;border-radius:8px;padding:10px 12px}
-.tl-data{font-size:10px;color:#2A5A3A;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.tl-data b{color:#8B9FE8;font-size:11px}
+.tl-content{background:#0D0D20;border:1px solid #ECEFFB;border-radius:8px;padding:10px 12px}
+.tl-data{font-size:10px;color:#5C7365;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.tl-data b{color:#4E63C8;font-size:11px}
 .tl-metrics{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px}
-.tl-m{font-size:11px;color:#4A7055}
-.tl-m span{color:#F0F0F0;font-weight:700}
+.tl-m{font-size:11px;color:#5C7365}
+.tl-m span{color:#17271E;font-weight:700}
 /* Delta de carteira */
 .delta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .delta-item{
   display:flex;align-items:center;gap:4px;
   padding:3px 8px;border-radius:6px;font-size:11px;
-  background:#0A0A1A;
+  background:#ECEFFB;
 }
-.delta-up-ok{color:#5DCAA5;border:1px solid #0A2018}
-.delta-up-bad{color:#FFD966;border:1px solid #1A1500}
-.delta-dn-ok{color:#5DCAA5;border:1px solid #0A2018}
-.delta-dn-bad{color:#FF6B6B;border:1px solid #2A1010}
-.delta-neutral{color:#3A6A48;border:1px solid #1A1A2E}
+.delta-up-ok{color:#1F9D77;border:1px solid #F5F8F5}
+.delta-up-bad{color:#A9800F;border:1px solid #FBF3D2}
+.delta-dn-ok{color:#1F9D77;border:1px solid #F5F8F5}
+.delta-dn-bad{color:#D93B3B;border:1px solid #FCEBEB}
+.delta-neutral{color:#5C7365;border:1px solid #ECEFFB}
 /* Nota do líder */
 .nota-input{
-  width:100%;background:#0A0A1A;border:1px solid #1E1E3A;
-  border-radius:6px;padding:6px 10px;color:#AAA;font-size:11px;
+  width:100%;background:#ECEFFB;border:1px solid #ECEFFB;
+  border-radius:6px;padding:6px 10px;color:#8A9A8E;font-size:11px;
   margin-top:8px;outline:none;
 }
-.nota-input:focus{border-color:#8B9FE8}
+.nota-input:focus{border-color:#4E63C8}
 /* Vazio */
-.vazio{text-align:center;color:#1E4A30;padding:40px;font-size:13px}
+.vazio{text-align:center;color:#5C7365;padding:40px;font-size:13px}
 .progress-anel{text-align:right}
 /* Tabela Resumo Financeiro */
 .tabela-resumo{width:100%;border-collapse:collapse;font-size:12px;min-width:780px}
-.tabela-resumo th{background:#0A1A0A;color:#5DCAA5;font-weight:700;padding:9px 10px;text-align:right;border-bottom:2px solid #1A3A1A;white-space:nowrap}
+.tabela-resumo th{background:#EFF3EF;color:#1F9D77;font-weight:700;padding:9px 10px;text-align:right;border-bottom:2px solid #D9E3DB;white-space:nowrap}
 .tabela-resumo th:first-child{text-align:left}
 .tabela-resumo td{padding:8px 10px;border-bottom:1px solid #0F1F0F;text-align:right;color:#C0C8C0;vertical-align:middle}
 .tabela-resumo td:first-child{text-align:left;color:#E0E8E0;font-weight:600;max-width:180px}
-.tabela-resumo tr:hover td{background:#0A1A0A}
-.tabela-resumo tr.tr-total td{background:#071E17;color:#C9A96E;font-weight:700;border-top:2px solid #1A3A1A}
-.okr-bar-mini{height:5px;border-radius:3px;margin-top:3px;background:#1A2A1A}
+.tabela-resumo tr:hover td{background:#EFF3EF}
+.tabela-resumo tr.tr-total td{background:#EFF3EF;color:#A8833C;font-weight:700;border-top:2px solid #D9E3DB}
+.okr-bar-mini{height:5px;border-radius:3px;margin-top:3px;background:#F5F8F5}
 .okr-bar-mini-fill{height:100%;border-radius:3px;transition:width .4s}
 .pct-okr-chip{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700}
 /* Botões resumo */
-.btn-resumo{display:inline-block;padding:7px 16px;border:1px solid #2A3A2A;border-radius:8px;background:#0A1A0A;color:#5DCAA5;font-size:12px;cursor:pointer;transition:all .2s}
-.btn-resumo:hover{border-color:#5DCAA5;color:#fff}
-.btn-gold{background:#1A1200;color:#C9A96E;border-color:#3A2A00}
-.btn-gold:hover{border-color:#C9A96E;color:#fff}
-.btn-danger{color:#FF6B6B;border-color:#3A1010;background:#1A0808}
-.btn-danger:hover{border-color:#FF6B6B}
+.btn-resumo{display:inline-block;padding:7px 16px;border:1px solid #2A3A2A;border-radius:8px;background:#EFF3EF;color:#1F9D77;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-resumo:hover{border-color:#1F9D77;color:#fff}
+.btn-gold{background:#1A1200;color:#A8833C;border-color:#3A2A00}
+.btn-gold:hover{border-color:#A8833C;color:#fff}
+.btn-danger{color:#D93B3B;border-color:#F7DADA;background:#FBE9E9}
+.btn-danger:hover{border-color:#D93B3B}
 /* Form modal */
-.flabel{display:block;font-size:11px;color:#4A7055;margin-bottom:4px;margin-top:2px}
-.finput{width:100%;background:#071E17;border:1px solid #1A3A1A;border-radius:7px;padding:8px 10px;color:#E0E8E0;font-size:13px;outline:none;box-sizing:border-box}
-.finput:focus{border-color:#C9A96E}
+.flabel{display:block;font-size:11px;color:#5C7365;margin-bottom:4px;margin-top:2px}
+.finput{width:100%;background:#EFF3EF;border:1px solid #D9E3DB;border-radius:7px;padding:8px 10px;color:#E0E8E0;font-size:13px;outline:none;box-sizing:border-box}
+.finput:focus{border-color:#A8833C}
 @media(max-width:900px){.kpi-row{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}.rank-bars{display:none}.metricas-assessor{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -12308,7 +12308,7 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
     <a href="/assessor">📊 Assessor</a>
     <a href="/lider" class="active">👥 Líder</a>
     <a href="/painel">📋 Painel</a>
-    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#4A7055;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#FF6B6B';this.style.color='#FF6B6B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#4A7055'">Sair</button>
+    <button onclick="sair()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A3A;color:#5C7365;background:none;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#D93B3B';this.style.color='#D93B3B'" onmouseout="this.style.borderColor='#2A2A3A';this.style.color='#5C7365'">Sair</button>
   </nav>
   <script>
   (function(){
@@ -12338,14 +12338,14 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 </div>
 
 <!-- Objetivos / OKR por assessor (definidos pelo líder) -->
-<div style="background:#0B1410;border:1px solid #1C3A24;border-radius:12px;padding:18px 20px;margin-bottom:18px">
-  <div style="font-size:15px;font-weight:700;color:#C9A96E;margin-bottom:6px">🎯 Objetivos por Assessor</div>
-  <p style="font-size:12px;color:#3A6A48;margin-bottom:14px;line-height:1.6">Objetivo de <b style="color:#D4B483">volume financeiro (R$)</b> a operar por classe. Cada troca de produto executada é lançada em <b>Realizado</b> e <b>abate</b> o objetivo da classe — a coluna <b>Restante</b> mostra o quanto ainda falta para bater. (Registro do realizado é manual por enquanto.)</p>
-  <div id="obj-status" style="font-size:12px;color:#5DCAA5;min-height:16px;margin-bottom:8px"></div>
-  <div id="obj-tabela" style="overflow-x:auto"><p style="color:#3A6A48;font-size:12px">Carregando...</p></div>
+<div style="background:#FFFFFF;border:1px solid #1C3A24;border-radius:12px;padding:18px 20px;margin-bottom:18px">
+  <div style="font-size:15px;font-weight:700;color:#A8833C;margin-bottom:6px">🎯 Objetivos por Assessor</div>
+  <p style="font-size:12px;color:#5C7365;margin-bottom:14px;line-height:1.6">Objetivo de <b style="color:#A8833C">volume financeiro (R$)</b> a operar por classe. Cada troca de produto executada é lançada em <b>Realizado</b> e <b>abate</b> o objetivo da classe — a coluna <b>Restante</b> mostra o quanto ainda falta para bater. (Registro do realizado é manual por enquanto.)</p>
+  <div id="obj-status" style="font-size:12px;color:#1F9D77;min-height:16px;margin-bottom:8px"></div>
+  <div id="obj-tabela" style="overflow-x:auto"><p style="color:#5C7365;font-size:12px">Carregando...</p></div>
   <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-    <button onclick="objSalvar()" style="background:#C9A96E;color:#071E17;font-weight:700;border:1px solid #C9A96E;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">💾 Salvar objetivos</button>
-    <button onclick="carregarObjetivos()" style="background:none;border:1px solid #1C4A34;color:#5DCAA5;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">↺ Recarregar</button>
+    <button onclick="objSalvar()" style="background:#A8833C;color:#EFF3EF;font-weight:700;border:1px solid #A8833C;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">💾 Salvar objetivos</button>
+    <button onclick="carregarObjetivos()" style="background:none;border:1px solid #D9E3DB;color:#1F9D77;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">↺ Recarregar</button>
   </div>
 </div>
 
@@ -12387,9 +12387,9 @@ header p{font-size:11px;color:#2A5A3A;margin-top:2px}
 <div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
     <h2 style="margin:0">🏆 Ranking dos Assessores</h2>
-    <label style="font-size:12px;color:#4A7055;cursor:pointer;display:flex;align-items:center;gap:6px">
+    <label style="font-size:12px;color:#5C7365;cursor:pointer;display:flex;align-items:center;gap:6px">
       <input type="file" id="input-planilha" accept=".xlsx" style="display:none" onchange="importarPlanilha(this)">
-      <span style="padding:5px 14px;border:1px solid #2A3A2A;border-radius:6px;background:#0A1A0A;color:#5DCAA5;font-size:12px" onclick="document.getElementById('input-planilha').click()">📥 Atualizar planilha</span>
+      <span style="padding:5px 14px;border:1px solid #2A3A2A;border-radius:6px;background:#EFF3EF;color:#1F9D77;font-size:12px" onclick="document.getElementById('input-planilha').click()">📥 Atualizar planilha</span>
     </label>
   </div>
   <div id="ranking-container">
@@ -12422,21 +12422,21 @@ function renderResumoFinanceiro(){
   const _at = document.getElementById("resumo-atualizado");
   if(_at) _at.textContent = dadosFinanceiros.atualizado_em ? "Atualizado em "+dadosFinanceiros.atualizado_em+" · "+dadosFinanceiros.fonte : "";
   if(!lista.length){
-    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#1E4A30;padding:24px">Nenhum dado importado ainda. Use "Importar Excel" ou "Adicionar manualmente".</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#5C7365;padding:24px">Nenhum dado importado ainda. Use "Importar Excel" ou "Adicionar manualmente".</td></tr>';
     return;
   }
   let totalPat=0, totalRec=0, totalOKR=0;
   tbody.innerHTML = lista.map(function(a,i){
     const pctOKR = a.pct_realizado_okr||0;
-    const okrColor = pctOKR>=100?"#5DCAA5":pctOKR>=70?"#FFD966":"#FF6B6B";
+    const okrColor = pctOKR>=100?"#1F9D77":pctOKR>=70?"#A9800F":"#D93B3B";
     const barW = Math.min(pctOKR,100);
     totalPat += a.patrimonio||0; totalRec += a.receita_total||0; totalOKR += a.okr_mensal||0;
     return '<tr>'
       +'<td>'+a.nome+'</td>'
       +'<td>'+fmtR(a.patrimonio)+'</td>'
-      +'<td style="color:#5DCAA5;font-weight:700">'+fmtR(a.receita_total)+'</td>'
+      +'<td style="color:#1F9D77;font-weight:700">'+fmtR(a.receita_total)+'</td>'
       +'<td>'+fmtR(a.okr_mensal)+'</td>'
-      +'<td><span class="pct-okr-chip" style="background:'+(pctOKR>=100?"#0A2018":pctOKR>=70?"#1A1500":"#2A1010")+';color:'+okrColor+'">'+Math.round(pctOKR)+'%</span><div class="okr-bar-mini"><div class="okr-bar-mini-fill" style="width:'+barW+'%;background:'+okrColor+'"></div></div></td>'
+      +'<td><span class="pct-okr-chip" style="background:'+(pctOKR>=100?"#F5F8F5":pctOKR>=70?"#FBF3D2":"#FCEBEB")+';color:'+okrColor+'">'+Math.round(pctOKR)+'%</span><div class="okr-bar-mini"><div class="okr-bar-mini-fill" style="width:'+barW+'%;background:'+okrColor+'"></div></div></td>'
       +'<td>'+fmtPct(a.rf&&a.rf.pct)+'</td>'
       +'<td>'+fmtPct(a.rv&&a.rv.pct)+'</td>'
       +'<td>'+fmtPct(a.fii&&a.fii.pct)+'</td>'
@@ -12453,7 +12453,7 @@ function renderResumoFinanceiro(){
     +'<td>'+fmtR(totalPat)+'</td>'
     +'<td>'+fmtR(totalRec)+'</td>'
     +'<td>'+fmtR(totalOKR)+'</td>'
-    +'<td><span class="pct-okr-chip" style="background:#0A1A0A;color:#C9A96E">'+Math.round(totalOKR>0?totalRec/totalOKR*100:0)+'%</span></td>'
+    +'<td><span class="pct-okr-chip" style="background:#EFF3EF;color:#A8833C">'+Math.round(totalOKR>0?totalRec/totalOKR*100:0)+'%</span></td>'
     +'<td colspan="5"></td><td></td></tr>';
 }
 
@@ -12757,7 +12757,7 @@ function verDetalhesCliente(assessor, nome){
       for(var i=0;i<cards.length;i++){
         if(cards[i].getAttribute("data-nome")===nome){
           cards[i].scrollIntoView({behavior:"smooth",block:"center"});
-          cards[i].style.borderColor="#FF6B6B";
+          cards[i].style.borderColor="#D93B3B";
           setTimeout(function(){ cards[i].style.borderColor=""; }, 3000);
           break;
         }
@@ -12788,7 +12788,7 @@ function renderAlertas(){
       +'<div class="alerta-header" onclick="toggleAlerta('+idx+')">'
       +'<span class="alerta-header-nome">'+aN+'</span>'
       +'<span class="alerta-count">'+als.length+' alerta(s)</span>'
-      +'<span style="font-size:16px;color:#2A2A4A;transition:transform .2s" id="achev-'+idx+'">▾</span>'
+      +'<span style="font-size:16px;color:#ECEFFB;transition:transform .2s" id="achev-'+idx+'">▾</span>'
       +'</div>'
       +'<div class="alerta-body" id="abody-'+idx+'">';
     als.forEach(function(al){
@@ -12956,8 +12956,8 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
     const emAjuste = a.clientes.filter(function(c){return (c.entradas&&c.entradas.length||0)>=2;}).length;
     const criticos = a.clientes.filter(function(c){return c.entradas&&c.entradas[0]&&c.entradas[0].status==="critico";}).length;
     const statusBadge = criticos>0
-      ? '<span class="rbadge" style="background:#2A1010;color:#FF6B6B">🔴 '+criticos+' critico(s)</span>'
-      : '<span class="rbadge" style="background:#0A2018;color:#5DCAA5">Saudavel</span>';
+      ? '<span class="rbadge" style="background:#FCEBEB;color:#D93B3B">🔴 '+criticos+' critico(s)</span>'
+      : '<span class="rbadge" style="background:#F5F8F5;color:#1F9D77">Saudavel</span>';
 
     // Dados financeiros da planilha
     const fin = findFinanc(a.nome);
@@ -12966,7 +12966,7 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
     const okrMensal  = fin ? fin.okr_mensal : 0;
     const pctOKR     = fin ? fin.pct_realizado_okr : 0;
     const roaAnual   = fin ? fin.roa_anual : 0;
-    const okrColor   = pctOKR >= 100 ? "#5DCAA5" : pctOKR >= 70 ? "#FFD966" : "#FF6B6B";
+    const okrColor   = pctOKR >= 100 ? "#1F9D77" : pctOKR >= 70 ? "#A9800F" : "#D93B3B";
     const okrBarW    = Math.min(pctOKR, 100);
     const fmtRec = function(v){ return v > 0 ? "R$ "+Number(v).toLocaleString("pt-BR",{maximumFractionDigits:0}) : "—"; };
 
@@ -12983,9 +12983,9 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
 
     const finBlock = fin ? (
       '<div style="display:flex;gap:16px;align-items:center;padding:4px 0 6px;flex-wrap:wrap">'
-      +'<span style="font-size:12px;color:#C9A96E;font-weight:700">'+fmtPat(patrimFin)+'</span>'
+      +'<span style="font-size:12px;color:#A8833C;font-weight:700">'+fmtPat(patrimFin)+'</span>'
       +'<span style="font-size:11px;color:#8A9A8A">|</span>'
-      +'<span style="font-size:11px;color:#B0B8B0">Rec: <b style="color:#5DCAA5">'+fmtRec(receitaFin)+'</b></span>'
+      +'<span style="font-size:11px;color:#B0B8B0">Rec: <b style="color:#1F9D77">'+fmtRec(receitaFin)+'</b></span>'
       +'<span style="font-size:11px;color:#8A9A8A">|</span>'
       +'<span style="font-size:11px;color:#B0B8B0">OKR: '+fmtRec(okrMensal)+'</span>'
       +'<span style="font-size:11px;color:#8A9A8A">|</span>'
@@ -13002,12 +13002,12 @@ function renderRankingFiltrado(filtroAssessor, filtroPerfil, filtroStatus){
       +'<div class="rank-meta" style="margin-top:2px">'+a.clientes.length+' cliente(s) · '+a.totalRel+' relatorio(s) · '+emAjuste+' em ajuste ativo</div>'
       +'</div>'
       +'<div class="rank-bars">'
-      +'<div class="rank-bar-row"><span class="lbl">Relatorios</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctBar+'%;background:#8B9FE8"></div></div></div>'
-      +'<div class="rank-bar-row"><span class="lbl">Em ajuste</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+(a.clientes.length>0?Math.round(emAjuste/a.clientes.length*100):0)+'%;background:#5DCAA5"></div></div></div>'
-      +'<div class="rank-bar-row"><span class="lbl">Score >=4</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctScore+'%;background:'+(pctScore>=60?"#5DCAA5":"#FF6B6B")+'"></div></div><span style="font-size:10px;color:#3A6A48;margin-left:4px">'+pctScore+'%</span></div>'
-      +'<div class="rank-bar-row"><span class="lbl">Rent >=80%</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctRent+'%;background:'+(pctRent>=60?"#5DCAA5":"#FFD966")+'"></div></div><span style="font-size:10px;color:#3A6A48;margin-left:4px">'+pctRent+'%</span></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Relatorios</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctBar+'%;background:#4E63C8"></div></div></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Em ajuste</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+(a.clientes.length>0?Math.round(emAjuste/a.clientes.length*100):0)+'%;background:#1F9D77"></div></div></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Score >=4</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctScore+'%;background:'+(pctScore>=60?"#1F9D77":"#D93B3B")+'"></div></div><span style="font-size:10px;color:#5C7365;margin-left:4px">'+pctScore+'%</span></div>'
+      +'<div class="rank-bar-row"><span class="lbl">Rent >=80%</span><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:'+pctRent+'%;background:'+(pctRent>=60?"#1F9D77":"#A9800F")+'"></div></div><span style="font-size:10px;color:#5C7365;margin-left:4px">'+pctRent+'%</span></div>'
       +'</div>'
-      +'<div class="rank-badges">'+statusBadge+'<span style="font-size:18px;color:#2A2A4A;transition:transform .2s" id="chevron-'+i+'">▾</span></div>'
+      +'<div class="rank-badges">'+statusBadge+'<span style="font-size:18px;color:#ECEFFB;transition:transform .2s" id="chevron-'+i+'">▾</span></div>'
       +'</div>'
       +'<div class="detalhe-assessor" id="detalhe-'+i+'">'
       +'<div class="metricas-assessor">'
@@ -13075,9 +13075,9 @@ function renderClientesAssessor(clientes, assessorNome){
           deltas.push('<span class="delta-item '+cls+'">'+sinal+' '+(LABEL_COMP[k]||k)+' '+(diff>0?"+":"")+diff.toFixed(1)+'%</span>');
         });
         if(deltas.length){
-          deltaHtml = '<div style="margin-top:4px;font-size:10px;color:#2A5A3A">Variacao vs analise anterior:</div><div class="delta-row">'+deltas.join("")+'</div>';
+          deltaHtml = '<div style="margin-top:4px;font-size:10px;color:#5C7365">Variacao vs analise anterior:</div><div class="delta-row">'+deltas.join("")+'</div>';
         } else {
-          deltaHtml = '<div style="font-size:10px;color:#2A2A4A;margin-top:4px">Sem variacoes significativas vs analise anterior</div>';
+          deltaHtml = '<div style="font-size:10px;color:#ECEFFB;margin-top:4px">Sem variacoes significativas vs analise anterior</div>';
         }
 
         if(sugestoesHist.length && deltas.length){
@@ -13093,13 +13093,13 @@ function renderClientesAssessor(clientes, assessorNome){
             if(s.acao==="substituir" && s.de && diff2>0.5) aderiuRF=true;
           });
           if(aderiuRF){
-            deltaHtml += '<div style="margin-top:6px;font-size:11px;color:#5DCAA5;padding:5px 10px;background:#0A2018;border-radius:6px;border:1px solid #0A3020">Adesao a sugestao de Renda Fixa detectada nesta analise</div>';
+            deltaHtml += '<div style="margin-top:6px;font-size:11px;color:#1F9D77;padding:5px 10px;background:#F5F8F5;border-radius:6px;border:1px solid #0A3020">Adesao a sugestao de Renda Fixa detectada nesta analise</div>';
           }
         }
       }
 
       const rentTxt = e.rent12_pct_cdi>0
-        ? '<span style="color:'+(e.rent12_pct_cdi<70?"#FF6B6B":"#5DCAA5")+'">'+e.rent12_pct_cdi+'%</span> do CDI'
+        ? '<span style="color:'+(e.rent12_pct_cdi<70?"#D93B3B":"#1F9D77")+'">'+e.rent12_pct_cdi+'%</span> do CDI'
         : "—";
 
       timelineHtml += '<div class="tl-entry">'
@@ -13107,7 +13107,7 @@ function renderClientesAssessor(clientes, assessorNome){
         +'<div class="tl-content">'
         +'<div class="tl-data"><b>'+e.data+' '+(e.hora||"")+'</b>'
         +'<span class="c-badge '+statusCls+'">'+statusTxt+'</span>'
-        +(isFirst?'<span style="font-size:10px;color:#8B9FE8;font-weight:700">MAIS RECENTE</span>':"")
+        +(isFirst?'<span style="font-size:10px;color:#4E63C8;font-weight:700">MAIS RECENTE</span>':"")
         +'</div>'
         +'<div class="tl-metrics">'
         +'<div class="tl-m">Patrimonio <span>'+fmt(e.patrimonio)+'</span></div>'
@@ -13126,7 +13126,7 @@ function renderClientesAssessor(clientes, assessorNome){
       +'<div class="cliente-perfil">'+(c.perfil||"—")+'</div>'
       +(c.objetivo?'<div class="cliente-objetivo">'+c.objetivo+'</div>':"")
       +'<span class="c-badge '+statusCls+'" style="margin-left:auto">'+statusTxt+'</span>'
-      +'<span style="font-size:11px;color:#3A6A48">'+entradas.length+' analise(s)</span>'
+      +'<span style="font-size:11px;color:#5C7365">'+entradas.length+' analise(s)</span>'
       +'</div>'
       +timelineHtml
       +'<input class="nota-input" value="'+notaVal+'"'
@@ -13152,7 +13152,7 @@ async function carregarObjetivos(){
   try{
     var r=await fetch("/api/objetivos"); _objData=await r.json();
     objRender();
-  }catch(e){ tb.innerHTML='<p style="color:#FF6B6B;font-size:12px">Erro ao carregar objetivos.</p>'; }
+  }catch(e){ tb.innerHTML='<p style="color:#D93B3B;font-size:12px">Erro ao carregar objetivos.</p>'; }
 }
 
 function objRender(){
@@ -13160,22 +13160,22 @@ function objRender(){
   var labels=(_objData._meta||{}).labels||{};
   var ass=_objData.assessores||[];
   var h='<table style="width:100%;border-collapse:collapse;font-size:11px;min-width:820px">';
-  h+='<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34;background:#071E17">'
+  h+='<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB;background:#EFF3EF">'
     +'<th style="text-align:left;padding:6px 8px">Assessor</th>';
-  _OBJ_CLS.forEach(function(k){ h+='<th style="text-align:right;padding:6px 8px">'+(labels[k]||k)+'<br><span style="color:#2A5A3A;font-weight:400">objetivo · realizado</span></th>'; });
-  h+='<th style="text-align:right;padding:6px 8px">Restante<br><span style="color:#2A5A3A;font-weight:400">p/ o objetivo</span></th></tr></thead><tbody>';
+  _OBJ_CLS.forEach(function(k){ h+='<th style="text-align:right;padding:6px 8px">'+(labels[k]||k)+'<br><span style="color:#5C7365;font-weight:400">objetivo · realizado</span></th>'; });
+  h+='<th style="text-align:right;padding:6px 8px">Restante<br><span style="color:#5C7365;font-weight:400">p/ o objetivo</span></th></tr></thead><tbody>';
   ass.forEach(function(a,i){
-    var bg=i%2===0?"#060C08":"#081208";
-    h+='<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F">';
-    h+='<td style="padding:5px 8px;color:#D4B483;font-weight:700">'+a.assessor+'</td>';
+    var bg=i%2===0?"#EFF3EF":"#EFF3EF";
+    h+='<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
+    h+='<td style="padding:5px 8px;color:#A8833C;font-weight:700">'+a.assessor+'</td>';
     _OBJ_CLS.forEach(function(k){
       var v=(a.classes||{})[k];
       var rz=(a.realizado||{})[k];
-      var stInp='width:82px;text-align:right;border:1px solid #1C4A34;border-radius:5px;padding:3px 6px;color:#F0F0F0;font-size:11px';
+      var stInp='width:82px;text-align:right;border:1px solid #D9E3DB;border-radius:5px;padding:3px 6px;color:#17271E;font-size:11px';
       h+='<td style="padding:5px 8px;text-align:right;white-space:nowrap">'
-        +'<input type="number" data-obj-cls="'+i+'" data-obj-k="'+k+'" value="'+_objNum(v)+'" placeholder="objetivo" oninput="objRecalc('+i+')" title="Objetivo" style="'+stInp+';background:#071E17">'
-        +'<br><input type="number" data-obj-real="'+i+'" data-obj-rk="'+k+'" value="'+_objNum(rz)+'" placeholder="realizado" oninput="objRecalc('+i+')" title="Realizado (abate o objetivo)" style="'+stInp+';background:#0A1508;margin-top:3px;color:#9FD8B0">'
-        +'<br><span data-obj-falta="'+i+'" data-obj-fk="'+k+'" style="font-size:9px;color:#6A7A6A">—</span></td>';
+        +'<input type="number" data-obj-cls="'+i+'" data-obj-k="'+k+'" value="'+_objNum(v)+'" placeholder="objetivo" oninput="objRecalc('+i+')" title="Objetivo" style="'+stInp+';background:#EFF3EF">'
+        +'<br><input type="number" data-obj-real="'+i+'" data-obj-rk="'+k+'" value="'+_objNum(rz)+'" placeholder="realizado" oninput="objRecalc('+i+')" title="Realizado (abate o objetivo)" style="'+stInp+';background:#F5F8F5;margin-top:3px;color:#1F9D77">'
+        +'<br><span data-obj-falta="'+i+'" data-obj-fk="'+k+'" style="font-size:9px;color:#5C7365">—</span></td>';
     });
     h+='<td style="padding:5px 8px;text-align:right;font-weight:700" id="obj-recclasse-'+i+'">—</td>';
     h+='</tr>';
@@ -13199,20 +13199,20 @@ function objRecalc(i){
       var falta=Math.max(obj-(real||0),0);
       restTot+=falta;
       if(ft){
-        if(falta<=0.5){ ft.textContent="✓ batido"; ft.style.color="#5DCAA5"; }
-        else { ft.textContent="falta R$ "+falta.toLocaleString("pt-BR",{maximumFractionDigits:0}); ft.style.color="#E8A87C"; }
+        if(falta<=0.5){ ft.textContent="✓ batido"; ft.style.color="#1F9D77"; }
+        else { ft.textContent="falta R$ "+falta.toLocaleString("pt-BR",{maximumFractionDigits:0}); ft.style.color="#C0673A"; }
       }
-    } else if(ft){ ft.textContent="—"; ft.style.color="#6A7A6A"; }
+    } else if(ft){ ft.textContent="—"; ft.style.color="#5C7365"; }
   });
   var cell=document.getElementById("obj-recclasse-"+i);
   if(!cell) return;
-  if(!algum){ cell.innerHTML="—"; cell.style.color="#888"; cell.dataset.falta=""; objDestacarMaisLonge(); return; }
+  if(!algum){ cell.innerHTML="—"; cell.style.color="#8A9A8E"; cell.dataset.falta=""; objDestacarMaisLonge(); return; }
   if(restTot<=0.5){
-    cell.dataset.falta="0"; cell.style.color="#5DCAA5";
-    cell.innerHTML='R$ 0 <span style="font-size:9px;color:#5DCAA5">· objetivo batido</span>';
+    cell.dataset.falta="0"; cell.style.color="#1F9D77";
+    cell.innerHTML='R$ 0 <span style="font-size:9px;color:#1F9D77">· objetivo batido</span>';
   } else {
-    cell.dataset.falta=String(restTot); cell.style.color="#E8A87C";
-    cell.innerHTML="R$ "+restTot.toLocaleString("pt-BR",{maximumFractionDigits:0})+' <span style="font-size:9px;color:#E8A87C">a operar</span>';
+    cell.dataset.falta=String(restTot); cell.style.color="#C0673A";
+    cell.innerHTML="R$ "+restTot.toLocaleString("pt-BR",{maximumFractionDigits:0})+' <span style="font-size:9px;color:#C0673A">a operar</span>';
   }
   objDestacarMaisLonge();
 }
@@ -13229,8 +13229,8 @@ function objDestacarMaisLonge(){
   document.querySelectorAll(".obj-longe-tag").forEach(function(e){ e.remove(); });
   if(maxCell && maxF>0.5){
     var tr=maxCell.closest("tr");
-    if(tr) tr.style.boxShadow="inset 3px 0 0 #E8A87C";
-    maxCell.insertAdjacentHTML("beforeend",'<span class="obj-longe-tag" style="font-size:8px;color:#E8A87C;display:block;margin-top:2px">▲ mais longe do objetivo</span>');
+    if(tr) tr.style.boxShadow="inset 3px 0 0 #C0673A";
+    maxCell.insertAdjacentHTML("beforeend",'<span class="obj-longe-tag" style="font-size:8px;color:#C0673A;display:block;margin-top:2px">▲ mais longe do objetivo</span>');
   }
 }
 
@@ -13247,17 +13247,17 @@ async function objSalvar(){
     });
     return {assessor:a.assessor, classes:classes, realizado:realizado};
   })};
-  if(st){ st.textContent="Salvando..."; st.style.color="#AAA"; }
+  if(st){ st.textContent="Salvando..."; st.style.color="#8A9A8E"; }
   try{
     var r=await fetch("/api/objetivos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
     var d=null; try{ d=await r.json(); }catch(_){}
     if(r.ok && d && d.ok){
       _objData=d.objetivos; objRender();   // re-renderiza com o que foi de fato salvo
-      if(st){ st.textContent="✓ Objetivos salvos às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); st.style.color="#5DCAA5"; }
+      if(st){ st.textContent="✓ Objetivos salvos às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); st.style.color="#1F9D77"; }
     } else {
-      if(st){ st.textContent="Erro ao salvar (HTTP "+r.status+")"; st.style.color="#FF6B6B"; }
+      if(st){ st.textContent="Erro ao salvar (HTTP "+r.status+")"; st.style.color="#D93B3B"; }
     }
-  }catch(e){ if(st){ st.textContent="Erro de conexão: "+e.message; st.style.color="#FF6B6B"; } }
+  }catch(e){ if(st){ st.textContent="Erro de conexão: "+e.message; st.style.color="#D93B3B"; } }
   setTimeout(function(){ if(st) st.textContent=""; },6000);
 }
 
@@ -13278,117 +13278,117 @@ HTML_ADMIN = r"""<!DOCTYPE html>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#060D08;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#071209;border-bottom:2px solid #1A3A1A;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-header h1{font-size:16px;color:#5DCAA5;font-weight:700;letter-spacing:.5px}
-header p{font-size:10px;color:#2A5A3A;margin-top:2px}
+body{background:#060D08;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#071209;border-bottom:2px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header h1{font-size:16px;color:#1F9D77;font-weight:700;letter-spacing:.5px}
+header p{font-size:10px;color:#5C7365;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #1A2A1A;color:#4A7055;text-decoration:none;transition:all .2s}
-.nav a:hover{border-color:#5DCAA5;color:#5DCAA5}
-.nav a.active{background:#5DCAA5;color:#000;border-color:#5DCAA5;font-weight:700}
+.nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #F5F8F5;color:#5C7365;text-decoration:none;transition:all .2s}
+.nav a:hover{border-color:#1F9D77;color:#1F9D77}
+.nav a.active{background:#1F9D77;color:#000;border-color:#1F9D77;font-weight:700}
 .container{max-width:1280px;margin:0 auto;padding:24px 20px}
 
 /* Tabs principais */
-.main-tabs{display:flex;gap:0;border-bottom:2px solid #1A3A1A;margin-bottom:24px}
-.main-tab{padding:12px 24px;font-size:13px;font-weight:600;color:#3A6A48;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;font-family:inherit;transition:all .2s;margin-bottom:-2px}
-.main-tab:hover{color:#5DCAA5}
-.main-tab.active{color:#5DCAA5;border-bottom-color:#5DCAA5}
+.main-tabs{display:flex;gap:0;border-bottom:2px solid #D9E3DB;margin-bottom:24px}
+.main-tab{padding:12px 24px;font-size:13px;font-weight:600;color:#5C7365;background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;font-family:inherit;transition:all .2s;margin-bottom:-2px}
+.main-tab:hover{color:#1F9D77}
+.main-tab.active{color:#1F9D77;border-bottom-color:#1F9D77}
 .main-panel{display:none}.main-panel.active{display:block}
 
 /* Cards */
-.card{background:#0A1A0C;border:1px solid #1A3A1A;border-radius:12px;padding:20px;margin-bottom:16px}
+.card{background:#0A1A0C;border:1px solid #D9E3DB;border-radius:12px;padding:20px;margin-bottom:16px}
 .card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-label{font-size:11px;color:#4A7055;display:block;margin-bottom:5px}
-input[type=text],textarea,select{width:100%;background:#060E08;border:1px solid #1A2A1A;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
-input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
-.btn{display:inline-flex;align-items:center;gap:6px;background:#5DCAA5;color:#000;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+label{font-size:11px;color:#5C7365;display:block;margin-bottom:5px}
+input[type=text],textarea,select{width:100%;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:7px;padding:8px 10px;color:#17271E;font-size:13px;outline:none;font-family:inherit}
+input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
+.btn{display:inline-flex;align-items:center;gap:6px;background:#1F9D77;color:#000;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn:hover{opacity:.85}.btn:disabled{opacity:.35;cursor:not-allowed}
-.btn-out{background:transparent;color:#5DCAA5;border:1px solid #5DCAA5}
+.btn-out{background:transparent;color:#1F9D77;border:1px solid #1F9D77}
 .btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
-.btn-ghost{background:transparent;border:1px solid #1A2A1A;color:#3A6A48;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
-.btn-ghost:hover{border-color:#5DCAA5;color:#5DCAA5}
+.btn-ghost{background:transparent;border:1px solid #F5F8F5;color:#5C7365;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost:hover{border-color:#1F9D77;color:#1F9D77}
 
 /* KPI chips */
 .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-.kpi{background:#0D1C10;border:1px solid #1A3A1A;border-radius:10px;padding:14px 18px;min-width:130px;flex:1}
+.kpi{background:#0D1C10;border:1px solid #D9E3DB;border-radius:10px;padding:14px 18px;min-width:130px;flex:1}
 .kpi-val{font-size:28px;font-weight:900;line-height:1}
-.kpi-lbl{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.kpi-lbl{font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
 /* Tabela de atividade */
 .act-table{width:100%;border-collapse:collapse;font-size:12px}
-.act-table th{text-align:left;padding:8px 10px;font-size:10px;color:#2A5A3A;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #1A3A1A;font-weight:700}
+.act-table th{text-align:left;padding:8px 10px;font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #D9E3DB;font-weight:700}
 .act-table td{padding:9px 10px;border-bottom:1px solid #0D1A0E;vertical-align:top}
 .act-table tr:hover td{background:#0C180E}
 
 /* Badges */
 .badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700}
-.badge-assessor{background:#0D2A1D;color:#5DCAA5;border:1px solid #1A4A2A}
-.badge-lider{background:#0D1030;color:#8B9FE8;border:1px solid #1A2050}
-.badge-head{background:#2A1A08;color:#C9A96E;border:1px solid #4A3010}
-.badge-ok{background:#0A2018;color:#5DCAA5}
-.badge-warn{background:#2A1808;color:#C9A96E}
+.badge-assessor{background:#0D2A1D;color:#1F9D77;border:1px solid #1A4A2A}
+.badge-lider{background:#0D1030;color:#4E63C8;border:1px solid #1A2050}
+.badge-head{background:#2A1A08;color:#A8833C;border:1px solid #4A3010}
+.badge-ok{background:#F5F8F5;color:#1F9D77}
+.badge-warn{background:#2A1808;color:#A8833C}
 
 /* Assessor cards */
-.user-card{background:#0A1A0C;border:1px solid #1A3A1A;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
-.user-card:hover{border-color:#2A5A3A}
+.user-card{background:#0A1A0C;border:1px solid #D9E3DB;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s}
+.user-card:hover{border-color:#5C7365}
 .user-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
 .user-info{flex:1;min-width:0}
-.user-name{font-size:13px;font-weight:700;color:#F0F0F0}
-.user-meta{font-size:10px;color:#3A6A48;margin-top:2px}
+.user-name{font-size:13px;font-weight:700;color:#17271E}
+.user-meta{font-size:10px;color:#5C7365;margin-top:2px}
 .user-log{margin-top:8px;display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto}
-.log-row{font-size:10px;color:#4A7055;display:flex;gap:8px;align-items:flex-start}
-.log-ts{color:#1E4A30;flex-shrink:0;min-width:90px}
+.log-row{font-size:10px;color:#5C7365;display:flex;gap:8px;align-items:flex-start}
+.log-ts{color:#5C7365;flex-shrink:0;min-width:90px}
 
 /* Head info cards */
 .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
-.info-card{background:#0A1A0C;border:1px solid #1A3A1A;border-radius:10px;padding:14px}
-.info-card-title{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px}
-.info-card-body{font-size:12px;color:#CCC;line-height:1.6}
+.info-card{background:#0A1A0C;border:1px solid #D9E3DB;border-radius:10px;padding:14px}
+.info-card-title{font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px}
+.info-card-body{font-size:12px;color:#5C7365;line-height:1.6}
 
 /* Doc list */
 .doc-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #0D1A0E;font-size:12px}
 .doc-row:last-child{border-bottom:none}
 .doc-icon{font-size:14px;flex-shrink:0}
-.doc-name{flex:1;color:#C9A96E;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.doc-meta{font-size:10px;color:#2A5A3A;flex-shrink:0}
+.doc-name{flex:1;color:#A8833C;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-meta{font-size:10px;color:#5C7365;flex-shrink:0}
 
 /* Config tab */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.upload-area{border:1.5px dashed #1A2A1A;border-radius:10px;padding:22px;text-align:center;cursor:pointer;position:relative;background:#060E08;transition:all .2s}
-.upload-area:hover{border-color:#5DCAA5;background:#050D05}
+.upload-area{border:1.5px dashed #F5F8F5;border-radius:10px;padding:22px;text-align:center;cursor:pointer;position:relative;background:#EFF3EF;transition:all .2s}
+.upload-area:hover{border-color:#1F9D77;background:#050D05}
 .upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-area .ui{pointer-events:none}
 .upload-area .icon{font-size:26px;margin-bottom:6px}
-.upload-area p{font-size:12px;color:#3A6A48}
-.upload-area .fname{color:#5DCAA5;font-weight:600;font-size:12px;margin-top:4px;min-height:18px}
-.tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#060C08;border:1px dashed #1A2A1A;border-radius:8px;margin-bottom:12px}
+.upload-area p{font-size:12px;color:#5C7365}
+.upload-area .fname{color:#1F9D77;font-weight:600;font-size:12px;margin-top:4px;min-height:18px}
+.tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#EFF3EF;border:1px dashed #F5F8F5;border-radius:8px;margin-bottom:12px}
 .tab-toolbar .lbl{font-size:11px;color:#3A4A3A;flex:1;min-width:120px}
 .btn-file-wrap{position:relative;overflow:hidden;display:inline-flex}
 .btn-file-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.pdf-preview{background:#060C08;border:1px solid #5DCAA5;border-radius:8px;padding:12px;margin-bottom:12px;display:none}
+.pdf-preview{background:#EFF3EF;border:1px solid #1F9D77;border-radius:8px;padding:12px;margin-bottom:12px;display:none}
 .pdf-preview .pdf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.pdf-preview .pdf-title{font-size:11px;color:#5DCAA5;font-weight:700}
+.pdf-preview .pdf-title{font-size:11px;color:#1F9D77;font-weight:700}
 .pdf-preview textarea{height:140px;font-size:11px;font-family:monospace;color:#9A9;background:#040A04;resize:vertical}
 .pdf-preview .pdf-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .sg-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #1A2A1A;background:#060E08;color:#4A7055;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
-.sg-tab.active{background:#5DCAA5;color:#000;border-color:#5DCAA5;font-weight:700}
+.sg-tab{padding:7px 16px;border-radius:8px;border:1px solid #F5F8F5;background:#EFF3EF;color:#5C7365;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.sg-tab.active{background:#1F9D77;color:#000;border-color:#1F9D77;font-weight:700}
 .sg-panel{display:none}.sg-panel.active{display:block}
-.sg-item{background:#060E08;border:1px solid #1A2A1A;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
+.sg-item{background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .sg-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#2A3A2A;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
-.sg-del:hover{color:#FF6B6B;background:#1A0505}
+.sg-del:hover{color:#D93B3B;background:#1A0505}
 .sg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .sg-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
-.sg-mini label{font-size:10px;color:#3A6A48;margin-bottom:3px}
+.sg-mini label{font-size:10px;color:#5C7365;margin-bottom:3px}
 .perfis-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
-.perfis-row label{display:flex;align-items:center;gap:4px;font-size:11px;color:#777;cursor:pointer;margin-bottom:0}
-.hist-item{background:#060E08;border:1px solid #1A2A1A;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
-.hist-item.ativa{border-color:#5DCAA5}
-.tag-ativa{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:#0A2018;color:#5DCAA5}
-.info-box{background:#060E08;border-radius:8px;padding:12px 14px;font-size:12px;color:#4A7055;line-height:1.6;border:1px solid #1A2A1A}
-.info-box b{color:#5DCAA5}
-.status-ok{color:#5DCAA5}.status-err{color:#FF6B6B}
+.perfis-row label{display:flex;align-items:center;gap:4px;font-size:11px;color:#8A9A8E;cursor:pointer;margin-bottom:0}
+.hist-item{background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.hist-item.ativa{border-color:#1F9D77}
+.tag-ativa{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:#F5F8F5;color:#1F9D77}
+.info-box{background:#EFF3EF;border-radius:8px;padding:12px 14px;font-size:12px;color:#5C7365;line-height:1.6;border:1px solid #F5F8F5}
+.info-box b{color:#1F9D77}
+.status-ok{color:#1F9D77}.status-err{color:#D93B3B}
 @media(max-width:640px){.grid-2,.sg-grid-2,.sg-grid-3{grid-template-columns:1fr}.kpi{min-width:100px}}
 </style>
 </head>
@@ -13417,26 +13417,26 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 <!-- ═══════ TAB: ASSESSORES ═══════ -->
 <div class="main-panel active" id="tab-assessores">
   <div class="kpi-row" id="kpi-assessores">
-    <div class="kpi"><div class="kpi-val" id="kpi-ativos" style="color:#5DCAA5">—</div><div class="kpi-lbl">Assessores Ativos</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-analises" style="color:#C9A96E">—</div><div class="kpi-lbl">Análises Realizadas</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-clientes" style="color:#8B9FE8">—</div><div class="kpi-lbl">Clientes Analisados</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-ultimo-acesso" style="color:#5DCAA5;font-size:14px">—</div><div class="kpi-lbl">Último Acesso</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-ativos" style="color:#1F9D77">—</div><div class="kpi-lbl">Assessores Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-analises" style="color:#A8833C">—</div><div class="kpi-lbl">Análises Realizadas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-clientes" style="color:#4E63C8">—</div><div class="kpi-lbl">Clientes Analisados</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-ultimo-acesso" style="color:#1F9D77;font-size:14px">—</div><div class="kpi-lbl">Último Acesso</div></div>
   </div>
 
   <div class="card">
-    <div class="card-title" style="color:#5DCAA5">👤 Assessores — Atividade por Usuário</div>
-    <div id="lista-assessores"><div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Carregando...</div></div>
+    <div class="card-title" style="color:#1F9D77">👤 Assessores — Atividade por Usuário</div>
+    <div id="lista-assessores"><div style="color:#5C7365;font-size:12px;padding:20px;text-align:center">Carregando...</div></div>
   </div>
 
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div class="card-title" style="color:#5DCAA5;margin-bottom:0">📋 Log de Atividade — Assessores</div>
+      <div class="card-title" style="color:#1F9D77;margin-bottom:0">📋 Log de Atividade — Assessores</div>
       <button class="btn-ghost" onclick="carregarDashboard()">↻ Atualizar</button>
     </div>
     <div style="overflow-x:auto">
       <table class="act-table" id="log-assessores">
         <thead><tr><th>Hora</th><th>Assessor</th><th>Ação</th><th>Detalhe</th></tr></thead>
-        <tbody id="log-assessores-body"><tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Carregando...</td></tr></tbody>
+        <tbody id="log-assessores-body"><tr><td colspan="4" style="color:#5C7365;text-align:center;padding:20px">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -13444,15 +13444,15 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
   <!-- ═══ Gestão de Acessos (senhas pessoais) ═══ -->
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:10px">
-      <div class="card-title" style="color:#C9A96E;margin-bottom:0">🔐 Gestão de Acessos — Senhas Pessoais</div>
+      <div class="card-title" style="color:#A8833C;margin-bottom:0">🔐 Gestão de Acessos — Senhas Pessoais</div>
       <button class="btn-ghost" onclick="carregarSenhas()">↻ Carregar</button>
     </div>
-    <p style="font-size:11px;color:#3A6A48;line-height:1.5;margin-bottom:12px">
+    <p style="font-size:11px;color:#5C7365;line-height:1.5;margin-bottom:12px">
       Por segurança, a senha pessoal de cada um é guardada criptografada e <b>não pode ser vista por ninguém</b> — nem pelo admin.
       Aqui você acompanha quem já criou a senha e pode <b>resetar</b> caso alguém esqueça (a pessoa cria uma nova no próximo acesso).
     </p>
     <div id="senhas-auth" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-      <input type="password" id="senhas-admin-pw" placeholder="Confirme a senha de admin" style="background:#060F0B;border:1px solid #2A2A18;border-radius:6px;padding:8px 10px;color:#F0F0F0;font-size:12px;outline:none;max-width:240px" onkeydown="if(event.key==='Enter')carregarSenhas()">
+      <input type="password" id="senhas-admin-pw" placeholder="Confirme a senha de admin" style="background:#EFF3EF;border:1px solid #F7F1D8;border-radius:6px;padding:8px 10px;color:#17271E;font-size:12px;outline:none;max-width:240px" onkeydown="if(event.key==='Enter')carregarSenhas()">
       <button class="btn btn-sm" onclick="carregarSenhas()">Ver acessos</button>
       <span id="senhas-st" style="font-size:11px"></span>
     </div>
@@ -13468,22 +13468,22 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 <!-- ═══════ TAB: LÍDERES ═══════ -->
 <div class="main-panel" id="tab-lideres">
   <div class="kpi-row">
-    <div class="kpi"><div class="kpi-val" id="kpi-lider-ativos" style="color:#8B9FE8">—</div><div class="kpi-lbl">Líderes Ativos</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-lider-acoes" style="color:#C9A96E">—</div><div class="kpi-lbl">Ações Realizadas</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-lider-ultimo" style="color:#8B9FE8;font-size:14px">—</div><div class="kpi-lbl">Último Acesso</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-lider-ativos" style="color:#4E63C8">—</div><div class="kpi-lbl">Líderes Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-lider-acoes" style="color:#A8833C">—</div><div class="kpi-lbl">Ações Realizadas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-lider-ultimo" style="color:#4E63C8;font-size:14px">—</div><div class="kpi-lbl">Último Acesso</div></div>
   </div>
 
   <div class="card">
-    <div class="card-title" style="color:#8B9FE8">👥 Líderes — Atividade por Usuário</div>
-    <div id="lista-lideres"><div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Carregando...</div></div>
+    <div class="card-title" style="color:#4E63C8">👥 Líderes — Atividade por Usuário</div>
+    <div id="lista-lideres"><div style="color:#5C7365;font-size:12px;padding:20px;text-align:center">Carregando...</div></div>
   </div>
 
   <div class="card">
-    <div class="card-title" style="color:#8B9FE8;margin-bottom:12px">📋 Log de Atividade — Líderes</div>
+    <div class="card-title" style="color:#4E63C8;margin-bottom:12px">📋 Log de Atividade — Líderes</div>
     <div style="overflow-x:auto">
       <table class="act-table">
         <thead><tr><th>Hora</th><th>Líder</th><th>Ação</th><th>Detalhe</th></tr></thead>
-        <tbody id="log-lideres-body"><tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Carregando...</td></tr></tbody>
+        <tbody id="log-lideres-body"><tr><td colspan="4" style="color:#5C7365;text-align:center;padding:20px">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -13494,34 +13494,34 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
   <!-- KPIs rápidos -->
   <div class="kpi-row" id="kpi-head-row">
-    <div class="kpi"><div class="kpi-val" id="kpi-docs" style="color:#C9A96E">—</div><div class="kpi-lbl">Docs na Base</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-calls" style="color:#5DCAA5">—</div><div class="kpi-lbl">Calls Ativos</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-estr" style="color:#8B9FE8">—</div><div class="kpi-lbl">Op. Estruturadas</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-prod" style="color:#C9A96E">—</div><div class="kpi-lbl">Produtos Destaque</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-alertas" style="color:#FF6B6B">—</div><div class="kpi-lbl">Alertas Ativos</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-gestoras" style="color:#5DCAA5">—</div><div class="kpi-lbl">Gestoras Cadastradas</div></div>
-    <div class="kpi"><div class="kpi-val" id="kpi-clientes" style="color:#8B9FE8">—</div><div class="kpi-lbl">Clientes Registrados</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-docs" style="color:#A8833C">—</div><div class="kpi-lbl">Docs na Base</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-calls" style="color:#1F9D77">—</div><div class="kpi-lbl">Calls Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-estr" style="color:#4E63C8">—</div><div class="kpi-lbl">Op. Estruturadas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-prod" style="color:#A8833C">—</div><div class="kpi-lbl">Produtos Destaque</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-alertas" style="color:#D93B3B">—</div><div class="kpi-lbl">Alertas Ativos</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-gestoras" style="color:#1F9D77">—</div><div class="kpi-lbl">Gestoras Cadastradas</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-clientes" style="color:#4E63C8">—</div><div class="kpi-lbl">Clientes Registrados</div></div>
   </div>
 
   <!-- Cenário Macro -->
   <div class="card" style="border-color:#2A3A20">
-    <div class="card-title" style="color:#C9A96E">🌐 Cenário Macro Atual</div>
-    <div id="head-cenario"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card-title" style="color:#A8833C">🌐 Cenário Macro Atual</div>
+    <div id="head-cenario"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
 
   <!-- Grid: Docs + Calls -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
 
     <!-- Base de Conhecimento -->
-    <div class="card" style="border-color:#2A2A18">
-      <div class="card-title" style="color:#C9A96E">📚 Base de Conhecimento</div>
-      <div id="head-docs"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card" style="border-color:#F7F1D8">
+      <div class="card-title" style="color:#A8833C">📚 Base de Conhecimento</div>
+      <div id="head-docs"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
     </div>
 
     <!-- Calls de Ações -->
-    <div class="card" style="border-color:#1A2E3A">
-      <div class="card-title" style="color:#5DCAA5">📈 Calls de Ações</div>
-      <div id="head-calls"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card" style="border-color:#EAF1F6">
+      <div class="card-title" style="color:#1F9D77">📈 Calls de Ações</div>
+      <div id="head-calls"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
     </div>
 
   </div>
@@ -13530,29 +13530,29 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
 
     <!-- Operações Estruturadas -->
-    <div class="card" style="border-color:#2A1A10">
-      <div class="card-title" style="color:#C9A96E">💼 Operações Estruturadas</div>
-      <div id="head-estruturadas"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card" style="border-color:#F3E7DD">
+      <div class="card-title" style="color:#A8833C">💼 Operações Estruturadas</div>
+      <div id="head-estruturadas"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
     </div>
 
     <!-- Alocações de Referência -->
-    <div class="card" style="border-color:#1A3A1A">
-      <div class="card-title" style="color:#5DCAA5">📐 Alocações de Referência — Gestoras</div>
-      <div id="head-gestoras"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card" style="border-color:#D9E3DB">
+      <div class="card-title" style="color:#1F9D77">📐 Alocações de Referência — Gestoras</div>
+      <div id="head-gestoras"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
     </div>
 
   </div>
 
   <!-- Alertas -->
   <div class="card" style="border-color:#2A1A08">
-    <div class="card-title" style="color:#FF6B6B">🚨 Alertas Ativos</div>
-    <div id="head-alertas"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card-title" style="color:#D93B3B">🚨 Alertas Ativos</div>
+    <div id="head-alertas"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
 
   <!-- Clientes Registrados -->
   <div class="card" style="border-color:#1A2A3A">
-    <div class="card-title" style="color:#8B9FE8">👤 Carteiras de Clientes Registradas</div>
-    <div id="head-clientes"><div style="color:#1E4A30;font-size:12px">Carregando...</div></div>
+    <div class="card-title" style="color:#4E63C8">👤 Carteiras de Clientes Registradas</div>
+    <div id="head-clientes"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
 
 </div>
@@ -13565,8 +13565,8 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
   <!-- Carta da Gestão -->
   <div class="card" style="margin-bottom:0">
-    <div class="card-title" style="color:#5DCAA5">📄 Carta da Gestão — Upload Mensal</div>
-    <p style="font-size:11px;color:#2A5A3A;margin-bottom:12px;line-height:1.5">Suba o PDF da carta mensal (Levante, BTG, XP Research…). O sistema extrai os insights e usa em todas as análises de carteira dos assessores.</p>
+    <div class="card-title" style="color:#1F9D77">📄 Carta da Gestão — Upload Mensal</div>
+    <p style="font-size:11px;color:#5C7365;margin-bottom:12px;line-height:1.5">Suba o PDF da carta mensal (Levante, BTG, XP Research…). O sistema extrai os insights e usa em todas as análises de carteira dos assessores.</p>
     <div class="upload-area" id="drop-carta">
       <input type="file" id="pdf-carta" accept=".pdf" onchange="onCartaSelect()">
       <div class="ui">
@@ -13580,14 +13580,14 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
       <span id="st-carta" style="font-size:11px"></span>
     </div>
     <div id="carta-preview" style="display:none;margin-top:8px">
-      <div class="info-box" id="carta-info" style="font-size:11px;color:#5DCAA5"></div>
+      <div class="info-box" id="carta-info" style="font-size:11px;color:#1F9D77"></div>
     </div>
-    <div style="margin-top:12px" id="status-contexto"><div class="info-box" style="color:#1E4A30;font-style:italic">Carregando status...</div></div>
+    <div style="margin-top:12px" id="status-contexto"><div class="info-box" style="color:#5C7365;font-style:italic">Carregando status...</div></div>
   </div>
 
   <!-- Comunicado -->
   <div class="card" style="margin-bottom:0">
-    <div class="card-title" style="color:#5DCAA5">📢 Comunicado para Assessores</div>
+    <div class="card-title" style="color:#1F9D77">📢 Comunicado para Assessores</div>
     <div style="margin-bottom:10px">
       <label>Estratégia do mês (visível na tela do assessor)</label>
       <textarea id="txt-estrategia" rows="3" placeholder="Ex: Foco em IPCA+ este mês. Clientes conservadores devem aumentar exposição em inflação..."></textarea>
@@ -13600,15 +13600,15 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
       <button class="btn btn-sm" onclick="salvarMensagem()">📤 Publicar</button>
       <span id="st-msg" style="font-size:11px"></span>
     </div>
-    <div style="margin-top:12px" id="status-msg"><div class="info-box" style="color:#1E4A30;font-style:italic">Carregando...</div></div>
+    <div style="margin-top:12px" id="status-msg"><div class="info-box" style="color:#5C7365;font-style:italic">Carregando...</div></div>
   </div>
 
 </div>
 
 <!-- Extrair Carteira da Carta (IA) -->
 <div class="card">
-  <div class="card-title" style="color:#5DCAA5">🧩 Extrair Carteira da Carta (IA)</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Suba o PDF de uma carteira modelo (ex.: perfil Conservadora da Levante, ou uma carteira da XP). A IA lê a composição (% por classe) e preenche a carteira que o assessor seleciona. Faça <b>uma carta por perfil</b>.</p>
+  <div class="card-title" style="color:#1F9D77">🧩 Extrair Carteira da Carta (IA)</div>
+  <p style="font-size:11px;color:#5C7365;margin-bottom:14px;line-height:1.5">Suba o PDF de uma carteira modelo (ex.: perfil Conservadora da Levante, ou uma carteira da XP). A IA lê a composição (% por classe) e preenche a carteira que o assessor seleciona. Faça <b>uma carta por perfil</b>.</p>
   <div class="grid-2" style="gap:14px">
     <div>
       <label>Carta (PDF)</label>
@@ -13643,8 +13643,8 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 
 <!-- Sugestões de Alocação -->
 <div class="card">
-  <div class="card-title" style="color:#5DCAA5">💡 Sugestões de Alocação para Assessores</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Monte as sugestões por categoria. Ao publicar, ficam disponíveis para todos os assessores filtradas pelo perfil do cliente.</p>
+  <div class="card-title" style="color:#1F9D77">💡 Sugestões de Alocação para Assessores</div>
+  <p style="font-size:11px;color:#5C7365;margin-bottom:14px;line-height:1.5">Monte as sugestões por categoria. Ao publicar, ficam disponíveis para todos os assessores filtradas pelo perfil do cliente.</p>
 
   <div style="margin-bottom:14px">
     <label>Título da publicação</label>
@@ -13673,7 +13673,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <input type="file" accept=".csv,.xlsx,.xls" onchange="importarPlanilha('rf',this)">
       </div>
       <button class="btn-ghost" onclick="baixarModelo('rf')">⬇ Modelo CSV</button>
-      <span id="import-st-rf" style="font-size:11px;color:#5DCAA5"></span>
+      <span id="import-st-rf" style="font-size:11px;color:#1F9D77"></span>
     </div>
     <!-- Preview PDF -->
     <div class="pdf-preview" id="pdf-preview-rf">
@@ -13704,7 +13704,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <input type="file" accept=".csv,.xlsx,.xls" onchange="importarPlanilha('rv',this)">
       </div>
       <button class="btn-ghost" onclick="baixarModelo('rv')">⬇ Modelo CSV</button>
-      <span id="import-st-rv" style="font-size:11px;color:#5DCAA5"></span>
+      <span id="import-st-rv" style="font-size:11px;color:#1F9D77"></span>
     </div>
     <div class="pdf-preview" id="pdf-preview-rv">
       <div class="pdf-header">
@@ -13734,7 +13734,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <input type="file" accept=".csv,.xlsx,.xls" onchange="importarFii(this)">
       </div>
       <button class="btn-ghost" onclick="baixarModelo('fii')">⬇ Modelo CSV</button>
-      <span id="import-st-fii" style="font-size:11px;color:#5DCAA5"></span>
+      <span id="import-st-fii" style="font-size:11px;color:#1F9D77"></span>
     </div>
     <div class="pdf-preview" id="pdf-preview-fii">
       <div class="pdf-header">
@@ -13747,7 +13747,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <button class="btn-ghost" onclick="copiarPdf('fii')">📋 Copiar</button>
       </div>
     </div>
-    <p style="font-size:11px;color:#3A6A48;margin-bottom:6px">Uma linha por fundo: <b style="color:#5DCAA5">TICKER | Segmento | % sugerido | Motivo</b></p>
+    <p style="font-size:11px;color:#5C7365;margin-bottom:6px">Uma linha por fundo: <b style="color:#1F9D77">TICKER | Segmento | % sugerido | Motivo</b></p>
     <textarea id="sg-fii" rows="8" placeholder="MXRF11 | Papel | 0.5% | Alta distribuição, baixa volatilidade&#10;HGLG11 | Logística | 1.0% | Contratos longos, boa gestão&#10;XPML11 | Shopping | 0.8% | Recuperação do varejo&#10;BTLG11 | Logística | 0.7% | Portfólio diversificado"></textarea>
   </div>
 
@@ -13764,7 +13764,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <input type="file" accept=".csv,.xlsx,.xls" onchange="importarPlanilha('intl',this)">
       </div>
       <button class="btn-ghost" onclick="baixarModelo('intl')">⬇ Modelo CSV</button>
-      <span id="import-st-intl" style="font-size:11px;color:#5DCAA5"></span>
+      <span id="import-st-intl" style="font-size:11px;color:#1F9D77"></span>
     </div>
     <div class="pdf-preview" id="pdf-preview-intl">
       <div class="pdf-header">
@@ -13789,7 +13789,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <button class="btn btn-sm btn-out">📄 PDF</button>
         <input type="file" accept=".pdf" onchange="uploadPdfCategoria('est',this)">
       </div>
-      <span id="import-st-est" style="font-size:11px;color:#5DCAA5"></span>
+      <span id="import-st-est" style="font-size:11px;color:#1F9D77"></span>
     </div>
     <div class="pdf-preview" id="pdf-preview-est">
       <div class="pdf-header">
@@ -13802,7 +13802,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
         <button class="btn-ghost" onclick="copiarPdf('est')">📋 Copiar</button>
       </div>
     </div>
-    <p style="font-size:11px;color:#3A6A48;margin-bottom:6px">Descreva as operações estruturadas disponíveis — exibido para clientes com ações na carteira.</p>
+    <p style="font-size:11px;color:#5C7365;margin-bottom:6px">Descreva as operações estruturadas disponíveis — exibido para clientes com ações na carteira.</p>
     <textarea id="sg-est" rows="8" placeholder="PETR4 — Financiamento com venda de call coberta OTM 10%, vencimento mensal.&#10;VALE3 — Trava de alta com compra de call ATM e venda de call OTM 15%.&#10;ITUB4 — Proteção com put ATM para carteiras acima de R$ 100k na ação."></textarea>
   </div>
 
@@ -13817,7 +13817,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#5DCAA5}
 <!-- Histórico -->
 <div class="card">
   <div class="card-title">📋 Histórico de Publicações</div>
-  <div id="sg-historico"><p style="color:#1E4A30;font-size:12px;font-style:italic">Carregando...</p></div>
+  <div id="sg-historico"><p style="color:#5C7365;font-size:12px;font-style:italic">Carregando...</p></div>
 </div>
 
 <script>
@@ -13865,9 +13865,9 @@ async function init(){
     // Status carta
     const ctxEl = document.getElementById("status-contexto");
     if(info.carta && info.carta.nome){
-      ctxEl.innerHTML = `<div class="info-box"><b>Carta ativa:</b> ${info.carta.nome}<br><span style="color:#5DCAA5">Atualizado: ${info.carta.atualizado}</span></div>`;
+      ctxEl.innerHTML = `<div class="info-box"><b>Carta ativa:</b> ${info.carta.nome}<br><span style="color:#1F9D77">Atualizado: ${info.carta.atualizado}</span></div>`;
     } else {
-      ctxEl.innerHTML = `<div class="info-box" style="color:#1E4A30">Nenhuma carta carregada.</div>`;
+      ctxEl.innerHTML = `<div class="info-box" style="color:#5C7365">Nenhuma carta carregada.</div>`;
     }
 
     // Status comunicado
@@ -13882,15 +13882,15 @@ async function init(){
         const dt = new Date(+p[3], +p[2]-1, +p[1], +p[4], +p[5]);
         const h = (Date.now() - dt.getTime())/3600000;
         selo = h > 72
-          ? `<br><span style="color:#E8A87C">⏳ Expirado — não aparece mais para os assessores. Republique para reexibir por mais 72h.</span>`
-          : `<br><span style="color:#5DCAA5">✓ Visível aos assessores — expira em ${Math.ceil(72-h)}h</span>`;
+          ? `<br><span style="color:#C0673A">⏳ Expirado — não aparece mais para os assessores. Republique para reexibir por mais 72h.</span>`
+          : `<br><span style="color:#1F9D77">✓ Visível aos assessores — expira em ${Math.ceil(72-h)}h</span>`;
       }
       msgEl.innerHTML = `<div class="info-box"><b>Publicado em:</b> ${info.mensagem.atualizado}${selo}</div>`;
     } else {
-      msgEl.innerHTML = `<div class="info-box" style="color:#1E4A30">Nenhum comunicado publicado.</div>`;
+      msgEl.innerHTML = `<div class="info-box" style="color:#5C7365">Nenhum comunicado publicado.</div>`;
     }
   } catch(e){
-    document.getElementById("status-contexto").innerHTML = '<div class="info-box" style="color:#3A6A48">Erro ao carregar status.</div>';
+    document.getElementById("status-contexto").innerHTML = '<div class="info-box" style="color:#5C7365">Erro ao carregar status.</div>';
   }
 }
 
@@ -13955,7 +13955,7 @@ async function extrairCarteiraIA(){
     destino = gestoraNome.trim();   // backend cria a gestora pelo nome
   }
   btn.disabled = true; btn.textContent = "🤖 Extraindo...";
-  st.innerHTML = '<span style="color:#C9A96E">IA lendo a composição da carta…</span>';
+  st.innerHTML = '<span style="color:#A8833C">IA lendo a composição da carta…</span>';
   res.style.display = "none";
   try{
     const fd = new FormData();
@@ -13969,14 +13969,14 @@ async function extrairCarteiraIA(){
     if(!d.ok){ throw new Error(d.error||"Falha na extração"); }
     const LBL = {pos_fixado:"Pós Fixado",inflacao:"Inflação",pre_fixado:"Pré Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional",alternativos:"Alternativos",criptomoedas:"Criptomoedas"};
     const linhas = Object.entries(d.alocacao).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1])
-      .map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span style="color:#888">${LBL[k]||k}</span><b style="color:#5DCAA5">${v}%</b></div>`).join("");
-    const somaCor = (Math.abs(d.soma-100) <= 2) ? "#5DCAA5" : "#FF9F40";
+      .map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span style="color:#8A9A8E">${LBL[k]||k}</span><b style="color:#1F9D77">${v}%</b></div>`).join("");
+    const somaCor = (Math.abs(d.soma-100) <= 2) ? "#1F9D77" : "#C0673A";
     st.innerHTML = `<span class="status-ok">✓ ${d.salvo?"Salvo":"Extraído"} — perfil ${d.perfil}</span>`;
     res.style.display = "block";
     res.innerHTML = `<div class="info-box" style="font-size:12px">
-      <div style="color:#C9A96E;font-weight:700;margin-bottom:6px">Alocação extraída ${d.destino==="levante"?"→ Levante":""}</div>
+      <div style="color:#A8833C;font-weight:700;margin-bottom:6px">Alocação extraída ${d.destino==="levante"?"→ Levante":""}</div>
       ${linhas}
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0 0;border-top:1px solid #1E1E1E;margin-top:6px"><span style="color:#888">Soma</span><b style="color:${somaCor}">${d.soma}%</b></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0 0;border-top:1px solid #FFFFFF;margin-top:6px"><span style="color:#8A9A8E">Soma</span><b style="color:${somaCor}">${d.soma}%</b></div>
     </div>`;
     carregarDestinosCarteira();
   }catch(e){
@@ -14218,16 +14218,16 @@ async function carregarHistorico(){
   const data = await fetch("/api/sugestoes").then(r=>r.json()).catch(()=>({historico:[]}));
   const el   = document.getElementById("sg-historico");
   const hist = data.historico || [];
-  if(!hist.length){ el.innerHTML='<p style="color:#1E4A30;font-size:12px;font-style:italic">Nenhuma publicação ainda.</p>'; return; }
+  if(!hist.length){ el.innerHTML='<p style="color:#5C7365;font-size:12px;font-style:italic">Nenhuma publicação ainda.</p>'; return; }
   el.innerHTML = hist.map(s=>{
     const total = (s.rf?.length||0)+(s.rv?.length||0)+(s.intl?.length||0)+(s.internacional?.length||0)+(s.fiis?.length||0);
     const ativaHtml = s.ativa
       ? `<span class="tag-ativa">● ATIVA</span>`
-      : `<span style="font-size:10px;color:#1C4A34">inativa</span>`;
+      : `<span style="font-size:10px;color:#D9E3DB">inativa</span>`;
     return `<div class="hist-item ${s.ativa?'ativa':''}">
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:${s.ativa?'#5DCAA5':'#3A6A48'}">${s.titulo||"—"}</div>
-        <div style="font-size:10px;color:#2A5A3A;margin-top:3px">${s.criado_em||""} · RF:${s.rf?.length||0} RV:${s.rv?.length||0} FIIs:${s.fiis?.length||0} Intl:${s.internacional?.length||s.intl?.length||0} · ${total} sugestões</div>
+        <div style="font-size:13px;font-weight:700;color:${s.ativa?'#1F9D77':'#5C7365'}">${s.titulo||"—"}</div>
+        <div style="font-size:10px;color:#5C7365;margin-top:3px">${s.criado_em||""} · RF:${s.rf?.length||0} RV:${s.rv?.length||0} FIIs:${s.fiis?.length||0} Intl:${s.internacional?.length||s.intl?.length||0} · ${total} sugestões</div>
       </div>
       ${ativaHtml}
     </div>`;
@@ -14356,39 +14356,39 @@ let _senhasAdminPw = "";
 async function carregarSenhas(){
   const pw = document.getElementById("senhas-admin-pw").value || _senhasAdminPw;
   const st = document.getElementById("senhas-st");
-  if(!pw){ st.innerHTML = '<span style="color:#FF6B6B">Digite a senha de admin.</span>'; return; }
-  st.innerHTML = '<span style="color:#D4B483">Carregando...</span>';
+  if(!pw){ st.innerHTML = '<span style="color:#D93B3B">Digite a senha de admin.</span>'; return; }
+  st.innerHTML = '<span style="color:#A8833C">Carregando...</span>';
   try{
     const r = await fetch("/api/admin/senhas-status",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({admin_senha:pw})});
     const d = await r.json();
-    if(!d.ok){ st.innerHTML = `<span style="color:#FF6B6B">${d.msg||"Falha"}</span>`; return; }
+    if(!d.ok){ st.innerHTML = `<span style="color:#D93B3B">${d.msg||"Falha"}</span>`; return; }
     _senhasAdminPw = pw;
     st.textContent = "";
     renderSenhas(d.assessores||[], d.papeis||[]);
-  } catch(e){ st.innerHTML = '<span style="color:#FF6B6B">Erro de conexão.</span>'; }
+  } catch(e){ st.innerHTML = '<span style="color:#D93B3B">Erro de conexão.</span>'; }
 }
 
 function renderSenhas(assessores, papeis){
   const tb = document.getElementById("senhas-body");
   const chip = (tem)=> tem
-    ? '<span style="background:#0A2A18;color:#5DCAA5;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✓ Criada</span>'
-    : '<span style="background:#2A1A0A;color:#D4B483;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">⏳ Pendente</span>';
+    ? '<span style="background:#E9F5EE;color:#1F9D77;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">✓ Criada</span>'
+    : '<span style="background:#2A1A0A;color:#A8833C;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">⏳ Pendente</span>';
   const linhas = [];
   assessores.forEach(a=>{
     linhas.push(`<tr>
       <td style="text-align:left">${a.nome}</td>
-      <td style="font-family:monospace;color:#C9A96E">${a.codigo}</td>
+      <td style="font-family:monospace;color:#A8833C">${a.codigo}</td>
       <td>${chip(a.tem_senha)}</td>
-      <td style="color:#888;font-size:11px">${a.criada_em||"—"}</td>
+      <td style="color:#8A9A8E;font-size:11px">${a.criada_em||"—"}</td>
       <td>${a.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#5A2A2A;color:#FF8B8B" onclick="resetarSenha('${a.codigo}','${a.nome.replace(/'/g,"")}')">Resetar</button>` : ""}</td>
     </tr>`);
   });
   papeis.forEach(p=>{
     linhas.push(`<tr style="opacity:.85">
-      <td style="text-align:left">${p.label} <span style="font-size:10px;color:#3A6A48">(perfil)</span></td>
-      <td style="font-family:monospace;color:#8B9FE8">${p.role}</td>
+      <td style="text-align:left">${p.label} <span style="font-size:10px;color:#5C7365">(perfil)</span></td>
+      <td style="font-family:monospace;color:#4E63C8">${p.role}</td>
       <td>${chip(p.tem_senha)}</td>
-      <td style="color:#888;font-size:11px">${p.criada_em||"—"}</td>
+      <td style="color:#8A9A8E;font-size:11px">${p.criada_em||"—"}</td>
       <td>${p.tem_senha ? `<button class="btn-ghost" style="font-size:11px;padding:3px 10px;border-color:#5A2A2A;color:#FF8B8B" onclick="resetarSenha('${p.role}','${p.label}')">Resetar</button>` : ""}</td>
     </tr>`);
   });
@@ -14423,9 +14423,9 @@ function renderAssessores(assessores){
   // Cards
   const lista = document.getElementById("lista-assessores");
   if(!assessores.length){
-    lista.innerHTML = '<div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Nenhum assessor registrado ainda.</div>';
+    lista.innerHTML = '<div style="color:#5C7365;font-size:12px;padding:20px;text-align:center">Nenhum assessor registrado ainda.</div>';
   } else {
-    const colors = ["#5DCAA5","#8B9FE8","#C9A96E","#FF8B6B","#A0D8A0"];
+    const colors = ["#1F9D77","#4E63C8","#A8833C","#FF8B6B","#A0D8A0"];
     lista.innerHTML = assessores.map((a,i)=>{
       const analises = (a.acoes||[]).filter(x=>x.acao==="análise");
       const logHtml  = (a.acoes||[]).slice(0,5).map(x=>
@@ -14436,7 +14436,7 @@ function renderAssessores(assessores){
         <div class="user-info">
           <div class="user-name">${a.nome||"Desconhecido"}</div>
           <div class="user-meta">Último acesso: ${a.ultimo||"—"} · ${(a.acoes||[]).length} ações · ${analises.length} análises</div>
-          <div class="user-log">${logHtml||'<div class="log-row"><span style="color:#1E4A30">Sem atividade registrada</span></div>'}</div>
+          <div class="user-log">${logHtml||'<div class="log-row"><span style="color:#5C7365">Sem atividade registrada</span></div>'}</div>
         </div>
         <span class="badge badge-assessor">Assessor</span>
       </div>`;
@@ -14447,8 +14447,8 @@ function renderAssessores(assessores){
   const activity = _dashData?._raw_activity || [];
   const rows = activity.filter(e=>e.role==="assessor").slice(0,50);
   document.getElementById("log-assessores-body").innerHTML = rows.length
-    ? rows.map(e=>`<tr><td style="color:#2A5A3A">${e.ts||""}</td><td style="color:#F0F0F0;font-weight:600">${e.nome||""}</td><td><span class="badge badge-${e.acao==="análise"?"warn":"ok"}">${e.acao||""}</span></td><td style="color:#888">${e.detalhe||""}</td></tr>`).join("")
-    : `<tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Sem atividade registrada.</td></tr>`;
+    ? rows.map(e=>`<tr><td style="color:#5C7365">${e.ts||""}</td><td style="color:#17271E;font-weight:600">${e.nome||""}</td><td><span class="badge badge-${e.acao==="análise"?"warn":"ok"}">${e.acao||""}</span></td><td style="color:#8A9A8E">${e.detalhe||""}</td></tr>`).join("")
+    : `<tr><td colspan="4" style="color:#5C7365;text-align:center;padding:20px">Sem atividade registrada.</td></tr>`;
 }
 
 // ─── Líderes ──────────────────────────────────────────────────────────────────
@@ -14461,18 +14461,18 @@ function renderLideres(lideres){
 
   const lista = document.getElementById("lista-lideres");
   if(!lideres.length){
-    lista.innerHTML = '<div style="color:#1E4A30;font-size:12px;padding:20px;text-align:center">Nenhum líder registrado ainda.</div>';
+    lista.innerHTML = '<div style="color:#5C7365;font-size:12px;padding:20px;text-align:center">Nenhum líder registrado ainda.</div>';
   } else {
     lista.innerHTML = lideres.map(l=>{
       const logHtml = (l.acoes||[]).slice(0,5).map(x=>
         `<div class="log-row"><span class="log-ts">${x.ts||""}</span><span>${x.acao}: ${x.detalhe||""}</span></div>`
       ).join("");
       return `<div class="user-card">
-        <div class="user-avatar" style="background:#8B9FE820;color:#8B9FE8">${(l.nome||"?")[0].toUpperCase()}</div>
+        <div class="user-avatar" style="background:#8B9FE820;color:#4E63C8">${(l.nome||"?")[0].toUpperCase()}</div>
         <div class="user-info">
           <div class="user-name">${l.nome||"Desconhecido"}</div>
           <div class="user-meta">Último acesso: ${l.ultimo||"—"} · ${(l.acoes||[]).length} ações</div>
-          <div class="user-log">${logHtml||'<div class="log-row"><span style="color:#1E4A30">Sem atividade</span></div>'}</div>
+          <div class="user-log">${logHtml||'<div class="log-row"><span style="color:#5C7365">Sem atividade</span></div>'}</div>
         </div>
         <span class="badge badge-lider">Líder</span>
       </div>`;
@@ -14482,8 +14482,8 @@ function renderLideres(lideres){
   const activity = _dashData?._raw_activity || [];
   const rows = activity.filter(e=>e.role==="lider"||e.role==="líder").slice(0,50);
   document.getElementById("log-lideres-body").innerHTML = rows.length
-    ? rows.map(e=>`<tr><td style="color:#2A5A3A">${e.ts||""}</td><td style="color:#F0F0F0;font-weight:600">${e.nome||""}</td><td><span class="badge badge-lider">${e.acao||""}</span></td><td style="color:#888">${e.detalhe||""}</td></tr>`).join("")
-    : `<tr><td colspan="4" style="color:#1E4A30;text-align:center;padding:20px">Sem atividade registrada.</td></tr>`;
+    ? rows.map(e=>`<tr><td style="color:#5C7365">${e.ts||""}</td><td style="color:#17271E;font-weight:600">${e.nome||""}</td><td><span class="badge badge-lider">${e.acao||""}</span></td><td style="color:#8A9A8E">${e.detalhe||""}</td></tr>`).join("")
+    : `<tr><td colspan="4" style="color:#5C7365;text-align:center;padding:20px">Sem atividade registrada.</td></tr>`;
 }
 
 // ─── Head ─────────────────────────────────────────────────────────────────────
@@ -14498,46 +14498,46 @@ function renderHead(h){
 
   // Cenário
   const c = h.cenario || {};
-  const cenRef = c.referencia ? `<div style="font-size:10px;color:#3A6A48;margin-bottom:8px">📅 Referência: <b style="color:#C9A96E">${c.referencia}</b></div>` : "";
+  const cenRef = c.referencia ? `<div style="font-size:10px;color:#5C7365;margin-bottom:8px">📅 Referência: <b style="color:#A8833C">${c.referencia}</b></div>` : "";
   const cenHtml = c.global || c.brasil || c.posicionamento
     ? `${cenRef}
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-        <div><div style="font-size:10px;color:#3A6A48;margin-bottom:4px;font-weight:700">🌐 GLOBAL</div><div style="font-size:11px;color:#CCC;line-height:1.6">${(c.global||"").substring(0,200)}${c.global_chars>200?"…":""}</div></div>
-        <div><div style="font-size:10px;color:#3A6A48;margin-bottom:4px;font-weight:700">🇧🇷 BRASIL</div><div style="font-size:11px;color:#CCC;line-height:1.6">${(c.brasil||"").substring(0,200)}${c.brasil_chars>200?"…":""}</div></div>
-        <div><div style="font-size:10px;color:#3A6A48;margin-bottom:4px;font-weight:700">🎯 POSICIONAMENTO</div><div style="font-size:11px;color:#CCC;line-height:1.6">${(c.posicionamento||"").substring(0,200)}${c.pos_chars>200?"…":""}</div></div>
+        <div><div style="font-size:10px;color:#5C7365;margin-bottom:4px;font-weight:700">🌐 GLOBAL</div><div style="font-size:11px;color:#5C7365;line-height:1.6">${(c.global||"").substring(0,200)}${c.global_chars>200?"…":""}</div></div>
+        <div><div style="font-size:10px;color:#5C7365;margin-bottom:4px;font-weight:700">🇧🇷 BRASIL</div><div style="font-size:11px;color:#5C7365;line-height:1.6">${(c.brasil||"").substring(0,200)}${c.brasil_chars>200?"…":""}</div></div>
+        <div><div style="font-size:10px;color:#5C7365;margin-bottom:4px;font-weight:700">🎯 POSICIONAMENTO</div><div style="font-size:11px;color:#5C7365;line-height:1.6">${(c.posicionamento||"").substring(0,200)}${c.pos_chars>200?"…":""}</div></div>
       </div>`
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic">Nenhum cenário publicado ainda.</div>`;
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic">Nenhum cenário publicado ainda.</div>`;
   document.getElementById("head-cenario").innerHTML = cenHtml;
 
   // Base de Conhecimento
   const docs = h.knowledge || [];
   document.getElementById("head-docs").innerHTML = docs.length
     ? docs.map(d=>`<div class="doc-row"><span class="doc-icon">📄</span><span class="doc-name" title="${d.nome||""}">${d.nome||"Documento"}</span><span class="doc-meta">${d.data||""}</span></div>`).join("")
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhum documento na base.</div>`;
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic;padding:8px">Nenhum documento na base.</div>`;
 
   // Calls
   const calls = h.calls || [];
   document.getElementById("head-calls").innerHTML = calls.length
-    ? calls.map(c=>`<div class="doc-row"><span class="doc-icon">📈</span><span class="doc-name">${c.ativo||c.nome||"—"} <span style="font-size:10px;color:#888">${c.acao||""}</span></span><span class="doc-meta">${c.data||""}</span></div>`).join("")
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma call ativa.</div>`;
+    ? calls.map(c=>`<div class="doc-row"><span class="doc-icon">📈</span><span class="doc-name">${c.ativo||c.nome||"—"} <span style="font-size:10px;color:#8A9A8E">${c.acao||""}</span></span><span class="doc-meta">${c.data||""}</span></div>`).join("")
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic;padding:8px">Nenhuma call ativa.</div>`;
 
   // Estruturadas
   const estr = h.estruturadas || [];
   document.getElementById("head-estruturadas").innerHTML = estr.length
-    ? estr.map(e=>`<div class="doc-row"><span class="doc-icon">💼</span><span class="doc-name">${e.ativo||"—"} <span style="font-size:10px;color:#888">${e.tipo||""}</span></span><span class="doc-meta" style="color:#C9A96E">${e.retorno||""}</span></div>`).join("")
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma operação cadastrada.</div>`;
+    ? estr.map(e=>`<div class="doc-row"><span class="doc-icon">💼</span><span class="doc-name">${e.ativo||"—"} <span style="font-size:10px;color:#8A9A8E">${e.tipo||""}</span></span><span class="doc-meta" style="color:#A8833C">${e.retorno||""}</span></div>`).join("")
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic;padding:8px">Nenhuma operação cadastrada.</div>`;
 
   // Gestoras
   const gest = h.gestoras2 || [];
   document.getElementById("head-gestoras").innerHTML = gest.length
     ? gest.map(g=>`<div class="doc-row"><span class="doc-icon">🏦</span><span class="doc-name">${g.nome||"—"}</span><span class="doc-meta">${g.referencia||""}</span></div>`).join("")
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma gestora cadastrada.</div>`;
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic;padding:8px">Nenhuma gestora cadastrada.</div>`;
 
   // Alertas
   const alertas = h.alertas || [];
   document.getElementById("head-alertas").innerHTML = alertas.length
     ? alertas.map(a=>`<div class="doc-row"><span class="doc-icon">🚨</span><span class="doc-name">${a.titulo||a.texto||"Alerta"}</span><span class="doc-meta">${a.data||""}</span></div>`).join("")
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhum alerta ativo.</div>`;
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic;padding:8px">Nenhum alerta ativo.</div>`;
 
   // Clientes registrados
   const clientes = h.clientes || [];
@@ -14548,16 +14548,16 @@ function renderHead(h){
         <tbody>${clientes.map(c=>{
           const ativos = [...(c.acoes||[]).slice(0,3).map(a=>a.ticker), ...(c.fiis||[]).slice(0,2).map(f=>f.ticker)].filter(Boolean).join(", ");
           return `<tr>
-            <td style="color:#C9A96E;font-weight:600">${c.conta||"—"}</td>
-            <td style="color:#AAA">${c.assessor||"—"}</td>
+            <td style="color:#A8833C;font-weight:600">${c.conta||"—"}</td>
+            <td style="color:#8A9A8E">${c.assessor||"—"}</td>
             <td><span class="badge badge-assessor">${c.perfil||"—"}</span></td>
-            <td style="color:#5DCAA5;font-weight:700">${fmtPat(c.patrimonio||0)}</td>
-            <td style="color:#888;font-size:11px">${ativos||"—"}</td>
-            <td style="color:#2A5A3A;font-size:10px">${c.atualizado_em||"—"}</td>
+            <td style="color:#1F9D77;font-weight:700">${fmtPat(c.patrimonio||0)}</td>
+            <td style="color:#8A9A8E;font-size:11px">${ativos||"—"}</td>
+            <td style="color:#5C7365;font-size:10px">${c.atualizado_em||"—"}</td>
           </tr>`;
         }).join("")}</tbody>
       </table></div>`
-    : `<div style="color:#1E4A30;font-size:12px;font-style:italic;padding:8px">Nenhuma carteira registrada ainda.</div>`;
+    : `<div style="color:#5C7365;font-size:12px;font-style:italic;padding:8px">Nenhuma carteira registrada ainda.</div>`;
 }
 
 // ─── Load on start ────────────────────────────────────────────────────────────
@@ -14576,85 +14576,85 @@ HTML_HEAD = r"""<!DOCTYPE html>
 <title>Braúna — Head de Produtos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#071E17;color:#F0F0F0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{background:#0F0F0A;border-bottom:1px solid #2A2A18;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-header h1{font-size:17px;color:#D4B483;font-weight:700}
-header p{font-size:11px;color:#2A5A3A;margin-top:2px}
+body{background:#EFF3EF;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:#0F0F0A;border-bottom:1px solid #F7F1D8;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header h1{font-size:17px;color:#A8833C;font-weight:700}
+header p{font-size:11px;color:#5C7365;margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #2A2A18;color:#4A7055;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
-.nav a:hover,.nav button:hover{border-color:#D4B483;color:#D4B483}
-.nav a.active{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
+.nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #F7F1D8;color:#5C7365;text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
+.nav a:hover,.nav button:hover{border-color:#A8833C;color:#A8833C}
+.nav a.active{background:#A8833C;color:#000;border-color:#A8833C;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
-.card{background:#0F0F0A;border:1px solid #2A2A18;border-radius:12px;padding:22px;margin-bottom:18px}
-.card-title{font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card{background:#0F0F0A;border:1px solid #F7F1D8;border-radius:12px;padding:22px;margin-bottom:18px}
+.card-title{font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title span{font-size:16px}
 /* Tabs */
 .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.tab{padding:7px 16px;border-radius:8px;border:1px solid #2A2A18;background:#060F0B;color:#4A7055;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
-.tab.active{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
+.tab{padding:7px 16px;border-radius:8px;border:1px solid #F7F1D8;background:#EFF3EF;color:#5C7365;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.tab.active{background:#A8833C;color:#000;border-color:#A8833C;font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
 /* Portfólio modelo — tabela */
 .porto-table{width:100%;border-collapse:collapse;font-size:12px}
-.porto-table th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #2A2A18;color:#4A7055}
-.porto-table th.classe{text-align:left;color:#D4B483;width:140px}
+.porto-table th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #F7F1D8;color:#5C7365}
+.porto-table th.classe{text-align:left;color:#A8833C;width:140px}
 .porto-table td{padding:6px 8px;border-bottom:1px solid #1A1A10;text-align:center}
-.porto-table td.classe-label{text-align:left;font-size:11px;color:#CCC;padding-left:4px}
-.porto-table td input[type=number]{width:70px;background:#060F0B;border:1px solid #2A2A18;border-radius:5px;padding:5px 6px;color:#F0F0F0;font-size:12px;text-align:center;outline:none}
-.porto-table td input[type=number]:focus{border-color:#D4B483}
-.porto-table .total-row td{font-weight:700;font-size:12px;border-top:2px solid #2A2A18;padding-top:8px}
-.total-val{color:#D4B483}
-.total-ok{color:#5DCAA5}.total-err{color:#FF6B6B}
+.porto-table td.classe-label{text-align:left;font-size:11px;color:#5C7365;padding-left:4px}
+.porto-table td input[type=number]{width:70px;background:#EFF3EF;border:1px solid #F7F1D8;border-radius:5px;padding:5px 6px;color:#17271E;font-size:12px;text-align:center;outline:none}
+.porto-table td input[type=number]:focus{border-color:#A8833C}
+.porto-table .total-row td{font-weight:700;font-size:12px;border-top:2px solid #F7F1D8;padding-top:8px}
+.total-val{color:#A8833C}
+.total-ok{color:#1F9D77}.total-err{color:#D93B3B}
 /* Viés badges */
-.vies-select{background:#060F0B;border:1px solid #2A2A18;border-radius:5px;padding:4px 6px;color:#CCC;font-size:11px;outline:none;cursor:pointer}
-.vies-select:focus{border-color:#D4B483}
+.vies-select{background:#EFF3EF;border:1px solid #F7F1D8;border-radius:5px;padding:4px 6px;color:#5C7365;font-size:11px;outline:none;cursor:pointer}
+.vies-select:focus{border-color:#A8833C}
 /* Inputs gerais */
-label{font-size:11px;color:#4A7055;display:block;margin-bottom:5px}
-input[type=text],textarea,select:not(.vies-select){width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none;font-family:inherit}
-input[type=text]:focus,textarea:focus{border-color:#D4B483}
+label{font-size:11px;color:#5C7365;display:block;margin-bottom:5px}
+input[type=text],textarea,select:not(.vies-select){width:100%;background:#EFF3EF;border:1px solid #F7F1D8;border-radius:7px;padding:8px 10px;color:#17271E;font-size:13px;outline:none;font-family:inherit}
+input[type=text]:focus,textarea:focus{border-color:#A8833C}
 textarea{resize:vertical}
 /* Produto item */
-.prod-item{background:#060F0B;border:1px solid #2A2A18;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
+.prod-item{background:#EFF3EF;border:1px solid #F7F1D8;border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.prod-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#2A2A18;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
-.prod-del:hover{color:#FF6B6B}
+.prod-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#F7F1D8;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
+.prod-del:hover{color:#D93B3B}
 .prod-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
 .prod-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.prod-mini label{font-size:10px;color:#3A6A48;margin-bottom:3px}
+.prod-mini label{font-size:10px;color:#5C7365;margin-bottom:3px}
 /* Botões */
-.btn{display:inline-flex;align-items:center;gap:6px;background:#D4B483;color:#000;border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;background:#A8833C;color:#000;border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn:hover{opacity:.88;transform:translateY(-1px)}
 .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.btn-out{background:transparent;color:#D4B483;border:1px solid #D4B483}
-.btn-out:hover{background:#D4B483;color:#000}
+.btn-out{background:transparent;color:#A8833C;border:1px solid #A8833C}
+.btn-out:hover{background:#A8833C;color:#000}
 .btn-sm{padding:6px 14px;font-size:12px}
-.btn-ghost{background:transparent;border:1px solid #2A2A18;color:#3A6A48;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
-.btn-ghost:hover{border-color:#D4B483;color:#D4B483}
-.btn-add{background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .2s;margin-bottom:10px;font-family:inherit}
-.btn-add:hover{background:#D4B483;color:#000}
+.btn-ghost{background:transparent;border:1px solid #F7F1D8;color:#5C7365;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost:hover{border-color:#A8833C;color:#A8833C}
+.btn-add{background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .2s;margin-bottom:10px;font-family:inherit}
+.btn-add:hover{background:#A8833C;color:#000}
 /* Status */
-.status-ok{color:#5DCAA5}.status-err{color:#FF6B6B}
-.info-box{background:#060F0B;border-radius:8px;padding:12px 14px;font-size:12px;color:#3A6A48;line-height:1.6;border:1px solid #2A2A18}
-.info-box b{color:#D4B483}
+.status-ok{color:#1F9D77}.status-err{color:#D93B3B}
+.info-box{background:#EFF3EF;border-radius:8px;padding:12px 14px;font-size:12px;color:#5C7365;line-height:1.6;border:1px solid #F7F1D8}
+.info-box b{color:#A8833C}
 /* Publish bar */
-.publish-bar{background:#1A1A08;border:2px solid #D4B483;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:border-color .3s,background .3s;position:relative;overflow:hidden}
-.publish-bar.pendente{border-color:#FF4444 !important;background:#1A0808 !important;animation:piscar-pub 1.2s ease-in-out infinite}
-@keyframes piscar-pub{0%,100%{border-color:#FF4444;box-shadow:0 0 0 0 #FF444400}50%{border-color:#FF8888;box-shadow:0 0 16px 4px #FF444455}}
+.publish-bar{background:#FBF3D2;border:2px solid #A8833C;border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:border-color .3s,background .3s;position:relative;overflow:hidden}
+.publish-bar.pendente{border-color:#CF2E2E !important;background:#FBE9E9 !important;animation:piscar-pub 1.2s ease-in-out infinite}
+@keyframes piscar-pub{0%,100%{border-color:#CF2E2E;box-shadow:0 0 0 0 #FF444400}50%{border-color:#FF8888;box-shadow:0 0 16px 4px #FF444455}}
 .publish-bar .pub-info{flex:1}
-.publish-bar .pub-info h3{font-size:14px;color:#D4B483;font-weight:700;transition:color .3s}
-.publish-bar.pendente .pub-info h3{color:#FF6B6B}
-.publish-bar .pub-info p{font-size:11px;color:#4A7055;margin-top:3px}
+.publish-bar .pub-info h3{font-size:14px;color:#A8833C;font-weight:700;transition:color .3s}
+.publish-bar.pendente .pub-info h3{color:#D93B3B}
+.publish-bar .pub-info p{font-size:11px;color:#5C7365;margin-top:3px}
 /* Referência */
 .ref-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .ref-row input{max-width:320px;font-size:12px;padding:6px 10px}
-.ref-badge{font-size:10px;padding:3px 10px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:10px;white-space:nowrap}
+.ref-badge{font-size:10px;padding:3px 10px;background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:10px;white-space:nowrap}
 /* Viés indicator */
-.vies-pos{color:#5DCAA5}.vies-neg{color:#FF6B6B}.vies-neu{color:#4A7055}
+.vies-pos{color:#1F9D77}.vies-neg{color:#D93B3B}.vies-neu{color:#5C7365}
 @media(max-width:640px){.prod-grid-3,.prod-grid-2{grid-template-columns:1fr}}
 /* ── Abas de topo do Head ── */
-.head-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:0;z-index:20;background:#071E17;padding:10px 0}
-.head-nav button{flex:1;min-width:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:11px 14px;border-radius:10px;border:1px solid #2A2A18;background:#0F0F0A;color:#4A7055;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
-.head-nav button:hover{border-color:#D4B483;color:#D4B483}
-.head-nav button.active{background:#D4B483;color:#071E17;border-color:#D4B483}
+.head-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;position:sticky;top:0;z-index:20;background:#EFF3EF;padding:10px 0}
+.head-nav button{flex:1;min-width:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:11px 14px;border-radius:10px;border:1px solid #F7F1D8;background:#0F0F0A;color:#5C7365;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
+.head-nav button:hover{border-color:#A8833C;color:#A8833C}
+.head-nav button.active{background:#A8833C;color:#EFF3EF;border-color:#A8833C}
 .head-nav button .ht-sub{font-size:9.5px;font-weight:600;opacity:.7;text-transform:none;letter-spacing:0}
 .head-nav button.active .ht-sub{opacity:.85}
 .head-tabpanel{display:none;animation:fadeIn .2s ease}
@@ -14700,14 +14700,14 @@ textarea{resize:vertical}
 <!-- ══ 1. CENÁRIO MACRO ═══════════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>🌐</span> Cenário Macro</div>
-  <div style="background:#060C08;border:1px solid #1A2E1A;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <span style="font-size:12px;color:#5DCAA5;font-weight:700">📩 Carta de Gestora</span>
-    <span style="font-size:11px;color:#2A5A3A;flex:1">Suba a carta mensal — a IA extrai e preenche Global, Brasil e Posicionamento automaticamente</span>
+  <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#1F9D77;font-weight:700">📩 Carta de Gestora</span>
+    <span style="font-size:11px;color:#5C7365;flex:1">Suba a carta mensal — a IA extrai e preenche Global, Brasil e Posicionamento automaticamente</span>
     <input type="file" id="carta-input" accept=".pdf" style="display:none" onchange="uploadCartaCenario(this)">
     <button class="btn btn-sm" onclick="document.getElementById('carta-input').click()" style="white-space:nowrap">📂 Selecionar carta (PDF)</button>
     <span id="carta-st" style="font-size:11px;min-width:120px"></span>
   </div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">Ou edite manualmente os campos abaixo. Este cenário embasa as sugestões e scripts dos assessores.</p>
+  <p style="font-size:11px;color:#5C7365;margin-bottom:14px;line-height:1.5">Ou edite manualmente os campos abaixo. Este cenário embasa as sugestões e scripts dos assessores.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
     <div><label>🌍 Cenário Global</label><textarea id="cenario-global" rows="5" placeholder="Contexto macro internacional..." oninput="autosaveCenario()"></textarea></div>
     <div><label>🇧🇷 Cenário Brasil</label><textarea id="cenario-brasil" rows="5" placeholder="Selic, IPCA, risco fiscal..." oninput="autosaveCenario()"></textarea></div>
@@ -14715,20 +14715,20 @@ textarea{resize:vertical}
   </div>
   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
     <div><label>Fonte / Referência do cenário</label><input type="text" id="cenario-ref" value="Levante Asset — Junho 2026" style="max-width:320px" oninput="autosaveCenario()"></div>
-    <span id="cenario-autosave-st" style="font-size:10px;color:#2A5A3A;margin-top:18px"></span>
+    <span id="cenario-autosave-st" style="font-size:10px;color:#5C7365;margin-top:18px"></span>
   </div>
 </div>
 
 <!-- ══ VISÃO DOS GESTORES (material da carta) ═════════════════════════════════ -->
-<div class="card" style="border-color:#1A2E3A">
-  <div class="card-title" style="color:#8BCFEF"><span>🧭</span> Visão dos Gestores — Consenso da Carta</div>
+<div class="card" style="border-color:#EAF1F6">
+  <div class="card-title" style="color:#2E86B8"><span>🧭</span> Visão dos Gestores — Consenso da Carta</div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-    <span style="font-size:11px;color:#2A5A3A">Extraído da carta atual. Embasa os textos acima e chega ao assessor no sistema dele.</span>
-    <span id="vg-ref" style="font-size:10px;color:#8BCFEF;background:#0A1A24;border:1px solid #1A2E3A;border-radius:10px;padding:3px 10px;margin-left:auto"></span>
+    <span style="font-size:11px;color:#5C7365">Extraído da carta atual. Embasa os textos acima e chega ao assessor no sistema dele.</span>
+    <span id="vg-ref" style="font-size:10px;color:#2E86B8;background:#0A1A24;border:1px solid #EAF1F6;border-radius:10px;padding:3px 10px;margin-left:auto"></span>
   </div>
 
   <!-- Tese central -->
-  <div id="vg-tese" style="display:none;background:#060C10;border:1px solid #1A2E3A;border-left:3px solid #8BCFEF;border-radius:8px;padding:12px 14px;margin-bottom:16px">
+  <div id="vg-tese" style="display:none;background:#EFF3EF;border:1px solid #EAF1F6;border-left:3px solid #2E86B8;border-radius:8px;padding:12px 14px;margin-bottom:16px">
     <div style="font-size:10px;color:#5A7A8A;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:5px">Tese central</div>
     <div id="vg-tese-txt" style="font-size:12px;color:#CFE3EF;line-height:1.55"></div>
   </div>
@@ -14740,9 +14740,9 @@ textarea{resize:vertical}
   <div id="vg-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
 
   <!-- Posicionamento da carta -->
-  <div id="vg-posic" style="display:none;margin-top:16px;background:#060C08;border:1px solid #1A2E1A;border-radius:8px;padding:14px 16px"></div>
+  <div id="vg-posic" style="display:none;margin-top:16px;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:14px 16px"></div>
 
-  <div id="vg-vazio" style="font-size:11px;color:#2A5A3A;text-align:center;padding:18px;display:none">Nenhuma carta processada ainda — suba a carta no topo para popular a visão dos gestores.</div>
+  <div id="vg-vazio" style="font-size:11px;color:#5C7365;text-align:center;padding:18px;display:none">Nenhuma carta processada ainda — suba a carta no topo para popular a visão dos gestores.</div>
 </div>
 
 </div><!-- /ht-cenario -->
@@ -14750,10 +14750,10 @@ textarea{resize:vertical}
 <div class="head-tabpanel" id="ht-recom">
 
 <!-- ══ CARTEIRAS RECOMENDADAS (Research XP) ════════════════════════════════════ -->
-<div class="card" style="border-color:#2A2418">
-  <div class="card-title" style="color:#C9A96E"><span>⭐</span> Carteiras Recomendadas — Research XP</div>
-  <div style="background:#0C0A06;border:1px solid #2A2418;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <span style="font-size:11px;color:#8A7A5A;flex:1;line-height:1.5">Suba os PDFs das carteiras recomendadas (RF, Fundos, FIIs, Alocação). O sistema extrai os ativos e passa a marcar <b style="color:#C9A96E">⭐ Recomendado XP</b> nas sugestões que o assessor recebe na análise do cliente.</span>
+<div class="card" style="border-color:#F5EFD9">
+  <div class="card-title" style="color:#A8833C"><span>⭐</span> Carteiras Recomendadas — Research XP</div>
+  <div style="background:#0C0A06;border:1px solid #F5EFD9;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span style="font-size:11px;color:#8A7A5A;flex:1;line-height:1.5">Suba os PDFs das carteiras recomendadas (RF, Fundos, FIIs, Alocação). O sistema extrai os ativos e passa a marcar <b style="color:#A8833C">⭐ Recomendado XP</b> nas sugestões que o assessor recebe na análise do cliente.</span>
     <input type="file" id="cartrec-input" accept=".pdf" style="display:none" onchange="uploadCarteiraRec(this)">
     <button class="btn btn-sm" onclick="document.getElementById('cartrec-input').click()" style="white-space:nowrap">📂 Subir carteira (PDF)</button>
     <span id="cartrec-st" style="font-size:11px;min-width:110px"></span>
@@ -14764,12 +14764,12 @@ textarea{resize:vertical}
 <!-- ══ 3. ALOCAÇÕES DE REFERÊNCIA ════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>📐</span> Alocações de Referência — Carteiras por Gestora</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.5">
-    Cadastre até <b style="color:#D4B483">5 gestoras</b> com as 5 categorias de perfil cada. Os % são usados como benchmark nas análises e sempre citados com a fonte.
+  <p style="font-size:11px;color:#5C7365;margin-bottom:16px;line-height:1.5">
+    Cadastre até <b style="color:#A8833C">5 gestoras</b> com as 5 categorias de perfil cada. Os % são usados como benchmark nas análises e sempre citados com a fonte.
   </p>
 
   <!-- Abas de gestoras (dinâmicas) -->
-  <div style="display:flex;gap:0;margin-bottom:0;border-bottom:1px solid #1A2A1A;flex-wrap:wrap" id="gest2-tabs"></div>
+  <div style="display:flex;gap:0;margin-bottom:0;border-bottom:1px solid #F5F8F5;flex-wrap:wrap" id="gest2-tabs"></div>
 
   <!-- Painel: lista de gestoras / form -->
   <div id="gest2-painel" style="margin-top:16px"></div>
@@ -14777,12 +14777,12 @@ textarea{resize:vertical}
   <!-- Botão adicionar gestora -->
   <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap" id="gest2-add-area">
     <button class="btn btn-sm" onclick="gest2MostrarForm()" id="btn-gest2-add">➕ Adicionar Gestora</button>
-    <span style="font-size:11px;color:#2A5A3A" id="gest2-count-label"></span>
+    <span style="font-size:11px;color:#5C7365" id="gest2-count-label"></span>
   </div>
 
   <!-- Formulário oculto para adicionar/editar gestora -->
-  <div id="gest2-form" style="display:none;margin-top:16px;background:#060C10;border:1px solid #1A2E3A;border-radius:10px;padding:18px">
-    <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:14px" id="gest2-form-titulo">➕ Nova Gestora</div>
+  <div id="gest2-form" style="display:none;margin-top:16px;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:10px;padding:18px">
+    <div style="font-size:12px;color:#2E86B8;font-weight:700;margin-bottom:14px" id="gest2-form-titulo">➕ Nova Gestora</div>
     <input type="hidden" id="gest2-id">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div><label>Nome da Gestora</label><input type="text" id="gest2-nome" placeholder="ex: Levante Asset"></div>
@@ -14797,40 +14797,40 @@ textarea{resize:vertical}
       <button type="button" class="gest2-ptab" data-p="agressiva" onclick="gest2SwitchPerfil('agressiva',this)">Agressiva</button>
     </div>
     <div id="gest2-aloc-panel" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-      <div><label style="color:#4A7055">Pós Fixado %</label><input type="number" id="g2aloc-pos_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Inflação %</label><input type="number" id="g2aloc-inflacao" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Pré Fixado %</label><input type="number" id="g2aloc-pre_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Ações %</label><input type="number" id="g2aloc-acoes" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">FIIs %</label><input type="number" id="g2aloc-fiis" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Multimercado %</label><input type="number" id="g2aloc-multimercado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Internacional %</label><input type="number" id="g2aloc-internacional" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Alternativos %</label><input type="number" id="g2aloc-alternativos" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
-      <div><label style="color:#4A7055">Criptomoedas %</label><input type="number" id="g2aloc-criptomoedas" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#060F0B;border:1px solid #1A2E3A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Pós Fixado %</label><input type="number" id="g2aloc-pos_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Inflação %</label><input type="number" id="g2aloc-inflacao" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Pré Fixado %</label><input type="number" id="g2aloc-pre_fixado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Ações %</label><input type="number" id="g2aloc-acoes" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">FIIs %</label><input type="number" id="g2aloc-fiis" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Multimercado %</label><input type="number" id="g2aloc-multimercado" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Internacional %</label><input type="number" id="g2aloc-internacional" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Alternativos %</label><input type="number" id="g2aloc-alternativos" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
+      <div><label style="color:#5C7365">Criptomoedas %</label><input type="number" id="g2aloc-criptomoedas" min="0" max="100" step="0.5" value="0" oninput="g2Total()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:6px 8px;color:#17271E;font-size:13px;outline:none"></div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <button class="btn" onclick="gest2Salvar()">💾 Salvar Gestora</button>
-      <span style="font-size:12px;color:#4A7055">Total: <b id="g2-total">0</b>%</span>
+      <span style="font-size:12px;color:#5C7365">Total: <b id="g2-total">0</b>%</span>
       <span id="gest2-st" style="font-size:12px"></span>
       <button class="btn-ghost" onclick="document.getElementById('gest2-form').style.display='none'" style="margin-left:auto;font-size:11px">✕ Fechar</button>
     </div>
   </div>
 </div>
 <style>
-.gest2-ptab{padding:5px 12px;border-radius:6px;border:1px solid #1A2E3A;background:#060C10;color:#4A7055;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
-.gest2-ptab.active{background:#1A2E3A;color:#8BcFEF;border-color:#8BcFEF;font-weight:700}
+.gest2-ptab{padding:5px 12px;border-radius:6px;border:1px solid #EAF1F6;background:#EFF3EF;color:#5C7365;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.gest2-ptab.active{background:#EAF1F6;color:#2E86B8;border-color:#2E86B8;font-weight:700}
 </style>
 
 <!-- ══ 3. PRODUTOS EM DESTAQUE ════════════════════════════════════════════════ -->
 <div class="card">
   <div class="card-title"><span>⭐</span> Produtos em Destaque do Mês</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
+  <p style="font-size:11px;color:#5C7365;margin-bottom:14px;line-height:1.5">
     Para cada classe/indexador, cadastre os produtos disponíveis e recomendados. O agente usa estes produtos para sugerir ao assessor como fechar o gap da carteira do cliente.
   </p>
 
   <!-- Sugestões já salvas no arquivo (persistidas) — nunca são esquecidas -->
   <div id="sugestoes-salvas" style="background:#060C06;border:1px solid #16241A;border-radius:10px;padding:14px 16px;margin-bottom:16px"></div>
 
-  <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">➕ Cadastrar novos ativos</div>
+  <div style="font-size:11px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">➕ Cadastrar novos ativos</div>
   <div class="tabs">
     <button class="tab active" onclick="prodTab('pos_fixado',this)">Pós Fixado</button>
     <button class="tab" onclick="prodTab('inflacao',this)">Inflação</button>
@@ -14851,9 +14851,9 @@ textarea{resize:vertical}
   <div id="prod-internacional"class="tab-panel"></div>
   <div id="prod-alternativos" class="tab-panel"></div>
 
-  <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid #2A2A18;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid #F7F1D8;flex-wrap:wrap">
     <button class="btn" id="btn-salvar-prod" onclick="salvarProdutos()">💾 Salvar produtos</button>
-    <span style="font-size:11px;color:#2A5A3A">Salva apenas os produtos em destaque. Use "Publicar" no final para enviar tudo de uma vez.</span>
+    <span style="font-size:11px;color:#5C7365">Salva apenas os produtos em destaque. Use "Publicar" no final para enviar tudo de uma vez.</span>
     <span id="prod-save-st" style="font-size:12px;margin-left:auto"></span>
   </div>
 
@@ -14861,78 +14861,78 @@ textarea{resize:vertical}
   <div style="margin-top:16px;padding-top:16px;border-top:1px solid #1A1A28">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
       <span style="font-size:11px;color:#B08FCF;font-weight:700;text-transform:uppercase;letter-spacing:.5px">🔔 Alertas de Produtos</span>
-      <span style="font-size:10px;color:#4A7055">▾ expandir</span>
+      <span style="font-size:10px;color:#5C7365">▾ expandir</span>
     </div>
     <div style="display:none">
-      <div style="background:#060F0B;border:1px solid #2A1A30;border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="background:#EFF3EF;border:1px solid #F2EAF8;border-radius:10px;padding:14px;margin-bottom:12px">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-          <div><label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Produto / Ticker</label>
-            <input id="alert-produto" type="text" placeholder="ex: NTN-B 2035, VALE3" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none"></div>
-          <div><label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Classe</label>
-            <select id="alert-classe" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          <div><label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Produto / Ticker</label>
+            <input id="alert-produto" type="text" placeholder="ex: NTN-B 2035, VALE3" style="width:100%;background:#EFF3EF;border:1px solid #F2EAF8;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none"></div>
+          <div><label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Classe</label>
+            <select id="alert-classe" style="width:100%;background:#EFF3EF;border:1px solid #F2EAF8;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
               <option value="">— Selecionar —</option>
               <option value="pos_fixado">Pós Fixado</option><option value="inflacao">Inflação</option>
               <option value="pre_fixado">Pré Fixado</option><option value="acoes">Ações</option>
               <option value="fiis">FIIs</option><option value="multimercado">Multimercado</option>
               <option value="internacional">Internacional</option><option value="alternativos">Alternativos</option>
             </select></div>
-          <div><label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tipo</label>
-            <select id="alert-tipo" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          <div><label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Tipo</label>
+            <select id="alert-tipo" style="width:100%;background:#EFF3EF;border:1px solid #F2EAF8;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
               <option value="info">ℹ️ Informativo</option>
               <option value="atencao">⚠️ Atenção</option>
               <option value="urgente">🚨 Urgente</option>
             </select></div>
         </div>
         <div style="margin-bottom:10px">
-          <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Direcionar para assessor (opcional)</label>
-          <input id="alert-assessor" type="text" placeholder="Deixe em branco para todos" style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+          <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Direcionar para assessor (opcional)</label>
+          <input id="alert-assessor" type="text" placeholder="Deixe em branco para todos" style="width:100%;background:#EFF3EF;border:1px solid #F2EAF8;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
         </div>
         <div style="margin-bottom:10px">
-          <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Mensagem</label>
-          <textarea id="alert-msg" rows="3" placeholder="ex: COPOM elevou Selic +50bps. Revisar alocação em pré-fixado." style="width:100%;background:#081F18;border:1px solid #2A1A30;border-radius:6px;padding:10px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+          <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Mensagem</label>
+          <textarea id="alert-msg" rows="3" placeholder="ex: COPOM elevou Selic +50bps. Revisar alocação em pré-fixado." style="width:100%;background:#EFF3EF;border:1px solid #F2EAF8;border-radius:6px;padding:10px;color:#5C7365;font-size:12px;resize:vertical;outline:none"></textarea>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <button class="btn" onclick="registrarAlerta()">🔔 Registrar alerta</button>
           <span id="alert-st" style="font-size:11px"></span>
         </div>
       </div>
-      <div style="font-size:11px;color:#3A6A48;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:11px;color:#5C7365;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
         <span>Histórico de alertas</span>
         <button onclick="carregarAlertas()" class="btn-ghost">↻ Atualizar</button>
       </div>
       <div id="alertas-feed" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
-        <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando alertas...</div>
+        <div style="color:#5C7365;font-size:11px;text-align:center;padding:20px">Carregando alertas...</div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- ══ 5. CALLS DE AÇÕES + OPERAÇÕES ESTRUTURADAS ════════════════════════════ -->
-<div class="card" style="border-color:#1A2E3A">
+<div class="card" style="border-color:#EAF1F6">
   <div class="card-title"><span>📈</span> Calls de Ações</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:14px;line-height:1.5">
+  <p style="font-size:11px;color:#5C7365;margin-bottom:14px;line-height:1.5">
     Registre calls de compra, venda ou neutro por ticker. O agente entrega o call ao assessor quando o cliente já tem o ativo na carteira ou quando o perfil está na lista de destinatários.
   </p>
 
   <!-- Formulário novo call -->
-  <div style="background:#060F0B;border:1px solid #1A2E3A;border-radius:10px;padding:16px;margin-bottom:16px">
-    <div style="font-size:12px;color:#8BcFEF;font-weight:700;margin-bottom:12px">➕ Novo Call</div>
+  <div style="background:#EFF3EF;border:1px solid #EAF1F6;border-radius:10px;padding:16px;margin-bottom:16px">
+    <div style="font-size:12px;color:#2E86B8;font-weight:700;margin-bottom:12px">➕ Novo Call</div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Ticker</label>
-        <input id="call-ticker" type="text" placeholder="ex: VALE3" oninput="this.value=this.value.toUpperCase()" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Ticker</label>
+        <input id="call-ticker" type="text" placeholder="ex: VALE3" oninput="this.value=this.value.toUpperCase()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Nome da empresa</label>
-        <input id="call-nome" type="text" placeholder="ex: Vale S.A." style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Nome da empresa</label>
+        <input id="call-nome" type="text" placeholder="ex: Vale S.A." style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Direção</label>
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Direção</label>
         <div style="display:flex;gap:6px">
-          <button id="call-dir-compra" onclick="setCallDir('compra')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #5DCAA5;background:#0A2018;color:#5DCAA5;font-size:12px;font-weight:700;cursor:pointer">▲ COMPRA</button>
-          <button id="call-dir-neutro" onclick="setCallDir('neutro')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #2A5A3A;background:#111;color:#888;font-size:12px;font-weight:700;cursor:pointer">→ NEUTRO</button>
-          <button id="call-dir-venda" onclick="setCallDir('venda')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #2A1010;background:#1A0808;color:#FF6B6B;font-size:12px;font-weight:700;cursor:pointer">▼ VENDA</button>
+          <button id="call-dir-compra" onclick="setCallDir('compra')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #1F9D77;background:#F5F8F5;color:#1F9D77;font-size:12px;font-weight:700;cursor:pointer">▲ COMPRA</button>
+          <button id="call-dir-neutro" onclick="setCallDir('neutro')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #5C7365;background:#FFFFFF;color:#8A9A8E;font-size:12px;font-weight:700;cursor:pointer">→ NEUTRO</button>
+          <button id="call-dir-venda" onclick="setCallDir('venda')" style="flex:1;padding:7px;border-radius:6px;border:1.5px solid #FCEBEB;background:#FBE9E9;color:#D93B3B;font-size:12px;font-weight:700;cursor:pointer">▼ VENDA</button>
         </div>
         <input type="hidden" id="call-direcao" value="compra">
       </div>
@@ -14940,53 +14940,53 @@ textarea{resize:vertical}
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Preço de entrada (R$)</label>
-        <input id="call-entrada" type="number" step="0.01" placeholder="62.50" oninput="calcCallUpside()" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Preço de entrada (R$)</label>
+        <input id="call-entrada" type="number" step="0.01" placeholder="62.50" oninput="calcCallUpside()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Preço alvo (R$)</label>
-        <input id="call-alvo" type="number" step="0.01" placeholder="74.00" oninput="calcCallUpside()" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Preço alvo (R$)</label>
+        <input id="call-alvo" type="number" step="0.01" placeholder="74.00" oninput="calcCallUpside()" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Upside calculado</label>
-        <div id="call-upside-display" style="padding:8px;border-radius:6px;background:#0A2A18;border:1px solid #1A3A28;font-size:14px;font-weight:700;color:#5DCAA5;text-align:center">—</div>
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Upside calculado</label>
+        <div id="call-upside-display" style="padding:8px;border-radius:6px;background:#E9F5EE;border:1px solid #1A3A28;font-size:14px;font-weight:700;color:#1F9D77;text-align:center">—</div>
       </div>
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Stop (R$)</label>
-        <input id="call-stop" type="number" step="0.01" placeholder="57.00" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Stop (R$)</label>
+        <input id="call-stop" type="number" step="0.01" placeholder="57.00" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Prazo</label>
-        <input id="call-prazo" type="text" placeholder="ex: 6 meses, 12 meses" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Prazo</label>
+        <input id="call-prazo" type="text" placeholder="ex: 6 meses, 12 meses" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
       <div>
-        <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Fonte</label>
-        <input id="call-fonte" type="text" placeholder="ex: Levante Asset — Jun 2026" style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+        <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Fonte</label>
+        <input id="call-fonte" type="text" placeholder="ex: Levante Asset — Jun 2026" style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
       </div>
     </div>
 
     <div style="margin-bottom:10px">
-      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tese de investimento</label>
-      <textarea id="call-tese" rows="3" placeholder="Descreva a tese resumidamente..." style="width:100%;background:#081F18;border:1px solid #1A2E3A;border-radius:6px;padding:8px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+      <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Tese de investimento</label>
+      <textarea id="call-tese" rows="3" placeholder="Descreva a tese resumidamente..." style="width:100%;background:#EFF3EF;border:1px solid #EAF1F6;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;resize:vertical;outline:none"></textarea>
     </div>
 
     <div style="margin-bottom:12px">
-      <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:6px">Perfis alvo (quem deve receber)</label>
+      <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:6px">Perfis alvo (quem deve receber)</label>
       <div style="display:flex;gap:10px">
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
-          <input type="checkbox" id="call-perf-arrojada" style="accent-color:#C9A96E"> Arrojada
+          <input type="checkbox" id="call-perf-arrojada" style="accent-color:#A8833C"> Arrojada
         </label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
-          <input type="checkbox" id="call-perf-agressiva" style="accent-color:#C9A96E"> Agressiva
+          <input type="checkbox" id="call-perf-agressiva" style="accent-color:#A8833C"> Agressiva
         </label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
-          <input type="checkbox" id="call-perf-moderada" style="accent-color:#C9A96E"> Moderada
+          <input type="checkbox" id="call-perf-moderada" style="accent-color:#A8833C"> Moderada
         </label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
-          <input type="checkbox" id="call-perf-conservadora" style="accent-color:#C9A96E"> Conservadora
+          <input type="checkbox" id="call-perf-conservadora" style="accent-color:#A8833C"> Conservadora
         </label>
       </div>
     </div>
@@ -14998,57 +14998,57 @@ textarea{resize:vertical}
   </div>
 
   <!-- Lista de calls ativos -->
-  <div style="font-size:11px;color:#3A6A48;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-size:11px;color:#5C7365;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
     <span>Calls ativos</span>
     <button onclick="carregarCalls()" class="btn-ghost">↻ Atualizar</button>
   </div>
   <div id="calls-feed" style="display:flex;flex-direction:column;gap:8px">
-    <div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Carregando calls...</div>
+    <div style="color:#5C7365;font-size:11px;text-align:center;padding:20px">Carregando calls...</div>
   </div>
 
   <!-- ── Operações Estruturadas ─────────────────────────────────────────────── -->
-  <div style="margin-top:24px;border-top:1px solid #1A2E3A;padding-top:18px">
+  <div style="margin-top:24px;border-top:1px solid #EAF1F6;padding-top:18px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;cursor:pointer" onclick="toggleEstruturadas()">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:14px;font-weight:700;color:#C9A96E">💼 Operações Estruturadas</span>
-        <span style="font-size:11px;color:#2A5A3A">COE, Termo, Opção e outras oportunidades manuais</span>
+        <span style="font-size:14px;font-weight:700;color:#A8833C">💼 Operações Estruturadas</span>
+        <span style="font-size:11px;color:#5C7365">COE, Termo, Opção e outras oportunidades manuais</span>
       </div>
-      <span id="icon-estr" style="color:#4A7055;font-size:14px">▼</span>
+      <span id="icon-estr" style="color:#5C7365;font-size:14px">▼</span>
     </div>
 
     <div id="painel-estruturadas">
       <!-- Formulário novo -->
-      <div style="background:#060C08;border:1px solid #2A1A10;border-radius:10px;padding:16px;margin-bottom:16px">
-        <div style="font-size:12px;color:#C9A96E;font-weight:700;margin-bottom:12px">➕ Nova Operação</div>
+      <div style="background:#EFF3EF;border:1px solid #F3E7DD;border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:12px;color:#A8833C;font-weight:700;margin-bottom:12px">➕ Nova Operação</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Tipo</label>
-            <select id="estr-tipo" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Tipo</label>
+            <select id="estr-tipo" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
               <option>COE</option><option>Termo</option><option>Opção de Compra</option><option>Opção de Venda</option>
               <option>Debenture Incentivada</option><option>CRI</option><option>CRA</option><option>Outro</option>
             </select>
           </div>
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Ativo / Ativo Base</label>
-            <input id="estr-ativo" type="text" placeholder="ex: PETR4, IPCA+6,5%" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Ativo / Ativo Base</label>
+            <input id="estr-ativo" type="text" placeholder="ex: PETR4, IPCA+6,5%" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
           </div>
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Emissor / Banco</label>
-            <input id="estr-emissor" type="text" placeholder="ex: BTG Pactual" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Emissor / Banco</label>
+            <input id="estr-emissor" type="text" placeholder="ex: BTG Pactual" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Vencimento</label>
-            <input id="estr-venc" type="text" placeholder="ex: Jan/2028" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Vencimento</label>
+            <input id="estr-venc" type="text" placeholder="ex: Jan/2028" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
           </div>
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Retorno Esperado</label>
-            <input id="estr-retorno" type="text" placeholder="ex: IPCA+7% ou 120% CDI" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Retorno Esperado</label>
+            <input id="estr-retorno" type="text" placeholder="ex: IPCA+7% ou 120% CDI" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
           </div>
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Perfil Mínimo</label>
-            <select id="estr-perfil" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Perfil Mínimo</label>
+            <select id="estr-perfil" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
               <option value="super_conservadora">Super Conservadora</option>
               <option value="conservadora">Conservadora</option>
               <option value="moderada" selected>Moderada</option>
@@ -15057,35 +15057,35 @@ textarea{resize:vertical}
             </select>
           </div>
           <div>
-            <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Aplicação Mínima</label>
-            <input id="estr-minimo" type="text" placeholder="ex: R$ 1.000" style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;outline:none">
+            <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Aplicação Mínima</label>
+            <input id="estr-minimo" type="text" placeholder="ex: R$ 1.000" style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;outline:none">
           </div>
         </div>
         <div style="margin-bottom:10px">
-          <label style="font-size:10px;color:#3A6A48;display:block;margin-bottom:4px">Observação / Tese</label>
-          <textarea id="estr-obs" rows="2" placeholder="Descreva a oportunidade, riscos e diferenciais..." style="width:100%;background:#081208;border:1px solid #2A1A10;border-radius:6px;padding:8px;color:#CCC;font-size:12px;resize:vertical;outline:none"></textarea>
+          <label style="font-size:10px;color:#5C7365;display:block;margin-bottom:4px">Observação / Tese</label>
+          <textarea id="estr-obs" rows="2" placeholder="Descreva a oportunidade, riscos e diferenciais..." style="width:100%;background:#EFF3EF;border:1px solid #F3E7DD;border-radius:6px;padding:8px;color:#5C7365;font-size:12px;resize:vertical;outline:none"></textarea>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn" onclick="adicionarEstruturada()" style="background:#C9A96E;color:#071E17;border-color:#C9A96E;font-weight:700">💼 Adicionar Operação</button>
+          <button class="btn" onclick="adicionarEstruturada()" style="background:#A8833C;color:#EFF3EF;border-color:#A8833C;font-weight:700">💼 Adicionar Operação</button>
           <span id="estr-st" style="font-size:11px"></span>
         </div>
       </div>
 
       <!-- Lista -->
-      <div style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Operações Ativas</div>
-      <div id="estr-lista"><div style="color:#2A2A18;font-size:11px;text-align:center;padding:16px">Carregando...</div></div>
+      <div style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Operações Ativas</div>
+      <div id="estr-lista"><div style="color:#F7F1D8;font-size:11px;text-align:center;padding:16px">Carregando...</div></div>
     </div>
   </div>
 </div>
 
 <!-- ══ 6b. CARTEIRA BRAÚNA — DESTAQUE DO MÊS ══════════════════════════════════ -->
 <div class="card" style="border-color:#2A1A3A">
-  <div class="card-title" style="color:#C9A96E"><span>📋</span> Carteira Braúna — Destaque do Mês</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
-    Produtos recomendados por categoria. O Head adiciona o <b style="color:#D4B483">motivo / racional</b> de cada alocação e salva um por um. Essa inteligência embasa os assessores nas conversas com clientes.
+  <div class="card-title" style="color:#A8833C"><span>📋</span> Carteira Braúna — Destaque do Mês</div>
+  <p style="font-size:11px;color:#5C7365;margin-bottom:16px;line-height:1.6">
+    Produtos recomendados por categoria. O Head adiciona o <b style="color:#A8833C">motivo / racional</b> de cada alocação e salva um por um. Essa inteligência embasa os assessores nas conversas com clientes.
   </p>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-    <div><label style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px">Data de referência</label>
+    <div><label style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px">Data de referência</label>
       <input type="text" id="cb-data-ref" placeholder="30/06/2026" style="max-width:140px;margin-top:4px" onchange="cbSalvarDataRef()">
     </div>
     <div style="display:flex;gap:6px;margin-top:18px;flex-wrap:wrap" id="cb-filtro-perfil">
@@ -15098,7 +15098,7 @@ textarea{resize:vertical}
       <button class="tab-btn" id="cb-toggle-salvos" onclick="cbToggleSalvos(this)" style="padding:4px 12px;font-size:11px">👁 Mostrar já salvos</button>
     </div>
   </div>
-  <div id="cb-asset-allocation" style="margin-bottom:20px;background:#060C08;border:1px solid #1A2E1A;border-radius:8px;padding:12px 16px"></div>
+  <div id="cb-asset-allocation" style="margin-bottom:20px;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:12px 16px"></div>
   <div id="cb-categorias"></div>
 </div>
 
@@ -15111,43 +15111,43 @@ textarea{resize:vertical}
   <input type="file" id="pdf-rapido" accept=".pdf" multiple style="display:none" onchange="uploadRapidoSelecionar(this)">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
     <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:13px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
-      <span style="font-size:11px;color:#2A5A3A">Carteiras recomendadas, produtos e material sobre ativos → <b style="color:#D4B483">Base de Conhecimento</b></span>
+      <span style="font-size:13px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px">⚡ Upload Rápido</span>
+      <span style="font-size:11px;color:#5C7365">Carteiras recomendadas, produtos e material sobre ativos → <b style="color:#A8833C">Base de Conhecimento</b></span>
     </div>
     <button class="btn-ghost" onclick="fecharRapido()" id="btn-limpar-rapido" style="display:none;font-size:11px;padding:4px 10px">✕ Limpar</button>
   </div>
   <div id="rapido-zona-vazia" onclick="document.getElementById('pdf-rapido').click()"
     style="border:2px dashed #2A4A2A;border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s"
-    onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#2A4A2A'">
+    onmouseover="this.style.borderColor='#A8833C'" onmouseout="this.style.borderColor='#2A4A2A'">
     <div style="font-size:26px;margin-bottom:8px">📂</div>
-    <div style="font-size:13px;color:#4A7055;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
+    <div style="font-size:13px;color:#5C7365;font-weight:600;margin-bottom:4px">Clique para selecionar PDFs</div>
     <div style="font-size:11px;color:#1E3A2A">Até 5 arquivos · Carteiras recomendadas Levante / XP, relatórios, material sobre ativos</div>
   </div>
   <div id="pdf-rapido-itens" style="display:none;margin-top:12px">
-    <div style="font-size:11px;color:#3A6A48;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Arquivos selecionados — <span id="pdf-rapido-contador">0</span></div>
+    <div style="font-size:11px;color:#5C7365;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Arquivos selecionados — <span id="pdf-rapido-contador">0</span></div>
     <div id="pdf-rapido-lista"></div>
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1A2A1A;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">📤 Subir para a Memória</button>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F5F8F5;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn" id="btn-extrair-todos" onclick="uploadRapidoTodos()" style="font-size:13px;padding:10px 22px;background:#A8833C;color:#EFF3EF;font-weight:700;border-color:#A8833C">📤 Subir para a Memória</button>
       <button class="btn-ghost" onclick="document.getElementById('pdf-rapido').click()" style="font-size:11px;padding:6px 14px">+ Adicionar mais</button>
-      <span id="rapido-upload-st" style="font-size:11px;color:#5DCAA5;margin-left:auto"></span>
+      <span id="rapido-upload-st" style="font-size:11px;color:#1F9D77;margin-left:auto"></span>
     </div>
   </div>
 </div>
 
 <!-- ══ 6. BASE DE CONHECIMENTO ═══════════════════════════════════════════════ -->
-<div class="card" style="border-color:#2A2A18">
+<div class="card" style="border-color:#F7F1D8">
   <div class="card-title"><span>📚</span> Base de Conhecimento — Cartas de Gestores</div>
-  <p style="font-size:11px;color:#2A5A3A;margin-bottom:16px;line-height:1.6">
-    Repositório de <b style="color:#D4B483">cartas mensais de gestoras</b>. Cada carta fica salva e pode ser consultada pelos assessores.
+  <p style="font-size:11px;color:#5C7365;margin-bottom:16px;line-height:1.6">
+    Repositório de <b style="color:#A8833C">cartas mensais de gestoras</b>. Cada carta fica salva e pode ser consultada pelos assessores.
   </p>
   <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;margin-bottom:20px">
     <div>
       <label>PDF da carta</label>
-      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#060F0B;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#D4B483'" onmouseout="this.style.borderColor='#3A3A20'">
+      <div id="know-drop" style="border:1.5px dashed #3A3A20;border-radius:10px;padding:22px;text-align:center;cursor:pointer;background:#EFF3EF;position:relative;transition:all .2s" onmouseover="this.style.borderColor='#A8833C'" onmouseout="this.style.borderColor='#3A3A20'">
         <input type="file" id="know-pdf" accept=".pdf" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="knowUpload(this)">
         <div style="font-size:28px;margin-bottom:8px">📄</div>
-        <p style="font-size:12px;color:#3A6A48">Arraste ou clique — múltiplos PDFs</p>
-        <p style="font-size:11px;color:#D4B483;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
+        <p style="font-size:12px;color:#5C7365">Arraste ou clique — múltiplos PDFs</p>
+        <p style="font-size:11px;color:#A8833C;margin-top:6px;min-height:16px;word-break:break-all" id="know-fname"></p>
       </div>
       <div style="margin-top:8px;text-align:center"><span id="know-st" style="font-size:11px"></span></div>
     </div>
@@ -15155,7 +15155,7 @@ textarea{resize:vertical}
       <div><label>Nome do documento</label><input type="text" id="know-nome" placeholder="ex: Carta Levante Junho 2026"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div><label>Tipo</label>
-          <select id="know-tipo" style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:8px 10px;color:#F0F0F0;font-size:13px;outline:none">
+          <select id="know-tipo" style="width:100%;background:#EFF3EF;border:1px solid #F7F1D8;border-radius:7px;padding:8px 10px;color:#17271E;font-size:13px;outline:none">
             <option value="carta">Carta de Gestora</option>
             <option value="research">Nota de Research</option>
             <option value="cenario">Cenário Macro</option>
@@ -15176,7 +15176,7 @@ textarea{resize:vertical}
           <button type="button" class="know-cls-btn" data-cls="multimercado">Multimercado</button>
           <button type="button" class="know-cls-btn" data-cls="internacional">Internacional</button>
           <button type="button" class="know-cls-btn" data-cls="alternativos">Alternativos</button>
-          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#2A2A18;color:#D4B483;border-color:#D4B483">Geral</button>
+          <button type="button" class="know-cls-btn" data-cls="geral" style="background:#F7F1D8;color:#A8833C;border-color:#A8833C">Geral</button>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
@@ -15189,21 +15189,21 @@ textarea{resize:vertical}
     <button class="btn btn-out" id="btn-toggle-base" onclick="toggleBaseLista()" style="width:100%;justify-content:center">📂 Gerenciar documentos da base</button>
     <div id="know-base-wrap" style="display:none;margin-top:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:11px;color:#D4B483;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
-        <span id="know-count" style="font-size:10px;color:#2A5A3A"></span>
+        <span style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.8px">📂 Documentos na Base</span>
+        <span id="know-count" style="font-size:10px;color:#5C7365"></span>
       </div>
       <input type="text" id="know-busca" placeholder="🔍 Buscar documento pelo nome..." oninput="filtrarBase()"
-        style="width:100%;background:#060F0B;border:1px solid #2A2A18;border-radius:7px;padding:9px 12px;color:#F0F0F0;font-size:13px;outline:none;margin-bottom:12px">
-      <div id="know-lista"><div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda.</div></div>
+        style="width:100%;background:#EFF3EF;border:1px solid #F7F1D8;border-radius:7px;padding:9px 12px;color:#17271E;font-size:13px;outline:none;margin-bottom:12px">
+      <div id="know-lista"><div style="color:#5C7365;font-size:11px;font-style:italic;text-align:center;padding:20px">Nenhum documento ainda.</div></div>
     </div>
   </div>
 </div>
 
 <style>
-.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #2A2A18;background:#0A0A0A;color:#4A7055;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
-.know-cls-btn.sel{background:#D4B483;color:#000;border-color:#D4B483;font-weight:700}
-.know-doc-card{background:#060F0B;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
-.know-doc-card:hover{border-color:#2A2A18}
+.know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #F7F1D8;background:#EFF3EF;color:#5C7365;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.know-cls-btn.sel{background:#A8833C;color:#000;border-color:#A8833C;font-weight:700}
+.know-doc-card{background:#EFF3EF;border:1px solid #1A1A10;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.know-doc-card:hover{border-color:#F7F1D8}
 .know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
 </style>
 
@@ -15212,16 +15212,16 @@ textarea{resize:vertical}
 <!-- ══ PUBLICAR ══════════════════════════════════════════════════════════════ -->
 <div class="publish-bar" id="publish-bar">
   <!-- Barra de progresso (oculta por padrão) -->
-  <div id="pub-progress-wrap" style="display:none;position:absolute;bottom:0;left:0;right:0;height:4px;border-radius:0 0 12px 12px;overflow:hidden;background:#1A0A0A">
-    <div id="pub-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#FF4444,#FF8C42,#FFD700);border-radius:0 0 12px 12px;transition:width .4s ease;box-shadow:0 0 8px #FF444488"></div>
+  <div id="pub-progress-wrap" style="display:none;position:absolute;bottom:0;left:0;right:0;height:4px;border-radius:0 0 12px 12px;overflow:hidden;background:#FBE9E9">
+    <div id="pub-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#CF2E2E,#FF8C42,#A9800F);border-radius:0 0 12px 12px;transition:width .4s ease;box-shadow:0 0 8px #FF444488"></div>
   </div>
   <div class="pub-info">
     <h3 id="pub-titulo">📤 Publicar para os Assessores</h3>
     <p id="pub-desc">Ao publicar, o cenário macro, alocações, produtos e calls ficam disponíveis para todos os assessores.</p>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <span id="pub-pendente-badge" style="display:none;font-size:11px;font-weight:700;color:#FF6B6B;background:#2A0808;border:1px solid #FF444455;border-radius:8px;padding:3px 10px;animation:piscar-pub 1.2s ease-in-out infinite">⚠️ Alterações não publicadas</span>
-    <button class="btn" id="btn-pub" onclick="publicar()" style="background:#C9A96E;color:#071E17;border-color:#C9A96E;font-weight:700">📤 Publicar agora</button>
+    <span id="pub-pendente-badge" style="display:none;font-size:11px;font-weight:700;color:#D93B3B;background:#2A0808;border:1px solid #FF444455;border-radius:8px;padding:3px 10px;animation:piscar-pub 1.2s ease-in-out infinite">⚠️ Alterações não publicadas</span>
+    <button class="btn" id="btn-pub" onclick="publicar()" style="background:#A8833C;color:#EFF3EF;border-color:#A8833C;font-weight:700">📤 Publicar agora</button>
     <span id="pub-st" style="font-size:12px"></span>
   </div>
 </div>
@@ -15262,15 +15262,15 @@ function headTab(name, btn){
 async function uploadCarteiraRec(input){
   const file = input.files[0]; if(!file) return; input.value="";
   const st = document.getElementById("cartrec-st");
-  if(file.size > 4.3*1024*1024){ st.innerHTML='<span style="color:#FF6B6B">Máx 4,3 MB</span>'; return; }
-  st.innerHTML='<span style="color:#D4B483">⏳ Processando...</span>';
+  if(file.size > 4.3*1024*1024){ st.innerHTML='<span style="color:#D93B3B">Máx 4,3 MB</span>'; return; }
+  st.innerHTML='<span style="color:#A8833C">⏳ Processando...</span>';
   try{
     const fd=new FormData(); fd.append("pdf",file); fd.append("nome",file.name.replace(/\.pdf$/i,""));
     const r=await fetch("/api/hp/carteira-rec-upload",{method:"POST",body:fd});
     const d=await r.json();
-    if(d.ok){ st.innerHTML='<span style="color:#5DCAA5">✅ '+d.item.qtd+' ativos ('+d.item.tipo+')</span>'; carregarCarteirasRec(); setTimeout(()=>st.textContent="",5000); }
-    else st.innerHTML='<span style="color:#FF6B6B">'+(d.error||"erro")+'</span>';
-  }catch(e){ st.innerHTML='<span style="color:#FF6B6B">'+e.message+'</span>'; }
+    if(d.ok){ st.innerHTML='<span style="color:#1F9D77">✅ '+d.item.qtd+' ativos ('+d.item.tipo+')</span>'; carregarCarteirasRec(); setTimeout(()=>st.textContent="",5000); }
+    else st.innerHTML='<span style="color:#D93B3B">'+(d.error||"erro")+'</span>';
+  }catch(e){ st.innerHTML='<span style="color:#D93B3B">'+e.message+'</span>'; }
 }
 async function carregarCarteirasRec(){
   try{
@@ -15280,8 +15280,8 @@ async function carregarCarteirasRec(){
     const TIPOS={rf:"Renda Fixa",fundos:"Fundos",fii:"FIIs",acoes:"Ações",alocacao:"Alocação",outro:"Outro"};
     box.innerHTML=carts.map(function(c){
       var amostra=(c.tickers||[]).slice(0,6).join(", ")+((c.tickers||[]).length>6?"…":"");
-      return '<div style="background:#0C0A06;border:1px solid #2A2418;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'
-        +'<div style="flex:1"><div style="font-size:12px;color:#DDD;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#C9A96E;background:#1A1608;border:1px solid #2A2418;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span></div>'
+      return '<div style="background:#0C0A06;border:1px solid #F5EFD9;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'
+        +'<div style="flex:1"><div style="font-size:12px;color:#D9E3DB;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#A8833C;background:#1A1608;border:1px solid #F5EFD9;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span></div>'
         +'<div style="font-size:10px;color:#5A7A6A">'+c.qtd+' ativos'+(c.referencia?" · "+c.referencia:"")+' · '+c.data+(amostra?" · "+amostra:"")+'</div></div>'
         +'<button onclick="deleteCarteiraRec(\''+c.id+'\')" style="background:none;border:none;color:#3A2A2A;cursor:pointer;font-size:14px" title="Remover">🗑</button></div>';
     }).join("");
@@ -15413,7 +15413,7 @@ function colorirVies(cls){
   const el = document.getElementById("vies-"+cls);
   if(!el) return;
   const v = el.value;
-  el.style.color = v==="positivo" ? "#5DCAA5" : v==="negativo" ? "#FF6B6B" : "#4A7055";
+  el.style.color = v==="positivo" ? "#1F9D77" : v==="negativo" ? "#D93B3B" : "#5C7365";
 }
 
 function coletarPortfolios(){
@@ -15473,7 +15473,7 @@ function renderVisaoGestores(data){
   if(elAl){
     elAl.innerHTML = alertas.map(a=>{
       const ok = String(a).trim().startsWith("✅");
-      const cor = ok ? "#5DCAA5" : "#E8A87C";
+      const cor = ok ? "#1F9D77" : "#C0673A";
       const bg  = ok ? "#081A12" : "#1A140A";
       const bd  = ok ? "#1A3A28" : "#3A2E14";
       return `<div style="font-size:11.5px;color:${cor};background:${bg};border:1px solid ${bd};border-radius:7px;padding:8px 11px;line-height:1.45">${_esc(a)}</div>`;
@@ -15482,13 +15482,13 @@ function renderVisaoGestores(data){
 
   // Cards por gestor
   cards.innerHTML = gestores.map(g=>`
-    <div style="background:#060C10;border:1px solid #1A2E3A;border-radius:9px;padding:13px 14px">
+    <div style="background:#EFF3EF;border:1px solid #EAF1F6;border-radius:9px;padding:13px 14px">
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px">
         <span style="font-size:12.5px;font-weight:700;color:#CFE3EF">${_esc(g.gestor)}</span>
       </div>
-      <div style="font-size:10px;color:#8BCFEF;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:7px">${_esc(g.tema)}</div>
-      <div style="font-size:11.5px;color:#AAB8C2;line-height:1.5;margin-bottom:8px">${_esc(g.mensagem)}</div>
-      ${g.implicacao_alocacao ? `<div style="font-size:11px;color:#D4B483;line-height:1.45;border-top:1px solid #14222C;padding-top:7px"><b style="color:#C9A96E">→ Alocação:</b> ${_esc(g.implicacao_alocacao)}</div>` : ""}
+      <div style="font-size:10px;color:#2E86B8;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:7px">${_esc(g.tema)}</div>
+      <div style="font-size:11.5px;color:#5C7365;line-height:1.5;margin-bottom:8px">${_esc(g.mensagem)}</div>
+      ${g.implicacao_alocacao ? `<div style="font-size:11px;color:#A8833C;line-height:1.45;border-top:1px solid #14222C;padding-top:7px"><b style="color:#A8833C">→ Alocação:</b> ${_esc(g.implicacao_alocacao)}</div>` : ""}
       ${g.fonte ? `<div style="font-size:9.5px;color:#3A5A6A;margin-top:7px">${_esc(g.fonte)}</div>` : ""}
     </div>`).join("");
 
@@ -15498,7 +15498,7 @@ function renderVisaoGestores(data){
     if(posic.mudanca_junho || rac.length){
       elPos.style.display="";
       elPos.innerHTML = `
-        <div style="font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:7px">📌 Posicionamento da carta — o que mudou</div>
+        <div style="font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:7px">📌 Posicionamento da carta — o que mudou</div>
         ${posic.mudanca_junho ? `<div style="font-size:12px;color:#CFE3D6;line-height:1.5;margin-bottom:${rac.length?"10px":"0"}">${_esc(posic.mudanca_junho)}</div>` : ""}
         ${rac.length ? `<ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">${rac.map(r=>`<li style="font-size:11px;color:#8FB8A0;line-height:1.4">${_esc(r)}</li>`).join("")}</ul>` : ""}`;
     } else elPos.style.display="none";
@@ -15545,24 +15545,24 @@ function buildProdHtml(cls, id, p){
   if(cls === "acoes"){
     const setores = ["Bancário","Energia","Mineração","Varejo","Tecnologia","Saúde","Agronegócio","Construção","Utilities","Transporte","Financeiro","Indústria","Outro"].map(s=>`<option ${s===p.setor?"selected":""}>${s}</option>`).join("");
     const coberturas = ["Compra","Compra Forte","Neutro","Vender","Sem cobertura"].map(s=>`<option ${s===p.cobertura?"selected":""}>${s}</option>`).join("");
-    return `<div class="prod-item" id="prod-item-${cls}-${id}" style="border-color:#1A2A18">
+    return `<div class="prod-item" id="prod-item-${cls}-${id}" style="border-color:#F5F8F5">
       <button class="prod-del" onclick="delProduto('${cls}',${id})">✕</button>
       <div class="prod-grid-3">
         <div class="prod-mini"><label>Ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: VALE3, WEGE3, PETR4" style="text-transform:uppercase"></div>
         <div class="prod-mini"><label>Nome da empresa</label><input type="text" id="pe-${cls}-${id}" value="${v("emissor")}" placeholder="Ex: Vale S.A."></div>
-        <div class="prod-mini"><label>Setor</label><select id="pt-${cls}-${id}" style="background:#060F0B;border:1px solid #1A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${setores}</select></div>
+        <div class="prod-mini"><label>Setor</label><select id="pt-${cls}-${id}" style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${setores}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Preço atual (R$)</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 68,40"></div>
         <div class="prod-mini"><label>Preço-alvo (R$)</label><input type="text" id="pv-${cls}-${id}" value="${v("vencimento")}" placeholder="Ex: 85,00"></div>
         <div class="prod-mini"><label>Upside estimado</label><input type="text" id="pup-${cls}-${id}" value="${v("upside")}" placeholder="Ex: +24%"></div>
-        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#060F0B;border:1px solid #1A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${coberturas}</select></div>
+        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${coberturas}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Dividend Yield esperado</label><input type="text" id="pdy-${cls}-${id}" value="${v("dy")}" placeholder="Ex: 8,5% a.a."></div>
         <div class="prod-mini"><label>Prazo da tese</label><input type="text" id="ppz-${cls}-${id}" value="${v("prazo")}" placeholder="Ex: 12-18 meses"></div>
       </div>
-      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#060F0B;border:1px solid #1A2A18;border-radius:6px;padding:8px;color:#F0F0F0;font-size:12px;resize:vertical;outline:none" placeholder="Por que recomendar? Quais os gatilhos de valorização?">${v("motivo")}</textarea></div>
+      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:6px;padding:8px;color:#17271E;font-size:12px;resize:vertical;outline:none" placeholder="Por que recomendar? Quais os gatilhos de valorização?">${v("motivo")}</textarea></div>
       <div class="prod-mini" style="margin-top:6px"><label>Riscos / Pontos de atenção</label><input type="text" id="prisk-${cls}-${id}" value="${v("riscos")}" placeholder="Ex: Exposição ao câmbio, risco regulatório, ciclo de commodities"></div>
     </div>`;
   }
@@ -15575,19 +15575,19 @@ function buildProdHtml(cls, id, p){
       <div class="prod-grid-3">
         <div class="prod-mini"><label>Ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: MXRF11, HGLG11" style="text-transform:uppercase"></div>
         <div class="prod-mini"><label>Nome do fundo</label><input type="text" id="pe-${cls}-${id}" value="${v("emissor")}" placeholder="Ex: Maxi Renda FII"></div>
-        <div class="prod-mini"><label>Segmento</label><select id="pt-${cls}-${id}" style="background:#060F0B;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${segmentos}</select></div>
+        <div class="prod-mini"><label>Segmento</label><select id="pt-${cls}-${id}" style="background:#EFF3EF;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${segmentos}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Preço atual (R$)</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 9,85"></div>
         <div class="prod-mini"><label>P/VP</label><input type="text" id="pv-${cls}-${id}" value="${v("vencimento")}" placeholder="Ex: 0,92"></div>
         <div class="prod-mini"><label>Dividend Yield (a.a.)</label><input type="text" id="pdy-${cls}-${id}" value="${v("dy")}" placeholder="Ex: 12,8%"></div>
-        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#060F0B;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${recs}</select></div>
+        <div class="prod-mini"><label>Recomendação</label><select id="pcob-${cls}-${id}" style="background:#EFF3EF;border:1px solid #1A1A2A;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${recs}</select></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div class="prod-mini"><label>Rendimento mensal esperado (R$/cota)</label><input type="text" id="pup-${cls}-${id}" value="${v("upside")}" placeholder="Ex: R$ 0,105/cota"></div>
         <div class="prod-mini"><label>Gestora</label><input type="text" id="ppz-${cls}-${id}" value="${v("prazo")}" placeholder="Ex: CSHG, Kinea, BTG Pactual"></div>
       </div>
-      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#060F0B;border:1px solid #1A1A2A;border-radius:6px;padding:8px;color:#F0F0F0;font-size:12px;resize:vertical;outline:none" placeholder="Portfólio, qualidade dos contratos, vacância, gestão...">${v("motivo")}</textarea></div>
+      <div class="prod-mini" style="margin-top:8px"><label>Tese de investimento</label><textarea id="pm-${cls}-${id}" rows="2" style="width:100%;background:#EFF3EF;border:1px solid #1A1A2A;border-radius:6px;padding:8px;color:#17271E;font-size:12px;resize:vertical;outline:none" placeholder="Portfólio, qualidade dos contratos, vacância, gestão...">${v("motivo")}</textarea></div>
       <div class="prod-mini" style="margin-top:6px"><label>Riscos</label><input type="text" id="prisk-${cls}-${id}" value="${v("riscos")}" placeholder="Ex: Alta de juros reduz atratividade, vacância elevada, risco de crédito dos CRIs"></div>
     </div>`;
   }
@@ -15597,7 +15597,7 @@ function buildProdHtml(cls, id, p){
     <button class="prod-del" onclick="delProduto('${cls}',${id})">✕</button>
     <div class="prod-grid-3">
       <div class="prod-mini"><label>Nome do produto / ticker</label><input type="text" id="pn-${cls}-${id}" value="${v("nome")}" placeholder="Ex: CDB Banco BTG 108% CDI"></div>
-      <div class="prod-mini"><label>Tipo</label><select id="pt-${cls}-${id}" style="background:#060F0B;border:1px solid #2A2A18;border-radius:6px;padding:6px 8px;color:#F0F0F0;font-size:12px;outline:none;width:100%">${tipos}</select></div>
+      <div class="prod-mini"><label>Tipo</label><select id="pt-${cls}-${id}" style="background:#EFF3EF;border:1px solid #F7F1D8;border-radius:6px;padding:6px 8px;color:#17271E;font-size:12px;outline:none;width:100%">${tipos}</select></div>
       <div class="prod-mini"><label>Taxa / retorno esperado</label><input type="text" id="pr-${cls}-${id}" value="${v("taxa")}" placeholder="Ex: 108% CDI / IPCA+7% / 13,5% a.a."></div>
     </div>
     <div class="prod-grid-2">
@@ -15644,32 +15644,32 @@ function initProdButtons(){
 
     // Barra de importação
     const toolbar = document.createElement("div");
-    toolbar.style.cssText = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#070C07;border:1px dashed #2A2A18;border-radius:8px;margin-bottom:12px";
+    toolbar.style.cssText = "display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#070C07;border:1px dashed #F7F1D8;border-radius:8px;margin-bottom:12px";
     toolbar.innerHTML = `
       <span style="font-size:11px;color:#3A4A3A;flex:1">📂 Importar produtos via arquivo:</span>
-      <label style="display:inline-flex;align-items:center;gap:6px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#D4B483';this.style.color='#000'" onmouseout="this.style.background='#1A1A08';this.style.color='#D4B483'">
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#A8833C';this.style.color='#000'" onmouseout="this.style.background='#FBF3D2';this.style.color='#A8833C'">
         📄 PDF
         <input type="file" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="uploadPdfProduto('${cls.key}',this)">
       </label>
-      <label style="display:inline-flex;align-items:center;gap:6px;background:#1A1A08;color:#D4B483;border:1px solid #D4B483;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#D4B483';this.style.color='#000'" onmouseout="this.style.background='#1A1A08';this.style.color='#D4B483'">
+      <label style="display:inline-flex;align-items:center;gap:6px;background:#FBF3D2;color:#A8833C;border:1px solid #A8833C;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden" onmouseover="this.style.background='#A8833C';this.style.color='#000'" onmouseout="this.style.background='#FBF3D2';this.style.color='#A8833C'">
         📊 Planilha CSV/Excel
         <input type="file" accept=".csv,.xlsx,.xls" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="importarProdPlanilha('${cls.key}',this)">
       </label>
       <button class="btn-ghost" onclick="baixarModeloProd('${cls.key}')">⬇ Modelo CSV</button>
-      <span id="prod-import-st-${cls.key}" style="font-size:11px;color:#5DCAA5"></span>
+      <span id="prod-import-st-${cls.key}" style="font-size:11px;color:#1F9D77"></span>
     `;
     panel.appendChild(toolbar);
 
     // Preview PDF por aba
     const preview = document.createElement("div");
     preview.id = `prod-pdf-preview-${cls.key}`;
-    preview.style.cssText = "display:none;background:#070C07;border:1px solid #D4B483;border-radius:8px;padding:12px;margin-bottom:12px";
+    preview.style.cssText = "display:none;background:#070C07;border:1px solid #A8833C;border-radius:8px;padding:12px;margin-bottom:12px";
     preview.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:11px;color:#D4B483;font-weight:700">📄 Conteúdo extraído — ${cls.label}</span>
-        <button onclick="document.getElementById('prod-pdf-preview-${cls.key}').style.display='none'" style="background:none;border:none;color:#3A6A48;cursor:pointer;font-size:14px">✕</button>
+        <span style="font-size:11px;color:#A8833C;font-weight:700">📄 Conteúdo extraído — ${cls.label}</span>
+        <button onclick="document.getElementById('prod-pdf-preview-${cls.key}').style.display='none'" style="background:none;border:none;color:#5C7365;cursor:pointer;font-size:14px">✕</button>
       </div>
-      <textarea id="prod-pdf-texto-${cls.key}" rows="6" style="width:100%;background:#050A05;border:1px solid #2A2A18;border-radius:7px;padding:10px;color:#AAA;font-size:11px;font-family:monospace;resize:vertical;outline:none"></textarea>
+      <textarea id="prod-pdf-texto-${cls.key}" rows="6" style="width:100%;background:#050A05;border:1px solid #F7F1D8;border-radius:7px;padding:10px;color:#8A9A8E;font-size:11px;font-family:monospace;resize:vertical;outline:none"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
         <button class="btn btn-sm" onclick="usarPdfComoProduto('${cls.key}')">→ Criar produto a partir deste texto</button>
         <button class="btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('prod-pdf-texto-${cls.key}').value)">📋 Copiar</button>
@@ -15853,19 +15853,19 @@ function renderSugestoesSalvas(){
     const arr = _produtosSalvos[cls] || [];
     if(!arr.length) return;
     total += arr.length;
-    html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${_PROD_LBL[cls]} <span style="color:#3A6A48">(${arr.length})</span></div>`;
+    html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${_PROD_LBL[cls]} <span style="color:#5C7365">(${arr.length})</span></div>`;
     arr.forEach((p,idx)=>{
-      html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#081208;border:1px solid #1A2A18;border-radius:8px;margin-bottom:5px">
-        <span style="flex:1;font-size:12px;color:#F0F0F0"><b>${_escapa(p.nome)||'—'}</b>${p.taxa?` · <span style="color:#5DCAA5">${_escapa(p.taxa)}</span>`:''}${p.emissor?` · <span style="color:#888">${_escapa(p.emissor)}</span>`:''}${p.indicado_em?`<span style="color:#2A5A3A;font-size:10px;margin-left:6px">salvo ${_escapa(p.indicado_em)}</span>`:''}</span>
-        <button onclick="editarSalvo('${cls}',${idx})" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:6px;padding:4px 10px;color:#7DCFEF;font-size:11px;cursor:pointer">✏️ editar</button>
-        <button onclick="removerSalvo('${cls}',${idx})" title="Remover do arquivo" style="background:#1A0808;border:1px solid #3A1010;border-radius:6px;padding:4px 10px;color:#FF6B6B;font-size:11px;cursor:pointer">🗑️</button>
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;margin-bottom:5px">
+        <span style="flex:1;font-size:12px;color:#17271E"><b>${_escapa(p.nome)||'—'}</b>${p.taxa?` · <span style="color:#1F9D77">${_escapa(p.taxa)}</span>`:''}${p.emissor?` · <span style="color:#8A9A8E">${_escapa(p.emissor)}</span>`:''}${p.indicado_em?`<span style="color:#5C7365;font-size:10px;margin-left:6px">salvo ${_escapa(p.indicado_em)}</span>`:''}</span>
+        <button onclick="editarSalvo('${cls}',${idx})" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:6px;padding:4px 10px;color:#2E86B8;font-size:11px;cursor:pointer">✏️ editar</button>
+        <button onclick="removerSalvo('${cls}',${idx})" title="Remover do arquivo" style="background:#FBE9E9;border:1px solid #F7DADA;border-radius:6px;padding:4px 10px;color:#D93B3B;font-size:11px;cursor:pointer">🗑️</button>
       </div>`;
     });
     html += `</div>`;
   });
   box.innerHTML = total
-    ? `<div style="font-size:12px;color:#5DCAA5;font-weight:700;margin-bottom:10px">📌 Sugestões salvas no arquivo — ${total} ativo(s) · nunca são esquecidos</div>${html}`
-    : `<div style="font-size:12px;color:#2A5A3A">📭 Nenhuma sugestão salva ainda. Cadastre abaixo e clique em "💾 Salvar produtos".</div>`;
+    ? `<div style="font-size:12px;color:#1F9D77;font-weight:700;margin-bottom:10px">📌 Sugestões salvas no arquivo — ${total} ativo(s) · nunca são esquecidos</div>${html}`
+    : `<div style="font-size:12px;color:#5C7365">📭 Nenhuma sugestão salva ainda. Cadastre abaixo e clique em "💾 Salvar produtos".</div>`;
 }
 
 async function removerSalvo(cls, idx){
@@ -15898,11 +15898,11 @@ function editarSalvo(cls, idx){
   const tabBtn = [...document.querySelectorAll('.tabs .tab')].find(b => (b.getAttribute('onclick')||'').includes("'"+cls+"'"));
   if(tabBtn) tabBtn.click();
   const st = document.getElementById("prod-save-st");
-  if(st) st.innerHTML = `<span style="color:#7DCFEF">✏️ Ativo movido para o formulário — ajuste e clique em "💾 Salvar produtos" para gravar de volta.</span>`;
+  if(st) st.innerHTML = `<span style="color:#2E86B8">✏️ Ativo movido para o formulário — ajuste e clique em "💾 Salvar produtos" para gravar de volta.</span>`;
 }
 
 // ── Base de Conhecimento ──────────────────────────────────────────────────────
-const KNOW_TIPO_COLORS = {carta:"#5DCAA5", research:"#8B9FE8", cenario:"#D4B483", relatorio:"#B08FCF", outro:"#888"};
+const KNOW_TIPO_COLORS = {carta:"#1F9D77", research:"#4E63C8", cenario:"#A8833C", relatorio:"#B08FCF", outro:"#8A9A8E"};
 const KNOW_TIPO_LABELS = {carta:"Carta de Gestora", research:"Research", cenario:"Cenário Macro", relatorio:"Relatório", outro:"Outro"};
 let _knowFile = null;
 
@@ -15927,7 +15927,7 @@ function knowUpload(input){
     document.getElementById("know-nome").value = files[0].name.replace(/\.pdf$/i,"");
   document.getElementById("know-btn-upload").disabled = false;
   document.getElementById("know-st").innerHTML =
-    `<span style="color:#5DCAA5">✓ ${files.length} arquivo${files.length>1?"s":""} prontos para subir</span>`;
+    `<span style="color:#1F9D77">✓ ${files.length} arquivo${files.length>1?"s":""} prontos para subir</span>`;
 }
 
 async function knowSalvar(){
@@ -16036,26 +16036,26 @@ function renderKnowledge(docs){
   if(!docs.length){
     const q = (document.getElementById("know-busca")?.value || "").trim();
     const msg = q ? `Nenhum documento encontrado para "${q}".` : "Nenhum documento ainda. Suba o primeiro PDF acima.";
-    el.innerHTML = `<div style="color:#1E4A30;font-size:11px;font-style:italic;text-align:center;padding:20px">${msg}</div>`;
+    el.innerHTML = `<div style="color:#5C7365;font-size:11px;font-style:italic;text-align:center;padding:20px">${msg}</div>`;
     return;
   }
   el.innerHTML = docs.map(d=>{
-    const cor = KNOW_TIPO_COLORS[d.tipo]||"#888";
+    const cor = KNOW_TIPO_COLORS[d.tipo]||"#8A9A8E";
     const label = KNOW_TIPO_LABELS[d.tipo]||d.tipo;
-    const clsTags = (d.classes||[]).map(c=>`<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${c}</span>`).join(" ");
-    const pubBadge = d.publicado ? `<span style="font-size:10px;background:#0A2A0A;color:#5DCAA5;padding:2px 8px;border-radius:10px;border:1px solid #1A4A1A">✓ publicado</span>` : `<span style="font-size:10px;color:#2A5A3A">rascunho</span>`;
+    const clsTags = (d.classes||[]).map(c=>`<span style="font-size:10px;background:#FBF3D2;color:#8A9A8E;padding:2px 7px;border-radius:10px">${c}</span>`).join(" ");
+    const pubBadge = d.publicado ? `<span style="font-size:10px;background:#0A2A0A;color:#1F9D77;padding:2px 8px;border-radius:10px;border:1px solid #1A4A1A">✓ publicado</span>` : `<span style="font-size:10px;color:#5C7365">rascunho</span>`;
     return `<div class="know-doc-card">
       <div style="display:flex;align-items:flex-start;gap:12px">
         <div style="font-size:24px;flex-shrink:0">📄</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
-            <span style="font-size:13px;font-weight:700;color:#F0F0F0">${d.nome||"Documento"}</span>
+            <span style="font-size:13px;font-weight:700;color:#17271E">${d.nome||"Documento"}</span>
             <span class="know-tipo-badge" style="background:${cor}22;color:${cor};border:1px solid ${cor}44">${label}</span>
             ${pubBadge}
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-            ${d.fonte ? `<span style="font-size:11px;color:#D4B483">📎 ${d.fonte}</span>` : ""}
-            <span style="font-size:10px;color:#2A5A3A">${d.chars?.toLocaleString()||0} chars · ${d.data||""}</span>
+            ${d.fonte ? `<span style="font-size:11px;color:#A8833C">📎 ${d.fonte}</span>` : ""}
+            <span style="font-size:10px;color:#5C7365">${d.chars?.toLocaleString()||0} chars · ${d.data||""}</span>
             ${clsTags}
           </div>
           <!-- Ações -->
@@ -16063,12 +16063,12 @@ function renderKnowledge(docs){
             <button class="btn btn-sm" onclick="knowAplicarCenario('${d.id}')">→ Cenário Macro</button>
             <button class="btn btn-sm btn-out" onclick="knowVerTexto('${d.id}')">👁 Ver texto</button>
             ${!d.publicado ? `<button class="btn-ghost" onclick="knowPublicar('${d.id}')">📢 Publicar</button>` : ""}
-            <button class="btn-ghost" style="color:#FF6B6B;border-color:#FF6B6B" onclick="knowDeletar('${d.id}')">🗑 Remover</button>
+            <button class="btn-ghost" style="color:#D93B3B;border-color:#D93B3B" onclick="knowDeletar('${d.id}')">🗑 Remover</button>
           </div>
         </div>
       </div>
       <!-- Preview expansível -->
-      <div id="know-preview-${d.id}" style="display:none;margin-top:10px;background:#050A05;border:1px solid #1A2A1A;border-radius:8px;padding:10px;font-size:11px;color:#AAA;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
+      <div id="know-preview-${d.id}" style="display:none;margin-top:10px;background:#050A05;border:1px solid #F5F8F5;border-radius:8px;padding:10px;font-size:11px;color:#8A9A8E;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
     </div>`;
   }).join("");
 }
@@ -16123,7 +16123,7 @@ function knowVerTexto(id){
 }
 
 // ── Alertas de Monitoramento ──────────────────────────────────────────────────
-const ALERT_COLORS = { info:"#5DCAA5", atencao:"#D4B483", urgente:"#FF6B6B" };
+const ALERT_COLORS = { info:"#1F9D77", atencao:"#A8833C", urgente:"#D93B3B" };
 const ALERT_LABELS = { info:"ℹ️ Informativo", atencao:"⚠️ Atenção", urgente:"🚨 Urgente" };
 
 async function registrarAlerta(){
@@ -16157,25 +16157,25 @@ async function carregarAlertas(){
     const r = await fetch("/api/hp/alertas");
     const lista = await r.json();
     if(!lista.length){
-      feed.innerHTML = `<div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Nenhum alerta registrado ainda.</div>`;
+      feed.innerHTML = `<div style="color:#5C7365;font-size:11px;text-align:center;padding:20px">Nenhum alerta registrado ainda.</div>`;
       return;
     }
     feed.innerHTML = lista.map(a=>`
-      <div style="background:#0A0A0A;border-left:3px solid ${ALERT_COLORS[a.tipo]||"#2A5A3A"};border-radius:0 8px 8px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
+      <div style="background:#EFF3EF;border-left:3px solid ${ALERT_COLORS[a.tipo]||"#5C7365"};border-radius:0 8px 8px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-            <span style="font-size:12px;font-weight:700;color:${ALERT_COLORS[a.tipo]||"#CCC"}">${ALERT_LABELS[a.tipo]||a.tipo}</span>
-            <span style="font-size:11px;color:#D4B483;font-weight:700">${a.produto||""}</span>
-            ${a.classe ? `<span style="font-size:10px;background:#1A1A08;color:#888;padding:2px 7px;border-radius:10px">${a.classe}</span>` : ""}
-            ${a.assessor_destino ? `<span style="background:#1A2E1A;color:#C9A96E;font-size:10px;padding:2px 7px;border-radius:10px">→ ${a.assessor_destino}</span>` : ""}
-            <span style="font-size:10px;color:#1E4A30;margin-left:auto">${a.data||""} · ${a.origem||"HP"}</span>
+            <span style="font-size:12px;font-weight:700;color:${ALERT_COLORS[a.tipo]||"#5C7365"}">${ALERT_LABELS[a.tipo]||a.tipo}</span>
+            <span style="font-size:11px;color:#A8833C;font-weight:700">${a.produto||""}</span>
+            ${a.classe ? `<span style="font-size:10px;background:#FBF3D2;color:#8A9A8E;padding:2px 7px;border-radius:10px">${a.classe}</span>` : ""}
+            ${a.assessor_destino ? `<span style="background:#F5F8F5;color:#A8833C;font-size:10px;padding:2px 7px;border-radius:10px">→ ${a.assessor_destino}</span>` : ""}
+            <span style="font-size:10px;color:#5C7365;margin-left:auto">${a.data||""} · ${a.origem||"HP"}</span>
           </div>
-          <p style="font-size:12px;color:#AAA;margin:0;line-height:1.5">${a.mensagem||""}</p>
+          <p style="font-size:12px;color:#8A9A8E;margin:0;line-height:1.5">${a.mensagem||""}</p>
         </div>
-        <button onclick="deletarAlerta('${a.id}')" title="Remover" style="background:none;border:none;color:#1E4A30;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#1E4A30'">✕</button>
+        <button onclick="deletarAlerta('${a.id}')" title="Remover" style="background:none;border:none;color:#5C7365;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#D93B3B'" onmouseout="this.style.color='#5C7365'">✕</button>
       </div>
     `).join("");
-  } catch(e){ feed.innerHTML=`<div style="color:#FF6B6B;font-size:11px;padding:12px">Erro ao carregar alertas.</div>`; }
+  } catch(e){ feed.innerHTML=`<div style="color:#D93B3B;font-size:11px;padding:12px">Erro ao carregar alertas.</div>`; }
 }
 
 async function deletarAlerta(id){
@@ -16189,18 +16189,18 @@ function setCallDir(dir){
   _callDir = dir;
   document.getElementById("call-direcao").value = dir;
   const styles = {
-    compra: {border:"#5DCAA5", bg:"#0A2018", color:"#5DCAA5"},
-    neutro: {border:"#888",    bg:"#1A1A1A", color:"#AAA"},
-    venda:  {border:"#FF6B6B", bg:"#1A0808", color:"#FF6B6B"},
+    compra: {border:"#1F9D77", bg:"#F5F8F5", color:"#1F9D77"},
+    neutro: {border:"#8A9A8E",    bg:"#F5F8F5", color:"#8A9A8E"},
+    venda:  {border:"#D93B3B", bg:"#FBE9E9", color:"#D93B3B"},
   };
   ["compra","neutro","venda"].forEach(d=>{
     const btn = document.getElementById("call-dir-"+d);
     if(!btn) return;
     const s = styles[d];
     const active = d === dir;
-    btn.style.borderColor = active ? s.border : "#1A1A1A";
-    btn.style.background  = active ? s.bg     : "#111";
-    btn.style.color       = active ? s.color  : "#444";
+    btn.style.borderColor = active ? s.border : "#F5F8F5";
+    btn.style.background  = active ? s.bg     : "#FFFFFF";
+    btn.style.color       = active ? s.color  : "#8A9A8E";
   });
 }
 setCallDir("compra");
@@ -16211,11 +16211,11 @@ function calcCallUpside(){
   const el      = document.getElementById("call-upside-display");
   if(entrada > 0 && alvo > 0){
     const up = ((alvo / entrada - 1) * 100).toFixed(1);
-    const cor = up >= 0 ? "#5DCAA5" : "#FF6B6B";
+    const cor = up >= 0 ? "#1F9D77" : "#D93B3B";
     el.textContent = (up >= 0 ? "+" : "") + up + "%";
     el.style.color = cor;
   } else {
-    el.textContent = "—"; el.style.color = "#5DCAA5";
+    el.textContent = "—"; el.style.color = "#1F9D77";
   }
 }
 
@@ -16261,38 +16261,38 @@ async function carregarCalls(){
     const r = await fetch("/api/hp/calls");
     const lista = await r.json();
     if(!lista.length){
-      feed.innerHTML = `<div style="color:#1E4A30;font-size:11px;text-align:center;padding:20px">Nenhum call cadastrado ainda.</div>`;
+      feed.innerHTML = `<div style="color:#5C7365;font-size:11px;text-align:center;padding:20px">Nenhum call cadastrado ainda.</div>`;
       return;
     }
-    const DIR_COR   = {compra:"#5DCAA5", neutro:"#AAA", venda:"#FF6B6B"};
+    const DIR_COR   = {compra:"#1F9D77", neutro:"#8A9A8E", venda:"#D93B3B"};
     const DIR_LABEL = {compra:"▲ COMPRA", neutro:"→ NEUTRO", venda:"▼ VENDA"};
     feed.innerHTML = lista.filter(c=>c.ativo!==false).map(c=>{
-      const cor = DIR_COR[c.direcao] || "#AAA";
-      const upCor = (c.upside||0) >= 0 ? "#5DCAA5" : "#FF6B6B";
-      const perfBadges = (c.perfis||[]).map(p=>`<span style="font-size:10px;background:#1A2E1A;color:#C9A96E;border:1px solid #C9A96E44;padding:1px 7px;border-radius:8px">${p}</span>`).join(" ");
-      return `<div style="background:#0A0F0B;border:1px solid #1A2E3A;border-left:3px solid ${cor};border-radius:0 10px 10px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
+      const cor = DIR_COR[c.direcao] || "#8A9A8E";
+      const upCor = (c.upside||0) >= 0 ? "#1F9D77" : "#D93B3B";
+      const perfBadges = (c.perfis||[]).map(p=>`<span style="font-size:10px;background:#F5F8F5;color:#A8833C;border:1px solid #C9A96E44;padding:1px 7px;border-radius:8px">${p}</span>`).join(" ");
+      return `<div style="background:#F5F8F5;border:1px solid #EAF1F6;border-left:3px solid ${cor};border-radius:0 10px 10px 0;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
             <span style="font-size:15px;font-weight:900;color:${cor}">${c.ticker}</span>
             <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${cor}22;color:${cor}">${DIR_LABEL[c.direcao]||c.direcao}</span>
-            ${c.nome ? `<span style="font-size:12px;color:#AAA">${c.nome}</span>` : ""}
+            ${c.nome ? `<span style="font-size:12px;color:#8A9A8E">${c.nome}</span>` : ""}
             ${perfBadges}
-            <span style="font-size:10px;color:#1E4A30;margin-left:auto">${c.data||""}</span>
+            <span style="font-size:10px;color:#5C7365;margin-left:auto">${c.data||""}</span>
           </div>
           <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:6px">
-            ${c.preco_entrada ? `<span style="color:#888">Entrada: <b style="color:#F0F0F0">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
-            ${c.preco_alvo ? `<span style="color:#888">→ Alvo: <b style="color:#F0F0F0">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+            ${c.preco_entrada ? `<span style="color:#8A9A8E">Entrada: <b style="color:#17271E">R$ ${c.preco_entrada.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+            ${c.preco_alvo ? `<span style="color:#8A9A8E">→ Alvo: <b style="color:#17271E">R$ ${c.preco_alvo.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
             ${c.upside !== undefined ? `<span style="color:${upCor};font-weight:700">Upside ${c.upside >= 0 ? "+" : ""}${c.upside}%</span>` : ""}
-            ${c.stop ? `<span style="color:#888">Stop: <b style="color:#FF6B6B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
-            ${c.prazo ? `<span style="color:#888">Prazo: <b style="color:#AAA">${c.prazo}</b></span>` : ""}
+            ${c.stop ? `<span style="color:#8A9A8E">Stop: <b style="color:#D93B3B">R$ ${c.stop.toLocaleString("pt-BR",{minimumFractionDigits:2})}</b></span>` : ""}
+            ${c.prazo ? `<span style="color:#8A9A8E">Prazo: <b style="color:#8A9A8E">${c.prazo}</b></span>` : ""}
           </div>
-          ${c.tese ? `<p style="font-size:11px;color:#888;margin:0 0 4px;line-height:1.5;font-style:italic">"${c.tese.length>120?c.tese.slice(0,120)+"...":c.tese}"</p>` : ""}
-          ${c.fonte ? `<div style="font-size:10px;color:#2A5A3A">${c.fonte}</div>` : ""}
+          ${c.tese ? `<p style="font-size:11px;color:#8A9A8E;margin:0 0 4px;line-height:1.5;font-style:italic">"${c.tese.length>120?c.tese.slice(0,120)+"...":c.tese}"</p>` : ""}
+          ${c.fonte ? `<div style="font-size:10px;color:#5C7365">${c.fonte}</div>` : ""}
         </div>
-        <button onclick="deletarCall('${c.id}')" title="Remover" style="background:none;border:none;color:#1E4A30;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#1E4A30'">✕</button>
+        <button onclick="deletarCall('${c.id}')" title="Remover" style="background:none;border:none;color:#5C7365;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#D93B3B'" onmouseout="this.style.color='#5C7365'">✕</button>
       </div>`;
     }).join("");
-  } catch(e){ feed.innerHTML=`<div style="color:#FF6B6B;font-size:11px;padding:12px">Erro ao carregar calls.</div>`; }
+  } catch(e){ feed.innerHTML=`<div style="color:#D93B3B;font-size:11px;padding:12px">Erro ao carregar calls.</div>`; }
 }
 
 async function deletarCall(id){
@@ -16322,7 +16322,7 @@ async function adicionarEstruturada(){
     minimo:       document.getElementById("estr-minimo").value.trim(),
   };
   if(!payload.ativo){ st.innerHTML=`<span class="status-err">Informe o ativo/produto.</span>`; return; }
-  st.innerHTML = `<span style="color:#4A7055">Salvando...</span>`;
+  st.innerHTML = `<span style="color:#5C7365">Salvando...</span>`;
   try{
     const r = await fetch("/api/hp/estruturadas", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
     const d = await r.json();
@@ -16344,30 +16344,30 @@ async function carregarEstruturadas(){
     const r = await fetch("/api/hp/estruturadas");
     const ops = await r.json();
     if(!ops.length){
-      lista.innerHTML=`<div style="color:#2A2A18;font-size:11px;text-align:center;padding:16px">Nenhuma operação cadastrada ainda.</div>`;
+      lista.innerHTML=`<div style="color:#F7F1D8;font-size:11px;text-align:center;padding:16px">Nenhuma operação cadastrada ainda.</div>`;
       return;
     }
     const PERFIL_LABEL = {super_conservadora:"Super Conserv.",conservadora:"Conservadora",moderada:"Moderada",arrojada:"Arrojada",agressiva:"Agressiva"};
     lista.innerHTML = ops.map(op=>`
-      <div style="background:#080C06;border:1px solid #2A1A10;border-left:3px solid #C9A96E;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+      <div style="background:#080C06;border:1px solid #F3E7DD;border-left:3px solid #A8833C;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
         <div style="flex:1">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-            <span style="font-size:12px;font-weight:700;background:#C9A96E22;color:#C9A96E;padding:2px 8px;border-radius:8px">${op.tipo}</span>
-            <span style="font-size:14px;font-weight:700;color:#F0F0F0">${op.ativo}</span>
-            ${op.emissor ? `<span style="font-size:11px;color:#888">${op.emissor}</span>` : ""}
-            <span style="font-size:10px;color:#1E4A30;margin-left:auto">${op.data||""}</span>
+            <span style="font-size:12px;font-weight:700;background:#C9A96E22;color:#A8833C;padding:2px 8px;border-radius:8px">${op.tipo}</span>
+            <span style="font-size:14px;font-weight:700;color:#17271E">${op.ativo}</span>
+            ${op.emissor ? `<span style="font-size:11px;color:#8A9A8E">${op.emissor}</span>` : ""}
+            <span style="font-size:10px;color:#5C7365;margin-left:auto">${op.data||""}</span>
           </div>
           <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:4px">
-            ${op.vencimento ? `<span style="color:#888">Venc: <b style="color:#DDD">${op.vencimento}</b></span>` : ""}
-            ${op.retorno ? `<span style="color:#888">Retorno: <b style="color:#5DCAA5">${op.retorno}</b></span>` : ""}
-            ${op.perfil_minimo ? `<span style="color:#888">Mínimo: <b style="color:#C9A96E">${PERFIL_LABEL[op.perfil_minimo]||op.perfil_minimo}</b></span>` : ""}
-            ${op.minimo ? `<span style="color:#888">Apl. mín: <b style="color:#DDD">${op.minimo}</b></span>` : ""}
+            ${op.vencimento ? `<span style="color:#8A9A8E">Venc: <b style="color:#D9E3DB">${op.vencimento}</b></span>` : ""}
+            ${op.retorno ? `<span style="color:#8A9A8E">Retorno: <b style="color:#1F9D77">${op.retorno}</b></span>` : ""}
+            ${op.perfil_minimo ? `<span style="color:#8A9A8E">Mínimo: <b style="color:#A8833C">${PERFIL_LABEL[op.perfil_minimo]||op.perfil_minimo}</b></span>` : ""}
+            ${op.minimo ? `<span style="color:#8A9A8E">Apl. mín: <b style="color:#D9E3DB">${op.minimo}</b></span>` : ""}
           </div>
-          ${op.observacao ? `<p style="font-size:11px;color:#888;margin:0;line-height:1.5;font-style:italic">"${op.observacao}"</p>` : ""}
+          ${op.observacao ? `<p style="font-size:11px;color:#8A9A8E;margin:0;line-height:1.5;font-style:italic">"${op.observacao}"</p>` : ""}
         </div>
-        <button onclick="deletarEstruturada('${op.id}')" title="Remover" style="background:none;border:none;color:#2A2A18;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#FF6B6B'" onmouseout="this.style.color='#2A2A18'">✕</button>
+        <button onclick="deletarEstruturada('${op.id}')" title="Remover" style="background:none;border:none;color:#F7F1D8;cursor:pointer;font-size:14px;flex-shrink:0;padding:2px 4px" onmouseover="this.style.color='#D93B3B'" onmouseout="this.style.color='#F7F1D8'">✕</button>
       </div>`).join("");
-  } catch(e){ lista.innerHTML=`<div style="color:#FF6B6B;font-size:11px;padding:12px">Erro ao carregar operações.</div>`; }
+  } catch(e){ lista.innerHTML=`<div style="color:#D93B3B;font-size:11px;padding:12px">Erro ao carregar operações.</div>`; }
 }
 
 async function deletarEstruturada(id){
@@ -16407,7 +16407,7 @@ function renderGest2Tabs(){
   if(!tabs) return;
   const gestoras = Object.values(_gest2_data);
   tabs.innerHTML = gestoras.map(g=>`
-    <button onclick="gest2ShowGestora('${g.id}')" style="font-size:12px;padding:8px 14px;border:none;border-bottom:2px solid transparent;background:none;color:#4A7055;cursor:pointer;transition:all .15s" id="gest2tab-${g.id}">
+    <button onclick="gest2ShowGestora('${g.id}')" style="font-size:12px;padding:8px 14px;border:none;border-bottom:2px solid transparent;background:none;color:#5C7365;cursor:pointer;transition:all .15s" id="gest2tab-${g.id}">
       🏦 ${g.nome||g.id}
     </button>`).join("") + (gestoras.length ? "" : `<span style="font-size:11px;color:#1E3A2A;padding:8px 14px">Nenhuma gestora ainda.</span>`);
 }
@@ -16419,11 +16419,11 @@ function gest2ShowGestora(gid){
   // highlight tab
   document.querySelectorAll("[id^='gest2tab-']").forEach(b=>{
     b.style.borderBottomColor = "transparent";
-    b.style.color = "#4A7055";
+    b.style.color = "#5C7365";
     b.style.fontWeight = "400";
   });
   const tab = document.getElementById("gest2tab-"+gid);
-  if(tab){ tab.style.borderBottomColor="#D4B483"; tab.style.color="#D4B483"; tab.style.fontWeight="700"; }
+  if(tab){ tab.style.borderBottomColor="#A8833C"; tab.style.color="#A8833C"; tab.style.fontWeight="700"; }
 
   const painel = document.getElementById("gest2-painel");
   if(!g){ painel.innerHTML=""; return; }
@@ -16433,41 +16433,41 @@ function gest2ShowGestora(gid){
     <div style="overflow-x:auto;margin-bottom:10px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div>
-          <span style="font-size:14px;font-weight:700;color:#D4B483">${g.nome}</span>
-          ${g.referencia ? `<span style="font-size:11px;color:#3A6A48;margin-left:10px">${g.referencia}</span>` : ""}
+          <span style="font-size:14px;font-weight:700;color:#A8833C">${g.nome}</span>
+          ${g.referencia ? `<span style="font-size:11px;color:#5C7365;margin-left:10px">${g.referencia}</span>` : ""}
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn-ghost" onclick="gest2EditarGestora('${gid}')" style="font-size:11px">✏️ Editar</button>
-          <button class="btn-ghost" onclick="gest2DeletarGestora('${gid}')" style="font-size:11px;color:#FF6B6B">✕ Remover</button>
+          <button class="btn-ghost" onclick="gest2DeletarGestora('${gid}')" style="font-size:11px;color:#D93B3B">✕ Remover</button>
         </div>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:11px">
         <thead>
-          <tr style="background:#060F0B">
-            <th style="padding:8px;text-align:left;color:#3A6A48;border-bottom:1px solid #1A2A1A">Classe</th>
-            ${G2_PERFIS.map(p=>`<th style="padding:8px;text-align:center;color:#3A6A48;border-bottom:1px solid #1A2A1A">${G2_PERFIL_LABEL[p]}</th>`).join("")}
+          <tr style="background:#EFF3EF">
+            <th style="padding:8px;text-align:left;color:#5C7365;border-bottom:1px solid #F5F8F5">Classe</th>
+            ${G2_PERFIS.map(p=>`<th style="padding:8px;text-align:center;color:#5C7365;border-bottom:1px solid #F5F8F5">${G2_PERFIL_LABEL[p]}</th>`).join("")}
           </tr>
         </thead>
         <tbody>
           ${G2_CLASSES.map(c=>{
             const vals = G2_PERFIS.map(p=>g.perfis?.[p]?.[c]||0);
             const allZero = vals.every(v=>v===0);
-            return `<tr style="border-bottom:1px solid #0A1A0A${allZero?";opacity:.4":""}">
-              <td style="padding:7px 8px;color:#4A7055;font-weight:600">${CLASSE_LABEL[c]||c}</td>
+            return `<tr style="border-bottom:1px solid #EFF3EF${allZero?";opacity:.4":""}">
+              <td style="padding:7px 8px;color:#5C7365;font-weight:600">${CLASSE_LABEL[c]||c}</td>
               ${G2_PERFIS.map(p=>{
                 const v = g.perfis?.[p]?.[c]||0;
-                return `<td style="padding:7px 8px;text-align:center;color:${v>0?"#F0F0F0":"#1E3A2A"};font-weight:${v>0?"700":"400"}">${v>0?v+"%":"—"}</td>`;
+                return `<td style="padding:7px 8px;text-align:center;color:${v>0?"#17271E":"#1E3A2A"};font-weight:${v>0?"700":"400"}">${v>0?v+"%":"—"}</td>`;
               }).join("")}
             </tr>`;
           }).join("")}
         </tbody>
         <tfoot>
-          <tr style="border-top:2px solid #1A2A1A;background:#060F0B">
-            <td style="padding:8px;color:#D4B483;font-weight:700">TOTAL</td>
+          <tr style="border-top:2px solid #F5F8F5;background:#EFF3EF">
+            <td style="padding:8px;color:#A8833C;font-weight:700">TOTAL</td>
             ${G2_PERFIS.map(p=>{
               const soma = G2_CLASSES.reduce((s,c)=>s+(g.perfis?.[p]?.[c]||0),0);
               const ok = Math.abs(soma-100)<0.1;
-              return `<td style="padding:8px;text-align:center;font-weight:700;color:${ok?"#5DCAA5":"#FF6B6B"}">${soma.toFixed(1)}%</td>`;
+              return `<td style="padding:8px;text-align:center;font-weight:700;color:${ok?"#1F9D77":"#D93B3B"}">${soma.toFixed(1)}%</td>`;
             }).join("")}
           </tr>
         </tfoot>
@@ -16527,7 +16527,7 @@ function g2Total(){
   let s=0;
   G2_CLASSES.forEach(c=>{ const el=document.getElementById("g2aloc-"+c); if(el) s+=parseFloat(el.value)||0; });
   const el=document.getElementById("g2-total");
-  if(el){ el.textContent=s.toFixed(1); el.style.color=Math.abs(s-100)<0.1?"#5DCAA5":"#FF6B6B"; }
+  if(el){ el.textContent=s.toFixed(1); el.style.color=Math.abs(s-100)<0.1?"#1F9D77":"#D93B3B"; }
 }
 
 async function gest2Salvar(){
@@ -16542,7 +16542,7 @@ async function gest2Salvar(){
     perfis:     _gest2_perfis_temp,
   };
   if(!payload.nome){ st.innerHTML=`<span class="status-err">Informe o nome.</span>`; return; }
-  st.innerHTML=`<span style="color:#4A7055">Salvando...</span>`;
+  st.innerHTML=`<span style="color:#5C7365">Salvando...</span>`;
   try{
     const r = await fetch("/api/hp/gestoras2", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
     const d = await r.json();
@@ -16607,7 +16607,7 @@ function _pubProgressHide(){
   const bar  = document.getElementById("pub-progress-bar");
   if(wrap && bar){
     bar.style.width = "100%";
-    bar.style.background = "linear-gradient(90deg,#5DCAA5,#C9A96E)";
+    bar.style.background = "linear-gradient(90deg,#1F9D77,#A8833C)";
     setTimeout(()=>{ if(wrap) wrap.style.display="none"; bar.style.width="0%"; }, 800);
   }
 }
@@ -16616,14 +16616,14 @@ async function publicar(){
   const btn = document.getElementById("btn-pub");
   const st  = document.getElementById("pub-st");
   btn.disabled = true;
-  st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Conectando...</span>`;
+  st.innerHTML = `<span style="color:#A8833C;font-size:11px">⏳ Conectando...</span>`;
 
   // Passo 1: ping para aquecer o container antes do payload pesado
   _pubProgress(8);
   try { await fetch("/api/ping"); } catch(e) {}
 
   _pubProgress(20);
-  st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ Preparando dados...</span>`;
+  st.innerHTML = `<span style="color:#A8833C;font-size:11px">⏳ Preparando dados...</span>`;
 
   let payload;
   try {
@@ -16637,7 +16637,7 @@ async function publicar(){
       produtos:   _snapProds,
     };
   } catch(eColeta) {
-    _pubProgress(100, "#FF4444");
+    _pubProgress(100, "#CF2E2E");
     st.innerHTML = `<span class="status-err">Erro ao coletar dados: ${eColeta.message}</span>`;
     btn.disabled = false;
     btn.textContent = "📤 Publicar agora";
@@ -16654,7 +16654,7 @@ async function publicar(){
   ];
   const timers = etapas.map(e => setTimeout(()=>{
     _pubProgress(e.pct);
-    st.innerHTML = `<span style="color:#D4B483;font-size:11px">⏳ ${e.label}</span>`;
+    st.innerHTML = `<span style="color:#A8833C;font-size:11px">⏳ ${e.label}</span>`;
   }, e.delay));
 
   try{
@@ -16662,7 +16662,7 @@ async function publicar(){
     const d = await r.json();
     timers.forEach(t=>clearTimeout(t));
     if(d.ok){
-      _pubProgress(100, "linear-gradient(90deg,#5DCAA5,#C9A96E)");
+      _pubProgress(100, "linear-gradient(90deg,#1F9D77,#A8833C)");
       st.innerHTML = `<span class="status-ok">✓ Publicado em ${d.publicado_em}</span>`;
       const bar = document.getElementById("status-pub");
       if(bar){ bar.style.display="block"; bar.innerHTML=`<b>✓ Última publicação:</b> ${d.publicado_em}`; }
@@ -16670,13 +16670,13 @@ async function publicar(){
       setTimeout(()=>_pubProgressHide(), 600);
     } else {
       timers.forEach(t=>clearTimeout(t));
-      _pubProgress(100, "#FF4444");
+      _pubProgress(100, "#CF2E2E");
       st.innerHTML = `<span class="status-err">Erro ao publicar.</span>`;
       setTimeout(()=>_pubProgressHide(), 1000);
     }
   } catch(e){
     timers.forEach(t=>clearTimeout(t));
-    _pubProgress(100, "#FF4444");
+    _pubProgress(100, "#CF2E2E");
     st.innerHTML = `<span class="status-err">Erro de conexão. Tente novamente.</span>`;
     setTimeout(()=>_pubProgressHide(), 1000);
   }
@@ -16709,18 +16709,18 @@ function uploadRapidoSelecionar(input){
 function renderListaRapido(){
   const el = document.getElementById("pdf-rapido-lista");
   el.innerHTML = _arquivosRapido.map((item, i) => {
-    const cor = item.status==="ok" ? "#5DCAA5" : item.status==="erro" ? "#FF6B6B" : item.status==="processando" ? "#D4B483" : "#4A7055";
+    const cor = item.status==="ok" ? "#1F9D77" : item.status==="erro" ? "#D93B3B" : item.status==="processando" ? "#A8833C" : "#5C7365";
     const icone = item.status==="ok" ? "✅" : item.status==="erro" ? "❌" : item.status==="processando" ? "⏳" : "📄";
     const tamanho = `${(item.file.size/1024).toFixed(0)} KB`;
     const statusTxt = item.status==="ok" ? `Salvo · ${item.chars} caracteres` : item.status==="erro" ? `Erro: ${item.erro}` : item.status==="processando" ? "Enviando..." : `Aguardando upload · ${tamanho}`;
-    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0A140A;border:1px solid ${item.status==='ok'?'#1A3A1A':'#1A2A1A'};border-radius:8px;margin-bottom:6px">
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0A140A;border:1px solid ${item.status==='ok'?'#D9E3DB':'#F5F8F5'};border-radius:8px;margin-bottom:6px">
       <span style="font-size:20px;flex-shrink:0">${icone}</span>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;color:#D4B483;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
+        <div style="font-size:13px;color:#A8833C;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.file.name}</div>
         <div style="font-size:10px;color:${cor};margin-top:3px">${statusTxt}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="btn-ghost" onclick="_arquivosRapido.splice(${i},1);if(!_arquivosRapido.length){fecharRapido();}else{renderListaRapido();document.getElementById('pdf-rapido-contador').textContent=_arquivosRapido.length+' arquivo'+(_arquivosRapido.length>1?'s':'');}" style="font-size:11px;padding:4px 8px;color:#FF6B6B" title="Remover">✕</button>
+        <button class="btn-ghost" onclick="_arquivosRapido.splice(${i},1);if(!_arquivosRapido.length){fecharRapido();}else{renderListaRapido();document.getElementById('pdf-rapido-contador').textContent=_arquivosRapido.length+' arquivo'+(_arquivosRapido.length>1?'s':'');}" style="font-size:11px;padding:4px 8px;color:#D93B3B" title="Remover">✕</button>
       </div>
     </div>`;
   }).join("");
@@ -16780,8 +16780,8 @@ async function uploadCartaCenario(input){
   if(!file) return;
   input.value = "";
   const st = document.getElementById("carta-st");
-  st.innerHTML = `<span style="color:#D4B483">⏳ Processando carta...</span>`;
-  if(file.size > 4.3*1024*1024){ st.innerHTML=`<span style="color:#FF6B6B">Arquivo muito grande (máx 4,3 MB)</span>`; return; }
+  st.innerHTML = `<span style="color:#A8833C">⏳ Processando carta...</span>`;
+  if(file.size > 4.3*1024*1024){ st.innerHTML=`<span style="color:#D93B3B">Arquivo muito grande (máx 4,3 MB)</span>`; return; }
   try{
     const fd = new FormData();
     fd.append("pdf", file);
@@ -16789,13 +16789,13 @@ async function uploadCartaCenario(input){
     const r = await fetch("/api/hp/carta-upload", {method:"POST", body:fd});
     const txt = await r.text();
     let d;
-    try{ d = JSON.parse(txt); } catch(_){ st.innerHTML=`<span style="color:#FF6B6B">Erro ${r.status} do servidor</span>`; return; }
+    try{ d = JSON.parse(txt); } catch(_){ st.innerHTML=`<span style="color:#D93B3B">Erro ${r.status} do servidor</span>`; return; }
     if(d.ok){
       aplicarCenarioNaPagina({global:d.global, brasil:d.brasil, posicionamento:d.posicionamento, referencia:d.fonte});
-      st.innerHTML = `<span style="color:#5DCAA5">✅ Cenário atualizado${d.ia?" (IA)":""}</span>`;
+      st.innerHTML = `<span style="color:#1F9D77">✅ Cenário atualizado${d.ia?" (IA)":""}</span>`;
       setTimeout(()=>st.textContent="", 5000);
-    } else { st.innerHTML=`<span style="color:#FF6B6B">${d.error}</span>`; }
-  } catch(e){ st.innerHTML=`<span style="color:#FF6B6B">${e.message}</span>`; }
+    } else { st.innerHTML=`<span style="color:#D93B3B">${d.error}</span>`; }
+  } catch(e){ st.innerHTML=`<span style="color:#D93B3B">${e.message}</span>`; }
 }
 
 function aplicarCenarioNaPagina(c){
@@ -16917,14 +16917,14 @@ const GEST_CLASSES = [
   {key:"internacional",lbl:"Internacional"}, {key:"alternativos",lbl:"Alternativos"},
   {key:"criptomoedas",lbl:"Cripto"},
 ];
-const GEST_CORES = ["#8BcFEF","#5DCAA5","#D4B483","#FF9966","#BB86FC","#4FC3F7","#A5D6A7","#FFD180","#F48FB1"];
+const GEST_CORES = ["#2E86B8","#1F9D77","#A8833C","#FF9966","#BB86FC","#4FC3F7","#A5D6A7","#FFD180","#F48FB1"];
 
 let _gestores = [];
 
 function atualizarTotalGest(){
   const tot = GEST_CLASSES.reduce((s,c)=>s+parseFloat(document.getElementById(`galoc-${c.key}`)?.value||0),0);
   const el = document.getElementById("gest-total");
-  if(el){ el.textContent = tot.toFixed(1); el.style.color = Math.abs(tot-100)<0.1?"#5DCAA5":"#FF6B6B"; }
+  if(el){ el.textContent = tot.toFixed(1); el.style.color = Math.abs(tot-100)<0.1?"#1F9D77":"#D93B3B"; }
 }
 
 async function carregarGestores(){
@@ -16946,23 +16946,23 @@ function renderGestores(){
     return;
   }
   lista.innerHTML = _gestores.map((g,i)=>`
-    <div style="background:#060C10;border:1px solid #1A2E3A;border-left:3px solid ${GEST_CORES[i%GEST_CORES.length]};border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+    <div style="background:#EFF3EF;border:1px solid #EAF1F6;border-left:3px solid ${GEST_CORES[i%GEST_CORES.length]};border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
           <span style="font-size:13px;color:${GEST_CORES[i%GEST_CORES.length]};font-weight:700">${g.nome||g.gestora}</span>
-          <span style="font-size:10px;background:#1A2E3A;border-radius:8px;padding:2px 8px;color:#8BcFEF">${g.perfil}</span>
+          <span style="font-size:10px;background:#EAF1F6;border-radius:8px;padding:2px 8px;color:#2E86B8">${g.perfil}</span>
           <span style="font-size:10px;color:#2A5A6A">📅 ${g.referencia||g.data}</span>
         </div>
         <div style="font-size:10px;color:#3A7A8A;margin-bottom:6px">Fonte: <b>${g.gestora}</b>${g.observacao?" · "+g.observacao:""}</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">
           ${GEST_CLASSES.filter(c=>(g.alocacao[c.key]||0)>0).map(c=>
-            `<span style="font-size:10px;background:#0A1A20;border:1px solid #1A3A4A;border-radius:8px;padding:2px 8px;color:#8BcFEF">${c.lbl}: <b>${g.alocacao[c.key]}%</b></span>`
+            `<span style="font-size:10px;background:#0A1A20;border:1px solid #1A3A4A;border-radius:8px;padding:2px 8px;color:#2E86B8">${c.lbl}: <b>${g.alocacao[c.key]}%</b></span>`
           ).join("")}
         </div>
       </div>
       <div style="display:flex;gap:6px;align-items:center">
         <button class="btn-ghost" onclick="editarGestora(${i})" style="font-size:10px;padding:4px 10px">✏️ Editar</button>
-        <button class="btn-ghost" onclick="deletarGestora('${g.id}')" style="font-size:10px;padding:4px 10px;color:#FF6B6B;border-color:#FF6B6B44">🗑️</button>
+        <button class="btn-ghost" onclick="deletarGestora('${g.id}')" style="font-size:10px;padding:4px 10px;color:#D93B3B;border-color:#FF6B6B44">🗑️</button>
       </div>
     </div>`).join("");
   renderComparativo();
@@ -16974,9 +16974,9 @@ function renderComparativo(){
   if(!comp||!tbl||_gestores.length < 2){ if(comp) comp.style.display="none"; return; }
   comp.style.display = "";
   const header = `<thead><tr>
-    <th style="text-align:left;padding:6px 10px;color:#3A7A8A;font-size:10px;border-bottom:1px solid #1A2E3A">Classe</th>
-    ${_gestores.map((g,i)=>`<th style="text-align:center;padding:6px 10px;color:${GEST_CORES[i%GEST_CORES.length]};font-size:10px;border-bottom:1px solid #1A2E3A">${g.gestora}<br><span style="font-weight:400;color:#2A5A6A">${g.referencia||""}</span></th>`).join("")}
-    ${_gestores.length>1?`<th style="text-align:center;padding:6px 10px;color:#FFD180;font-size:10px;border-bottom:1px solid #1A2E3A">Média</th>`:""}
+    <th style="text-align:left;padding:6px 10px;color:#3A7A8A;font-size:10px;border-bottom:1px solid #EAF1F6">Classe</th>
+    ${_gestores.map((g,i)=>`<th style="text-align:center;padding:6px 10px;color:${GEST_CORES[i%GEST_CORES.length]};font-size:10px;border-bottom:1px solid #EAF1F6">${g.gestora}<br><span style="font-weight:400;color:#2A5A6A">${g.referencia||""}</span></th>`).join("")}
+    ${_gestores.length>1?`<th style="text-align:center;padding:6px 10px;color:#FFD180;font-size:10px;border-bottom:1px solid #EAF1F6">Média</th>`:""}
   </tr></thead>`;
   const rows = GEST_CLASSES.map(c=>{
     const vals = _gestores.map(g=>g.alocacao[c.key]||0);
@@ -16984,7 +16984,7 @@ function renderComparativo(){
     const max = Math.max(...vals);
     return `<tr style="border-bottom:1px solid #0D1E28">
       <td style="padding:5px 10px;color:#6A9AAA;font-size:11px">${c.lbl}</td>
-      ${vals.map(v=>`<td style="text-align:center;padding:5px 10px;font-size:11px;color:${v===max&&max>0?"#5DCAA5":"#AAA"};font-weight:${v===max&&max>0?"700":"400"}">${v>0?v+"%":"—"}</td>`).join("")}
+      ${vals.map(v=>`<td style="text-align:center;padding:5px 10px;font-size:11px;color:${v===max&&max>0?"#1F9D77":"#8A9A8E"};font-weight:${v===max&&max>0?"700":"400"}">${v>0?v+"%":"—"}</td>`).join("")}
       ${_gestores.length>1?`<td style="text-align:center;padding:5px 10px;font-size:11px;color:#FFD180;font-weight:600">${media>0?media.toFixed(1)+"%":"—"}</td>`:""}
     </tr>`;
   });
@@ -17089,15 +17089,15 @@ function cbRenderAA(){
   var perfis = ["conservadora","moderada","arrojada"];
   var cats = ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","internacional"];
   var labels = {pos_fixado:"Pós-Fixado",inflacao:"Inflação",pre_fixado:"Pré-Fixado",acoes:"Ações",fiis:"FIIs",multimercado:"Multimercado",internacional:"Internacional"};
-  var h = '<p style="font-size:10px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Asset Allocation</p>';
+  var h = '<p style="font-size:10px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Asset Allocation</p>';
   h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
-  h += '<thead><tr style="color:#3A6A48;border-bottom:1px solid #1C4A34"><th style="text-align:left;padding:5px 8px">Classe</th>';
+  h += '<thead><tr style="color:#5C7365;border-bottom:1px solid #D9E3DB"><th style="text-align:left;padding:5px 8px">Classe</th>';
   perfis.forEach(function(p){ h += '<th style="text-align:center;padding:5px 8px;text-transform:capitalize">'+p+'</th>'; });
   h += '</tr></thead><tbody>';
   cats.forEach(function(c,i){
-    var bg = i%2===0?"#071E17":"#081F18";
-    h += '<tr style="background:'+bg+';border-bottom:1px solid #0F2A1F"><td style="padding:5px 8px;color:#AAA">'+labels[c]+'</td>';
-    perfis.forEach(function(p){ var v=(aa[p]||{})[c]||0; h += '<td style="text-align:center;padding:5px 8px;color:'+(v>0?"#C9A96E":"#2A5A3A")+'">'+v+'%</td>'; });
+    var bg = i%2===0?"#EFF3EF":"#EFF3EF";
+    h += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5"><td style="padding:5px 8px;color:#8A9A8E">'+labels[c]+'</td>';
+    perfis.forEach(function(p){ var v=(aa[p]||{})[c]||0; h += '<td style="text-align:center;padding:5px 8px;color:'+(v>0?"#A8833C":"#5C7365")+'">'+v+'%</td>'; });
     h += '</tr>';
   });
   h += '</tbody></table></div>';
@@ -17124,26 +17124,26 @@ function cbRenderCategorias(){
     var prods = _cbMostrarSalvos ? doPerfil : pendentes;
     if(!prods.length) return;
 
-    h += '<div style="margin-bottom:20px;background:#060C08;border:1px solid #1C3A20;border-radius:10px;overflow:hidden">';
-    h += '<div style="background:#0A1A10;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">';
-    h += '<span style="font-size:12px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px">'+cat.nome+'</span>';
-    h += '<span style="font-size:10px;color:#2A5A3A">'+pendentes.length+' pendente(s)'+(salvos.length?' · '+salvos.length+' com motivo':'')+'</span>';
+    h += '<div style="margin-bottom:20px;background:#EFF3EF;border:1px solid #1C3A20;border-radius:10px;overflow:hidden">';
+    h += '<div style="background:#EFF3EF;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">';
+    h += '<span style="font-size:12px;color:#A8833C;font-weight:700;text-transform:uppercase;letter-spacing:.5px">'+cat.nome+'</span>';
+    h += '<span style="font-size:10px;color:#5C7365">'+pendentes.length+' pendente(s)'+(salvos.length?' · '+salvos.length+' com motivo':'')+'</span>';
     h += '</div>';
 
     prods.forEach(function(prod){
       var pKey = cat.id + "__" + prod.id;
       var temMotivo = (prod.motivo||"").trim().length > 0;
 
-      h += '<div style="padding:12px 14px;border-top:1px solid #0F2A1F" id="cb-prod-'+pKey+'">';
+      h += '<div style="padding:12px 14px;border-top:1px solid #F5F8F5" id="cb-prod-'+pKey+'">';
       // Header do produto
       h += '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap">';
       h += '<div style="flex:1;min-width:180px">';
-      h += '<span style="font-size:13px;font-weight:700;color:#F0F0F0">';
-      if(prod.ticker) h += '<span style="color:#7DCFEF;margin-right:6px">'+prod.ticker+'</span>';
+      h += '<span style="font-size:13px;font-weight:700;color:#17271E">';
+      if(prod.ticker) h += '<span style="color:#2E86B8;margin-right:6px">'+prod.ticker+'</span>';
       h += prod.nome+'</span>';
       // Detalhes
       var detalhes = [];
-      if(prod.taxa) detalhes.push('<span style="color:#5DCAA5">'+prod.taxa+'</span>');
+      if(prod.taxa) detalhes.push('<span style="color:#1F9D77">'+prod.taxa+'</span>');
       if(prod.vencimento) detalhes.push('venc. '+prod.vencimento);
       if(prod.rating) detalhes.push('rating: '+prod.rating);
       if(prod.garantia) detalhes.push(prod.garantia);
@@ -17154,25 +17154,25 @@ function cbRenderCategorias(){
       if(prod.pvp) detalhes.push('P/VP: '+prod.pvp);
       if(prod.preco_alvo) detalhes.push('alvo: '+prod.preco_alvo);
       if(prod.peso_moderada) detalhes.push('mod: '+prod.peso_moderada);
-      if(detalhes.length) h += '<div style="font-size:10px;color:#3A6A48;margin-top:3px">'+detalhes.join(' · ')+'</div>';
+      if(detalhes.length) h += '<div style="font-size:10px;color:#5C7365;margin-top:3px">'+detalhes.join(' · ')+'</div>';
       // Perfis
       if(prod.perfis&&prod.perfis.length){
         h += '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">';
-        prod.perfis.forEach(function(p){ h += '<span style="font-size:9px;padding:1px 6px;background:#0A2A18;border:1px solid #1C4A34;border-radius:10px;color:#3A8A58;text-transform:capitalize">'+p+'</span>'; });
+        prod.perfis.forEach(function(p){ h += '<span style="font-size:9px;padding:1px 6px;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:10px;color:#3A8A58;text-transform:capitalize">'+p+'</span>'; });
         h += '</div>';
       }
       h += '</div>';
       // Status do motivo
-      h += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid '+(temMotivo?"#5DCAA533":"#FF6B6B33")+';color:'+(temMotivo?"#5DCAA5":"#FF6B6B")+';white-space:nowrap">';
+      h += '<span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid '+(temMotivo?"#5DCAA533":"#FF6B6B33")+';color:'+(temMotivo?"#1F9D77":"#D93B3B")+';white-space:nowrap">';
       h += temMotivo ? "✓ Motivo salvo" : "⚠ Sem motivo";
       h += '</span>';
       h += '</div>';
 
       // Textarea e botão salvar
-      h += '<textarea id="cb-motivo-'+pKey+'" rows="3" placeholder="Digite aqui o motivo / racional desta alocação para os assessores..." style="width:100%;font-size:12px;background:#071E17;color:#F0F0F0;border:1px solid #1C4A34;border-radius:6px;padding:8px;resize:vertical;box-sizing:border-box">'+escHtml(prod.motivo||"")+'</textarea>';
+      h += '<textarea id="cb-motivo-'+pKey+'" rows="3" placeholder="Digite aqui o motivo / racional desta alocação para os assessores..." style="width:100%;font-size:12px;background:#EFF3EF;color:#17271E;border:1px solid #D9E3DB;border-radius:6px;padding:8px;resize:vertical;box-sizing:border-box">'+escHtml(prod.motivo||"")+'</textarea>';
       h += '<div style="display:flex;align-items:center;gap:10px;margin-top:6px">';
-      h += '<button class="btn btn-sm" onclick="cbSalvarMotivo(\''+cat.id+'\',\''+prod.id+'\',\''+pKey+'\')" style="font-size:11px;padding:5px 14px;background:#C9A96E;color:#071E17;font-weight:700;border-color:#C9A96E">💾 Salvar Motivo</button>';
-      h += '<span id="cb-st-'+pKey+'" style="font-size:10px;color:#5DCAA5"></span>';
+      h += '<button class="btn btn-sm" onclick="cbSalvarMotivo(\''+cat.id+'\',\''+prod.id+'\',\''+pKey+'\')" style="font-size:11px;padding:5px 14px;background:#A8833C;color:#EFF3EF;font-weight:700;border-color:#A8833C">💾 Salvar Motivo</button>';
+      h += '<span id="cb-st-'+pKey+'" style="font-size:10px;color:#1F9D77"></span>';
       h += '</div>';
       h += '</div>';
     });
@@ -17180,13 +17180,13 @@ function cbRenderCategorias(){
   });
   if(!h){
     if(totSalvos && !totPend){
-      h = '<div style="background:#071E17;border:1px solid #1C4A34;border-radius:10px;padding:18px;text-align:center">'
+      h = '<div style="background:#EFF3EF;border:1px solid #D9E3DB;border-radius:10px;padding:18px;text-align:center">'
         + '<div style="font-size:22px;margin-bottom:6px">✅</div>'
-        + '<p style="font-size:13px;color:#5DCAA5;font-weight:700;margin-bottom:4px">Tudo preenchido</p>'
-        + '<p style="font-size:11px;color:#3A6A48">Os '+totSalvos+' produto(s) deste filtro já têm motivo salvo. Use <b style="color:#C9A96E">👁 Mostrar já salvos</b> para revisar ou editar.</p>'
+        + '<p style="font-size:13px;color:#1F9D77;font-weight:700;margin-bottom:4px">Tudo preenchido</p>'
+        + '<p style="font-size:11px;color:#5C7365">Os '+totSalvos+' produto(s) deste filtro já têm motivo salvo. Use <b style="color:#A8833C">👁 Mostrar já salvos</b> para revisar ou editar.</p>'
         + '</div>';
     } else {
-      h = '<p style="color:#3A6A48;font-size:12px">Nenhum produto encontrado para o perfil selecionado.</p>';
+      h = '<p style="color:#5C7365;font-size:12px">Nenhum produto encontrado para o perfil selecionado.</p>';
     }
   }
   el.innerHTML = h;
@@ -17200,7 +17200,7 @@ async function cbSalvarMotivo(catId, prodId, pKey){
   if(!ta||!st) return;
   var motivo = ta.value.trim();
   st.textContent = "Salvando...";
-  st.style.color = "#AAA";
+  st.style.color = "#8A9A8E";
   try{
     var r = await fetch("/api/hp/carteira-brauna/motivo",{
       method:"POST",
@@ -17210,7 +17210,7 @@ async function cbSalvarMotivo(catId, prodId, pKey){
     var d = await r.json();
     if(d.ok){
       st.textContent = "✓ Salvo!";
-      st.style.color = "#5DCAA5";
+      st.style.color = "#1F9D77";
       // Atualiza o dado local e re-render parcial (só o badge de status)
       if(_cbData){
         var cat = (_cbData.categorias||[]).find(function(c){return c.id===catId;});
@@ -17223,15 +17223,15 @@ async function cbSalvarMotivo(catId, prodId, pKey){
         if(badge && motivo){
           badge.textContent = "✓ Motivo salvo";
           badge.style.borderColor = "#5DCAA533";
-          badge.style.color = "#5DCAA5";
+          badge.style.color = "#1F9D77";
         }
       }
       // Motivo preenchido: some da lista (a menos que o Head esteja vendo os salvos)
       if(motivo && !_cbMostrarSalvos){
         setTimeout(function(){ cbRenderCategorias(); }, 900);
       }
-    } else { st.textContent="Erro"; st.style.color="#FF6B6B"; }
-  }catch(e){ st.textContent="Erro: "+e.message; st.style.color="#FF6B6B"; }
+    } else { st.textContent="Erro"; st.style.color="#D93B3B"; }
+  }catch(e){ st.textContent="Erro: "+e.message; st.style.color="#D93B3B"; }
   setTimeout(function(){st.textContent="";},3000);
 }
 
@@ -17541,98 +17541,98 @@ HTML_PAINEL = r"""<!DOCTYPE html>
 <title>Painel de Carteiras — Braúna</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{min-height:100%;background:#0A0A0A;font-family:'Segoe UI',system-ui,sans-serif;color:#F0F0F0}
+html,body{min-height:100%;background:#EFF3EF;font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{padding:0 0 60px}
 
 /* Header */
-.header{background:#081F18;border-bottom:1px solid #1A4030;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header-logo{font-size:16px;font-weight:800;color:#C9A96E;letter-spacing:1.5px;text-transform:uppercase}
-.header-sub{font-size:11px;color:#2A5A3A;letter-spacing:.5px}
+.header{background:#EFF3EF;border-bottom:1px solid #D9E3DB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-logo{font-size:16px;font-weight:800;color:#A8833C;letter-spacing:1.5px;text-transform:uppercase}
+.header-sub{font-size:11px;color:#5C7365;letter-spacing:.5px}
 .header-nav{display:flex;gap:10px}
-.nav-btn{background:transparent;border:1px solid #1A4030;border-radius:8px;padding:7px 14px;color:#3A6A48;font-size:12px;cursor:pointer;text-decoration:none;transition:all .2s}
-.nav-btn:hover{border-color:#C9A96E;color:#C9A96E}
-.nav-btn.active{background:#C9A96E;color:#081F18;border-color:#C9A96E;font-weight:700}
+.nav-btn{background:transparent;border:1px solid #D9E3DB;border-radius:8px;padding:7px 14px;color:#5C7365;font-size:12px;cursor:pointer;text-decoration:none;transition:all .2s}
+.nav-btn:hover{border-color:#A8833C;color:#A8833C}
+.nav-btn.active{background:#A8833C;color:#EFF3EF;border-color:#A8833C;font-weight:700}
 
 /* Layout */
 .container{max-width:1300px;margin:0 auto;padding:24px 20px}
 
 /* Topo stats */
 .stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
-.stat-card{background:#111;border:1px solid #1A1A1A;border-radius:12px;padding:14px 20px;min-width:140px;flex:1}
-.stat-label{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.stat-val{font-size:22px;font-weight:700;color:#C9A96E}
-.stat-val.ok{color:#5DCAA5}
-.stat-val.atencao{color:#FFD966}
-.stat-val.critico{color:#FF6B6B}
+.stat-card{background:#FFFFFF;border:1px solid #F5F8F5;border-radius:12px;padding:14px 20px;min-width:140px;flex:1}
+.stat-label{font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:700;color:#A8833C}
+.stat-val.ok{color:#1F9D77}
+.stat-val.atencao{color:#A9800F}
+.stat-val.critico{color:#D93B3B}
 
 /* Filtros */
 .filtros{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
-.filtros input,.filtros select{background:#111;border:1px solid #1A4030;border-radius:8px;padding:8px 12px;color:#F0F0F0;font-size:13px;outline:none}
+.filtros input,.filtros select{background:#FFFFFF;border:1px solid #D9E3DB;border-radius:8px;padding:8px 12px;color:#17271E;font-size:13px;outline:none}
 .filtros input{flex:1;min-width:200px}
-.filtros input::placeholder{color:#3A6A48}
+.filtros input::placeholder{color:#5C7365}
 
 /* Cards de clientes */
-.cliente-card{background:#111;border:1px solid #1E1E1E;border-radius:14px;margin-bottom:14px;overflow:hidden;transition:border-color .2s}
-.cliente-card:hover{border-color:#2A4A38}
-.cliente-card.critico{border-left:4px solid #FF6B6B}
-.cliente-card.atencao{border-left:4px solid #FFD966}
-.cliente-card.ok{border-left:4px solid #5DCAA5}
+.cliente-card{background:#FFFFFF;border:1px solid #FFFFFF;border-radius:14px;margin-bottom:14px;overflow:hidden;transition:border-color .2s}
+.cliente-card:hover{border-color:#C6D6C9}
+.cliente-card.critico{border-left:4px solid #D93B3B}
+.cliente-card.atencao{border-left:4px solid #A9800F}
+.cliente-card.ok{border-left:4px solid #1F9D77}
 
 .cliente-header{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;flex-wrap:wrap}
-.cliente-nome{font-size:15px;font-weight:700;color:#F0F0F0;flex:1;min-width:140px}
-.cliente-assessor{font-size:11px;color:#3A6A48}
+.cliente-nome{font-size:15px;font-weight:700;color:#17271E;flex:1;min-width:140px}
+.cliente-assessor{font-size:11px;color:#5C7365}
 .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.badge.ok{background:#0F2A1F;color:#5DCAA5;border:1px solid #1A4030}
-.badge.atencao{background:#2A2000;color:#FFD966;border:1px solid #4A3A00}
-.badge.critico{background:#2A0808;color:#FF6B6B;border:1px solid #4A1010}
-.badge.perfil{background:#1A1008;color:#C9A96E;border:1px solid #3A2A10}
-.patrimonio{font-size:13px;color:#C9A96E;font-weight:600;white-space:nowrap}
-.data-tag{font-size:10px;color:#2A4A38}
-.expand-icon{font-size:12px;color:#3A6A48;transition:transform .2s}
+.badge.ok{background:#F5F8F5;color:#1F9D77;border:1px solid #D9E3DB}
+.badge.atencao{background:#2A2000;color:#A9800F;border:1px solid #4A3A00}
+.badge.critico{background:#2A0808;color:#D93B3B;border:1px solid #4A1010}
+.badge.perfil{background:#1A1008;color:#A8833C;border:1px solid #3A2A10}
+.patrimonio{font-size:13px;color:#A8833C;font-weight:600;white-space:nowrap}
+.data-tag{font-size:10px;color:#C6D6C9}
+.expand-icon{font-size:12px;color:#5C7365;transition:transform .2s}
 
 /* Detalhe expandido */
-.cliente-body{display:none;padding:0 18px 18px;border-top:1px solid #1A1A1A;margin-top:0}
+.cliente-body{display:none;padding:0 18px 18px;border-top:1px solid #F5F8F5;margin-top:0}
 .cliente-body.open{display:block}
 
-.section-title{font-size:10px;color:#3A6A48;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:14px 0 8px}
+.section-title{font-size:10px;color:#5C7365;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:14px 0 8px}
 
 /* Desvios */
 .desvio-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
-.desvio-label{font-size:12px;color:#888;width:110px;flex-shrink:0}
-.desvio-bar-wrap{flex:1;min-width:100px;height:6px;background:#1A1A1A;border-radius:3px;overflow:hidden}
+.desvio-label{font-size:12px;color:#8A9A8E;width:110px;flex-shrink:0}
+.desvio-bar-wrap{flex:1;min-width:100px;height:6px;background:#F5F8F5;border-radius:3px;overflow:hidden}
 .desvio-bar{height:100%;border-radius:3px}
-.desvio-bar.ok{background:#5DCAA5}
-.desvio-bar.atencao{background:#FFD966}
-.desvio-bar.fora{background:#FF6B6B}
+.desvio-bar.ok{background:#1F9D77}
+.desvio-bar.atencao{background:#A9800F}
+.desvio-bar.fora{background:#D93B3B}
 .desvio-nums{font-size:11px;white-space:nowrap;min-width:130px;text-align:right}
 .desvio-delta{font-size:11px;font-weight:700;min-width:60px;text-align:right}
-.desvio-delta.pos{color:#FF6B6B}
-.desvio-delta.neg{color:#5DCAA5}
+.desvio-delta.pos{color:#D93B3B}
+.desvio-delta.neg{color:#1F9D77}
 
 /* Trocas sugeridas */
 .trocas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:4px}
 .troca-card{background:#0A1A12;border:1px solid #1A3020;border-radius:10px;padding:12px 14px}
-.troca-card.reduzir{background:#1A0A0A;border-color:#3A1010}
+.troca-card.reduzir{background:#FBE9E9;border-color:#F7DADA}
 .troca-acao{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.troca-acao.comprar{color:#5DCAA5}
-.troca-acao.reduzir{color:#FF6B6B}
-.troca-produto{font-size:13px;color:#F0F0F0;font-weight:600;margin-bottom:2px}
-.troca-cls{font-size:11px;color:#3A6A48}
-.troca-gap{font-size:10px;color:#888;margin-top:4px}
+.troca-acao.comprar{color:#1F9D77}
+.troca-acao.reduzir{color:#D93B3B}
+.troca-produto{font-size:13px;color:#17271E;font-weight:600;margin-bottom:2px}
+.troca-cls{font-size:11px;color:#5C7365}
+.troca-gap{font-size:10px;color:#8A9A8E;margin-top:4px}
 
 /* Ativos */
 .ativos-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.ativo-chip{background:#181818;border:1px solid #222;border-radius:8px;padding:4px 10px;font-size:11px;color:#BBB}
-.ativo-chip span{color:#C9A96E;font-weight:600}
+.ativo-chip{background:#181818;border:1px solid #F5F8F5;border-radius:8px;padding:4px 10px;font-size:11px;color:#8A9A8E}
+.ativo-chip span{color:#A8833C;font-weight:600}
 
 /* Vazio */
-.empty-state{text-align:center;padding:60px 20px;color:#2A4A38}
+.empty-state{text-align:center;padding:60px 20px;color:#C6D6C9}
 .empty-icon{font-size:48px;margin-bottom:12px}
-.empty-msg{font-size:15px;color:#3A6A48}
+.empty-msg{font-size:15px;color:#5C7365}
 .empty-sub{font-size:12px;color:#1A3A28;margin-top:6px}
 
-.spinner-wrap{text-align:center;padding:60px;color:#2A5A3A}
-.spin{width:36px;height:36px;border:3px solid #1A3A28;border-top-color:#C9A96E;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+.spinner-wrap{text-align:center;padding:60px;color:#5C7365}
+.spin{width:36px;height:36px;border:3px solid #1A3A28;border-top-color:#A8833C;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 @media(max-width:600px){
@@ -17661,27 +17661,27 @@ body{padding:0 0 60px}
   <div id="upload-lote-box" style="background:#0A1208;border:1.5px dashed #1A4020;border-radius:14px;padding:20px 24px;margin-bottom:22px">
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
       <div style="flex:1;min-width:220px">
-        <div style="font-size:13px;font-weight:700;color:#C9A96E;margin-bottom:4px">📦 Importar XPerformances em lote</div>
-        <div style="font-size:12px;color:#3A6A48">Arraste ou selecione um <strong style="color:#C9A96E">.zip</strong> com até 50 PDFs, ou um <strong style="color:#C9A96E">PDF</strong> individual. Os dados de cada cliente são salvos automaticamente.</div>
+        <div style="font-size:13px;font-weight:700;color:#A8833C;margin-bottom:4px">📦 Importar XPerformances em lote</div>
+        <div style="font-size:12px;color:#5C7365">Arraste ou selecione um <strong style="color:#A8833C">.zip</strong> com até 50 PDFs, ou um <strong style="color:#A8833C">PDF</strong> individual. Os dados de cada cliente são salvos automaticamente.</div>
       </div>
-      <label id="lote-label" style="background:#1A3018;border:1px solid #2A5028;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#5DCAA5;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#C9A96E';this.style.color='#C9A96E'" onmouseout="this.style.borderColor='#2A5028';this.style.color='#5DCAA5'">
+      <label id="lote-label" style="background:#1A3018;border:1px solid #2A5028;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#1F9D77;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#A8833C';this.style.color='#A8833C'" onmouseout="this.style.borderColor='#2A5028';this.style.color='#1F9D77'">
         Selecionar arquivo
         <input type="file" id="input-lote" accept=".zip,.pdf" style="display:none" onchange="processarLote(this)">
       </label>
-      <button id="btn-atualizar-painel" onclick="atualizarPainel(this)" title="Recarrega todos os dados do painel" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#7DCFEF;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#7DCFEF'" onmouseout="this.style.borderColor='#2A5A7A'">
+      <button id="btn-atualizar-painel" onclick="atualizarPainel(this)" title="Recarrega todos os dados do painel" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:13px;color:#2E86B8;white-space:nowrap;transition:all .2s" onmouseover="this.style.borderColor='#2E86B8'" onmouseout="this.style.borderColor='#2A5A7A'">
         ↻ Atualizar
       </button>
     </div>
-    <div id="painel-status-atualizacao" style="font-size:11px;color:#3A6A48;margin-top:8px"></div>
+    <div id="painel-status-atualizacao" style="font-size:11px;color:#5C7365;margin-top:8px"></div>
 
     <!-- Barra de progresso -->
     <div id="lote-progress" style="display:none;margin-top:14px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#3A6A48;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#5C7365;margin-bottom:6px">
         <span id="lote-progress-txt">Processando...</span>
         <span id="lote-progress-pct">0%</span>
       </div>
-      <div style="height:6px;background:#1A1A1A;border-radius:3px;overflow:hidden">
-        <div id="lote-progress-bar" style="height:100%;background:#5DCAA5;border-radius:3px;width:0%;transition:width .3s"></div>
+      <div style="height:6px;background:#F5F8F5;border-radius:3px;overflow:hidden">
+        <div id="lote-progress-bar" style="height:100%;background:#1F9D77;border-radius:3px;width:0%;transition:width .3s"></div>
       </div>
     </div>
 
@@ -17703,7 +17703,7 @@ body{padding:0 0 60px}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <div>
         <div style="font-size:11px;color:#8A6A2A;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:2px">🏛️ Visão Head de Produtos — Oportunidade de Realocação da Base</div>
-        <div style="font-size:12px;color:#3A6A48">Classes mais sub-alocadas e sobre-alocadas considerando todos os clientes</div>
+        <div style="font-size:12px;color:#5C7365">Classes mais sub-alocadas e sobre-alocadas considerando todos os clientes</div>
       </div>
     </div>
     <div id="macro-classes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px"></div>
@@ -17769,12 +17769,12 @@ async function atualizarPainel(btn){
   try{
     await carregar();
     const st = document.getElementById('painel-status-atualizacao');
-    if(st){ st.textContent = '✓ Atualizado às ' + new Date().toLocaleTimeString('pt-BR'); st.style.color = '#5DCAA5'; }
-    if(btn){ btn.innerHTML = '✓ Atualizado'; btn.style.color = '#5DCAA5'; }
-    setTimeout(function(){ if(btn){ btn.innerHTML = original; btn.style.color = '#7DCFEF'; } }, 1600);
+    if(st){ st.textContent = '✓ Atualizado às ' + new Date().toLocaleTimeString('pt-BR'); st.style.color = '#1F9D77'; }
+    if(btn){ btn.innerHTML = '✓ Atualizado'; btn.style.color = '#1F9D77'; }
+    setTimeout(function(){ if(btn){ btn.innerHTML = original; btn.style.color = '#2E86B8'; } }, 1600);
   } catch(e){
-    if(btn){ btn.innerHTML = '⚠ Erro'; btn.style.color = '#FF6B6B'; }
-    setTimeout(function(){ if(btn){ btn.innerHTML = original; btn.style.color = '#7DCFEF'; } }, 2500);
+    if(btn){ btn.innerHTML = '⚠ Erro'; btn.style.color = '#D93B3B'; }
+    setTimeout(function(){ if(btn){ btn.innerHTML = original; btn.style.color = '#2E86B8'; } }, 2500);
   } finally {
     if(btn){ btn.disabled = false; btn.style.opacity = '1'; }
   }
@@ -17806,20 +17806,20 @@ function renderMacroHead(lista){
     const pctSub   = Math.round(c.sub/c.total*100);
     const pctSobre = Math.round(c.sobre/c.total*100);
     const mediaStr = (c.media>0?'+':'')+c.media.toFixed(1)+'pp';
-    const cor = c.media < -2 ? '#5DCAA5' : c.media > 2 ? '#FF6B6B' : '#FFD966';
+    const cor = c.media < -2 ? '#1F9D77' : c.media > 2 ? '#D93B3B' : '#A9800F';
     const icon = c.media < -2 ? '▲' : c.media > 2 ? '▼' : '≈';
     const desc = c.media < -2
       ? `${pctSub}% dos clientes sub-alocados`
       : c.media > 2
       ? `${pctSobre}% dos clientes sobre-alocados`
       : 'Base alinhada nesta classe';
-    return `<div style="background:#111;border:1px solid #1A1A1A;border-radius:10px;padding:12px 14px;border-left:3px solid ${cor}">
+    return `<div style="background:#FFFFFF;border:1px solid #F5F8F5;border-radius:10px;padding:12px 14px;border-left:3px solid ${cor}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span style="font-size:12px;color:#CCC;font-weight:600">${c.label}</span>
+        <span style="font-size:12px;color:#5C7365;font-weight:600">${c.label}</span>
         <span style="font-size:13px;font-weight:700;color:${cor}">${icon} ${mediaStr}</span>
       </div>
-      <div style="font-size:11px;color:#3A6A48">${desc}</div>
-      <div style="margin-top:6px;height:4px;background:#1A1A1A;border-radius:2px;overflow:hidden">
+      <div style="font-size:11px;color:#5C7365">${desc}</div>
+      <div style="margin-top:6px;height:4px;background:#F5F8F5;border-radius:2px;overflow:hidden">
         <div style="height:100%;width:${Math.min(100,Math.abs(c.media)*5)}%;background:${cor};border-radius:2px"></div>
       </div>
     </div>`;
@@ -17833,12 +17833,12 @@ function renderMacroHead(lista){
       (prods[cls]||[]).slice(0,2).forEach(p=>{
         const nome = typeof p==='string'?p:(p.nome||'');
         const ticker = typeof p==='object'?p.ticker||'':'';
-        if(nome) chips.push(`<div style="background:#0A1A10;border:1px solid #1A3018;border-radius:20px;padding:6px 14px;font-size:12px;color:#C9A96E;display:flex;align-items:center;gap:6px"><span style="color:#3A6A48;font-size:10px">${LABELS[cls]||cls}</span> ${nome}${ticker?` <span style="color:#2A4A2A;font-size:10px">${ticker}</span>`:''}</div>`);
+        if(nome) chips.push(`<div style="background:#EFF3EF;border:1px solid #1A3018;border-radius:20px;padding:6px 14px;font-size:12px;color:#A8833C;display:flex;align-items:center;gap:6px"><span style="color:#5C7365;font-size:10px">${LABELS[cls]||cls}</span> ${nome}${ticker?` <span style="color:#2A4A2A;font-size:10px">${ticker}</span>`:''}</div>`);
       });
     });
     document.getElementById('macro-produtos').innerHTML = chips.length
       ? chips.join('')
-      : '<span style="font-size:12px;color:#2A4A38">Nenhum produto cadastrado para as classes sub-alocadas. Cadastre na área do Head de Produtos.</span>';
+      : '<span style="font-size:12px;color:#C6D6C9">Nenhum produto cadastrado para as classes sub-alocadas. Cadastre na área do Head de Produtos.</span>';
   }).catch(()=>{});
 
   document.getElementById('macro-head').style.display = 'block';
@@ -17905,7 +17905,7 @@ function renderLista(lista){
   const restantes = lista.length - mostrar.length;
   if(restantes > 0){
     html += '<div style="text-align:center;padding:16px 0">'
-      + '<button onclick="verMais()" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 24px;color:#7DCFEF;font-size:13px;cursor:pointer">'
+      + '<button onclick="verMais()" style="background:#0F2030;border:1px solid #2A5A7A;border-radius:10px;padding:10px 24px;color:#2E86B8;font-size:13px;cursor:pointer">'
       + '▼ Ver mais ' + Math.min(_RENDER_PASSO, restantes) + ' de ' + restantes + ' restantes</button></div>';
   }
   el.innerHTML = html;
@@ -17927,7 +17927,7 @@ function clienteCard(c, i){
     return `<div class="desvio-row">
       <div class="desvio-label">${d.label}</div>
       <div class="desvio-bar-wrap"><div class="desvio-bar ${d.status}" style="width:${pct}%"></div></div>
-      <div class="desvio-nums" style="color:#888;font-size:11px">${d.atual.toFixed(1)}% → alvo ${d.alvo.toFixed(1)}%</div>
+      <div class="desvio-nums" style="color:#8A9A8E;font-size:11px">${d.atual.toFixed(1)}% → alvo ${d.alvo.toFixed(1)}%</div>
       <div class="desvio-delta ${deltaClass}">${deltaStr}</div>
     </div>`;
   }).join('');
@@ -17939,7 +17939,7 @@ function clienteCard(c, i){
       ${t.ticker?`<div class="troca-cls">${t.ticker}</div>`:''}
       <div class="troca-gap">Desvio: ${(t.gap>0?'+':'')+t.gap.toFixed(1)}pp em relação ao modelo</div>
     </div>`).join('')
-    : '<p style="font-size:12px;color:#2A4A38">Carteira alinhada ao modelo ✓</p>';
+    : '<p style="font-size:12px;color:#C6D6C9">Carteira alinhada ao modelo ✓</p>';
 
   const acoesHtml = (c.acoes||[]).length ? (c.acoes||[]).slice(0,12).map(a=>{
     const pct = a.perc||a.pct||0;
@@ -17962,15 +17962,15 @@ function clienteCard(c, i){
     <div class="section-title">Histórico de XPerformances (${(c.snapshots||[]).length} snapshots)</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
     ${(c.snapshots||[]).map((s,si)=>`
-      <div style="background:#0F1A10;border:1px solid #1A2A18;border-radius:10px;padding:10px 14px;min-width:180px">
-        <div style="font-size:10px;color:#C9A96E;font-weight:700;margin-bottom:4px">${si===0?'Mais recente':'Anterior '+(si)} · ${s.data_ref||s.data}</div>
-        <div style="font-size:13px;color:#F0F0F0;font-weight:600">${brl(s.patrimonio||0)}</div>
-        ${s.rent&&s.rent.portfolio?`<div style="font-size:11px;color:#3A6A48;margin-top:2px">12m: ${(s.rent.portfolio['12m']||0).toFixed(1)}%</div>`:''}
-        <div style="font-size:10px;color:#2A4A38;margin-top:4px">${Object.entries(s.composicao||{}).filter(([,v])=>v>3).map(([k,v])=>`${LABELS_PT[k]||k}: ${v.toFixed(0)}%`).join(' · ')}</div>
+      <div style="background:#0F1A10;border:1px solid #F5F8F5;border-radius:10px;padding:10px 14px;min-width:180px">
+        <div style="font-size:10px;color:#A8833C;font-weight:700;margin-bottom:4px">${si===0?'Mais recente':'Anterior '+(si)} · ${s.data_ref||s.data}</div>
+        <div style="font-size:13px;color:#17271E;font-weight:600">${brl(s.patrimonio||0)}</div>
+        ${s.rent&&s.rent.portfolio?`<div style="font-size:11px;color:#5C7365;margin-top:2px">12m: ${(s.rent.portfolio['12m']||0).toFixed(1)}%</div>`:''}
+        <div style="font-size:10px;color:#C6D6C9;margin-top:4px">${Object.entries(s.composicao||{}).filter(([,v])=>v>3).map(([k,v])=>`${LABELS_PT[k]||k}: ${v.toFixed(0)}%`).join(' · ')}</div>
       </div>`).join('')}
     </div>` : '';
 
-  const objetivoHtml = c.objetivo ? `<div style="font-size:11px;color:#3A6A48;margin-top:8px">🎯 ${c.objetivo}</div>` : '';
+  const objetivoHtml = c.objetivo ? `<div style="font-size:11px;color:#5C7365;margin-top:8px">🎯 ${c.objetivo}</div>` : '';
 
   return `
 <div class="cliente-card ${c.status}" id="card-${i}">
@@ -18032,7 +18032,7 @@ async function processarLote(input){
   const resBox   = document.getElementById('lote-resultado');
   progBox.style.display  = 'block';
   resBox.style.display   = 'none';
-  progBar.style.background = '#5DCAA5';
+  progBar.style.background = '#1F9D77';
   progBar.style.width    = '4%';
   progPct.textContent    = '4%';
   progTxt.textContent    = `Abrindo ${file.name}...`;
@@ -18100,41 +18100,41 @@ async function processarLote(input){
     const ok  = processados;
     const err = erros.length;
     const lista = clientes.slice(0,20).map(c=>
-      `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #1A1A1A;font-size:12px">
-        <span style="color:#5DCAA5;font-size:14px">✓</span>
-        <span style="flex:1;color:#CCC">${c.nome||c.conta}</span>
-        <span style="color:#3A6A48">${c.data_ref||''}</span>
-        <span style="color:#C9A96E">${brl(c.patrimonio||0)}</span>
-        <span style="color:#2A4A38;font-size:10px">${c.acoes_n||0}ações · ${c.fiis_n||0}FIIs · ${c.rf_n||0}RF</span>
+      `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #F5F8F5;font-size:12px">
+        <span style="color:#1F9D77;font-size:14px">✓</span>
+        <span style="flex:1;color:#5C7365">${c.nome||c.conta}</span>
+        <span style="color:#5C7365">${c.data_ref||''}</span>
+        <span style="color:#A8833C">${brl(c.patrimonio||0)}</span>
+        <span style="color:#C6D6C9;font-size:10px">${c.acoes_n||0}ações · ${c.fiis_n||0}FIIs · ${c.rf_n||0}RF</span>
       </div>`).join('');
     const errosHtml = erros.map(e=>
-      `<div style="font-size:11px;color:#FF6B6B;padding:3px 0">⚠ ${e.arquivo||''}: ${e.erro||''}</div>`).join('');
-    const maisHtml = ok > 20 ? `<div style="font-size:11px;color:#3A6A48;margin-top:6px">... e mais ${ok-20} clientes processados</div>` : '';
+      `<div style="font-size:11px;color:#D93B3B;padding:3px 0">⚠ ${e.arquivo||''}: ${e.erro||''}</div>`).join('');
+    const maisHtml = ok > 20 ? `<div style="font-size:11px;color:#5C7365;margin-top:6px">... e mais ${ok-20} clientes processados</div>` : '';
 
     resBox.innerHTML = `
       <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-        <div style="background:#0F2A1F;border:1px solid #1A4030;border-radius:8px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:700;color:#5DCAA5">${ok}</div>
-          <div style="font-size:10px;color:#3A6A48">clientes salvos</div>
+        <div style="background:#F5F8F5;border:1px solid #D9E3DB;border-radius:8px;padding:8px 16px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#1F9D77">${ok}</div>
+          <div style="font-size:10px;color:#5C7365">clientes salvos</div>
         </div>
-        <div style="background:#0A0A0A;border:1px solid #1A1A1A;border-radius:8px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:700;color:#888">${total}</div>
-          <div style="font-size:10px;color:#3A6A48">PDFs no arquivo</div>
+        <div style="background:#EFF3EF;border:1px solid #F5F8F5;border-radius:8px;padding:8px 16px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#8A9A8E">${total}</div>
+          <div style="font-size:10px;color:#5C7365">PDFs no arquivo</div>
         </div>
-        ${err ? `<div style="background:#1A0808;border:1px solid #3A1010;border-radius:8px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:700;color:#FF6B6B">${err}</div>
-          <div style="font-size:10px;color:#FF4444">erros</div>
+        ${err ? `<div style="background:#FBE9E9;border:1px solid #F7DADA;border-radius:8px;padding:8px 16px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#D93B3B">${err}</div>
+          <div style="font-size:10px;color:#CF2E2E">erros</div>
         </div>` : ''}
       </div>
       <div style="max-height:240px;overflow-y:auto">${lista}${maisHtml}</div>
-      ${errosHtml ? `<div style="margin-top:8px;padding:10px;background:#1A0808;border-radius:8px">${errosHtml}</div>` : ''}
-      <button onclick="carregar()" style="margin-top:12px;background:#1A3018;border:1px solid #2A5028;border-radius:8px;padding:8px 18px;color:#5DCAA5;font-size:12px;cursor:pointer">
+      ${errosHtml ? `<div style="margin-top:8px;padding:10px;background:#FBE9E9;border-radius:8px">${errosHtml}</div>` : ''}
+      <button onclick="carregar()" style="margin-top:12px;background:#1A3018;border:1px solid #2A5028;border-radius:8px;padding:8px 18px;color:#1F9D77;font-size:12px;cursor:pointer">
         ↻ Atualizar painel
       </button>`;
     resBox.style.display = 'block';
 
   }catch(e){
-    progBar.style.background = '#FF6B6B';
+    progBar.style.background = '#D93B3B';
     progTxt.textContent = 'Erro: '+e.message;
     progPct.textContent = '';
   }
