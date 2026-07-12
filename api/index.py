@@ -3228,6 +3228,13 @@ select option{background:#F5F8F5}
   <div id="calls-assessor-lista"></div>
 </div>
 
+<!-- Radar de notícias dos ativos que os clientes têm em carteira -->
+<div id="radar-noticias-card" class="card" style="display:none">
+  <h2 style="display:flex;align-items:center;gap:8px">📰 Radar dos seus ativos <span id="radar-cont" style="font-size:14px;color:#5C7365;font-weight:400"></span></h2>
+  <p style="font-size:14px;color:#7A8A80;margin:-4px 0 12px;line-height:1.5">Notícias recentes dos ativos mais presentes nas carteiras dos seus clientes. Priorizados pelos que mais têm exposição.</p>
+  <div id="radar-noticias-lista"></div>
+</div>
+
 <div class="card">
   <h2>Dados do cliente</h2>
 
@@ -5346,8 +5353,48 @@ async function buscarClientesSalvos(){
     ul.innerHTML = '<div class="cs-grid">'+h+'</div>';
     if(box) box.style.display="block";
     try{ carregarCallsAssessor(); }catch(e){}
+    try{ carregarRadarNoticias(); }catch(e){}
   }catch(e){}
 }
+
+// Radar de notícias dos ativos das carteiras do assessor
+function carregarRadarNoticias(){
+  var assessor=(document.getElementById("assessor")||{}).value||"";
+  if(!assessor) return;
+  var card=document.getElementById("radar-noticias-card");
+  var lista=document.getElementById("radar-noticias-lista");
+  if(!card||!lista) return;
+  fetch("/api/radar-noticias?assessor="+encodeURIComponent(assessor.toLowerCase())).then(r=>r.json()).then(function(d){
+    var itens=(d&&d.itens)||[];
+    if(!itens.length){ card.style.display="none"; return; }
+    var cont=document.getElementById("radar-cont");
+    if(cont) cont.textContent="· "+itens.length+" ativos"+(d.atualizado?(" · atualizado "+d.atualizado):"")+(d.ia?"":" · IA off");
+    var tagCor=function(t){ return t==="fii"?"#2E86B8":"#A8833C"; };
+    lista.innerHTML=itens.map(function(it){
+      var nots=(it.noticias||[]).map(function(n){
+        var f=(n.fonte?(' <span style="color:#5F7065">· '+n.fonte+'</span>'):'');
+        var dt=(n.data?(' <span style="color:#5F7065">'+n.data+'</span>'):'');
+        var titHtml=n.link
+          ? '<a href="'+n.link+'" target="_blank" rel="noopener" style="color:#0A0F0C;text-decoration:none">'+n.titulo+'</a>'
+          : n.titulo;
+        return '<li style="font-size:14px;line-height:1.5;margin-bottom:5px">'+titHtml+f+dt+'</li>';
+      }).join("");
+      var holders=(it.holders||[]).join(", ");
+      var maisTxt=(it.n_holders>it.holders.length)?(" +"+(it.n_holders-it.holders.length)):"";
+      return '<div style="padding:12px;border:1px solid #EAF4EC;border-radius:10px;margin-bottom:10px;background:#F5F8F5">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+        +   '<span style="font-size:16px;font-weight:700;color:'+tagCor(it.tipo)+'">'+it.ticker+'</span>'
+        +   '<span style="font-size:12px;color:#fff;background:'+tagCor(it.tipo)+';border-radius:6px;padding:1px 7px;font-weight:700">'+(it.tipo==="fii"?"FII":"Ação")+'</span>'
+        +   '<span style="font-size:13px;color:#5C7365">'+it.n_holders+' cliente'+(it.n_holders>1?"s":"")+' têm</span>'
+        + '</div>'
+        + '<ul style="margin:0 0 4px;padding-left:18px">'+nots+'</ul>'
+        + '<div style="font-size:12px;color:#7A8A80">👤 '+holders+maisTxt+'</div>'
+        + '</div>';
+    }).join("");
+    card.style.display="block";
+  }).catch(function(){ card.style.display="none"; });
+}
+
 function csToggle(id){
   var el=document.getElementById(id); var ar=document.getElementById(id+"-ar");
   if(!el) return;
@@ -7381,6 +7428,111 @@ def _quote_yahoo_simples_par(sym_full: str):
         return {"preco": round(float(prc), 2), "variacao": round((prc/prev - 1)*100, 2)}
     except Exception:
         return None
+
+def _ia_disponivel() -> bool:
+    """True se a ANTHROPIC_API_KEY estiver configurada (habilita curadoria por IA)."""
+    import os as _os
+    return bool(_os.environ.get("ANTHROPIC_API_KEY"))
+
+def _holdings_assessor(assessor: str) -> dict:
+    """Mapa dos ativos (ações/FIIs) presentes nas carteiras dos clientes do assessor.
+    Retorna {TICKER: {"nome":str, "tipo":"acao|fii", "holders":set(nomes)}}."""
+    assessor = (assessor or "").lower().strip()
+    fichas = load_fichas()
+    hold = {}
+    for f in fichas.values():
+        if not isinstance(f, dict):
+            continue
+        if f.get("assessor", "").lower().strip() != assessor:
+            continue
+        nome_cli = (f.get("nome", "") or ("#" + str(f.get("conta", "")))).strip()
+        for tipo, lista in (("acao", f.get("acoes", [])), ("fii", f.get("fiis", []))):
+            for a in (lista or []):
+                tk = (a.get("ticker", "") or "").upper().strip()
+                if not tk:
+                    continue
+                h = hold.setdefault(tk, {"nome": a.get("nome", ""), "tipo": tipo, "holders": set()})
+                if a.get("nome") and not h["nome"]:
+                    h["nome"] = a.get("nome")
+                h["holders"].add(nome_cli)
+    return hold
+
+def _google_news(query: str, limit: int = 2, dias_max: int = 12) -> list:
+    """Manchetes recentes do Google News RSS para uma query. Sem auth."""
+    import urllib.request as _ur, urllib.parse as _up, re as _re, ssl as _ssl
+    import html as _html, email.utils as _eu, datetime as _dt
+    ctx = _ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = _ssl.CERT_NONE
+    HEAD = {"User-Agent": "Mozilla/5.0 (compatible; Brauna-Mesas/1.0)"}
+    url = "https://news.google.com/rss/search?q=" + _up.quote(query) + "&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+    out = []
+    try:
+        with _ur.urlopen(_ur.Request(url, headers=HEAD), timeout=6, context=ctx) as r:
+            raw = r.read().decode("utf-8", "ignore")
+    except Exception:
+        return out
+    for it in _re.findall(r"<item>(.*?)</item>", raw, _re.S):
+        tt = _re.search(r"<title>(.*?)</title>", it, _re.S)
+        ln = _re.search(r"<link>(.*?)</link>", it, _re.S)
+        pd = _re.search(r"<pubDate>(.*?)</pubDate>", it, _re.S)
+        if not tt:
+            continue
+        titulo = _html.unescape(tt.group(1)).strip()
+        fonte = ""
+        if " - " in titulo:
+            titulo, fonte = titulo.rsplit(" - ", 1)
+        data_txt = ""
+        if pd:
+            try:
+                dtp = _eu.parsedate_to_datetime(pd.group(1))
+                if (_dt.datetime.now(dtp.tzinfo) - dtp).days > dias_max:
+                    continue
+                data_txt = dtp.strftime("%d/%m")
+            except Exception:
+                pass
+        out.append({"titulo": titulo.strip(), "fonte": fonte.strip(),
+                    "data": data_txt, "link": (ln.group(1).strip() if ln else "")})
+        if len(out) >= limit:
+            break
+    return out
+
+@app.route("/api/radar-noticias", methods=["GET"])
+def radar_noticias():
+    """Radar de notícias dos ativos que os clientes do assessor têm em carteira.
+    Prioriza os ativos com mais clientes. Cache por assessor (3h)."""
+    import time as _t
+    from concurrent.futures import ThreadPoolExecutor
+    assessor = request.args.get("assessor", "").lower().strip()
+    if not assessor:
+        return jsonify({"itens": [], "ia": _ia_disponivel()})
+    cache = radar_noticias.__dict__.setdefault("_cache", {})
+    ce = cache.get(assessor)
+    if ce and (_t.time() - ce["ts"] < 10800):
+        return jsonify(ce["data"])
+
+    hold = _holdings_assessor(assessor)
+    ranked = sorted(hold.items(), key=lambda kv: len(kv[1]["holders"]), reverse=True)[:12]
+
+    def _fetch(item):
+        tk, info = item
+        nome = (info.get("nome") or "").strip()
+        q = tk + ((" " + nome.split()[0]) if nome else "")
+        nots = _google_news(q, limit=2)
+        return {"ticker": tk, "tipo": info["tipo"], "nome": nome,
+                "holders": sorted(info["holders"])[:12], "n_holders": len(info["holders"]),
+                "noticias": nots}
+
+    itens = []
+    try:
+        with ThreadPoolExecutor(max_workers=12) as ex:
+            for res in ex.map(_fetch, ranked):
+                if res["noticias"]:
+                    itens.append(res)
+    except Exception:
+        pass
+
+    data = {"itens": itens, "atualizado": datetime.now().strftime("%d/%m %H:%M"), "ia": _ia_disponivel()}
+    cache[assessor] = {"ts": _t.time(), "data": data}
+    return jsonify(data)
 
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
