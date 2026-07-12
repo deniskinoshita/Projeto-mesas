@@ -1966,7 +1966,36 @@ def _texto_racional_modelo(modelo_lbl, perfil_lbl):
         f"risco/retorno e a resiliência a diferentes cenários de mercado."
     )
 
-def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomendacoes, alertas, macro, ref_contexto, checklist_servir=None, acoes=None, conta="", assessor="", modelo_nome=""):
+def _plano_troca_resumo(plano):
+    """Agrega o plano_troca (venda→compra) em listas — MESMA fonte para o PDF (assessor)
+    e o Braúna 360° (cliente), garantindo números idênticos. Retorna dict ou None."""
+    if not plano or not isinstance(plano, dict):
+        return None
+    movs = plano.get("movimentacoes") or []
+    if not movs and not (plano.get("bloqueados") or plano.get("previdencia")):
+        return None
+    red, comp = {}, {}
+    for m in movs:
+        ok = (m.get("origem_nome") or "—", m.get("origem_label") or "")
+        r = red.setdefault(ok, {"nome": ok[0], "label": ok[1], "valor": 0.0, "desagio": m.get("origem_desagio")})
+        r["valor"] += m.get("valor") or 0
+        ck = (m.get("destino_produto") or "—", m.get("destino_label") or "")
+        c = comp.setdefault(ck, {"nome": ck[0], "label": ck[1], "valor": 0.0, "detalhe": m.get("destino_detalhe") or ""})
+        c["valor"] += m.get("valor") or 0
+    return {
+        "total":   plano.get("total_mover") or sum(m.get("valor") or 0 for m in movs),
+        "reduzir": sorted(red.values(),  key=lambda x: -x["valor"]),
+        "comprar": sorted(comp.values(), key=lambda x: -x["valor"]),
+        "bloqueados":  plano.get("bloqueados") or [],
+        "previdencia": plano.get("previdencia") or [],
+        "limite_desagio": plano.get("limite_desagio", 3),
+    }
+
+
+def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomendacoes, alertas, macro, ref_contexto, checklist_servir=None, acoes=None, conta="", assessor="", modelo_nome="", plano_troca=None):
+    # Normaliza os desvios: analyze-xp usa 'atual'/'cls'; o PDF espera 'real'/'cat'.
+    desvios = [{**d, "real": d.get("real", d.get("atual", 0)), "cat": d.get("cat", d.get("cls"))}
+               for d in (desvios or [])]
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import cm
@@ -2184,6 +2213,38 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                 prods=", ".join(rec["produtos"])
                 elems.append(Paragraph(f"Produtos sugeridos: {prods} (sujeitos a disponibilidade, suitability e análise no líquido).",s_sug))
             elems.append(Spacer(1,0.15*cm))
+
+    # ── Plano de Troca (venda → compra) — MESMA fonte do 360°/tela (versão técnica) ──
+    _pt = _plano_troca_resumo(plano_troca)
+    if _pt and (_pt["reduzir"] or _pt["comprar"] or _pt["bloqueados"]):
+        def _pesc(s):
+            return str(s or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+        _lim = _pt["limite_desagio"]
+        elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+        elems.append(Paragraph("Plano de Troca — venda → compra",s_sec))
+        elems.append(Paragraph(
+            f"Total a realocar: <b>{_fmt_brl(_pt['total'])}</b>. Vende primeiro os ativos de pior rentabilidade; "
+            f"deságio acima de {_lim:.0f}% em renda fixa/crédito privado não é realizado (ações e FIIs livres). "
+            f"Compra: ações/FIIs por Markowitz-tangência; renda fixa em títulos diretos respeitando o FGC "
+            f"(R$ 250k/emissor) e depois fundos.", s_body))
+        elems.append(Paragraph("Vender / reduzir",s_bold))
+        for it in _pt["reduzir"]:
+            des = it.get("desagio")
+            dtxt = (f" · no ano {des:+.1f}%") if des is not None else ""
+            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{dtxt} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
+        elems.append(Paragraph("Comprar / aplicar",s_bold))
+        for it in _pt["comprar"]:
+            det = (f" · {_pesc(it['detalhe'])}") if it.get("detalhe") else ""
+            elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{det} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
+        if _pt["bloqueados"]:
+            elems.append(Paragraph(f"Não vender agora — deságio acima de {_lim:.0f}% (renda fixa / crédito privado)",s_bold))
+            for b in _pt["bloqueados"]:
+                elems.append(Paragraph(f"{_pesc(b.get('nome'))} ({_pesc(b.get('label'))}) — deságio de {abs(b.get('desagio',0) or 0):.1f}% no ano; manter e monitorar até recuperar.", s_sug))
+        if _pt["previdencia"]:
+            elems.append(Paragraph("Previdência — avaliar portabilidade (fora da venda automática)",s_bold))
+            for p in _pt["previdencia"]:
+                elems.append(Paragraph(f"{_pesc(p.get('nome'))} ({_pesc(p.get('label'))}) — portabilidade, regime tributário, carência e IR.", s_sug))
+        elems.append(Spacer(1,0.2*cm))
 
     # ── Posicionamento das ações + proteção de posições (Stock Guide Levante + XP)
     if acoes:
@@ -2601,7 +2662,7 @@ def _b360_rebal(comp, alvo, patrimonio, carteira=None):
             "dest_lbls": ", ".join(LABELS.get(c,c) for c,_ in dests[:3]),
             "rows": rows}
 
-def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="", assessor="", checklist_servir=None, acoes=None, carteira=None):
+def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="", assessor="", checklist_servir=None, acoes=None, carteira=None, plano_troca=None):
     """Documento BRAÚNA 360° (HTML completo) montado a partir dos dados reais do cliente."""
     e = _b360_esc
     perfil_pt = {"super_conservadora":"Super Conservador","conservadora":"Conservador","moderada":"Moderado",
@@ -2666,9 +2727,34 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
             + "".join(linhas) +
             '<p style="font-size:12px;color:var(--faint);margin-top:18px">Preço-alvo é referência; o preço vigente vem do XPerformance. Não constitui recomendação individualizada.</p></section>')
 
-    # (4) seção de rebalanceamento (movimentações origem→destino em R$)
-    rebal = _b360_rebal(comp, alvo, patrimonio, carteira)
+    # (4) seção de rebalanceamento — MESMA fonte do PDF/tela (plano_troca), versão objetiva p/ cliente
     rebal_section = ""
+    _pt = _plano_troca_resumo(plano_troca)
+    if _pt and (_pt["reduzir"] or _pt["comprar"]):
+        def _col(titulo, itens, cor):
+            linhas = "".join(
+                f'<div class="rbr" style="grid-template-columns:1fr auto"><div class="ro">{_b360_esc(it["nome"])}'
+                f'<span style="color:var(--faint);font-weight:400"> · {_b360_esc(it["label"])}</span></div>'
+                f'<div class="rv" style="color:{cor}">{_b360_brl(it["valor"])}</div></div>'
+                for it in itens[:8])
+            return (f'<div><div class="rbh" style="grid-template-columns:1fr auto"><div>{titulo}</div>'
+                    f'<div class="rv">Valor aprox.</div></div>{linhas}</div>')
+        nota = ""
+        if _pt["bloqueados"]:
+            nota += ('<p style="font-size:12px;color:var(--faint);margin-top:14px;line-height:1.55">Algumas posições de renda fixa em queda momentânea serão <b>mantidas e monitoradas</b>, para evitar realizar perdas antes da recuperação.</p>')
+        if _pt["previdencia"]:
+            nota += ('<p style="font-size:12px;color:var(--faint);margin-top:6px;line-height:1.55">Posições de previdência são tratadas à parte (portabilidade), preservando o regime tributário.</p>')
+        rebal_section = (
+            '<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Rebalanceamento · 06</span></div>'
+            '<div class="kicker">Plano de rebalanceamento</div><h2 class="q">O que reduzir e onde aplicar.</h2>'
+            f'<p class="lede">Realocar cerca de <b style="color:var(--petroleo)">{_b360_brl(_pt["total"])}</b> — reduzindo posições acima do modelo e aplicando em produtos alinhados ao seu perfil. Execução gradual, priorizando aportes, caixa e vencimentos, para cuidar da tributação e da marcação a mercado.</p>'
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">'
+            + _col("Reduzir", _pt["reduzir"], "var(--faint)")
+            + _col("Aplicar", _pt["comprar"], "var(--petroleo)")
+            + '</div>' + nota +
+            '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos — validada com o assessor.</p></section>')
+    # Fallback: rebalanceamento simples por classe quando não há plano_troca
+    rebal = None if _pt else _b360_rebal(comp, alvo, patrimonio, carteira)
     if rebal:
         rows_html = "".join(
             f'<div class="rbr"><div class="ro">{_b360_esc(o)}</div><div class="ra">{_b360_esc(a)}</div>'
@@ -11450,6 +11536,7 @@ def pdf_endpoint():
         d.get("checklist_servir"),
         d.get("acoes", []), d.get("conta", ""),
         d.get("assessor", ""), d.get("modelo_nome", ""),
+        plano_troca=d.get("plano_troca"),
     )
     nome_arq = f"{d.get('nome','cliente').replace(' ','-').lower()}_{d.get('data_ref','')}_analise.pdf"
     return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=nome_arq)
@@ -11472,7 +11559,7 @@ def brauna360_endpoint():
         d.get("nome",""), d.get("perfil","conservadora"), comp, d.get("rent",{}),
         d.get("patrimonio",0), d.get("data_ref",""), d.get("conta",""),
         d.get("assessor",""), d.get("checklist_servir"),
-        acoes=d.get("acoes") or [], carteira=carteira)
+        acoes=d.get("acoes") or [], carteira=carteira, plano_troca=d.get("plano_troca"))
     return Response(html, mimetype="text/html")
 
 
