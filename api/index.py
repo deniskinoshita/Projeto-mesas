@@ -4121,14 +4121,14 @@ function renderInstToggle(){
   wrap.innerHTML = itens.map(function(it){
     var isAt = (it.id === _instAtiva);
     return '<div onclick="selecionarInstituicao(\''+it.id+'\')" style="'
-      +'flex:1 1 0;min-width:150px;max-width:340px;cursor:pointer;border-radius:10px;padding:12px 16px;'
+      +'flex:1 1 0;min-width:180px;max-width:none;cursor:pointer;border-radius:10px;padding:14px 20px;'
       +'border:2px solid '+(isAt?it.cor:"#EAF4EC")+';'
       +'background:'+(isAt?it.cor+'18':"#EFF3EF")+';'
       +'transition:all .15s;box-sizing:border-box">'
-      +'<div style="font-size:21px;margin-bottom:3px">'+it.icon+'</div>'
-      +'<div style="font-size:15px;font-weight:700;color:'+(isAt?it.cor:"#0A0F0C")+';margin-bottom:2px">'+it.nome+'</div>'
-      +'<div style="font-size:12px;color:#39493F">'+it.ref+'</div>'
-      +(isAt?'<div style="font-size:11px;color:'+it.cor+';font-weight:700;margin-top:4px">&#10003; SELECIONADA</div>':'')
+      +'<div style="font-size:24px;margin-bottom:3px">'+it.icon+'</div>'
+      +'<div style="font-size:18px;font-weight:700;color:'+(isAt?it.cor:"#0A0F0C")+';margin-bottom:2px">'+it.nome+'</div>'
+      +'<div style="font-size:15px;color:#39493F">'+it.ref+'</div>'
+      +(isAt?'<div style="font-size:14px;color:'+it.cor+';font-weight:700;margin-top:4px">&#10003; SELECIONADA</div>':'')
       +'</div>';
   }).join("");
 }
