@@ -5931,7 +5931,7 @@ function renderPlanoTroca(sugs, plano){
   if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
     let h='<p style="font-size:11px;color:#C9A96E;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
-    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Vendemos primeiro os ativos de <b>pior rentabilidade</b> (trim dos laggards), com a venda <b>espalhada</b> entre vários ativos e a <b>compra diversificada</b> entre os produtos da prateleira de cada classe (não concentra num único título). A trava de <b>deságio acima de '+lim+'%</b> vale só para <b>renda fixa e crédito privado</b> (marcados a mercado) — <b>ações e FIIs são livres</b>. <b>Previdência</b> fica de fora (só por portabilidade).</p>';
+    h+='<p style="font-size:11px;color:#6A7A6A;margin:0 0 12px">Venda: os de <b>pior rentabilidade</b> primeiro (trim dos laggards), <b>espalhada</b>; trava de <b>deságio > '+lim+'%</b> só em <b>renda fixa/crédito privado</b> (ações e FIIs livres); previdência fica de fora (só portabilidade). Compra: <b>ações e FIIs por Markowitz</b> (peso risco-retorno); <b>renda fixa</b> em títulos diretos respeitando o <b>FGC (R$ 250k/emissor)</b>, até 3 bancários + 3 crédito privado e o excedente em fundos; multi/alternativos em até 5 fundos.</p>';
     if(plano.total_mover>0) h+='<div style="font-size:12px;color:#8B9FE8;margin-bottom:10px">Total a realocar: <b style="color:#F0F0F0">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
       const des=m.origem_desagio;
@@ -9111,6 +9111,171 @@ def hp_knowledge_publicar():
 DESAGIO_LIMITE = 3.0  # % — acima disso não se realiza a venda (evita cristalizar prejuízo)
 _CLS_RF_DESAGIO = {"pos_fixado", "pre_fixado", "inflacao"}
 
+# ── Motor de alocação da COMPRA ─────────────────────────────────────────────────
+FGC_EMISSOR = 250000.0   # cobertura FGC por emissor/conglomerado
+_RF_IDX = {"pos_fixado": ("% CDI", "CDI+", "LFT"),
+           "pre_fixado": ("Pré-Fixado",),
+           "inflacao":   ("IPC-A", "IGP-M")}
+_RF_FUND_CLASSES = {
+    "pos_fixado": ["Crédito High Grade", "Crédito Liquidez", "Renda Fixa Ativo", "Referenciado DI Soberano"],
+    "pre_fixado": ["Renda Fixa Ativo", "Crédito High Grade"],
+    "inflacao":   ["Renda Fixa Inflação", "Debêntures Incentivadas Hedgeado", "Debêntures Incentivadas Não Hedgeado"],
+}
+_FUND_XPCLASS = {
+    "acoes":        ["Renda Variável Long Only", "Renda Variável Long Biased"],
+    "fiis":         ["Fundo Listado"],
+    "multimercado": ["Macro Alta Vol", "Macro Média Vol", "Multiestratégia", "Macro Baixa Vol"],
+    "alternativos": ["Alternativo Líquido", "Multiestratégia", "Alternativo Ilíquido"],
+    "internacional":["Internacional Ações Hedgeado", "Internacional Ações Não Hedgeado", "Internacional Renda Fixa"],
+}
+
+def _fund_ret(p):
+    for k in ("rent_36m", "rent_24m", "rent_12m"):
+        v = p.get(k)
+        if isinstance(v, (int, float)):
+            return v
+    return None
+
+def _fundos_cand(classe, held, n=8):
+    """Fundos candidatos da classe (suitability Geral) com retorno e risco_genio,
+    ordenados por retorno/risco (melhor risco-ajustado primeiro)."""
+    classes = _FUND_XPCLASS.get(classe, [])
+    out = []
+    for p in _prat("fundos_xp.json").get("fundos", []):
+        if p.get("investidor") not in (None, "", "Geral"):
+            continue
+        if p.get("xp_class") not in classes:
+            continue
+        if held and (p.get("nome") or "").upper() in held:
+            continue
+        ret = _fund_ret(p)
+        if ret is None:
+            continue
+        risco = p.get("risco_genio") if isinstance(p.get("risco_genio"), (int, float)) and p.get("risco_genio") > 0 else 20.0
+        out.append({"nome": p.get("nome"),
+                    "detalhe": f"36m {_fpct(p.get('rent_36m'))} · 24m {_fpct(p.get('rent_24m'))} · adm {_fpct(p.get('taxa_adm'))}",
+                    "fonte": "Fundo XP", "ret": ret, "risco": risco})
+    out.sort(key=lambda p: -(max(p["ret"], 0.0) / p["risco"]))
+    return out[:n]
+
+def _pesos_tangencia(prods):
+    """Markowitz-tangência (proxy): peso ∝ retorno/risco, com piso de 15% p/ manter a
+    diversificação. prods: dicts com 'ret' e 'risco'. Retorna [(prod, peso)]."""
+    prods = [p for p in prods if p]
+    if not prods:
+        return []
+    sc = [max(p.get("ret") or 0.0, 0.0) / (p.get("risco") or 20.0) for p in prods]
+    tot = sum(sc)
+    w = [s / tot for s in sc] if tot > 0 else [1.0 / len(prods)] * len(prods)
+    piso = 0.15 if len(prods) >= 2 else 0.0
+    w = [max(x, piso) for x in w]
+    s = sum(w)
+    return [(p, x / s) for p, x in zip(prods, w)]
+
+def _rf_det(p):
+    det = p.get("tax_max") or p.get("tax_min") or ""
+    if p.get("isento") and p.get("grossup_max"):
+        det = f"{det} · isento (≈{p['grossup_max']} bruto)"
+    return det
+
+def _alocar_rf(classe, valor, held):
+    """RF: preenche com títulos DIRETOS respeitando FGC (R$250k/emissor bancário) e o
+    teto de 3 bancários + 3 crédito privado (+ públicos como núcleo); o excedente vai
+    para FUNDOS de RF (até 5). Retorna lista de {nome,valor,detalhe,fgc,tipo}."""
+    idx = _RF_IDX.get(classe, ())
+    prods = _prat("rf_tradicional_br.json").get("produtos", [])
+    def _match(p):
+        return (p.get("indexador") in idx) and (p.get("publico") or "").startswith("Investidor Geral")
+    publicos = [p for p in prods if _match(p) and p.get("categoria") == "titulos_publicos"]
+    banc     = [p for p in prods if _match(p) and p.get("categoria") in ("emissao_bancaria", "melhores_taxas") and p.get("fgc")]
+    priv     = [p for p in prods if _match(p) and p.get("categoria") == "credito_privado"]
+    _rank = lambda p: (not p.get("isento"), str(p.get("risco") or "99"))
+    out = []
+    rem = [valor]
+    def _take(lst, n, cap, tipo, dedupe_emissor=False):
+        vistos, emis, cnt = set(), set(), 0
+        for p in sorted(lst, key=_rank):
+            if rem[0] <= 1 or cnt >= n:
+                break
+            at = p.get("ativo")
+            if not at or at in vistos or at.upper() in (held or set()):
+                continue
+            vistos.add(at)
+            if dedupe_emissor:
+                ek = " ".join(at.split()[:2]).upper()
+                if ek in emis:
+                    continue
+                emis.add(ek)
+            v = min(rem[0], cap)
+            if v < 500:
+                continue
+            out.append({"nome": at, "valor": round(v, 2), "detalhe": _rf_det(p),
+                        "fgc": (tipo == "bancario"), "tipo": tipo, "fonte": "RF XP"})
+            rem[0] -= v; cnt += 1
+    # teto por título ~1/3 do valor (força diversificar em até 3), FGC 250k nos bancários
+    cap_pub = max(valor / 3.0, 30000.0)
+    cap_dir = min(FGC_EMISSOR, max(valor / 3.0, 30000.0))
+    if classe == "inflacao":
+        _take(publicos, 3, cap_pub, "publico")      # NTN-B núcleo, até 3 vencimentos
+    else:
+        _take(publicos, 1, cap_pub, "publico")      # LFT/LTN núcleo
+    _take(banc, 3, cap_dir, "bancario", dedupe_emissor=True)   # FGC 250k/emissor
+    _take(priv, 3, cap_dir, "privado")
+    # excedente → fundos de RF (até 5), ponderação risco-retorno
+    if rem[0] > 500:
+        classes = _RF_FUND_CLASSES.get(classe, [])
+        cand = []
+        for p in _prat("fundos_xp.json").get("fundos", []):
+            if p.get("investidor") not in (None, "", "Geral") or p.get("xp_class") not in classes:
+                continue
+            if held and (p.get("nome") or "").upper() in held:
+                continue
+            ret = _fund_ret(p)
+            if ret is None:
+                continue
+            risco = p.get("risco_genio") if isinstance(p.get("risco_genio"), (int, float)) and p.get("risco_genio") > 0 else 12.0
+            cand.append({"nome": p.get("nome"),
+                         "detalhe": f"36m {_fpct(p.get('rent_36m'))} · adm {_fpct(p.get('taxa_adm'))}",
+                         "fonte": "Fundo XP", "ret": ret, "risco": risco})
+        cand.sort(key=lambda p: -(max(p["ret"], 0.0) / p["risco"]))
+        for p, w in _pesos_tangencia(cand[:5]):
+            v = round(rem[0] * w, 2)
+            if v >= 500:
+                out.append({"nome": p["nome"], "valor": v, "detalhe": p["detalhe"],
+                            "fgc": False, "tipo": "fundo", "fonte": "Fundo XP"})
+    return out
+
+def _alocar_compra(classe, valor, held):
+    """Distribui o valor a comprar numa classe conforme as regras:
+    - ações e FIIs: até 3 fundos por Markowitz-tangência (peso ∝ retorno/risco);
+    - renda fixa: diretos (3 banc + 3 priv, FGC 250k) e depois fundos (até 5);
+    - multimercado/alternativos: até 5 fundos por tangência;
+    - internacional: títulos diretos (treasuries/bonds) + fundos.
+    Retorna lista de {nome, valor, detalhe, fgc, tipo, fonte}."""
+    held = held or set()
+    if not valor or valor <= 0:
+        return []
+    if classe in ("acoes", "fiis"):
+        pesos = _pesos_tangencia(_fundos_cand(classe, held, 6)[:3])
+        return [{"nome": p["nome"], "valor": round(valor * w, 2), "detalhe": p["detalhe"],
+                 "fgc": False, "tipo": "fundo", "fonte": p["fonte"]} for p, w in pesos if valor * w >= 500]
+    if classe in ("multimercado", "alternativos"):
+        pesos = _pesos_tangencia(_fundos_cand(classe, held, 5)[:5])
+        return [{"nome": p["nome"], "valor": round(valor * w, 2), "detalhe": p["detalhe"],
+                 "fgc": False, "tipo": "fundo", "fonte": p["fonte"]} for p, w in pesos if valor * w >= 500]
+    if classe in ("pos_fixado", "pre_fixado", "inflacao"):
+        return _alocar_rf(classe, valor, held)
+    if classe == "internacional":
+        out, rem = [], valor
+        for p in (_sug_intl(3, held) or [])[:3]:                    # treasuries/bonds diretos
+            v = round(rem / 3, 2)
+            if v >= 500:
+                out.append({"nome": p["nome"], "valor": v, "detalhe": p["detalhe"],
+                            "fgc": False, "tipo": "titulo", "fonte": p["fonte"]})
+        return out or [{"nome": "Fundo internacional", "valor": round(valor, 2), "detalhe": "",
+                        "fgc": False, "tipo": "fundo", "fonte": "Fundo XP"}]
+    return []
+
 def _aplica_desagio(classe, nome):
     """A trava de deságio vale só para RENDA FIXA e CRÉDITO PRIVADO (marcados a
     mercado, com recuperação no vencimento). Ações e FIIs são livres — podem ser
@@ -9194,15 +9359,31 @@ def _plano_troca(desvios, patrimonio, dados, destinos):
     monitorar = [{"classe": f["classe"], "label": f["label"], "excesso_valor": f["excesso_valor"]}
                  for f in fontes if f["todos_bloqueados"] and f["excesso_valor"] >= 1000]
 
-    # Alvos de COMPRA: espalha o gap de cada destino entre os produtos da prateleira
-    # (até 3) — evita jogar tudo num só título (ex.: só NTN-B). Divisão igual.
+    # o que o cliente já tem (não sugerir de novo na compra)
+    held_set = set()
+    for a in (dados.get("acoes") or []) + (dados.get("fiis") or []):
+        held_set.add((a.get("ticker") or "").upper()); held_set.add((a.get("nome") or "").upper())
+    for a in (dados.get("rf_ativos") or []):
+        held_set.add((a.get("nome") or "").upper())
+    held_set.discard("")
+
+    # Alvos de COMPRA pelo motor de alocação: ações/FIIs por Markowitz-tangência;
+    # RF por títulos diretos (3 banc + 3 priv, FGC 250k) e depois fundos; multi/alt em
+    # até 5 fundos. Fallback: 1º produto da prateleira.
     alvos = []
     for dest in destinos:
-        prods = [p for p in (dest.get("produtos_prateleira") or []) if p][:3] or [{}]
-        gap = dest.get("gap_valor", 0)
-        share = gap / len(prods)
-        for prod in prods:
-            alvos.append({"need": share, "prod": prod, "dest": dest})
+        try:
+            aloc = _alocar_compra(dest.get("classe"), dest.get("gap_valor", 0), held_set)
+        except Exception:
+            aloc = []
+        if aloc:
+            for a in aloc:
+                alvos.append({"need": a["valor"],
+                              "prod": {"nome": a["nome"], "detalhe": a.get("detalhe", ""), "fgc": a.get("fgc")},
+                              "dest": dest})
+        else:
+            prod = (dest.get("produtos_prateleira") or [{}])[0] or {}
+            alvos.append({"need": dest.get("gap_valor", 0), "prod": prod, "dest": dest})
     alvos.sort(key=lambda x: -x["need"])   # maiores fatias primeiro (preserva prioridade de classe)
 
     # casa cada alvo de compra com os ativos vendáveis das fontes
