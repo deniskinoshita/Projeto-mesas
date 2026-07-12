@@ -1,6 +1,12 @@
 import io, re, json, os, uuid, time
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from flask import Flask, request, jsonify, send_file, render_template_string, Response
+
+# Horário de Brasília (servidor roda em UTC). BRT = UTC-3 fixo (sem horário de verão desde 2019).
+_TZ_BR = timezone(timedelta(hours=-3))
+def agora_br():
+    """datetime NAIVE já no horário de Brasília (BRT). Usar no lugar do now() padrão."""
+    return datetime.now(timezone.utc).astimezone(_TZ_BR).replace(tzinfo=None)
 
 app = Flask(__name__)
 
@@ -844,11 +850,11 @@ def _msg_base_dt(m):
     return None
 def msg_expirada(m):
     dt = _msg_base_dt(m)
-    return bool(dt and (datetime.now() - dt).total_seconds() > COMUNICADO_TTL_H*3600)
+    return bool(dt and (agora_br() - dt).total_seconds() > COMUNICADO_TTL_H*3600)
 def msg_horas_restantes(m):
     dt = _msg_base_dt(m)
     if not dt: return None
-    resta = COMUNICADO_TTL_H*3600 - (datetime.now() - dt).total_seconds()
+    resta = COMUNICADO_TTL_H*3600 - (agora_br() - dt).total_seconds()
     return max(0, int(resta // 3600))
 
 
@@ -7199,7 +7205,7 @@ def login_pessoal():
             return jsonify({"ok": False, "msg": "Use seu e-mail corporativo @grupobrauna.com.br."}), 400
         senhas[identity] = {
             "hash": _hash_senha(senha),
-            "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "criada_em": agora_br().strftime("%d/%m/%Y %H:%M"),
             "email": email,
         }
         save_senhas_pessoais(senhas)
@@ -7255,7 +7261,7 @@ def solicitar_reset():
         "nome": nome,
         "email": email,
         "expira": agora + 3600,
-        "criado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "criado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
     }
     save_reset_tokens(tokens)
 
@@ -7305,7 +7311,7 @@ def confirmar_reset():
     senhas[identity] = {
         "hash": _hash_senha(nova_senha),
         "criada_em": existente.get("criada_em", "") if isinstance(existente, dict) else "",
-        "atualizada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "atualizada_em": agora_br().strftime("%d/%m/%Y %H:%M"),
         "email": email,
     }
     save_senhas_pessoais(senhas)
@@ -7479,7 +7485,7 @@ def mercado_destaques():
         "acoes":     _top(_DESTAQUES_ACOES),
         "fiis":      _top(_DESTAQUES_FIIS),
         "dolar":     dolar,
-        "atualizado": datetime.now().strftime("%d/%m %H:%M"),
+        "atualizado": agora_br().strftime("%d/%m %H:%M"),
     }
     if data["acoes"] or data["fiis"]:
         cache["data"] = data; cache["ts"] = _t.time()
@@ -7639,7 +7645,7 @@ def radar_noticias():
     except Exception:
         pass
 
-    data = {"itens": itens, "atualizado": datetime.now().strftime("%d/%m %H:%M"), "ia": _ia_disponivel()}
+    data = {"itens": itens, "atualizado": agora_br().strftime("%d/%m %H:%M"), "ia": _ia_disponivel()}
     cache[assessor] = {"ts": _t.time(), "data": data}
     return jsonify(data)
 
@@ -7677,7 +7683,7 @@ def sugestoes_endpoint():
     if request.method == "POST":
         nova = request.get_json()
         nova["id"]         = str(uuid.uuid4())[:8]
-        nova["criado_em"]  = datetime.now().strftime("%d/%m/%Y %H:%M")
+        nova["criado_em"]  = agora_br().strftime("%d/%m/%Y %H:%M")
         nova["ativa"]      = True
         for s in data["historico"]:
             s["ativa"] = False
@@ -7759,7 +7765,7 @@ def ficha_endpoint():
         cross_atual_set = set(cross_final)
         if cross_atual_set != cross_anterior:   # só registra se mudou
             cross_historico.append({
-                "data": datetime.now().strftime("%d/%m/%Y"),
+                "data": agora_br().strftime("%d/%m/%Y"),
                 "ativos": list(cross_atual_set),
                 "ativados":   list(cross_atual_set - cross_anterior),
                 "desativados": list(cross_anterior - cross_atual_set),
@@ -7777,7 +7783,7 @@ def ficha_endpoint():
             "checklist": checklist_final,
             "cross_ativos": cross_final,
             "cross_historico": cross_historico,
-            "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "atualizado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
         }
         # Remove a ficha por nome se agora temos a chave por conta
         if conta and key_nome in fichas and key_nome != key:
@@ -7824,7 +7830,7 @@ def protecoes_endpoint():
         except Exception:
             return a.get("ticker") == b.get("ticker")
 
-    hoje = datetime.now().strftime("%d/%m/%Y")
+    hoje = agora_br().strftime("%d/%m/%Y")
     novos = 0
     for e in (d.get("entradas", []) or []):
         tk = str(e.get("ticker", "")).upper().strip()
@@ -7873,7 +7879,7 @@ def protecoes_status():
     for p in ficha.get("protecoes", []):
         if p.get("id") == pid:
             p["status"] = status
-            p["status_em"] = datetime.now().strftime("%d/%m/%Y")
+            p["status_em"] = agora_br().strftime("%d/%m/%Y")
             achou = True
             break
     fichas[key] = ficha
@@ -7948,7 +7954,7 @@ def xp_identificar():
         ficha["conta"] = conta
         if assessor_logado and not ficha.get("assessor"):
             ficha["assessor"] = assessor_logado
-        ficha["data_ultimo_xp"] = datetime.now().strftime("%Y-%m-%d")
+        ficha["data_ultimo_xp"] = agora_br().strftime("%Y-%m-%d")
         fichas[_key] = ficha
         save_fichas(fichas)
 
@@ -8020,7 +8026,7 @@ def salvar_carteira():
         "patrimonio": d.get("patrimonio", 0),
         "composicao": d.get("composicao", {}),
         "rent":       d.get("rent", {}),
-        "salvo_em":   datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "salvo_em":   agora_br().strftime("%d/%m/%Y %H:%M"),
         # Posições individuais — salvas junto ao snapshot
         "rf_ativos":  d.get("rf_ativos", []),
         "acoes":      d.get("acoes", []),
@@ -8142,7 +8148,7 @@ def importar_assessores_xlsx():
 
         payload = {
             "assessores": assessores,
-            "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "atualizado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
             "fonte": arquivo.filename,
         }
         _save(_ASSESSORES_FILE, payload)
@@ -8158,7 +8164,7 @@ def admin_activity():
         data = request.get_json() or {}
         log = _load(_ADMIN_ACTIVITY_FILE, [])
         entry = {
-            "ts":     datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "ts":     agora_br().strftime("%d/%m/%Y %H:%M"),
             "role":   data.get("role",""),
             "nome":   data.get("nome",""),
             "acao":   data.get("acao","acesso"),
@@ -8236,7 +8242,7 @@ def admin_dashboard():
 def mensagem_endpoint():
     if request.method == "POST":
         d = request.get_json()
-        agora = datetime.now()
+        agora = agora_br()
         d["atualizado"] = agora.strftime("%d/%m/%Y %H:%M")
         d["publicado_iso"] = agora.isoformat()
         save_msg(d)
@@ -8263,7 +8269,7 @@ def upload_contexto():
     texto = extrair_texto_pdf(carta.read())
     _save("/tmp/brauna_carta.json", {
         "texto": texto[:8000],
-        "atualizado": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "atualizado": agora_br().strftime("%d/%m/%Y %H:%M"),
         "nome": carta.filename
     })
     return jsonify({"ok":True, "chars":len(texto), "preview":texto[:400]})
@@ -8396,7 +8402,7 @@ def hp_produtos():
 @app.route("/api/ping", methods=["GET","POST"])
 def ping():
     """Endpoint leve para aquecer o container antes de operações pesadas."""
-    return jsonify({"ok": True, "ts": datetime.now().isoformat()})
+    return jsonify({"ok": True, "ts": agora_br().isoformat()})
 
 @app.route("/api/hp/publicar", methods=["POST"])
 def hp_publicar():
@@ -8423,7 +8429,7 @@ def hp_publicar():
         threads.append(threading.Thread(target=_s, args=(_HP_PROD_FILE, produtos)))
     for t in threads: t.start()
     for t in threads: t.join(timeout=8)
-    return jsonify({"ok": True, "publicado_em": datetime.now().strftime("%d/%m/%Y %H:%M")})
+    return jsonify({"ok": True, "publicado_em": agora_br().strftime("%d/%m/%Y %H:%M")})
 
 @app.route("/api/hp/alertas", methods=["GET","POST","DELETE"])
 def hp_alertas():
@@ -8446,7 +8452,7 @@ def hp_alertas():
         "tipo":       data.get("tipo","info"),  # info | atencao | urgente
         "mensagem":   data.get("mensagem",""),
         "origem":     data.get("origem","Head de Produtos"),
-        "data":       datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "data":       agora_br().strftime("%d/%m/%Y %H:%M"),
         "lido":       False,
         "assessor_destino": data.get("assessor_destino", ""),  # "" = global, "lucas" = só Lucas
     }
@@ -8504,7 +8510,7 @@ def hp_calls():
         "tese":          data.get("tese",""),
         "perfis":        data.get("perfis", []),
         "fonte":         data.get("fonte",""),
-        "data":          datetime.now().strftime("%d/%m/%Y"),
+        "data":          agora_br().strftime("%d/%m/%Y"),
         "ativo":         True,
     }
     calls = _load(_HP_CALLS_FILE, [])
@@ -8573,7 +8579,7 @@ def _disparar_notificacoes_ativo(ticker_ou_nome: str, tipo: str, mensagem: str, 
                 por_assessor[assessor] = []
             por_assessor[assessor].append(nome_cli)
 
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+    agora = agora_br().strftime("%d/%m/%Y %H:%M")
     for assessor, clientes in por_assessor.items():
         if assessor not in notif:
             notif[assessor] = []
@@ -8736,7 +8742,7 @@ def _notificar_call_nova(call):
             assessores.setdefault(_norm_assessor_key(nome), nome)
 
     notif = _load(_NOTIF_FILE, {})
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+    agora = agora_br().strftime("%d/%m/%Y %H:%M")
     direc = str(call.get("direcao", "") or "").upper()
     afetados = {}
     for ass_nome in assessores.values():
@@ -8918,7 +8924,7 @@ def api_retornos_classe():
                     atual["classes"][c][p] = float(v) if v not in (None, "") else None
                 except Exception:
                     atual["classes"][c][p] = None
-    atual["atualizado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    atual["atualizado_em"] = agora_br().strftime("%d/%m/%Y %H:%M")
     _save(_RETORNOS_FILE, {"classes": atual["classes"], "atualizado_em": atual["atualizado_em"]})
     return jsonify({"ok": True, "retornos": _retornos_payload()})
 
@@ -8961,7 +8967,7 @@ def api_objetivos():
                     a["realizado"][k] = float(v) if v not in (None, "") else None
                 except Exception:
                     a["realizado"][k] = None
-    atual.setdefault("_meta", {})["atualizado_em"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+    atual.setdefault("_meta", {})["atualizado_em"] = agora_br().strftime("%d/%m/%Y %H:%M")
     _save(_OBJETIVOS_FILE, atual)
     return jsonify({"ok": True, "objetivos": atual})
 
@@ -9020,7 +9026,7 @@ def hp_estruturadas():
         "retorno": data.get("retorno","").strip(),
         "perfil_minimo": data.get("perfil_minimo","moderada"),
         "observacao": data.get("observacao","").strip(),
-        "data": datetime.now().strftime("%d/%m/%Y"),
+        "data": agora_br().strftime("%d/%m/%Y"),
     }
     ops = _load(_HP_ESTRUTURADAS_FILE, [])
     ops.insert(0, nova)
@@ -9050,7 +9056,7 @@ def hp_gestores():
         "perfil":     data.get("perfil","moderada"),
         "alocacao":   alocacao,
         "observacao": data.get("observacao","").strip(),
-        "data":       datetime.now().strftime("%d/%m/%Y"),
+        "data":       agora_br().strftime("%d/%m/%Y"),
     }
     gestores = _load(_HP_GESTORES_FILE, [])
     # Atualiza se mesmo nome+gestora, senão insere (máx 5)
@@ -9109,7 +9115,7 @@ def hp_knowledge_upload():
         "chars":     len(texto),
         "preview":   texto[:300],
         "tickers":   _extrair_tickers(texto),
-        "data":      datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "data":      agora_br().strftime("%d/%m/%Y %H:%M"),
         "ts":        time.time(),
         "publicado": False,
     }
@@ -9152,7 +9158,7 @@ def hp_knowledge_upload_texto():
         "chars":     len(texto),
         "preview":   texto[:300],
         "tickers":   _extrair_tickers(texto),
-        "data":      datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "data":      agora_br().strftime("%d/%m/%Y %H:%M"),
         "ts":        time.time(),
         "publicado": False,
     }
@@ -9356,7 +9362,7 @@ def hp_carteira_rec_upload():
     item = {"id": str(uuid.uuid4())[:8], "nome": nome, "referencia": ref, "tipo": parsed["tipo"],
             "tickers": parsed["tickers"], "fii": parsed["fii"], "acoes": parsed["acoes"],
             "nomes": parsed["nomes"], "qtd": len(parsed["tickers"]) + len(parsed["nomes"]),
-            "data": datetime.now().strftime("%d/%m/%Y %H:%M")}
+            "data": agora_br().strftime("%d/%m/%Y %H:%M")}
     carts.append(item)
     _save(_HP_CARTEIRAS_REC_FILE, carts)
     return jsonify({"ok": True, "item": item})
@@ -10211,7 +10217,7 @@ def analyze_xp():
                 "mensagem": f"Concentração muito alta: {pct:.1f}% em {LABELS_CLS.get(cls, cls)}. Discuta diversificação com o cliente.",
                 "origem": "Análise automática",
                 "origem_tipo": "auto",
-                "data": datetime.now().strftime("%d/%m/%Y"),
+                "data": agora_br().strftime("%d/%m/%Y"),
             })
         elif pct >= 60:
             alertas_relevantes.append({
@@ -10222,7 +10228,7 @@ def analyze_xp():
                 "mensagem": f"Alocação elevada: {pct:.1f}% em {LABELS_CLS.get(cls, cls)}. Verifique se está alinhado ao objetivo do cliente.",
                 "origem": "Análise automática",
                 "origem_tipo": "auto",
-                "data": datetime.now().strftime("%d/%m/%Y"),
+                "data": agora_br().strftime("%d/%m/%Y"),
             })
 
     for d_desvio in desvios:
@@ -10237,7 +10243,7 @@ def analyze_xp():
                 "mensagem": f"Desvio significativo: {sinal}{d_desvio['desvio_pp']:.1f}pp em relação ao modelo. Pauta prioritária para rebalanceamento.",
                 "origem": "Análise automática",
                 "origem_tipo": "auto",
-                "data": datetime.now().strftime("%d/%m/%Y"),
+                "data": agora_br().strftime("%d/%m/%Y"),
             })
 
     # Remove duplicatas por id
@@ -10270,7 +10276,7 @@ def analyze_xp():
     #    (3) docs da Base que citam troca/redução do ativo que o cliente tem.
     _guia_sg   = (carregar_stock_guide() or {}).get("acoes", {})
     _acoes_cli = [str(a.get("ticker","")).upper() for a in dados.get("acoes", []) if a.get("ticker")]
-    _hoje_str  = datetime.now().strftime("%d/%m/%Y")
+    _hoje_str  = agora_br().strftime("%d/%m/%Y")
     _troca_ids = set()
     def _add_troca(t):
         if t["id"] in _troca_ids:
@@ -10337,7 +10343,7 @@ def analyze_xp():
         "fiis":        dados.get("fiis",[])[:20],
         "rf_ativos":   dados.get("rf_ativos",[])[:40],
         "data_ref":    dados.get("data_ref",""),
-        "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "atualizado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
     }
     _save(_CLIENTS_FILE, clientes)
 
@@ -10391,14 +10397,14 @@ def analyze_xp():
             for an in parsed:
                 if not isinstance(an, dict) or not an.get("ticker"): continue
                 alertas_mercado.append({
-                    "id":       f"news_{an['ticker']}_{datetime.now().strftime('%H%M%S')}",
+                    "id":       f"news_{an['ticker']}_{agora_br().strftime('%H%M%S')}",
                     "produto":  an["ticker"],
                     "classe":   "",
                     "tipo":     an.get("tipo","atencao"),
                     "mensagem": an.get("mensagem",""),
                     "origem":   f"📰 {an.get('fonte','Notícias do mercado')}",
                     "origem_tipo": "mercado",
-                    "data":     datetime.now().strftime("%d/%m/%Y"),
+                    "data":     agora_br().strftime("%d/%m/%Y"),
                 })
     except Exception as _e:
         app.logger.warning(f"News fetch warning: {_e}")
@@ -10497,7 +10503,7 @@ def analyze_xp():
         "alertas_mercado":    alertas_mercado,
         "calls_relevantes":   calls_relevantes,
         "carteira_salva":     True,
-        "analisado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "analisado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
     }
     return jsonify(resultado)
 
@@ -10909,7 +10915,7 @@ def _analisar_sugestoes_inteligentes(body, produtos_hp, calls_hp, gestoras2_hp, 
 
     # Tentar usar gestora do HP
     gestora_nome = "Carteira Braúna FII"
-    referencia   = datetime.now().strftime("%B %Y")
+    referencia   = agora_br().strftime("%B %Y")
     posicoes_fii = []
 
     gestora_match = None
@@ -11278,7 +11284,7 @@ def hp_produtos_salvar():
     data = request.get_json()
     produtos_por_classe = data.get("produtos", {})
     indicado_por = data.get("indicado_por", "Head de Produtos")
-    indicado_em  = datetime.now().strftime("%d/%m/%Y %H:%M")
+    indicado_em  = agora_br().strftime("%d/%m/%Y %H:%M")
     force        = bool(data.get("force", False))
 
     # Trava de segurança: não sobrescreve os produtos salvos com um conjunto vazio
@@ -11309,7 +11315,7 @@ def analyze():
     nome   = request.form.get("nome","")
     perfil = request.form.get("perfil","conservadora")
     objetivo = request.form.get("objetivo","")
-    data   = datetime.now().strftime("%d/%m/%Y")
+    data   = agora_br().strftime("%d/%m/%Y")
     pdf    = request.files.get("pdf")
     salvos_raw     = request.form.get("dados_salvos","")
     checklist_raw  = request.form.get("checklist","{}")
@@ -11371,7 +11377,7 @@ def analyze():
         "alertas_count": len(alertas),
         "status": status,
         "nota_lider": "",
-        "analisado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "analisado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
     }
     clientes = load_clientes()
     # Substitui se mesmo nome+assessor
@@ -11395,7 +11401,7 @@ def analyze():
         "acoes":    [{"ticker": a.get("ticker",""), "nome": a.get("nome",""), "pct": a.get("pct", a.get("perc_carteira",0))} for a in xp_parsed.get("acoes",[])[:30]],
         "fiis":     [{"ticker": a.get("ticker",""), "nome": a.get("nome",""), "pct": a.get("pct", a.get("perc_carteira",0))} for a in xp_parsed.get("fiis",[])[:20]],
         "rf_ativos":[{"nome": a.get("nome",""), "classe": a.get("classe",""), "saldo": a.get("saldo",0)} for a in xp_parsed.get("rf_ativos",[])[:40]],
-        "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "atualizado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
     }
     # Salva por ambas as chaves: nome+assessor E conta (se disponível)
     fichas[fkey] = ficha_nova
@@ -11406,8 +11412,8 @@ def analyze():
     # Salva histórico de análises (últimos 3 por cliente, com ativos completos)
     hist = load_hist()
     entrada_hist = {
-        "data": datetime.now().strftime("%d/%m/%Y"),
-        "hora": datetime.now().strftime("%H:%M"),
+        "data": agora_br().strftime("%d/%m/%Y"),
+        "hora": agora_br().strftime("%H:%M"),
         "data_ref": xp_parsed.get("data_ref", ""),
         "patrimonio": patrimonio,
         "perfil": perfil,
@@ -11581,8 +11587,8 @@ def gerar_ppt(dados):
     PLABEL = {"super_conservadora": "Super Conservadora", "conservadora": "Conservadora",
               "moderada": "Moderada", "arrojada": "Arrojada", "agressiva": "Agressiva"}
     fmt_brl = lambda v: f"R$ {int(v):,.0f}".replace(",", ".") if v else "—"
-    data_hoje = datetime.now().strftime("%d/%m/%Y")
-    mes_ano   = datetime.now().strftime("%B de %Y").capitalize()
+    data_hoje = agora_br().strftime("%d/%m/%Y")
+    mes_ano   = agora_br().strftime("%B de %Y").capitalize()
 
     prs = Presentation()
     prs.slide_width  = Inches(13.33)
@@ -11977,7 +11983,7 @@ def ppt_endpoint():
     try:
         dados["hist_macro"] = buscar_hist_macro()
         buf = gerar_ppt(dados)
-        nome_arq = f"Brauna_{dados.get('nome','cliente').replace(' ','_')}_{datetime.now().strftime('%Y%m%d')}.pptx"
+        nome_arq = f"Brauna_{dados.get('nome','cliente').replace(' ','_')}_{agora_br().strftime('%Y%m%d')}.pptx"
         return send_file(
             buf,
             mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -17940,8 +17946,8 @@ def processar_zip_xp():
             "acoes":    [{"ticker":a.get("ticker",""),"nome":a.get("nome",""),"saldo":a.get("saldo",0),"qtd":a.get("qtd",0),"perc":a.get("perc",0)} for a in xp.get("acoes",[])[:40]],
             "fiis":     [{"ticker":a.get("ticker",""),"nome":a.get("nome",""),"saldo":a.get("saldo",0),"qtd":a.get("qtd",0),"perc":a.get("perc",0)} for a in xp.get("fiis",[])[:30]],
             "rf_ativos":[{"nome":a.get("nome",""),"classe":a.get("classe",""),"saldo":a.get("saldo",0),"perc":a.get("perc",0),"rent_mes":a.get("rent_mes"),"rent_12m":a.get("rent_12m")} for a in xp.get("rf_ativos",[])[:60]],
-            "data_ultimo_xp": datetime.now().strftime("%Y-%m-%d"),
-            "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "data_ultimo_xp": agora_br().strftime("%Y-%m-%d"),
+            "atualizado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
         }
         fichas[f"conta:{conta}"] = ficha_upd
         if fkey and fkey != f"conta:{conta}":
@@ -17950,8 +17956,8 @@ def processar_zip_xp():
 
         # Monta snapshot para o histórico
         entrada = {
-            "data":      datetime.now().strftime("%d/%m/%Y"),
-            "hora":      datetime.now().strftime("%H:%M"),
+            "data":      agora_br().strftime("%d/%m/%Y"),
+            "hora":      agora_br().strftime("%H:%M"),
             "data_ref":  data_ref,
             "patrimonio": patrimonio,
             "perfil":    perfil,

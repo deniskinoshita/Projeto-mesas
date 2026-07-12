@@ -6,8 +6,14 @@ Cold start < 1s (vs ~10s com Flask).
 import json, os, time
 import hashlib as _hashlib
 import secrets as _secrets
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import urllib.request as _urllib
+
+# Horário de Brasília (servidor em UTC). BRT = UTC-3 fixo (sem horário de verão desde 2019).
+_TZ_BR = timezone(timedelta(hours=-3))
+def agora_br():
+    """datetime NAIVE no horário de Brasília (BRT). Usar no lugar do now() padrão."""
+    return datetime.now(timezone.utc).astimezone(_TZ_BR).replace(tzinfo=None)
 
 # ── Dados ────────────────────────────────────────────────────────────────────
 
@@ -729,7 +735,7 @@ def _handle(environ, start_response):
 
     # ── ping ──────────────────────────────────────────────────────────────────
     if path == "/api/ping":
-        return _json(start_response, {"ok": True, "ts": datetime.now().isoformat()})
+        return _json(start_response, {"ok": True, "ts": agora_br().isoformat()})
 
     # ── /api/login ────────────────────────────────────────────────────────────
     if method == "POST" and path == "/api/login":
@@ -780,7 +786,7 @@ def _handle(environ, start_response):
                 return _err(start_response, "Use seu e-mail corporativo @grupobrauna.com.br.", 400)
             senhas[identity] = {
                 "hash": _hash_senha(senha),
-                "criada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "criada_em": agora_br().strftime("%d/%m/%Y %H:%M"),
                 "email": email,
             }
             save_senhas_pessoais(senhas)
@@ -828,7 +834,7 @@ def _handle(environ, start_response):
         tokens[token] = {
             "identity": identity, "nome": nome, "email": email,
             "expira": agora + 3600,
-            "criado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "criado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
         }
         save_reset_tokens(tokens)
 
@@ -872,7 +878,7 @@ def _handle(environ, start_response):
         senhas[identity] = {
             "hash": _hash_senha(nova_senha),
             "criada_em": existente.get("criada_em", "") if isinstance(existente, dict) else "",
-            "atualizada_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "atualizada_em": agora_br().strftime("%d/%m/%Y %H:%M"),
             "email": email,
         }
         save_senhas_pessoais(senhas)

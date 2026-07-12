@@ -2267,7 +2267,7 @@ def s_historico_mensal(prs, d, num=8):
     try:
         ano_atual = int(data_r.split("/")[2])
     except Exception:
-        ano_atual = datetime.datetime.now().year
+        ano_atual = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=3)).year
 
     header(sl, num, "Rentabilidade Histórica — Mensal",
            sub=f"Rentabilidade mensal do portfólio vs CDI  |  Fonte: XP Performance",
