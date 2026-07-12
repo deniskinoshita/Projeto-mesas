@@ -5369,7 +5369,8 @@ function carregarRadarNoticias(){
     if(!itens.length){ card.style.display="none"; return; }
     var cont=document.getElementById("radar-cont");
     if(cont) cont.textContent="· "+itens.length+" ativos"+(d.atualizado?(" · atualizado "+d.atualizado):"")+(d.ia?"":" · IA off");
-    var tagCor=function(t){ return t==="fii"?"#2E86B8":"#A8833C"; };
+    var tagCor=function(t){ return t==="fii"?"#2E86B8":(t==="fundo"?"#7A5CC0":"#A8833C"); };
+    var tagLbl=function(t){ return t==="fii"?"FII":(t==="fundo"?"Fundo":"Ação"); };
     lista.innerHTML=itens.map(function(it){
       var nots=(it.noticias||[]).map(function(n){
         var f=(n.fonte?(' <span style="color:#5F7065">· '+n.fonte+'</span>'):'');
@@ -5384,7 +5385,7 @@ function carregarRadarNoticias(){
       return '<div style="padding:12px;border:1px solid #EAF4EC;border-radius:10px;margin-bottom:10px;background:#F5F8F5">'
         + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
         +   '<span style="font-size:16px;font-weight:700;color:'+tagCor(it.tipo)+'">'+it.ticker+'</span>'
-        +   '<span style="font-size:12px;color:#fff;background:'+tagCor(it.tipo)+';border-radius:6px;padding:1px 7px;font-weight:700">'+(it.tipo==="fii"?"FII":"Ação")+'</span>'
+        +   '<span style="font-size:12px;color:#fff;background:'+tagCor(it.tipo)+';border-radius:6px;padding:1px 7px;font-weight:700">'+tagLbl(it.tipo)+'</span>'
         +   '<span style="font-size:13px;color:#5C7365">'+it.n_holders+' cliente'+(it.n_holders>1?"s":"")+' têm</span>'
         + '</div>'
         + '<ul style="margin:0 0 4px;padding-left:18px">'+nots+'</ul>'
@@ -7434,12 +7435,26 @@ def _ia_disponivel() -> bool:
     import os as _os
     return bool(_os.environ.get("ANTHROPIC_API_KEY"))
 
-def _holdings_assessor(assessor: str) -> dict:
-    """Mapa dos ativos (ações/FIIs) presentes nas carteiras dos clientes do assessor.
-    Retorna {TICKER: {"nome":str, "tipo":"acao|fii", "holders":set(nomes)}}."""
+_FUND_NOISE = {"FIC","FIF","FIRF","FIM","FIA","FI","FIP","RL","LP","CP","CIC","RF","SIMPLES",
+    "MULTI","CLASSE","FII","CREDITO","PRIVADO","LONGO","PRAZO","SEG","PREV","FICFIM","QUALIFICADO",
+    "MASTER","RESP","LIMITADA","A","B","C","DE","DO","DA","E","EM","II","III"}
+
+def _nome_fundo_query(nome: str) -> str:
+    """Reduz o nome legal de um fundo a gestora+estratégia (query de notícia menos ruidosa)."""
+    import re as _re
+    toks = _re.findall(r"[A-Za-zÀ-ú0-9]+", nome or "")
+    sig = [t for t in toks if t.upper() not in _FUND_NOISE and len(t) > 1]
+    return " ".join(sig[:3]) if sig else (nome or "").strip()
+
+def _holdings_assessor(assessor: str, incluir_fundos: bool = False) -> dict:
+    """Mapa dos ativos presentes nas carteiras dos clientes do assessor.
+    Retorna {chave: {"nome":str, "query":str, "tipo":"acao|fii|fundo", "holders":set(nomes)}}.
+    Ações/FIIs são chaveados por ticker; fundos (rf_ativos, exceto RF pura) por nome-query."""
     assessor = (assessor or "").lower().strip()
     fichas = load_fichas()
     hold = {}
+    # Classes de rf_ativos que são fundos de gestão (têm notícia útil); RF pura fica de fora
+    FUNDO_CLS = {"multimercado", "alternativos", "internacional", "acoes_fundo", "cripto_fundo"}
     for f in fichas.values():
         if not isinstance(f, dict):
             continue
@@ -7451,9 +7466,20 @@ def _holdings_assessor(assessor: str) -> dict:
                 tk = (a.get("ticker", "") or "").upper().strip()
                 if not tk:
                     continue
-                h = hold.setdefault(tk, {"nome": a.get("nome", ""), "tipo": tipo, "holders": set()})
+                h = hold.setdefault(tk, {"nome": a.get("nome", ""), "query": tk, "tipo": tipo, "holders": set()})
                 if a.get("nome") and not h["nome"]:
                     h["nome"] = a.get("nome")
+                h["holders"].add(nome_cli)
+        if incluir_fundos:
+            for a in (f.get("rf_ativos", []) or []):
+                if (a.get("classe", "") or "").lower() not in FUNDO_CLS:
+                    continue
+                nome_f = (a.get("nome", "") or "").strip()
+                q = _nome_fundo_query(nome_f)
+                if len(q) < 4:
+                    continue
+                chave = "F:" + q.upper()
+                h = hold.setdefault(chave, {"nome": nome_f, "query": q, "tipo": "fundo", "holders": set()})
                 h["holders"].add(nome_cli)
     return hold
 
@@ -7509,15 +7535,26 @@ def radar_noticias():
     if ce and (_t.time() - ce["ts"] < 10800):
         return jsonify(ce["data"])
 
-    hold = _holdings_assessor(assessor)
-    ranked = sorted(hold.items(), key=lambda kv: len(kv[1]["holders"]), reverse=True)[:12]
+    hold = _holdings_assessor(assessor, incluir_fundos=True)
+    itens_rv  = [kv for kv in hold.items() if kv[1]["tipo"] in ("acao", "fii")]
+    itens_fnd = [kv for kv in hold.items() if kv[1]["tipo"] == "fundo"]
+    itens_rv.sort(key=lambda kv: len(kv[1]["holders"]), reverse=True)
+    itens_fnd.sort(key=lambda kv: len(kv[1]["holders"]), reverse=True)
+    ranked = itens_rv[:12] + itens_fnd[:5]   # RV/FII em foco + poucos fundos
 
     def _fetch(item):
-        tk, info = item
+        chave, info = item
         nome = (info.get("nome") or "").strip()
-        q = tk + ((" " + nome.split()[0]) if nome else "")
-        nots = _google_news(q, limit=2)
-        return {"ticker": tk, "tipo": info["tipo"], "nome": nome,
+        tipo = info["tipo"]
+        if tipo == "fundo":
+            rotulo = info.get("query") or nome
+            q = info.get("query") or nome
+            nots = _google_news(q, limit=2, dias_max=30)   # fundo: notícia mais esparsa
+        else:
+            rotulo = chave  # ticker
+            q = chave + ((" " + nome.split()[0]) if nome else "")
+            nots = _google_news(q, limit=2)
+        return {"ticker": rotulo, "tipo": tipo, "nome": nome,
                 "holders": sorted(info["holders"])[:12], "n_holders": len(info["holders"]),
                 "noticias": nots}
 
