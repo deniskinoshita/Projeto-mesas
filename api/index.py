@@ -3351,16 +3351,6 @@ select option{background:#1A1A1A}
     </div>
   </div>
 
-  <div class="card" style="text-align:center">
-    <h2>Exportar Análise</h2>
-    <p style="font-size:12px;color:#3A6A48;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#0D2333;color:#F3EFE7;border-color:#0D2333">◎ Abrir Braúna 360°</button>
-      <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
-    </div>
-    <p style="font-size:11px;color:#2A5A3A;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
-  </div>
-
   <div class="card">
     <h2>Resumo</h2>
     <div class="grid-4" id="metrics"></div>
@@ -3476,13 +3466,15 @@ select option{background:#1A1A1A}
     </div>
   </div>
 
-  <!-- ── Gerar Apresentação de Reunião — ao final ── -->
-  <div style="padding:20px 0 8px">
-    <button id="btn-apres" onclick="gerarApresentacao()" class="btn" style="background:#C9A96E;color:#071E17;font-size:15px;font-weight:700;padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%">
-      🎯 Gerar Apresentação de Reunião (.pptx)
-    </button>
-    <p style="font-size:11px;color:#3A6A48;text-align:center;margin-top:8px">PowerPoint · Cenário macro · Análise da carteira · Sugestões de realocação · Identidade Braúna</p>
-    <span id="apres-st" style="display:block;font-size:12px;color:#888;text-align:center;margin-top:6px"></span>
+  <!-- ── Exportar Análise — ao final ── -->
+  <div class="card" style="text-align:center">
+    <h2>Exportar Análise</h2>
+    <p style="font-size:12px;color:#3A6A48;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#0D2333;color:#F3EFE7;border-color:#0D2333">◎ Abrir Braúna 360°</button>
+      <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
+    </div>
+    <p style="font-size:11px;color:#2A5A3A;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
   </div>
 
 </div>
@@ -6337,84 +6329,7 @@ function renderizar(data){
   }
 }
 
-// ── Gerar Apresentação de Reunião ─────────────────────────────────────────────
-async function gerarApresentacao(){
-  if(!analiseData) return;
-  const btn = document.getElementById("btn-apres");
-  const st  = document.getElementById("apres-st");
-  btn.disabled = true;
-  btn.textContent = "⏳ Gerando com IA...";
-  st.textContent = "Claude está escrevendo a narrativa personalizada...";
-
-  const xp = analiseData._xp || {};
-
-  // Monta checklist de modelo de servir (formato esperado pelo PPTX)
-  const checklistServir = {};
-  if(analiseData.checklist_servir){
-    analiseData.checklist_servir.forEach(p => {
-      checklistServir[p.id || p.pilar] = {
-        feito: p.status === "feito" || p.status === "ok",
-        nome: p.nome || p.pilar || p.id,
-        critico: p.critico || false,
-      };
-    });
-  }
-
-  // Cross-sell: mapeia IDs para nomes (o PPTX compara por nome)
-  const crossAtivosNomes   = CROSS_AREAS.filter(a=>crossSell[a.id]).map(a=>a.nome);
-  const crossFaltandoNomes = CROSS_AREAS.filter(a=>!crossSell[a.id]).map(a=>a.nome);
-
-  const payload = {
-    nome_cliente:        analiseData.nome || "Cliente",
-    conta:               xp.conta || "",
-    assessor:            analiseData.assessor || document.getElementById("assessor")?.value || "",
-    perfil:              analiseData.perfil || "moderada",
-    gestora:             xp.gestora || (document.getElementById("gestora-sel")||{}).value || "",
-    data_ref:            analiseData.data_ref || new Date().toLocaleDateString("pt-BR"),
-    patrimonio:          analiseData.patrimonio || xp.patrimonio || 0,
-    rent:                analiseData.rent || xp.rent || {},
-    composicao:          analiseData.composicao || xp.comp || {},
-    desvios:             xp.desvios || analiseData.desvios || [],
-    acoes:               analiseData.acoes || xp.acoes || [],
-    fiis:                analiseData.fiis  || xp.fiis  || [],
-    rf_ativos:           analiseData.rf_ativos || [],
-    diagnosticos:        analiseData.diagnosticos || [],
-    sugestoes_produtos:  xp.sugestoes_produtos || [],
-    cenario_macro:       xp.cenario_macro || {},
-    alertas_relevantes:  xp.alertas_relevantes || analiseData.alertas || [],
-    // Modelo de Servir
-    score_servir:        analiseData.score_servir || 0,
-    checklist:           checklistServir,
-    pendentes_criticos:  analiseData.pendentes_criticos || 0,
-    // Cross-sell
-    cross_ativos:        crossAtivosNomes,
-    cross_ativos_nomes:  crossAtivosNomes,
-    cross_faltando:      crossFaltandoNomes,
-    // Objetivo e perfil detalhado
-    objetivo:            analiseData.objetivo || "",
-  };
-
-  try{
-    const r = await fetch("/api/gerar-pptx", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(payload),
-    });
-    if(!r.ok) throw new Error(await r.text());
-    const blob = await r.blob();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `apresentacao_${(payload.nome_cliente).replace(/ /g,"-").toLowerCase()}_${payload.data_ref.replace(/\//g,"-")}.pptx`;
-    a.click();
-    st.innerHTML = `<span style="color:#5DCAA5">✓ Apresentação PowerPoint gerada com sucesso!</span>`;
-  } catch(e){
-    st.innerHTML = `<span style="color:#FF6B6B">Erro: ${e.message}</span>`;
-  } finally{
-    btn.disabled = false;
-    btn.textContent = "🎯 Gerar Apresentação de Reunião";
-    setTimeout(()=>st.textContent="", 5000);
-  }
-}
+// (Removido: "Gerar Apresentação de Reunião" (.pptx) — substituído pelo Braúna 360°.)
 
 function renderCrossSellResult(areas, tem, naoTem){
   const el=document.getElementById("crosssell-list");
