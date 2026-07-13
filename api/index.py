@@ -4514,6 +4514,9 @@ function selecionarPerfil(key){
   sel.value = key;
   sel.dispatchEvent(new Event("change"));
   renderPerfilCards();
+  // Com um perfil escolhido o assessor já pode seguir para a Parte 2
+  // (avancarEtapa2 tem fallback caso o cliente ainda não tenha sido identificado).
+  try{ mostrarBotaoProximaEtapa(typeof _clienteIdentificado!=="undefined" ? _clienteIdentificado : null); }catch(e){}
 }
 
 setTimeout(renderPerfilCards, 80);
