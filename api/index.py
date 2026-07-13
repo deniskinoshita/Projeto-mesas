@@ -792,11 +792,24 @@ def save_clientes(d): _save(_DATA_FILE, d)
 
 def load_fichas():   return _load(_FICHA_FILE, {})
 def save_fichas(d):  _save(_FICHA_FILE, d)
+_POSICAO_VALIDADE_DIAS = 3   # Posição (assessor) vale 3 dias; depois, re-subir
+_XP_VALIDADE_DIAS      = 30  # XPerformance (admin) vale 30 dias
+
 def carregar_posicao(conta):
     """Foto patrimonial da Posição Consolidada salva por conta (ou None)."""
     if not conta:
         return None
     return _load(_POSICAO_FILE, {}).get(str(conta).strip())
+
+def _posicao_validade(salvo_em):
+    """Status de validade (3 dias) a partir de 'salvo_em' (YYYY-MM-DD HH:MM)."""
+    try:
+        dt = datetime.strptime(str(salvo_em)[:16], "%Y-%m-%d %H:%M")
+    except Exception:
+        return {"valida": False, "dias": None, "restam": 0}
+    dias = (agora_br() - dt).days
+    return {"valida": dias < _POSICAO_VALIDADE_DIAS, "dias": dias,
+            "restam": max(0, _POSICAO_VALIDADE_DIAS - dias), "salvo_em": salvo_em}
 def load_hist():     return _load(_HIST_FILE, {})
 def save_hist(d):    _save(_HIST_FILE, d)
 def load_suge():     return _load(_SUGE_FILE, {"historico":[]})
@@ -2253,8 +2266,10 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
     # Próximas etapas do planejamento (versão do cliente, sem conteúdo interno do assessor)
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-    # Foto Patrimonial — da Posição Consolidada salva (se houver), versão técnica
+    # Foto Patrimonial — da Posição Consolidada salva (se válida, < 3 dias), técnica
     _posp = carregar_posicao(conta) if conta else None
+    if _posp and not _posicao_validade(_posp.get("salvo_em")).get("valida"):
+        _posp = None   # Posição vencida: não entra no PDF até re-subir
     if _posp and _posp.get("patrimonio_total"):
         _rpp = _posp.get("resumo") or {}
         def _fbrl(v):
@@ -2977,9 +2992,11 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
             + rows_html +
             '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos, validada com o assessor. Produto de destino específico sujeito à validação.</p></section>')
 
-    # Patrimônio real — da Posição Consolidada salva (se houver), em tom client-safe
+    # Patrimônio real — da Posição Consolidada salva (se válida, < 3 dias), client-safe
     patrimonio_section = ""
     _pos = carregar_posicao(conta) if conta else None
+    if _pos and not _posicao_validade(_pos.get("salvo_em")).get("valida"):
+        _pos = None   # Posição vencida: não entra nos documentos até o assessor re-subir
     if _pos and _pos.get("patrimonio_total"):
         _rp = _pos.get("resumo") or {}
         _cxp = _rp.get("caixa_pct") or 0
@@ -3501,7 +3518,7 @@ select option{background:#F5F8F5}
         onchange="onXpFileChange(this)">
       <div class="icon" style="font-size:25px;margin-bottom:4px">📊</div>
       <p id="upload-hint-text" style="font-size:15px;margin:0">XPerformance, clique para identificar o cliente</p>
-      <p style="font-size:13px;color:#39493F;margin:3px 0 0">ou solte um <b style="color:#8A6A28">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
+      <p style="font-size:13px;color:#39493F;margin:3px 0 0"><b style="color:#8A6A28">Atualizado pelo admin (a cada 30 dias)</b>, em lote via <b style="color:#8A6A28">.zip</b> com até 50 PDFs. Fica salvo na memória.</p>
       <p class="fname" id="fname-xp" style="font-size:14px;margin:2px 0 0"></p>
     </div>
     <!-- Progresso + resultado da importação em lote (ZIP) -->
@@ -3525,7 +3542,7 @@ select option{background:#F5F8F5}
         onchange="onPosicaoFileChange(this)">
       <div class="icon" style="font-size:25px;margin-bottom:4px">🏦</div>
       <p style="font-size:15px;margin:0">Posição Consolidada, clique para ver o patrimônio real</p>
-      <p style="font-size:13px;color:#39493F;margin:3px 0 0">revela o <b style="color:#8A6A28">caixa parado</b> e os vencimentos que o XPerformance não mostra</p>
+      <p style="font-size:13px;color:#39493F;margin:3px 0 0"><b style="color:#8A6A28">Tarefa do assessor:</b> subir a cada 3 dias (validade). Revela o caixa e os vencimentos que o XPerformance não mostra.</p>
       <p class="fname" id="fname-pos" style="font-size:14px;margin:2px 0 0"></p>
     </div>
   </div>
@@ -4781,6 +4798,18 @@ function onPosicaoFileChange(input){
     try{ renderFotoPatrimonial(d); }catch(e){ console.error("renderFotoPatrimonial:",e); }
   }).catch(function(){ if(fn){ fn.textContent="Falha ao processar o PDF"; fn.style.color="#C0673A"; } });
 }
+// Ao carregar um cliente, busca a Posição salva e mostra a validade (3 dias) ou o aviso de pendência
+function carregarPosicaoSalva(conta){
+  var card=document.getElementById("foto-patrimonial-card"); if(!card||!conta) return;
+  fetch("/api/posicao-consolidada?conta="+encodeURIComponent(conta)).then(function(r){return r.json();}).then(function(d){
+    if(d && d.existe && d.patrimonio_total){
+      try{ renderFotoPatrimonial(d); }catch(e){ console.error("renderFotoPatrimonial:",e); }
+    } else {
+      card.innerHTML='<div style="font-size:14px;color:#B0502F;line-height:1.5"><b>🏦 Posição Consolidada pendente.</b> Suba o PDF da Posição acima para ver o patrimônio real (caixa, vencimentos, FGC). Sua tarefa: manter atualizada a cada <b>3 dias</b>.</div>';
+      card.style.display="block";
+    }
+  }).catch(function(){});
+}
 function renderFotoPatrimonial(d){
   var card=document.getElementById("foto-patrimonial-card"); if(!card) return;
   var r=d.resumo||{}, pt=d.patrimonio_total||0, cx=d.saldo_conta||0, inv=d.investido||0, cxp=r.caixa_pct||0;
@@ -4809,6 +4838,13 @@ function renderFotoPatrimonial(d){
     else if(pc!=null && pc<100){ insight="Rendendo "+pc.toFixed(0)+"% do CDI no ano, abaixo do CDI. Avaliar a carteira de crédito e a marcação a mercado."; }
   }
   var insightHtml = insight ? ('<div style="margin-top:12px;padding:12px 14px;background:#F8E3D4;border-radius:8px;font-size:14px;color:#0A0F0C;font-weight:600;line-height:1.5">💡 '+insight+'</div>') : '';
+  // Validade de 3 dias (tarefa do assessor)
+  var vb="";
+  if(d.validade){
+    var vv=d.validade;
+    if(vv.valida){ vb='<div style="margin-top:6px;font-size:13px;color:#2E7D5B;font-weight:700">✓ Posição válida'+(vv.restam!=null?(', subir novamente em '+vv.restam+' dia'+(vv.restam===1?'':'s')):'')+(vv.salvo_em?(' · salva em '+vv.salvo_em):'')+'</div>'; }
+    else { vb='<div style="margin-top:6px;font-size:13px;color:#B0502F;font-weight:700">⚠ Posição vencida (mais de 3 dias). Suba a Posição Consolidada novamente para dados atuais.</div>'; }
+  }
   var vh="";
   if((d.vencimentos||[]).length){
     var rows=d.vencimentos.slice(0,8).map(function(v){
@@ -4853,7 +4889,7 @@ function renderFotoPatrimonial(d){
   var subt = xp ? 'XPerformance + Posição Consolidada' : 'Posição Consolidada';
   card.innerHTML=
     '<h2 style="display:flex;align-items:center;gap:8px">'+titulo+' <span style="font-size:13px;color:#5A6A60;font-weight:400">'+subt+(d.data_ref?(" · "+d.data_ref):"")+'</span></h2>'
-    +insightHtml
+    +vb+insightHtml
     +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 22px;margin-top:12px">'
       +_kpi("Patrimônio real",_fmtBrlPos(pt))
       +_kpi("Caixa parado",_fmtBrlPos(cx),cor,'<p style="font-size:12px;color:'+cor+';margin:2px 0 0;font-weight:700">'+cxp.toFixed(0)+'% do patrimônio</p>')
@@ -5062,6 +5098,7 @@ async function identificarCliente(file){
 
     // ── Mostra o botão para avançar à Parte 2 (Cross Sell + Modelo de Servir)
     try{ mostrarBotaoProximaEtapa(d); }catch(re){ console.error("mostrarBotaoProximaEtapa:", re); }
+    try{ carregarPosicaoSalva(d.conta); }catch(re){ console.error("carregarPosicaoSalva:", re); }
 
     // ── Pré-carrega o painel de histórico da Parte 2 (ainda oculta)
     try{ renderPainelCliente(d); }catch(re){ console.error("renderPainelCliente:", re); }
@@ -5632,6 +5669,7 @@ async function buscarUltimoXpPorCodigo(conta){
       const btn  = document.getElementById("btn-proxima-etapa");
       if(wBtn) wBtn.style.display="block";
       if(btn){ btn.innerHTML="Continuar para a Parte 2, Cross Sell &amp; Modelo de Servir →"; btn.disabled=false; btn.style.opacity="1"; }
+      try{ carregarPosicaoSalva(conta); }catch(e){}
     }
 
     if(lbl){
@@ -8035,11 +8073,21 @@ def _perf_xp_por_conta(conta):
             "data_ref": e.get("data_ref"),
             "perfil_xp": (hentry.get("perfil") if isinstance(hentry, dict) else None)}
 
-@app.route("/api/posicao-consolidada", methods=["POST"])
+@app.route("/api/posicao-consolidada", methods=["GET", "POST"])
 def posicao_consolidada_endpoint():
     """Recebe o PDF da Posição Consolidada e devolve a foto patrimonial parseada
     (patrimônio real, caixa, vencimentos, risco, emissores). Se o cliente já tiver
-    XPerformance salvo, faz o MERGE por conta e devolve a performance junto (bloco 'xp')."""
+    XPerformance salvo, faz o MERGE por conta e devolve a performance junto (bloco 'xp').
+    GET ?conta=X devolve a Posição salva (com validade de 3 dias) ou {existe:false}."""
+    if request.method == "GET":
+        conta = (request.args.get("conta", "") or "").strip()
+        d = carregar_posicao(conta)
+        if not d:
+            return jsonify({"existe": False})
+        d = dict(d)
+        d["validade"] = _posicao_validade(d.get("salvo_em"))
+        d["existe"] = True
+        return jsonify(d)
     f = request.files.get("pdf") or request.files.get("file")
     if not f:
         return jsonify({"erro": "envie o PDF no campo 'pdf'"}), 400
@@ -8053,10 +8101,12 @@ def posicao_consolidada_endpoint():
             perf = _perf_xp_por_conta(dados["conta"])
             if perf:
                 dados["xp"] = perf
-            # Persiste a foto por conta — o Braúna 360 e o PDF puxam daqui.
+            # Carimba a data de upload (validade de 3 dias) e persiste por conta.
+            dados["salvo_em"] = agora_br().strftime("%Y-%m-%d %H:%M")
             store = _load(_POSICAO_FILE, {})
             store[str(dados["conta"]).strip()] = dados
             _save(_POSICAO_FILE, store)
+            dados["validade"] = _posicao_validade(dados["salvo_em"])
     except Exception as e:
         app.logger.warning(f"merge/persist Posicao: {e}")
     return jsonify(dados)
