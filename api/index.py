@@ -228,6 +228,7 @@ _OKR_FILE   = "/tmp/brauna_okrs.json"
 _MSG_FILE   = "/tmp/brauna_msg.json"
 _FICHA_FILE = "/tmp/brauna_ficha.json"
 _HIST_FILE  = "/tmp/brauna_historico.json"
+_POSICAO_FILE = "/tmp/brauna_posicao.json"
 _SUGE_FILE  = "/tmp/brauna_sugestoes.json"
 _HP_PORT_FILE   = "/tmp/brauna_hp_portfolios.json"
 _HP_CENARIO_FILE= "/tmp/brauna_hp_cenario.json"
@@ -791,6 +792,11 @@ def save_clientes(d): _save(_DATA_FILE, d)
 
 def load_fichas():   return _load(_FICHA_FILE, {})
 def save_fichas(d):  _save(_FICHA_FILE, d)
+def carregar_posicao(conta):
+    """Foto patrimonial da Posição Consolidada salva por conta (ou None)."""
+    if not conta:
+        return None
+    return _load(_POSICAO_FILE, {}).get(str(conta).strip())
 def load_hist():     return _load(_HIST_FILE, {})
 def save_hist(d):    _save(_HIST_FILE, d)
 def load_suge():     return _load(_SUGE_FILE, {"historico":[]})
@@ -2247,6 +2253,35 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
     # Próximas etapas do planejamento (versão do cliente, sem conteúdo interno do assessor)
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
+    # Foto Patrimonial — da Posição Consolidada salva (se houver), versão técnica
+    _posp = carregar_posicao(conta) if conta else None
+    if _posp and _posp.get("patrimonio_total"):
+        _rpp = _posp.get("resumo") or {}
+        def _fbrl(v):
+            return ("R$ " + f"{(v or 0):,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        def _esc(s):
+            return str(s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        elems.append(Paragraph("Foto Patrimonial, Posição Consolidada"
+                               + (f" (ref. {_posp.get('data_ref')})" if _posp.get('data_ref') else ""), s_sec))
+        _cxp = _rpp.get("caixa_pct") or 0
+        elems.append(Paragraph(
+            f"Patrimônio real <b>{_fbrl(_posp.get('patrimonio_total'))}</b>. Investido {_fbrl(_posp.get('investido'))}. "
+            f"Caixa em conta <b>{_fbrl(_posp.get('saldo_conta'))}</b> ({_cxp:.0f}% do patrimônio). "
+            f"Para realocar (caixa mais vencimentos em 90 dias): <b>{_fbrl(_rpp.get('oportunidade_90d'))}</b>.", s_body))
+        if _posp.get("risco_atual") is not None:
+            _lbl = {"acima_do_limite": "acima do limite (desenquadrado por excesso)",
+                    "subalocado": "subalocado em risco", "ok": "dentro do limite"}.get(_posp.get("risco_status"), "")
+            elems.append(Paragraph(f"Risco atual {_posp['risco_atual']} de {_posp.get('risco_limite')}, {_lbl}.", s_body))
+        _vs = _posp.get("vencimentos") or []
+        if _vs:
+            _lv = "; ".join(f"{_esc(v['titulo'])} (venc. {v['vencimento']}, {_fbrl(v['liquido'])})" for v in _vs[:6])
+            elems.append(Paragraph(f"<b>Vencimentos:</b> {_lv}.", s_body))
+        _fg = _posp.get("emissores_fgc") or []
+        if _fg:
+            _lf = ", ".join(f"{_esc(e['emissor'])} {_fbrl(e['valor'])}" + (" (ACIMA DO TETO)" if e.get("acima_teto") else "") for e in _fg[:6])
+            elems.append(Paragraph(f"<b>FGC por emissor (teto R$ 250 mil/conglomerado):</b> {_lf}.", s_body))
+        elems.append(Spacer(1, 0.3 * cm))
+
     elems.append(Paragraph("Próximas etapas do planejamento",s_sec))
     for _i,_e in enumerate([
         "Consolidar o patrimônio total, inclusive posições fora da XP.",
@@ -2260,12 +2295,13 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
     if rent.get("portfolio") and rent.get("cdi"):
         p,c=rent["portfolio"],rent["cdi"]
-        def _dpp(a,b): return f'{a-b:+.2f} p.p.'
-        rd=[["Período","Carteira","CDI","Diferença (p.p.)"],
-            ["Mês",f'{p["mes"]:.2f}%',f'{c["mes"]:.2f}%',_dpp(p["mes"],c["mes"])],
-            ["Ano",f'{p["ano"]:.2f}%',f'{c["ano"]:.2f}%',_dpp(p["ano"],c["ano"])],
-            ["12M",f'{p["12m"]:.2f}%',f'{c["12m"]:.2f}%',_dpp(p["12m"],c["12m"])],
-            ["24M",f'{p["24m"]:.2f}%',f'{c["24m"]:.2f}%',_dpp(p["24m"],c["24m"])]]
+        def _pct(v): return "n/d" if v is None else f'{v:.2f}%'
+        def _dpp(a,b): return "n/d" if (a is None or b is None) else f'{a-b:+.2f} p.p.'
+        rd=[["Período","Carteira","CDI","Diferença (p.p.)"]]
+        for _lb,_k in [("Mês","mes"),("Ano","ano"),("12M","12m"),("24M","24m")]:
+            if p.get(_k) is None:   # carteira ainda não tem esse período (ex.: carteira nova)
+                continue
+            rd.append([_lb,_pct(p.get(_k)),_pct(c.get(_k)),_dpp(p.get(_k),c.get(_k))])
         elems.append(Paragraph("Rentabilidade vs. CDI",s_sec))
         tr=Table(rd,colWidths=[3*cm,4*cm,4*cm,4*cm])
         tr.setStyle(TableStyle([
@@ -2940,6 +2976,27 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
             + rows_html +
             '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos, validada com o assessor. Produto de destino específico sujeito à validação.</p></section>')
 
+    # Patrimônio real — da Posição Consolidada salva (se houver), em tom client-safe
+    patrimonio_section = ""
+    _pos = carregar_posicao(conta) if conta else None
+    if _pos and _pos.get("patrimonio_total"):
+        _rp = _pos.get("resumo") or {}
+        _cxp = _rp.get("caixa_pct") or 0
+        _cells = (
+            f'<div class="cell"><div class="lbl">Patrimônio total</div><div class="big">{_b360_brl(_pos.get("patrimonio_total"))}</div><div class="sub">tudo o que você tem hoje</div></div>'
+            f'<div class="cell"><div class="lbl">Investido</div><div class="big">{_b360_brl(_pos.get("investido"))}</div><div class="sub">trabalhando na carteira</div></div>'
+        )
+        if _cxp >= 10 and _rp.get("oportunidade_90d"):
+            _cells += f'<div class="cell gold"><div class="lbl">Pronto para investir</div><div class="big">{_b360_brl(_rp.get("oportunidade_90d"))}</div><div class="sub">disponível hoje mais a vencer</div></div>'
+            _lede_pat = (f'<p class="lede">Você tem <b>{_b360_brl(_rp.get("oportunidade_90d"))}</b> prontos para serem colocados para trabalhar, '
+                         'entre o saldo disponível e aplicações a vencer nos próximos meses. Um bom momento para revisar a alocação com seu assessor.</p>')
+        else:
+            _lede_pat = '<p class="lede">Seu patrimônio está praticamente todo alocado. A seguir, como ele está distribuído.</p>'
+        patrimonio_section = (
+            '<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Seu patrimônio · 03</span></div>'
+            '<div class="kicker">Patrimônio real</div><h2 class="q">O quadro completo do seu patrimônio.</h2>'
+            + _lede_pat + f'<div class="cards">{_cells}</div></section>')
+
     # nome do cliente, ignora placeholders do parser
     _n = (nome or "").strip()
     if (not _n) or ("identificado" in _n.lower()):
@@ -3060,6 +3117,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <div class="dist">{dist_html}</div>
 <div class="distsum">Principais ajustes sugeridos: &nbsp;{ajustes_html}{gap_reais_html}</div></section>
 
+{patrimonio_section}
 {rebal_section}
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Desempenho · 06</span></div>
 <div class="kicker">Performance</div><h2 class="q">A carteira fez seu trabalho?</h2>
@@ -7993,8 +8051,12 @@ def posicao_consolidada_endpoint():
             perf = _perf_xp_por_conta(dados["conta"])
             if perf:
                 dados["xp"] = perf
+            # Persiste a foto por conta — o Braúna 360 e o PDF puxam daqui.
+            store = _load(_POSICAO_FILE, {})
+            store[str(dados["conta"]).strip()] = dados
+            _save(_POSICAO_FILE, store)
     except Exception as e:
-        app.logger.warning(f"merge XP x Posicao: {e}")
+        app.logger.warning(f"merge/persist Posicao: {e}")
     return jsonify(dados)
 
 @app.route("/api/macro", methods=["GET"])
