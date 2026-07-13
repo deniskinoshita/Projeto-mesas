@@ -4690,6 +4690,23 @@ function renderFotoPatrimonial(d){
         rc=(st==="acima_do_limite")?"#B0502F":((st==="subalocado")?"#B4833A":"#2E7D5B");
     rs='<div style="margin-top:12px;font-size:13px;font-weight:700;color:'+rc+'">⚖️ Risco '+d.risco_atual+'/'+d.risco_limite+', '+lbl+'</div>';
   }
+  // Merge com o XPerformance (performance) quando o cliente já tem XP salvo
+  var xp=d.xp||null, ph="", insight="";
+  if(xp){
+    var pc=xp.pct_cdi, pcCor=(pc==null)?"#5A6A60":((pc>=100)?"#2E7D5B":((pc>=80)?"#B4833A":"#B0502F"));
+    var _pctf=function(v){ return (v!=null)?(v.toFixed(2).replace(".",",")+"%"):"n/d"; };
+    ph='<div style="margin-top:16px;padding:12px 14px;background:#F5F8F5;border-radius:10px">'
+      +'<p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 6px">Performance <span style="color:#5A6A60;font-weight:400;text-transform:none;letter-spacing:0">, XPerformance'+(xp.data_ref?(" · "+xp.data_ref):"")+'</span></p>'
+      +'<div style="display:flex;gap:26px;flex-wrap:wrap;font-size:14px">'
+      +'<span style="color:#5A6A60">No ano <b style="color:#1E2A22">'+_pctf(xp.rent_ano)+'</b></span>'
+      +((pc!=null)?('<span style="color:#5A6A60">vs CDI <b style="color:'+pcCor+'">'+pc.toFixed(0)+'%</b></span>'):'')
+      +((xp.rent_24m!=null)?('<span style="color:#5A6A60">24 meses <b style="color:#1E2A22">'+_pctf(xp.rent_24m)+'</b></span>'):'')
+      +'</div></div>';
+    if(cxp>=15){ insight="A carteira investida rende "+((pc!=null)?(pc.toFixed(0)+"% do CDI"):"bem")+", mas "+cxp.toFixed(0)+"% do patrimônio ("+_fmtBrlPos(cx)+") está parado. "+_fmtBrlPos(r.oportunidade_90d)+" prontos para trabalhar."; }
+    else if(d.risco_status==="acima_do_limite"){ insight="Carteira acima do limite de risco ("+d.risco_atual+"/"+d.risco_limite+")"+((pc!=null&&pc<100)?(" e rendendo "+pc.toFixed(0)+"% do CDI no ano"):"")+". Revisar enquadramento."; }
+    else if(pc!=null && pc<100){ insight="Rendendo "+pc.toFixed(0)+"% do CDI no ano, abaixo do CDI. Avaliar a carteira de crédito e a marcação a mercado."; }
+  }
+  var insightHtml = insight ? ('<div style="margin-top:12px;padding:12px 14px;background:#F8E3D4;border-radius:8px;font-size:14px;color:#0A0F0C;font-weight:600;line-height:1.5">💡 '+insight+'</div>') : '';
   var vh="";
   if((d.vencimentos||[]).length){
     var rows=d.vencimentos.slice(0,8).map(function(v){
@@ -4716,16 +4733,22 @@ function renderFotoPatrimonial(d){
     fgh='<div style="margin-top:16px"><p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">Exposição FGC por emissor <span style="color:#5A6A60;font-weight:400;text-transform:none;letter-spacing:0">, teto R$ 250 mil/conglomerado (só emissões bancárias)</span></p><div style="display:flex;flex-wrap:wrap">'+chips+'</div></div>';
   }
   function _kpi(t,v,c,sub){ return '<div><p style="font-size:12px;color:#5A6A60;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0">'+t+'</p><p style="font-size:22px;font-weight:800;color:'+(c||"#1E2A22")+';margin:4px 0 0">'+v+'</p>'+(sub||"")+'</div>'; }
+  var titulo = xp ? '📊 Análise Combinada' : '🏦 Foto Patrimonial';
+  var subt = xp ? 'XPerformance + Posição Consolidada' : 'Posição Consolidada';
   card.innerHTML=
-    '<h2 style="display:flex;align-items:center;gap:8px">🏦 Foto Patrimonial <span style="font-size:13px;color:#5A6A60;font-weight:400">Posição Consolidada'+(d.data_ref?(" · "+d.data_ref):"")+'</span></h2>'
-    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 22px;margin-top:4px">'
+    '<h2 style="display:flex;align-items:center;gap:8px">'+titulo+' <span style="font-size:13px;color:#5A6A60;font-weight:400">'+subt+(d.data_ref?(" · "+d.data_ref):"")+'</span></h2>'
+    +insightHtml
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 22px;margin-top:12px">'
       +_kpi("Patrimônio real",_fmtBrlPos(pt))
       +_kpi("Caixa parado",_fmtBrlPos(cx),cor,'<p style="font-size:12px;color:'+cor+';margin:2px 0 0;font-weight:700">'+cxp.toFixed(0)+'% do patrimônio</p>')
       +_kpi("Investido",_fmtBrlPos(inv))
       +_kpi("Para realocar (caixa + 90d)",_fmtBrlPos(r.oportunidade_90d),"#8A6A28")
     +'</div>'
-    +rs+vh+fgh
-    +'<p style="font-size:12px;color:#5A6A60;margin-top:14px;line-height:1.5">O XPerformance mede a performance do que está investido; esta foto mostra o patrimônio real, incluindo o caixa que ele não exibe.</p>';
+    +ph+rs+vh+fgh
+    +'<p style="font-size:12px;color:#5A6A60;margin-top:14px;line-height:1.5">'
+      +(xp?'Visão combinada: a performance vem do XPerformance (carteira investida) e a foto patrimonial da Posição Consolidada (patrimônio real, com o caixa).'
+          :'Suba também o XPerformance deste cliente para cruzar a performance com esta foto patrimonial.')
+    +'</p>';
   card.style.display="block";
   try{ card.scrollIntoView({behavior:"smooth",block:"nearest"}); }catch(e){}
 }
@@ -7866,10 +7889,41 @@ def cotacoes_endpoint():
     return jsonify({tk: {"preco": v.get("preco"), "variacao_dia": v.get("variacao_dia")}
                     for tk, v in cot.items()})
 
+def _perf_xp_por_conta(conta):
+    """Puxa a performance do XPerformance já salvo (por conta) para o merge com
+    a Posição Consolidada. Retorna None se o cliente ainda não tiver XP salvo."""
+    conta = str(conta or "").strip()
+    if not conta:
+        return None
+    hist = load_hist()
+    hentry = hist.get(f"conta:{conta}") or hist.get(conta)
+    if not hentry:
+        fi = load_fichas().get(f"conta:{conta}") or load_fichas().get(conta)
+        if fi:
+            fkey = f"{fi.get('assessor','')}|{fi.get('nome','')}".lower().strip()
+            hentry = hist.get(fkey)
+    if not hentry:
+        return None
+    ents = hentry.get("entradas") if isinstance(hentry, dict) else hentry
+    if not ents:
+        return None
+    e = ents[0]
+    rent = e.get("rent") or {}
+    port = rent.get("portfolio") or {}
+    cdi = rent.get("cdi") or {}
+    if port.get("ano") is None and cdi.get("ano") is None:
+        return None
+    pct = round(100 * port["ano"] / cdi["ano"], 1) if (port.get("ano") and cdi.get("ano")) else None
+    return {"rent_ano": port.get("ano"), "cdi_ano": cdi.get("ano"), "pct_cdi": pct,
+            "rent_mes": port.get("mes"), "rent_24m": port.get("24m"),
+            "data_ref": e.get("data_ref"),
+            "perfil_xp": (hentry.get("perfil") if isinstance(hentry, dict) else None)}
+
 @app.route("/api/posicao-consolidada", methods=["POST"])
 def posicao_consolidada_endpoint():
     """Recebe o PDF da Posição Consolidada e devolve a foto patrimonial parseada
-    (patrimônio real, caixa em conta, vencimentos, risco, emissores)."""
+    (patrimônio real, caixa, vencimentos, risco, emissores). Se o cliente já tiver
+    XPerformance salvo, faz o MERGE por conta e devolve a performance junto (bloco 'xp')."""
     f = request.files.get("pdf") or request.files.get("file")
     if not f:
         return jsonify({"erro": "envie o PDF no campo 'pdf'"}), 400
@@ -7878,6 +7932,13 @@ def posicao_consolidada_endpoint():
     except Exception as e:
         app.logger.warning(f"posicao_consolidada parse: {e}")
         return jsonify({"erro": "falha ao processar o PDF"}), 500
+    try:
+        if dados.get("conta"):
+            perf = _perf_xp_por_conta(dados["conta"])
+            if perf:
+                dados["xp"] = perf
+    except Exception as e:
+        app.logger.warning(f"merge XP x Posicao: {e}")
     return jsonify(dados)
 
 @app.route("/api/macro", methods=["GET"])
