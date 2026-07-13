@@ -3382,6 +3382,23 @@ select option{background:#F5F8F5}
     <div id="xp-lote-resultado" style="display:none;margin-top:10px"></div>
   </div>
 
+  <!-- LINHA 2b: Upload Posição Consolidada (patrimônio real + caixa) -->
+  <div style="margin-bottom:14px">
+    <label>Posição Consolidada (PDF) <span style="font-size:13px;color:#39493F;font-weight:400">, patrimônio real + caixa</span></label>
+    <div class="upload-area" id="drop-pos" onclick="document.getElementById('pdf-pos').click()" style="cursor:pointer;padding:14px 10px">
+      <input type="file" id="pdf-pos" accept=".pdf"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
+        onchange="onPosicaoFileChange(this)">
+      <div class="icon" style="font-size:25px;margin-bottom:4px">🏦</div>
+      <p style="font-size:15px;margin:0">Posição Consolidada, clique para ver o patrimônio real</p>
+      <p style="font-size:13px;color:#39493F;margin:3px 0 0">revela o <b style="color:#8A6A28">caixa parado</b> e os vencimentos que o XPerformance não mostra</p>
+      <p class="fname" id="fname-pos" style="font-size:14px;margin:2px 0 0"></p>
+    </div>
+  </div>
+
+  <!-- Foto patrimonial (Posição Consolidada) -->
+  <div id="foto-patrimonial-card" class="card" style="display:none;background:#FFFFFF;margin-bottom:14px"></div>
+
   <!-- Preview dos dados extraídos do PDF -->
   <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#EAF4EC;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
 
@@ -4616,6 +4633,60 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
   if(d.ipca_12m)   b.innerHTML+=`<span class="macro-badge">IPCA 12M <span>${d.ipca_12m.toFixed(2)}%</span></span>`;
   if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#39493F">Gestores ref. <span style="color:#3B4D43">${d.ref_contexto}</span></span>`;
 }).catch(()=>{});
+
+// ── Posição Consolidada: foto patrimonial real (complementa o XPerformance) ──
+function _fmtBrlPos(v){ if(v==null||isNaN(v)) return "n/d"; return "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function onPosicaoFileChange(input){
+  var file=input.files[0]; if(!file) return;
+  var fn=document.getElementById("fname-pos"); if(fn){ fn.textContent="Lendo "+file.name+"..."; fn.style.color="#8A6A28"; }
+  var fd=new FormData(); fd.append("pdf", file);
+  fetch("/api/posicao-consolidada",{method:"POST",body:fd}).then(function(r){return r.json();}).then(function(d){
+    if(!d || d.erro){ if(fn){ fn.textContent=(d&&d.erro)||"Não foi possível ler o PDF"; fn.style.color="#C0673A"; } return; }
+    if(fn){ fn.textContent="✓ "+(d.nome||("Conta "+d.conta))+(d.data_ref?(" · ref. "+d.data_ref):""); fn.style.color="#1F9D77"; }
+    try{ renderFotoPatrimonial(d); }catch(e){ console.error("renderFotoPatrimonial:",e); }
+  }).catch(function(){ if(fn){ fn.textContent="Falha ao processar o PDF"; fn.style.color="#C0673A"; } });
+}
+function renderFotoPatrimonial(d){
+  var card=document.getElementById("foto-patrimonial-card"); if(!card) return;
+  var r=d.resumo||{}, pt=d.patrimonio_total||0, cx=d.saldo_conta||0, inv=d.investido||0, cxp=r.caixa_pct||0;
+  var cor=(cxp>=40)?"#B0502F":((cxp>=15)?"#B4833A":"#2E7D5B");
+  var rs="";
+  if(d.risco_atual!=null){
+    var st=d.risco_status,
+        lbl=(st==="acima_do_limite")?"acima do limite (desenquadrado por excesso)":((st==="subalocado")?"subalocado em risco (espaço para alocar)":"dentro do limite"),
+        rc=(st==="acima_do_limite")?"#B0502F":((st==="subalocado")?"#B4833A":"#2E7D5B");
+    rs='<div style="margin-top:12px;font-size:13px;font-weight:700;color:'+rc+'">⚖️ Risco '+d.risco_atual+'/'+d.risco_limite+', '+lbl+'</div>';
+  }
+  var vh="";
+  if((d.vencimentos||[]).length){
+    var rows=d.vencimentos.slice(0,8).map(function(v){
+      return '<tr><td style="padding:6px 10px;border-top:1px solid #EAF4EC">'+v.titulo+'</td>'
+        +'<td style="padding:6px 10px;border-top:1px solid #EAF4EC;white-space:nowrap">'+v.taxa+'</td>'
+        +'<td style="padding:6px 10px;border-top:1px solid #EAF4EC;white-space:nowrap">'+v.vencimento+'</td>'
+        +'<td style="padding:6px 10px;border-top:1px solid #EAF4EC;text-align:right;font-variant-numeric:tabular-nums">'+_fmtBrlPos(v.liquido)+'</td></tr>';
+    }).join("");
+    vh='<div style="margin-top:16px"><p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 6px">Próximos vencimentos</p>'
+      +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>'
+      +'<th style="text-align:left;padding:6px 10px;color:#5A6A60;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Título</th>'
+      +'<th style="text-align:left;padding:6px 10px;color:#5A6A60;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Taxa</th>'
+      +'<th style="text-align:left;padding:6px 10px;color:#5A6A60;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Venc.</th>'
+      +'<th style="text-align:right;padding:6px 10px;color:#5A6A60;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Líquido</th></tr></thead><tbody>'
+      +rows+'</tbody></table></div></div>';
+  }
+  function _kpi(t,v,c,sub){ return '<div><p style="font-size:12px;color:#5A6A60;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0">'+t+'</p><p style="font-size:22px;font-weight:800;color:'+(c||"#1E2A22")+';margin:4px 0 0">'+v+'</p>'+(sub||"")+'</div>'; }
+  card.innerHTML=
+    '<h2 style="display:flex;align-items:center;gap:8px">🏦 Foto Patrimonial <span style="font-size:13px;color:#5A6A60;font-weight:400">Posição Consolidada'+(d.data_ref?(" · "+d.data_ref):"")+'</span></h2>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 22px;margin-top:4px">'
+      +_kpi("Patrimônio real",_fmtBrlPos(pt))
+      +_kpi("Caixa parado",_fmtBrlPos(cx),cor,'<p style="font-size:12px;color:'+cor+';margin:2px 0 0;font-weight:700">'+cxp.toFixed(0)+'% do patrimônio</p>')
+      +_kpi("Investido",_fmtBrlPos(inv))
+      +_kpi("Para realocar (caixa + 90d)",_fmtBrlPos(r.oportunidade_90d),"#8A6A28")
+    +'</div>'
+    +rs+vh
+    +'<p style="font-size:12px;color:#5A6A60;margin-top:14px;line-height:1.5">O XPerformance mede a performance do que está investido; esta foto mostra o patrimônio real, incluindo o caixa que ele não exibe.</p>';
+  card.style.display="block";
+  try{ card.scrollIntoView({behavior:"smooth",block:"nearest"}); }catch(e){}
+}
 
 // Handler global do input XPerformance, chamado pelo onchange inline no HTML
 function onXpFileChange(input){
