@@ -5743,7 +5743,7 @@ async function buscarClientesSalvos(){
     function _chip(c){
       const idx = _clientesSalvos.indexOf(c);
       const dias = _diasDesdeXP(c.data_ultimo_xp);
-      const vencido = (dias===null) || (dias>60);
+      const vencido = (dias===null) || (dias>30);   // XP: atualizado pelo admin a cada 30 dias
       const borda = vencido ? "#E8A87C55" : "#D9E3DB";
       const selo = vencido
         ? `<span style="background:#FBEEEC;color:#C0673A;border:1px solid #E8A87C55;padding:1px 6px;border-radius:8px;font-size:12px;margin-left:5px">🔄 atualizar${dias!==null?` (${dias}d)`:""}</span>`
@@ -5909,10 +5909,10 @@ function carregarFicha(jsonStr){
   const _av = document.getElementById("xp-aviso-atualizar");
   if(_av){
     const _d = _diasDesdeXP(c.data_ultimo_xp);
-    if(_d===null || _d>60){
+    if(_d===null || _d>30){
       _av.innerHTML = "🔄 O XPerformance de <b>"+(c.nome||("#"+(c.conta||"")))+"</b> "+
         (_d===null ? "não tem registro de atualização recente" : ("está com <b>"+_d+" dias</b>"))+
-        ". Suba um relatório novo para atualizar a memória (a cada 60 dias).";
+        ". O admin deve subir um relatório novo para atualizar a memória (a cada 30 dias).";
       _av.style.display="block";
     } else { _av.style.display="none"; }
   }
