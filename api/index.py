@@ -1973,7 +1973,7 @@ def _texto_racional_modelo(modelo_lbl, perfil_lbl):
     )
 
 def _plano_troca_resumo(plano):
-    """Agrega o plano_troca (venda→compra) em listas — MESMA fonte para o PDF (assessor)
+    """Agrega o plano_troca (venda→compra) em listas, MESMA fonte para o PDF (assessor)
     e o Braúna 360° (cliente), garantindo números idênticos. Retorna dict ou None."""
     if not plano or not isinstance(plano, dict):
         return None
@@ -1982,10 +1982,10 @@ def _plano_troca_resumo(plano):
         return None
     red, comp = {}, {}
     for m in movs:
-        ok = (m.get("origem_nome") or "—", m.get("origem_label") or "")
+        ok = (m.get("origem_nome") or "n/d", m.get("origem_label") or "")
         r = red.setdefault(ok, {"nome": ok[0], "label": ok[1], "valor": 0.0, "desagio": m.get("origem_desagio")})
         r["valor"] += m.get("valor") or 0
-        ck = (m.get("destino_produto") or "—", m.get("destino_label") or "")
+        ck = (m.get("destino_produto") or "n/d", m.get("destino_label") or "")
         c = comp.setdefault(ck, {"nome": ck[0], "label": ck[1], "valor": 0.0, "detalhe": m.get("destino_detalhe") or ""})
         c["valor"] += m.get("valor") or 0
     return {
@@ -2043,7 +2043,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
     elems=[]
     elems.append(Paragraph("BRAÚNA INVESTIMENTOS",s_title))
-    elems.append(Paragraph(f"Análise de Alocação por Indexador — Modelo {modelo_lbl}",s_sub))
+    elems.append(Paragraph(f"Análise de Alocação por Indexador, Modelo {modelo_lbl}",s_sub))
     elems.append(HRFlowable(width="100%",thickness=1,color=DOURADO,spaceAfter=8))
 
     perfil_pt={"super_conservadora":"Super Conservadora","conservadora":"Conservadora","moderada":"Moderada","arrojada":"Arrojada","agressiva":"Agressiva"}
@@ -2051,14 +2051,14 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     pat_fmt=f"R$ {patrimonio:,.2f}".replace(",","X").replace(".",",").replace("X",".")
     _conta = str(conta or "").strip()
     _nome  = str(nome or "").strip()
-    cliente_txt = (f"{_conta} — {_nome}" if (_conta and _nome) else (_conta or _nome or "—"))
-    assessor_txt = str(assessor or "").strip() or "—"
+    cliente_txt = (f"{_conta}, {_nome}" if (_conta and _nome) else (_conta or _nome or "n/d"))
+    assessor_txt = str(assessor or "").strip() or "n/d"
     meta=[
         ["Cliente:",cliente_txt,"Assessor:",assessor_txt],
         ["Perfil:",perfil_lbl,"Data ref.:",data_ref],
         ["Patrimônio:",pat_fmt,"Caixa:",f"{caixa:.1f}% (excluído do modelo)"],
     ]
-    # Só mostra a linha macro quando houver dado real (nunca "—")
+    # Só mostra a linha macro quando houver dado real (nunca "n/d")
     if macro.get('selic_meta') and macro.get('ipca_12m'):
         meta.append(["Selic meta:",f"{macro['selic_meta']:.2f}%","IPCA 12M:",f"{macro['ipca_12m']:.2f}%"])
     tm=Table(meta,colWidths=[2.6*cm,7*cm,2.6*cm,5*cm])
@@ -2074,14 +2074,14 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     _blocos = _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl)
     if _blocos:
         elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-        elems.append(Paragraph("Olhar de Mercado — Carteira Atual e Fragilidades",s_sec))
+        elems.append(Paragraph("Olhar de Mercado, Carteira Atual e Fragilidades",s_sec))
         for _tipo,_txt in _blocos:
             if _tipo=="sub":    elems.append(Paragraph(_txt, s_olh_h))
             elif _tipo=="frag": elems.append(Paragraph(_txt, s_frag2))
             else:               elems.append(Paragraph(_txt, s_olh_b))
         elems.append(Spacer(1,0.3*cm))
 
-    # Próximas etapas do planejamento (versão do cliente — sem conteúdo interno do assessor)
+    # Próximas etapas do planejamento (versão do cliente, sem conteúdo interno do assessor)
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
     elems.append(Paragraph("Próximas etapas do planejamento",s_sec))
     for _i,_e in enumerate([
@@ -2138,7 +2138,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     _hh=max(3.2,0.72*len(lbs)+1.2)
     elems.append(Image(ib,width=15*cm,height=_hh*cm)); elems.append(Spacer(1,0.3*cm))
 
-    # Rentabilidade — Cliente vs. Carteira Recomendada vs. CDI (linha)
+    # Rentabilidade, Cliente vs. Carteira Recomendada vs. CDI (linha)
     try:
         _rc = (carregar_retornos() or {}).get("classes", {})
         _pers = [("mes","Mês"),("ano","Ano"),("12m","12M"),("24m","24M")]
@@ -2156,7 +2156,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         _rec_vals = [_rec_pdf(pk)  for pk,_ in _pers]
         _tem_rec = any(v is not None for v in _rec_vals)
         if any(v is not None for v in _cli_vals):
-            _titulo = ("Rentabilidade — Carteira vs. Carteira-Modelo vs. CDI" if _tem_rec
+            _titulo = ("Rentabilidade, Carteira vs. Carteira-Modelo vs. CDI" if _tem_rec
                        else "Rentabilidade da Carteira vs. CDI")
             elems.append(Paragraph(_titulo,s_sec))
             figr,axr=plt.subplots(figsize=(10,3.8))
@@ -2204,7 +2204,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
     if recomendacoes:
         elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-        elems.append(Paragraph(f"Por que estas recomendações — Modelo {modelo_lbl}",s_sec))
+        elems.append(Paragraph(f"Por que estas recomendações, Modelo {modelo_lbl}",s_sec))
         elems.append(Paragraph(_texto_racional_modelo(modelo_lbl, perfil_lbl), s_body))
         elems.append(Spacer(1,0.25*cm))
         elems.append(Paragraph("Recomendações Fundamentadas",s_sec))
@@ -2212,7 +2212,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             _falta = float(rec.get('falta_pp', 0) or 0)
             _valor = patrimonio * (_falta / 100.0)
             elems.append(Paragraph(
-                f"{rec['urgencia']} — {rec['classe']} (falta {_falta:.1f}%) &nbsp;&nbsp;"
+                f"{rec['urgencia']}, {rec['classe']} (falta {_falta:.1f}%) &nbsp;&nbsp;"
                 f"<font size=14 color=\"#FFD966\"><b>{_fmt_brl(_valor)}</b></font>", s_bold))
             elems.append(Paragraph(rec["explicacao"],s_body))
             if rec.get("produtos"):
@@ -2220,14 +2220,14 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                 elems.append(Paragraph(f"Produtos sugeridos: {prods} (sujeitos a disponibilidade, suitability e análise no líquido).",s_sug))
             elems.append(Spacer(1,0.15*cm))
 
-    # ── Plano de Troca (venda → compra) — MESMA fonte do 360°/tela (versão técnica) ──
+    # ── Plano de Troca (venda → compra), MESMA fonte do 360°/tela (versão técnica) ──
     _pt = _plano_troca_resumo(plano_troca)
     if _pt and (_pt["reduzir"] or _pt["comprar"] or _pt["bloqueados"]):
         def _pesc(s):
             return str(s or "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
         _lim = _pt["limite_desagio"]
         elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-        elems.append(Paragraph("Plano de Troca — venda → compra",s_sec))
+        elems.append(Paragraph("Plano de Troca, venda → compra",s_sec))
         elems.append(Paragraph(
             f"Total a realocar: <b>{_fmt_brl(_pt['total'])}</b>. Vende primeiro os ativos de pior rentabilidade; "
             f"deságio acima de {_lim:.0f}% em renda fixa/crédito privado não é realizado (ações e FIIs livres). "
@@ -2243,13 +2243,13 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             det = (f" · {_pesc(it['detalhe'])}") if it.get("detalhe") else ""
             elems.append(Paragraph(f"{_pesc(it['nome'])} <font color=\"#888888\">({_pesc(it['label'])})</font>{det} &nbsp; <b>{_fmt_brl(it['valor'])}</b>", s_sug))
         if _pt["bloqueados"]:
-            elems.append(Paragraph(f"Não vender agora — deságio acima de {_lim:.0f}% (renda fixa / crédito privado)",s_bold))
+            elems.append(Paragraph(f"Não vender agora, deságio acima de {_lim:.0f}% (renda fixa / crédito privado)",s_bold))
             for b in _pt["bloqueados"]:
-                elems.append(Paragraph(f"{_pesc(b.get('nome'))} ({_pesc(b.get('label'))}) — deságio de {abs(b.get('desagio',0) or 0):.1f}% no ano; manter e monitorar até recuperar.", s_sug))
+                elems.append(Paragraph(f"{_pesc(b.get('nome'))} ({_pesc(b.get('label'))}), deságio de {abs(b.get('desagio',0) or 0):.1f}% no ano; manter e monitorar até recuperar.", s_sug))
         if _pt["previdencia"]:
-            elems.append(Paragraph("Previdência — avaliar portabilidade (fora da venda automática)",s_bold))
+            elems.append(Paragraph("Previdência, avaliar portabilidade (fora da venda automática)",s_bold))
             for p in _pt["previdencia"]:
-                elems.append(Paragraph(f"{_pesc(p.get('nome'))} ({_pesc(p.get('label'))}) — portabilidade, regime tributário, carência e IR.", s_sug))
+                elems.append(Paragraph(f"{_pesc(p.get('nome'))} ({_pesc(p.get('label'))}), portabilidade, regime tributário, carência e IR.", s_sug))
         elems.append(Spacer(1,0.2*cm))
 
     # ── Posicionamento das ações + proteção de posições (Stock Guide Levante + XP)
@@ -2262,11 +2262,11 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             if "NEUTRO" in r: return AMARELO
             return colors.HexColor("#AAAAAA")
         def _up(v):
-            if v is None: return "—"
+            if v is None: return "n/d"
             pv=v*100
             return (f"+{pv:.0f}%" if pv>=0 else f"queda de {abs(pv):.0f}%")
         def _brl(v):
-            return ("R$ "+f"{v:,.2f}".replace(",","X").replace(".",",").replace("X",".")) if v is not None else "—"
+            return ("R$ "+f"{v:,.2f}".replace(",","X").replace(".",",").replace("X",".")) if v is not None else "n/d"
         linhas_pos=[["Ativo","% Cart.","Visão (Levante)","Preço-alvo","Upside","Consenso (XP)"]]
         estilo_extra=[]; prot_itens=[]; i=0
         for a in acoes:
@@ -2278,9 +2278,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             g=guia.get(tk) or {}
             lev=g.get("levante"); xp=g.get("xp"); src=lev or xp
             visao_txt=(lev.get("rating") if lev else ((xp.get("rating","")+" (via XP)") if xp else "sem cobertura"))
-            alvo_txt=_brl(src.get("alvo")) if (src and src.get("alvo") is not None) else "—"
-            up_txt=_up(src.get("upside")) if src else "—"
-            cons_txt=((xp.get("consenso") or xp.get("rating","") or "—") if xp else "—")
+            alvo_txt=_brl(src.get("alvo")) if (src and src.get("alvo") is not None) else "n/d"
+            up_txt=_up(src.get("upside")) if src else "n/d"
+            cons_txt=((xp.get("consenso") or xp.get("rating","") or "n/d") if xp else "n/d")
             linhas_pos.append([tk, f'{_peso:.1f}%', visao_txt, alvo_txt, up_txt, cons_txt])
             estilo_extra.append(("TEXTCOLOR",(2,i),(2,i),_rt(lev.get("rating") if lev else (xp.get("rating") if xp else ""))))
             if src and src.get("upside") is not None and src.get("upside")<=0.10:
@@ -2288,7 +2288,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                     "fonte":("Levante" if lev else "XP"),"alvo":src.get("alvo"),"upside":src.get("upside")})
         if len(linhas_pos) > 1:
             elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-            elems.append(Paragraph("Posicionamento das Ações — Levante (casa principal) + XP (visão de mercado)",s_sec))
+            elems.append(Paragraph("Posicionamento das Ações, Levante (casa principal) + XP (visão de mercado)",s_sec))
             tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm])
             est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
                      ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
@@ -2314,17 +2314,17 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                     pass
             STATUS_LBL={"pendente":"Pendente","recusada":"Cliente recusou","estruturada":"Estruturada aplicada","caixa":"Vendido p/ caixa"}
             elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-            elems.append(Paragraph("Proteção de posições — perto do preço-alvo",s_sec))
-            elems.append(Paragraph("Ações a 10% ou menos do preço-alvo. Formas de proteger o ganho: (a) operação estruturada (collar, put de proteção ou fence) — que envolve custo, prazo e limitação de ganho, exigindo suitability; ou (b) realizar parte da posição e alocar em caixa (pós-fixado). A decisão considera preço, tributação e o objetivo do cliente.",s_body))
+            elems.append(Paragraph("Proteção de posições, perto do preço-alvo",s_sec))
+            elems.append(Paragraph("Ações a 10% ou menos do preço-alvo. Formas de proteger o ganho: (a) operação estruturada (collar, put de proteção ou fence), que envolve custo, prazo e limitação de ganho, exigindo suitability; ou (b) realizar parte da posição e alocar em caixa (pós-fixado). A decisão considera preço, tributação e o objetivo do cliente.",s_body))
             elems.append(Spacer(1,0.1*cm))
             for it in prot_itens:
                 st=STATUS_LBL.get(status_por_ticker.get(it["ticker"],"pendente"),"Pendente")
-                elems.append(Paragraph(f'{it["ticker"]} — {it["rating"]} ({it["fonte"]}) · alvo {_brl(it["alvo"])} (upside {_up(it["upside"])}) · Status: {st}',
+                elems.append(Paragraph(f'{it["ticker"]}, {it["rating"]} ({it["fonte"]}) · alvo {_brl(it["alvo"])} (upside {_up(it["upside"])}) · Status: {st}',
                     S("Prot",fontSize=9,leading=13,tc=LARANJA)))
             elems.append(Spacer(1,0.3*cm))
 
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
-    elems.append(Paragraph(f"Consenso dos Gestores — Ref. {ref_contexto}",s_sec))
+    elems.append(Paragraph(f"Consenso dos Gestores, Ref. {ref_contexto}",s_sec))
     elems.append(Paragraph("Convergência: o pós-fixado segue atrativo, mas não deve dominar; a inflação (NTN-B) é a oportunidade do momento, com juro real elevado; o internacional atua como diversificação cambial; e há cautela com alternativos ilíquidos para perfis conservadores.",s_body))
     elems.append(Spacer(1,0.5*cm))
 
@@ -2332,7 +2332,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
     elems.append(Paragraph("Estratégia de realocação",s_sec))
     elems.append(Paragraph(
-        "A transição parte da redução das concentrações identificadas — sobretudo em renda variável — em direção às classes "
+        "A transição parte da redução das concentrações identificadas, sobretudo em renda variável, em direção às classes "
         "sub-alocadas: pós-fixado, inflação (IPCA+) e internacional. A execução deve ser gradual e está sempre condicionada à "
         "validação tributária, ao preço e à liquidez de cada posição e à anuência do cliente. Os valores por classe indicados "
         "nas recomendações são referência de destino, não ordens de execução.", s_body))
@@ -2342,10 +2342,10 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     elems.append(PageBreak())
     elems.append(Paragraph("Plano de ação recomendado",s_sec))
     for _t,_d in [
-        ("Etapa 1 — Diagnóstico completo","Consolidar o patrimônio total (inclusive fora da XP), validar objetivos, prazos e a liquidez necessária."),
-        ("Etapa 2 — Redução de concentração","Revisar as maiores posições em renda variável, definindo realização imediata ou gradual e avaliando os impactos tributários."),
-        ("Etapa 3 — Reequilíbrio","Elevar o pós-fixado, introduzir proteção inflacionária (IPCA+) e diversificação internacional, e avaliar parcela complementar em multimercados."),
-        ("Etapa 4 — Acompanhamento","Revisão periódica, rebalanceamento por faixa e atualização dos objetivos."),
+        ("Etapa 1, Diagnóstico completo","Consolidar o patrimônio total (inclusive fora da XP), validar objetivos, prazos e a liquidez necessária."),
+        ("Etapa 2, Redução de concentração","Revisar as maiores posições em renda variável, definindo realização imediata ou gradual e avaliando os impactos tributários."),
+        ("Etapa 3, Reequilíbrio","Elevar o pós-fixado, introduzir proteção inflacionária (IPCA+) e diversificação internacional, e avaliar parcela complementar em multimercados."),
+        ("Etapa 4, Acompanhamento","Revisão periódica, rebalanceamento por faixa e atualização dos objetivos."),
     ]:
         elems.append(Paragraph(_t, s_olh_h))
         elems.append(Paragraph(_d, s_body))
@@ -2357,7 +2357,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
     elems.append(Paragraph("Metodologia e fontes",s_sec))
     elems.append(Paragraph(
-        f"Modelo de referência: {modelo_lbl} — alocação estratégica por indexador aplicada ao perfil {perfil_lbl}"
+        f"Modelo de referência: {modelo_lbl}, alocação estratégica por indexador aplicada ao perfil {perfil_lbl}"
         + (f", data-base {data_ref}" if data_ref else "") + ". "
         "A análise considera a carteira mantida na XP; posições fora da XP ainda não estão consolidadas "
         "(Open Finance/Open Investment em implantação) e devem ser incorporadas para uma recomendação completa. "
@@ -2370,7 +2370,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     elems.append(Paragraph(
         "Este material tem caráter informativo e não constitui recomendação individualizada de investimento, oferta ou promessa "
         "de rentabilidade. Rentabilidade passada não garante resultados futuros. A adequação de qualquer produto depende do perfil "
-        "(suitability), dos objetivos e da situação financeira do investidor. Braúna Investimentos — escritório vinculado à XP Investimentos.",
+        "(suitability), dos objetivos e da situação financeira do investidor. Braúna Investimentos, escritório vinculado à XP Investimentos.",
         S("Disc",fontSize=8,leading=11,tc=colors.HexColor("#8AA79A"),alignment=TA_CENTER)))
 
     def fundo(canvas,doc):
@@ -2418,7 +2418,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-#  BRAÚNA 360° — Check-up Patrimonial (documento premium do cliente, HTML)
+#  BRAÚNA 360°, Check-up Patrimonial (documento premium do cliente, HTML)
 # ═══════════════════════════════════════════════════════════════════════════════
 def _b360_esc(s):
     return (str(s) if s is not None else "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
@@ -2477,14 +2477,14 @@ def _b360_narrativa(comp, alvo, rent, dims_geral):
             f"{infl:.0f}% do patrimônio em IPCA+ preservam o poder de compra num juro real historicamente alto."))
     if supera:
         achados.append(("g","Rentabilidade acima do CDI",
-            f"+{p12:.1f}% em 12 meses contra ~{c12:.1f}% do CDI — retorno consistente."))
+            f"+{p12:.1f}% em 12 meses contra ~{c12:.1f}% do CDI, retorno consistente."))
     if sobre:
         c,g = sobre[0]
         achados.append(("y",f"Concentração em {lbl(c).lower()}",
             f"{comp.get(c,0):.0f}% em um único bloco. Concentra o resultado num só fator de risco."))
     if intl < 5:
         achados.append(("y","Sem diversificação internacional",
-            "A exposição global está abaixo do adequado — o patrimônio depende quase só do Brasil e do real."))
+            "A exposição global está abaixo do adequado, o patrimônio depende quase só do Brasil e do real."))
     achados.append(("r","Planejamento e sucessão a estruturar",
         "A carteira está boa; a estrutura patrimonial ao redor dela ainda pode ser desenhada."))
     achados = achados[:5]
@@ -2504,7 +2504,7 @@ def _b360_narrativa(comp, alvo, rent, dims_geral):
         "rec":"Consolidar o patrimônio total e desenhar a estrutura sucessória."})
     # prioridades
     prioridades = [
-        ("Planejamento financeiro","A base de tudo — objetivos, prazos e liquidez consolidados antes de qualquer troca."),
+        ("Planejamento financeiro","A base de tudo, objetivos, prazos e liquidez consolidados antes de qualquer troca."),
         ("Diversificação internacional","Reduz a dependência exclusiva do Brasil e protege contra a desvalorização do real."),
     ]
     if sobre:
@@ -2518,8 +2518,8 @@ def _b360_narrativa(comp, alvo, rent, dims_geral):
     return achados, atencao, prioridades[:5], supera
 
 _B360_CSS = """
-:root{color-scheme:light;--paper:#F6F7F6;--card:#FFFFFF;--ink:#ECEFFB;--muted:#5F6F77;--faint:#94A2A8;
---line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#ECEFFB;--marinho:#123047;--gold:#A9834F;--gold-soft:#C7AC80;
+:root{color-scheme:light;--paper:#F6F7F6;--card:#FFFFFF;--ink:#17271E;--muted:#4F5E66;--faint:#6E7C82;
+--line:#E4E8E7;--line-soft:#EEF1F0;--petroleo:#0E3A54;--marinho:#123047;--gold:#8A6A28;--gold-soft:#C7AC80;
 --good:#3E7A5E;--warn:#B4833A;--crit:#A5533E;
 --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;--mx:920px}
@@ -2533,13 +2533,13 @@ _B360_CSS = """
 .q{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,46px);line-height:1.12;letter-spacing:-.01em;text-wrap:balance;margin:0 0 10px}
 .lede{color:var(--muted);font-size:17px;max-width:60ch;margin:0 0 44px}
 .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:14px}
-.cover{background:var(--marinho);color:#17271E;min-height:100vh;display:flex;flex-direction:column;padding:72px 56px}
+.cover{background:var(--marinho);color:#EDE7DA;min-height:100vh;display:flex;flex-direction:column;padding:72px 56px}
 .cover .top{display:flex;justify-content:space-between;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:#8FA4AC}
 .cover .mid{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:var(--mx);margin:0 auto;width:100%}
 .deg{font-family:var(--serif);font-weight:500;letter-spacing:-.02em;line-height:.9;font-size:clamp(88px,17vw,190px)}
 .deg .o{color:var(--gold-soft)}
 .wordmark{font-size:13px;letter-spacing:.44em;text-transform:uppercase;color:#B9C7CD;margin:34px 0 6px}
-.cover h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.6vw,38px);margin:0;color:#17271E}
+.cover h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.6vw,38px);margin:0;color:#F3EEE4}
 .cover .rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);width:120px;margin:30px 0 0}
 .cover .foot{max-width:var(--mx);margin:0 auto;width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-top:26px;border-top:1px solid rgba(255,255,255,.12)}
 .cover .foot .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#7E939B;margin-bottom:6px}
@@ -2564,7 +2564,7 @@ _B360_CSS = """
 .meter .sc{font-size:13.5px;color:var(--muted);text-align:right}
 .meter.low .fill{background:var(--warn)}
 .score{background:var(--marinho);color:#F1ECE2;border-radius:18px;padding:40px 34px;text-align:center}
-.score .n{font-family:var(--serif);font-size:76px;line-height:1;color:#17271E}
+.score .n{font-family:var(--serif);font-size:76px;line-height:1;color:#F3EEE4}
 .score .d{color:var(--gold-soft);font-size:15px}
 .score .t{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8FA4AC;margin-bottom:14px}
 .score .cap{font-size:13px;color:#B9C7CD;margin-top:16px;line-height:1.5}
@@ -2672,7 +2672,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     """Documento BRAÚNA 360° (HTML completo) montado a partir dos dados reais do cliente."""
     e = _b360_esc
     perfil_pt = {"super_conservadora":"Super Conservador","conservadora":"Conservador","moderada":"Moderado",
-                 "arrojada":"Arrojado","agressiva":"Agressivo"}.get(perfil, (perfil or "").title() or "—")
+                 "arrojada":"Arrojado","agressiva":"Agressivo"}.get(perfil, (perfil or "").title() or "n/d")
     alvo = saa_alvo(perfil) or {}
     dims, geral = _raio_x(comp, alvo, rent, checklist_servir)
     achados, atencao, prioridades, supera = _b360_narrativa(comp, alvo, rent, (dims, geral))
@@ -2687,7 +2687,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     _sd = sorted(dims, key=lambda x:-x[1])
     _forte = (_sd[0][0].lower() if _sd else "renda fixa")
     _fraca = (_sd[-1][0].lower() if _sd else "internacional")
-    visao_intro = f"Sua carteira já cumpre bem o essencial — com destaque em {_forte}. O próximo salto de qualidade está em {_fraca}."
+    visao_intro = f"Sua carteira já cumpre bem o essencial, com destaque em {_forte}. O próximo salto de qualidade está em {_fraca}."
 
     # (1) mini-tabela de performance (números reais, estilo enxuto)
     _pf = rent.get("portfolio") or {}; _cd = rent.get("cdi") or {}
@@ -2698,8 +2698,8 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
             pv=_pf.get(k); cv=_cd.get(k)
             if pv is None: continue
             dpp=(pv-cv) if (cv is not None) else None
-            dtxt=(f'<span class="{"pp" if dpp>=0 else "pn"}">{dpp:+.2f} p.p.</span>' if dpp is not None else "—")
-            rows.append(f'<div>{lb}</div><div>{pv:.2f}%</div><div>{("%.2f%%"%cv) if cv is not None else "—"}</div><div>{dtxt}</div>')
+            dtxt=(f'<span class="{"pp" if dpp>=0 else "pn"}">{dpp:+.2f} p.p.</span>' if dpp is not None else "n/d")
+            rows.append(f'<div>{lb}</div><div>{pv:.2f}%</div><div>{("%.2f%%"%cv) if cv is not None else "n/d"}</div><div>{dtxt}</div>')
         perf_table_html = '<div class="ptab">'+"".join(rows)+'</div>'
 
     # (2) gaps em R$ (os mesmos 3 ajustes, agora em valores)
@@ -2714,13 +2714,13 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     _acs = [a for a in (acoes or []) if float(a.get("perc",0) or 0) >= 0.1]
     if _acs:
         guia = (carregar_stock_guide() or {}).get("acoes", {})
-        def _uptxt(v): return "—" if v is None else (f"+{v*100:.0f}%" if v>=0 else f"−{abs(v)*100:.0f}%")
+        def _uptxt(v): return "n/d" if v is None else (f"+{v*100:.0f}%" if v>=0 else f"−{abs(v)*100:.0f}%")
         linhas=['<div class="posh"><div>Ativo</div><div>Peso</div><div>Visão (Levante)</div><div class="av">Preço-alvo</div><div class="up">Potencial</div></div>']
         for a in sorted(_acs, key=lambda x:-(float(x.get("perc",0) or 0)))[:10]:
             tk=str(a.get("ticker") or a.get("nome") or "").upper()[:8]
             g=guia.get(tk) or {}; lev=g.get("levante"); xp=g.get("xp"); src=lev or xp
             visao=(lev.get("rating") if lev else ((str(xp.get("rating",""))+" (XP)") if xp else "sem cobertura"))
-            alvo_v=_b360_brl(src.get("alvo")) if (src and src.get("alvo") is not None) else "—"
+            alvo_v=_b360_brl(src.get("alvo")) if (src and src.get("alvo") is not None) else "n/d"
             up_v=src.get("upside") if src else None
             linhas.append(f'<div class="posr"><div class="tk">{_b360_esc(tk)}</div>'
                 f'<div class="pz">{float(a.get("perc",0) or 0):.1f}%</div>'
@@ -2733,7 +2733,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
             + "".join(linhas) +
             '<p style="font-size:12px;color:var(--faint);margin-top:18px">Preço-alvo é referência; o preço vigente vem do XPerformance. Não constitui recomendação individualizada.</p></section>')
 
-    # (4) seção de rebalanceamento — MESMA fonte do PDF/tela (plano_troca), versão objetiva p/ cliente
+    # (4) seção de rebalanceamento, MESMA fonte do PDF/tela (plano_troca), versão objetiva p/ cliente
     rebal_section = ""
     _pt = _plano_troca_resumo(plano_troca)
     if _pt and (_pt["reduzir"] or _pt["comprar"]):
@@ -2753,12 +2753,12 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
         rebal_section = (
             '<section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Rebalanceamento · 06</span></div>'
             '<div class="kicker">Plano de rebalanceamento</div><h2 class="q">O que reduzir e onde aplicar.</h2>'
-            f'<p class="lede">Realocar cerca de <b style="color:var(--petroleo)">{_b360_brl(_pt["total"])}</b> — reduzindo posições acima do modelo e aplicando em produtos alinhados ao seu perfil. Execução gradual, priorizando aportes, caixa e vencimentos, para cuidar da tributação e da marcação a mercado.</p>'
+            f'<p class="lede">Realocar cerca de <b style="color:var(--petroleo)">{_b360_brl(_pt["total"])}</b>, reduzindo posições acima do modelo e aplicando em produtos alinhados ao seu perfil. Execução gradual, priorizando aportes, caixa e vencimentos, para cuidar da tributação e da marcação a mercado.</p>'
             '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">'
             + _col("Reduzir", _pt["reduzir"], "var(--faint)")
             + _col("Aplicar", _pt["comprar"], "var(--petroleo)")
             + '</div>' + nota +
-            '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos — validada com o assessor.</p></section>')
+            '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos, validada com o assessor.</p></section>')
     # Fallback: rebalanceamento simples por classe quando não há plano_troca
     rebal = None if _pt else _b360_rebal(comp, alvo, patrimonio, carteira)
     if rebal:
@@ -2771,15 +2771,15 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
             '<div class="kicker">Movimentações sugeridas</div><h2 class="q">Como sair de onde você está e chegar ao modelo.</h2>'
             f'<p class="lede">Reduzir cerca de <b style="color:var(--petroleo)">{_b360_brl(rebal["tot_red"])}</b> em '
             f'{_b360_esc(", ".join(rebal["src_lbls"]))}, direcionando para {_b360_esc(rebal["dest_lbls"])}. '
-            'A execução é gradual — priorizando novos aportes, caixa e vencimentos, para evitar custo tributário e perdas por marcação.</p>'
+            'A execução é gradual, priorizando novos aportes, caixa e vencimentos, para evitar custo tributário e perdas por marcação.</p>'
             '<div class="rbh"><div>Origem</div><div>Ação</div><div class="rv">Valor aprox.</div><div>Destino</div><div>Prazo</div></div>'
             + rows_html +
-            '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos — validada com o assessor. Produto de destino específico sujeito à validação.</p></section>')
+            '<p style="font-size:12px;color:var(--faint);margin-top:18px;line-height:1.55">Proposta preliminar de rebalanceamento. A execução deve considerar suitability, liquidez, carência, tributação, vencimentos, marcação a mercado e a disponibilidade dos produtos, validada com o assessor. Produto de destino específico sujeito à validação.</p></section>')
 
-    # nome do cliente — ignora placeholders do parser
+    # nome do cliente, ignora placeholders do parser
     _n = (nome or "").strip()
     if (not _n) or ("identificado" in _n.lower()):
-        _n = (f"Conta {conta}" if conta else "—")
+        _n = (f"Conta {conta}" if conta else "n/d")
     nome_disp = _n
 
     # snapshot
@@ -2787,7 +2787,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
     nclasses = sum(1 for c in CATS if (comp.get(c,0) or 0) >= 3)
     r12 = (rent.get("portfolio") or {}).get("12m")
     pat_curto = f"R$ {patrimonio/1e6:.2f} mi".replace(".",",") if patrimonio and patrimonio>=1e6 else _b360_brl(patrimonio)
-    # renda passiva estimada — FIIs distribuem ~10% a.a. (referência, não garantia)
+    # renda passiva estimada, FIIs distribuem ~10% a.a. (referência, não garantia)
     fiis_pct = comp.get("fiis",0) or 0
     renda_mes = (patrimonio*(fiis_pct/100.0)*0.10/12.0) if (patrimonio and fiis_pct) else 0
     if renda_mes >= 1000:
@@ -2801,7 +2801,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
         ("hi","Patrimônio",pat_curto,_b360_brl(patrimonio)),
         ("","Perfil",perfil_pt,"Suitability informado"),
         ("","Objetivo",obj,"Acúmulo de longo prazo" if obj=="Crescimento" else "Renda e proteção"),
-        ("gold","Rentabilidade 12m",(f"+{r12:.1f}%" if r12 is not None else "—"),("Acima do CDI" if supera else "vs. CDI")),
+        ("gold","Rentabilidade 12m",(f"+{r12:.1f}%" if r12 is not None else "n/d"),("Acima do CDI" if supera else "vs. CDI")),
         ("","Diversificação",f'{nclasses} <span style="font-size:18px;color:var(--muted)">classes</span>',f"{9-nclasses} ainda ausentes"),
         ("","Proteção inflação",f"{infl:.0f}%","Em IPCA+"),
         ("","Renda passiva",renda_val,renda_sub),
@@ -2821,7 +2821,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
         f'<div class="track"><div class="fill" style="width:{v}%"></div></div><div class="sc num">{v}</div></div>'
         for k,v in dims)
 
-    # distribuição — classes com posição atual OU alvo relevante
+    # distribuição, classes com posição atual OU alvo relevante
     dist_cats = [c for c in ["pos_fixado","inflacao","internacional","pre_fixado","multimercado","acoes","fiis","alternativos"]
                  if (comp.get(c,0) or 0) >= 0.5 or (alvo.get(c,0) or 0) >= 0.5]
     dmax = max([comp.get(c,0) or 0 for c in dist_cats] + [alvo.get(c,0) or 0 for c in dist_cats] + [1])
@@ -2861,7 +2861,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 
     html_doc = f"""<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Braúna 360° — Check-up Patrimonial</title><style>{_B360_CSS}</style></head>
+<title>Braúna 360°, Check-up Patrimonial</title><style>{_B360_CSS}</style></head>
 <body><div class="doc">
 <button class="printbtn" onclick="window.print()">⬇ Salvar em PDF</button>
 <section class="cover"><div class="top"><span>Braúna Investimentos</span><span>Documento confidencial</span></div>
@@ -2869,8 +2869,8 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <h1>Check-up Patrimonial</h1><div class="rule"></div>
 <div class="prep">Check-up preparado para <b>{e(nome_disp)}</b></div></div>
 <div class="foot"><div><div class="lbl">Cliente</div><div class="val">{e(nome_disp)}</div></div>
-<div><div class="lbl">Assessor</div><div class="val">{e(assessor or "—")}</div></div>
-<div><div class="lbl">Data de referência</div><div class="val num">{e(data_ref or "—")}</div></div></div></section>
+<div><div class="lbl">Assessor</div><div class="val">{e(assessor or "n/d")}</div></div>
+<div><div class="lbl">Data de referência</div><div class="val num">{e(data_ref or "n/d")}</div></div></div></section>
 
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Visão geral · 02</span></div>
 <div class="kicker">Sua carteira em 30 segundos</div><h2 class="q">O essencial do seu patrimônio, em um olhar.</h2>
@@ -2890,7 +2890,7 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 <div class="cap">Fundamentos sólidos de renda fixa e liquidez. O caminho de evolução está em internacional, planejamento e sucessão.</div></div></div></section>
 
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Alocação · 05</span></div>
-<div class="kicker">Como seu patrimônio está distribuído</div><h2 class="q">Onde você está — e para onde faz sentido caminhar.</h2>
+<div class="kicker">Como seu patrimônio está distribuído</div><h2 class="q">Onde você está, e para onde faz sentido caminhar.</h2>
 <p class="lede">A carteira atual comparada ao modelo estratégico para o seu perfil.</p>
 <div class="legend"><span><i style="background:var(--petroleo)"></i>Atual</span><span><i style="background:var(--gold)"></i>Recomendada</span></div>
 <div class="dist">{dist_html}</div>
@@ -2899,12 +2899,12 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 {rebal_section}
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Desempenho · 06</span></div>
 <div class="kicker">Performance</div><h2 class="q">A carteira fez seu trabalho?</h2>
-<p class="lede">Quatro perguntas objetivas — antes de qualquer número.</p>
+<p class="lede">Quatro perguntas objetivas, antes de qualquer número.</p>
 <div class="verds">{perf_html}</div>{perf_table_html}</section>
 
 {acoes_section}
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Pontos de atenção · 08</span></div>
-<div class="kicker">Pontos de atenção</div><h2 class="q">O que merece cuidado — e o que fazer a respeito.</h2>
+<div class="kicker">Pontos de atenção</div><h2 class="q">O que merece cuidado, e o que fazer a respeito.</h2>
 <div class="att">{att_html}</div></section>
 
 <section class="page"><div class="eyebrow"><b>Braúna 360°</b><span>Plano de evolução · 09</span></div>
@@ -2922,10 +2922,10 @@ def gerar_brauna360_html(nome, perfil, comp, rent, patrimonio, data_ref, conta="
 
 <section class="close"><div class="in"><div class="kicker">Nossa visão</div>
 <p class="visao-intro">{e(visao_intro)}</p>
-<blockquote>Patrimônio é muito maior do que rentabilidade. É proteção, é liquidez no momento certo, é a tranquilidade de quem sabe para onde vai — e o cuidado com quem virá depois. Seu ponto de partida é sólido. A partir daqui, nosso trabalho é transformar uma boa carteira num patrimônio verdadeiramente bem estruturado.</blockquote>
+<blockquote>Patrimônio é muito maior do que rentabilidade. É proteção, é liquidez no momento certo, é a tranquilidade de quem sabe para onde vai, e o cuidado com quem virá depois. Seu ponto de partida é sólido. A partir daqui, nosso trabalho é transformar uma boa carteira num patrimônio verdadeiramente bem estruturado.</blockquote>
 <div class="sig"><span>Braúna Investimentos · <b>Check-up Patrimonial 360°</b></span><span>{e(assessor or "")}</span></div></div></section>
 </div></body></html>"""
-    # Renumeração dinâmica das páginas (02, 03, …) — robusta à inserção de seções
+    # Renumeração dinâmica das páginas (02, 03, …), robusta à inserção de seções
     import re as _re360
     _pg = [1]
     def _rn(_m):
