@@ -1590,6 +1590,95 @@ def extrair_texto_pdf(pdf_bytes):
     return texto
 
 
+# ── Parser da Posição Consolidada (complementa o XPerformance) ────────────────
+# O XPerformance mede performance da carteira INVESTIDA; a Posição Consolidada
+# mostra o patrimônio REAL (com o caixa em conta), vencimentos, risco e emissores.
+_POS_TIPOS_RF = r'LCI|LCA|LC|LF|LFSN|LIG|CDB|RDB|CRA|CRI|CDCA|CCB|DEB|COE'
+
+def _pos_brl(s):
+    m = re.search(r'R\$\s*([\d.]+,\d{2})', s or "")
+    return float(m.group(1).replace(".", "").replace(",", ".")) if m else None
+
+def parse_posicao_consolidada(pdf_bytes):
+    """Foto patrimonial a partir da Posição Consolidada (XP): patrimônio real,
+    caixa parado em conta, vencimentos, risco/suitability e emissores (FGC)."""
+    try:
+        texto = extrair_texto_pdf(pdf_bytes)
+    except Exception:
+        return {"fonte": "posicao_consolidada", "erro": "falha ao ler o PDF"}
+    return _parse_posicao_consolidada_texto(texto)
+
+def _parse_posicao_consolidada_texto(texto):
+    L = [l.rstrip() for l in (texto or "").split("\n")]
+    o = {"fonte": "posicao_consolidada"}
+    # Identificação
+    for l in L:
+        m = re.search(r'Cliente:\s*(.+?)\s+Conta:\s*(\d+)\s+Perfil:\s*([A-Za-zÀ-ÿ]+)\s+Assessoria:\s*(.+)', l)
+        if m:
+            o["nome"] = m.group(1).strip(); o["conta"] = m.group(2)
+            o["perfil"] = m.group(3).strip().lower()
+            o["assessor"] = re.sub(r'\(.*?\)', '', m.group(4)).strip()
+            break
+    m = re.search(r'Data de refer[êe]ncia:\s*(\d{2}/\d{2}/\d{4})', texto or "")
+    o["data_ref"] = m.group(1) if m else ""
+    # Patrimônio total / investido / caixa em conta (linha-cabeçalho + próxima)
+    for i, l in enumerate(L):
+        if re.search(r'PATRIM[ÔO]NIO\s+INVESTIMENTO\s+SALDO DISPON', l) and i + 1 < len(L):
+            v = re.findall(r'R\$\s*[\d.]+,\d{2}', L[i + 1])
+            if len(v) >= 3:
+                o["patrimonio_total"] = _pos_brl(v[0]); o["investido"] = _pos_brl(v[1]); o["saldo_conta"] = _pos_brl(v[2])
+            break
+    if not o.get("patrimonio_total"):
+        m = re.search(r'PATRIM[ÔO]NIO TOTAL\s+(R\$\s*[\d.]+,\d{2})', texto or "")
+        o["patrimonio_total"] = _pos_brl(m.group(1)) if m else None
+    if o.get("saldo_conta") is None:
+        m = re.search(r'SALDO DISPON[ÍI]VEL\s+(R\$\s*[\d.]+,\d{2})', texto or "")
+        o["saldo_conta"] = _pos_brl(m.group(1)) if m else None
+    # Próximos vencimentos (fonte mais limpa por ativo)
+    venc = []
+    for l in L:
+        m = re.match(r'^(.+?)\s+(\d{2}/\d{2}/\d{4})\s+(\d{2}/\d{2}/\d{4})\s+(R\$\s*[\d.]+,\d{2})\s+(.+?)\s+(\d+)\s+(R\$\s*[\d.]+,\d{2})$', l)
+        if m and re.match(r'^(' + _POS_TIPOS_RF + r')\b', m.group(1)):
+            venc.append({"titulo": m.group(1).strip(), "aplicacao": m.group(2), "vencimento": m.group(3),
+                         "aplicado": _pos_brl(m.group(4)), "taxa": m.group(5).strip(),
+                         "ir": int(m.group(6)), "liquido": _pos_brl(m.group(7))})
+    o["vencimentos"] = venc
+    # Emissores (best-effort) para FGC por conglomerado
+    emis = {}
+    for l in L:
+        m = re.match(r'^(' + _POS_TIPOS_RF + r')\s+(.+?)\s*-\s*(?:[A-Z]{3}/\d{4}\b|$)', l)
+        if m:
+            nome = re.sub(r'\s+', ' ', m.group(2).strip())
+            if 2 < len(nome) < 40 and not nome[0].isdigit():
+                emis[nome] = emis.get(nome, 0) + 1
+    o["emissores"] = [{"emissor": k, "n": v} for k, v in sorted(emis.items(), key=lambda x: -x[1])]
+    # Risco / suitability (N Pts (Limite: X)) — status numérico confiável
+    m = re.search(r'(\d+)\s*Pts\s*\(Limite:\s*(\d+)\)', texto or "")
+    if m:
+        o["risco_atual"] = int(m.group(1)); o["risco_limite"] = int(m.group(2))
+        uso = o["risco_atual"] / o["risco_limite"] if o["risco_limite"] else 0
+        o["risco_uso"] = round(uso, 2)
+        o["risco_status"] = "acima_do_limite" if uso > 1.0 else ("subalocado" if uso < 0.6 else "ok")
+    # Resumo computado: caixa % do patrimônio + ladder de vencimentos
+    def _dt(s):
+        try: return datetime.strptime(s, "%d/%m/%Y").date()
+        except Exception: return None
+    ref = _dt(o.get("data_ref") or "") or agora_br().date()
+    d30 = d60 = d90 = 0.0
+    for v in venc:
+        dv = _dt(v["vencimento"])
+        if not dv: continue
+        dd = (dv - ref).days
+        if 0 <= dd <= 30: d30 += v["liquido"] or 0
+        if 0 <= dd <= 60: d60 += v["liquido"] or 0
+        if 0 <= dd <= 90: d90 += v["liquido"] or 0
+    cx = o.get("saldo_conta") or 0; pt = o.get("patrimonio_total") or 0
+    o["resumo"] = {"caixa_pct": round(100 * cx / pt, 1) if pt else 0,
+                   "venc_30d": round(d30, 2), "venc_60d": round(d60, 2), "venc_90d": round(d90, 2),
+                   "oportunidade_90d": round(cx + d90, 2)}
+    return o
+
+
 def calcular_desvios(comp, modelo):
     resultado = []
     for cat in CATS:
@@ -7663,6 +7752,20 @@ def cotacoes_endpoint():
     cot = _buscar_cotacoes_brapi(tickers[:40])
     return jsonify({tk: {"preco": v.get("preco"), "variacao_dia": v.get("variacao_dia")}
                     for tk, v in cot.items()})
+
+@app.route("/api/posicao-consolidada", methods=["POST"])
+def posicao_consolidada_endpoint():
+    """Recebe o PDF da Posição Consolidada e devolve a foto patrimonial parseada
+    (patrimônio real, caixa em conta, vencimentos, risco, emissores)."""
+    f = request.files.get("pdf") or request.files.get("file")
+    if not f:
+        return jsonify({"erro": "envie o PDF no campo 'pdf'"}), 400
+    try:
+        dados = parse_posicao_consolidada(f.read())
+    except Exception as e:
+        app.logger.warning(f"posicao_consolidada parse: {e}")
+        return jsonify({"erro": "falha ao processar o PDF"}), 500
+    return jsonify(dados)
 
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
