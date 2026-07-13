@@ -1643,15 +1643,40 @@ def _parse_posicao_consolidada_texto(texto):
                          "aplicado": _pos_brl(m.group(4)), "taxa": m.group(5).strip(),
                          "ir": int(m.group(6)), "liquido": _pos_brl(m.group(7))})
     o["vencimentos"] = venc
-    # Emissores (best-effort) para FGC por conglomerado
-    emis = {}
-    for l in L:
-        m = re.match(r'^(' + _POS_TIPOS_RF + r')\s+(.+?)\s*-\s*(?:[A-Z]{3}/\d{4}\b|$)', l)
-        if m:
-            nome = re.sub(r'\s+', ' ', m.group(2).strip())
-            if 2 < len(nome) < 40 and not nome[0].isdigit():
-                emis[nome] = emis.get(nome, 0) + 1
-    o["emissores"] = [{"emissor": k, "n": v} for k, v in sorted(emis.items(), key=lambda x: -x[1])]
+    # RF por ativo (nome + linha de dados): tipo, emissor, classe, vencimento, valor.
+    # A linha de dados tem 3 datas + taxa? + 3 inteiros + 4 valores R$ (último = líquido).
+    _DATAROW = re.compile(r'(\d{2}/\d{2}/\d{4})\s+(\d{2}/\d{2}/\d{4})\s+(\d{2}/\d{2}/\d{4})\s+'
+                          r'(.*?)(\d+)\s+(\d+)\s+(\d+)\s+(R\$\s*[\d.]+,\d{2})\s+(R\$\s*[\d.]+,\d{2})'
+                          r'\s+(R\$\s*[\d.]+,\d{2})\s+(R\$\s*[\d.]+,\d{2})\s*$')
+    def _norm_emis(n):
+        n = re.sub(r'\s+', ' ', n or '').strip().upper()
+        n = re.sub(r'\s*(S\.?/?A\.?|LTDA)\.?$', '', n).strip()
+        n = re.sub(r'^BANCO\s+', '', n).strip()
+        return n
+    rf_ativos = []; classe_atual = None
+    for i, l in enumerate(L):
+        mc = re.search(r'([\d.,]+)%\s*\|\s*(Prefixada|Pós-Fixada|Pos-Fixada|Inflação|Inflacao)', l)
+        if mc: classe_atual = mc.group(2)
+        m = _DATAROW.search(l)
+        if not m:
+            continue
+        prefix = l[:m.start()].strip()
+        nome_ativo = prefix if re.match(r'^(' + _POS_TIPOS_RF + r'|NTN|LTN|LFT)\b', prefix) else (L[i-1].strip() if i > 0 else "")
+        tm = re.match(r'^(' + _POS_TIPOS_RF + r')\s+(.+?)\s+-(?:\s|$)', nome_ativo)
+        rf_ativos.append({"tipo": tm.group(1) if tm else None,
+                          "emissor": _norm_emis(tm.group(2)) if tm else None,
+                          "classe": classe_atual, "vencimento": m.group(3),
+                          "valor": _pos_brl(m.group(11))})
+    o["rf_ativos"] = rf_ativos
+    # FGC por emissor: só emissões bancárias cobertas (CDB/RDB/LCI/LCA/LC/LIG/LFSN/LF).
+    # CRA, CRI, CDCA, DEB, COE e Tesouro (NTN/LTN/LFT) NÃO têm FGC.
+    _FGC_TIPOS = {"CDB", "RDB", "LCI", "LCA", "LC", "LIG", "LFSN", "LF"}
+    fgc = {}
+    for a in rf_ativos:
+        if a["tipo"] in _FGC_TIPOS and a["emissor"] and a["valor"]:
+            fgc[a["emissor"]] = fgc.get(a["emissor"], 0.0) + a["valor"]
+    o["emissores_fgc"] = [{"emissor": k, "valor": round(v, 2), "acima_teto": v > 250000}
+                          for k, v in sorted(fgc.items(), key=lambda x: -x[1])]
     # Risco / suitability (N Pts (Limite: X)) — status numérico confiável
     m = re.search(r'(\d+)\s*Pts\s*\(Limite:\s*(\d+)\)', texto or "")
     if m:
@@ -4673,6 +4698,15 @@ function renderFotoPatrimonial(d){
       +'<th style="text-align:right;padding:6px 10px;color:#5A6A60;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Líquido</th></tr></thead><tbody>'
       +rows+'</tbody></table></div></div>';
   }
+  var fgh="";
+  if((d.emissores_fgc||[]).length){
+    var chips=d.emissores_fgc.slice(0,8).map(function(e){
+      var over=e.acima_teto, bg=over?"#F6E4DB":"#F5F8F5", cc=over?"#B0502F":"#1E2A22";
+      return '<span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;background:'+bg+';border:1px solid #EAF4EC;border-radius:8px;padding:4px 10px;margin:0 6px 6px 0">'
+        +'<b style="color:'+cc+'">'+e.emissor+'</b><span style="color:#5A6A60;font-variant-numeric:tabular-nums">'+_fmtBrlPos(e.valor)+'</span>'+(over?' <span style="color:#B0502F;font-weight:700">⚠ acima do teto</span>':'')+'</span>';
+    }).join("");
+    fgh='<div style="margin-top:16px"><p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">Exposição FGC por emissor <span style="color:#5A6A60;font-weight:400;text-transform:none;letter-spacing:0">, teto R$ 250 mil/conglomerado (só emissões bancárias)</span></p><div style="display:flex;flex-wrap:wrap">'+chips+'</div></div>';
+  }
   function _kpi(t,v,c,sub){ return '<div><p style="font-size:12px;color:#5A6A60;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0">'+t+'</p><p style="font-size:22px;font-weight:800;color:'+(c||"#1E2A22")+';margin:4px 0 0">'+v+'</p>'+(sub||"")+'</div>'; }
   card.innerHTML=
     '<h2 style="display:flex;align-items:center;gap:8px">🏦 Foto Patrimonial <span style="font-size:13px;color:#5A6A60;font-weight:400">Posição Consolidada'+(d.data_ref?(" · "+d.data_ref):"")+'</span></h2>'
@@ -4682,7 +4716,7 @@ function renderFotoPatrimonial(d){
       +_kpi("Investido",_fmtBrlPos(inv))
       +_kpi("Para realocar (caixa + 90d)",_fmtBrlPos(r.oportunidade_90d),"#8A6A28")
     +'</div>'
-    +rs+vh
+    +rs+vh+fgh
     +'<p style="font-size:12px;color:#5A6A60;margin-top:14px;line-height:1.5">O XPerformance mede a performance do que está investido; esta foto mostra o patrimônio real, incluindo o caixa que ele não exibe.</p>';
   card.style.display="block";
   try{ card.scrollIntoView({behavior:"smooth",block:"nearest"}); }catch(e){}
