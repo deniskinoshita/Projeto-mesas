@@ -1352,12 +1352,20 @@ def extrair_xperformance(pdf_bytes):
             try: patrimonio = float(pat_m.group(1).replace(".","").replace(",","."))
             except: pass
 
-    # Rentabilidade portfolio e CDI
+    # Rentabilidade portfolio e CDI (tabela-resumo "Referências (%)": Mês Ano 12M 24M).
+    # O Portfólio pode ter "-" em 12M/24M (carteira nova) — por isso ancoramos na
+    # tabela-resumo, senão a regex de 4 percentuais casava o HISTÓRICO MENSAL por engano.
     rent = {}
-    mp = re.search(r"Portf.lio\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%", texto)
+    def _rv(x):
+        x = (x or "").strip()
+        return None if x in ("-", "") else float(x.replace("%", "").replace(",", "."))
+    mp = re.search(r"Refer[êe]ncias?\s*\(%\)[^\n]*\n(?:[^\n]*\n){0,6}?\s*Portf.lio\s+"
+                   r"(-|[-\d,]+%)\s+(-|[-\d,]+%)\s+(-|[-\d,]+%)\s+(-|[-\d,]+%)\s*(?:\n|$)", texto)
+    if not mp:  # fallback: formato antigo (4 percentuais na mesma linha)
+        mp = re.search(r"Portf.lio\s+([-\d,]+%)\s+([-\d,]+%)\s+([-\d,]+%)\s+([-\d,]+%)", texto)
     mc = re.search(r"CDI\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%\s+([-\d,]+)%", texto)
-    if mp: rent["portfolio"] = {k: float(mp.group(i+1).replace(",",".")) for i,k in enumerate(["mes","ano","12m","24m"])}
-    if mc: rent["cdi"]       = {k: float(mc.group(i+1).replace(",",".")) for i,k in enumerate(["mes","ano","12m","24m"])}
+    if mp: rent["portfolio"] = {k: _rv(mp.group(i+1)) for i, k in enumerate(["mes", "ano", "12m", "24m"])}
+    if mc: rent["cdi"]       = {k: float(mc.group(i+1).replace(",", ".")) for i, k in enumerate(["mes", "ano", "12m", "24m"])}
 
     # Composição, suporta acentos normais E substituídos por ? (encoding pdfplumber)
     # Mapa amplo: nomes como aparecem no PDF (com e sem acento)
