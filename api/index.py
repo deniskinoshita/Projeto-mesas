@@ -2939,7 +2939,7 @@ HTML = r"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Braúna — Análise de Carteiras</title>
+<title>Braúna, Análise de Carteiras</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -3059,7 +3059,7 @@ select option{background:#F5F8F5}
 .cs-chip .cs-icon{font-size:19px}
 .cs-chip .cs-check{width:16px;height:16px;border-radius:50%;border:1.5px solid #5C7365;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
 .cs-chip.ativo .cs-check{background:#A8833C;border-color:#8A6A28;color:#EFF3EF;font-weight:900}
-/* Clientes salvos — colunas por categoria (lado a lado) */
+/* Clientes salvos, colunas por categoria (lado a lado) */
 .cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;align-items:start}
 .cs-grupo{margin:0}
 .cs-grupo .cs-chips-col{display:flex;flex-direction:column;gap:6px}
@@ -3203,17 +3203,17 @@ select option{background:#F5F8F5}
     <h2 style="margin:0;display:flex;align-items:center;gap:8px">📈 Destaques do Mercado <span id="mkt-dest-hora" style="font-size:13px;color:#39493F;font-weight:400"></span></h2>
     <div id="mkt-dest-dolar" style="display:flex;align-items:baseline;gap:8px">
       <span style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;font-weight:700">Dólar</span>
-      <span id="mkt-dest-dolar-val" style="font-size:26px;font-weight:800;color:#0A0F0C">—</span>
+      <span id="mkt-dest-dolar-val" style="font-size:26px;font-weight:800;color:#0A0F0C">n/d</span>
       <span id="mkt-dest-dolar-var" style="font-size:15px;font-weight:700"></span>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
     <div>
-      <p style="font-size:13px;color:#1F9D77;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🔼 Ações — maiores altas do dia</p>
+      <p style="font-size:13px;color:#1F9D77;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🔼 Ações, maiores altas do dia</p>
       <div id="mkt-dest-acoes"></div>
     </div>
     <div>
-      <p style="font-size:13px;color:#1F9D77;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🔼 FIIs — maiores altas do dia</p>
+      <p style="font-size:13px;color:#1F9D77;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🔼 FIIs, maiores altas do dia</p>
       <div id="mkt-dest-fiis"></div>
     </div>
   </div>
@@ -3227,7 +3227,7 @@ select option{background:#F5F8F5}
   <p id="msg-admin-data" style="font-size:13px;color:#39493F;margin-top:4px"></p>
 </div>
 
-<!-- Calls do Head — proativo: para cada call ativa, os clientes DESTE assessor -->
+<!-- Calls do Head, proativo: para cada call ativa, os clientes DESTE assessor -->
 <div id="calls-assessor-card" class="card" style="display:none">
   <h2 style="display:flex;align-items:center;gap:8px">📣 Calls do Head <span id="calls-assessor-cont" style="font-size:14px;color:#39493F;font-weight:400"></span></h2>
   <p style="font-size:14px;color:#42524A;margin:-4px 0 12px;line-height:1.5">Recomendações de renda variável publicadas pela mesa. Para cada ativo, seus clientes que já o possuem ou têm perfil compatível com a operação.</p>
@@ -3250,12 +3250,12 @@ select option{background:#F5F8F5}
       <label>Assessor</label>
       <input type="text" id="assessor" placeholder="Nome do assessor" onblur="buscarClientesSalvos()" readonly style="background:#F5F8F5;cursor:default;color:#8A6A28;display:none">
       <select id="assessor-select" onchange="document.getElementById('assessor').value=this.value;buscarClientesSalvos()" style="display:none;width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#8A6A28;font-size:16px;outline:none">
-        <option value="">— Selecione o assessor —</option>
+        <option value="">Selecione o assessor</option>
       </select>
     </div>
     <div>
-      <label>Código do cliente <span style="font-size:13px;color:#39493F;font-weight:400">— busca no sistema</span></label>
-      <input type="text" id="codigo-cliente" placeholder="Ex: 7712906 — Enter para carregar" oninput="buscarPorCodigoCliente(this.value)" onkeydown="if(event.key==='Enter')buscarUltimoXpPorCodigo(this.value)" autocomplete="off"
+      <label>Código do cliente, <span style="font-size:13px;color:#39493F;font-weight:400">busca no sistema</span></label>
+      <input type="text" id="codigo-cliente" placeholder="Ex: 7712906, Enter para carregar" oninput="buscarPorCodigoCliente(this.value)" onkeydown="if(event.key==='Enter')buscarUltimoXpPorCodigo(this.value)" autocomplete="off"
         style="width:100%;background:#E9F5EE;border:1px solid #D9E3DB;border-radius:8px;padding:9px 12px;color:#0A0F0C;font-size:16px;outline:none;box-sizing:border-box">
       <input type="text" id="nome" placeholder="" style="display:none">
       <p id="cliente-encontrado-label" style="display:none;font-size:14px;color:#1F9D77;margin-top:4px;font-weight:700"></p>
@@ -3277,7 +3277,7 @@ select option{background:#F5F8F5}
         style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
         onchange="onXpFileChange(this)">
       <div class="icon" style="font-size:25px;margin-bottom:4px">📊</div>
-      <p id="upload-hint-text" style="font-size:15px;margin:0">XPerformance — clique para identificar o cliente</p>
+      <p id="upload-hint-text" style="font-size:15px;margin:0">XPerformance, clique para identificar o cliente</p>
       <p style="font-size:13px;color:#39493F;margin:3px 0 0">ou solte um <b style="color:#8A6A28">.zip</b> com até 50 PDFs para importar vários clientes de uma vez</p>
       <p class="fname" id="fname-xp" style="font-size:14px;margin:2px 0 0"></p>
     </div>
@@ -3301,7 +3301,7 @@ select option{background:#F5F8F5}
     <label style="margin-bottom:8px;display:block">Perfil do cliente</label>
     <!-- Aviso quando o perfil foi sugerido automaticamente pela carteira atual -->
     <p id="perfil-sugerido-hint" style="display:none;font-size:14px;color:#8A6A28;margin:0 0 8px 0;font-weight:600"></p>
-    <!-- Cards clicáveis por perfil — renderizados pelo servidor -->
+    <!-- Cards clicáveis por perfil, renderizados pelo servidor -->
     <div id="perfil-cards" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">
       {{ perfil_cards | safe }}
     </div>
@@ -3329,7 +3329,7 @@ select option{background:#F5F8F5}
 
     <!-- Select oculto mantém compatibilidade com atualizarModelo() -->
     <select id="gestora-sel" onchange="onGestoraChange()" style="display:none">
-      <option value="">— —</option>
+      <option value="">Selecione</option>
     </select>
     <p id="gestora-vazia-hint" style="display:none"></p>
 
@@ -3355,12 +3355,12 @@ select option{background:#F5F8F5}
   <!-- Botão para avançar -->
   <div id="btn-proxima-etapa-wrap" style="display:none;margin-top:16px">
     <button class="btn" id="btn-proxima-etapa" onclick="avancarEtapa2()" style="background:#A8833C;color:#EFF3EF;font-size:18px;padding:15px">
-      Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →
+      Continuar para a Parte 2, Cross Sell &amp; Modelo de Servir →
     </button>
   </div>
 </div>
 
-<!-- ETAPA 2 — aparece após identificar o cliente pelo XPerformance -->
+<!-- ETAPA 2, aparece após identificar o cliente pelo XPerformance -->
 <div id="step2-wrapper" style="display:none">
 
 <!-- Banner de status do cliente -->
@@ -3373,7 +3373,7 @@ select option{background:#F5F8F5}
   <div id="step2-badges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
 </div>
 
-<!-- Modelo de Servir — visível apenas na etapa 2 -->
+<!-- Modelo de Servir, visível apenas na etapa 2 -->
 <div class="card" id="card-servir">
   <h2>Modelo de Servir Braúna</h2>
 
@@ -3393,16 +3393,16 @@ select option{background:#F5F8F5}
       <p style="font-size:13px;color:#39493F;margin-top:10px;line-height:1.5">Clique em cada pilar para marcar como concluído</p>
     </div>
 
-    <!-- Checklist de pilares — renderizado pelo servidor -->
+    <!-- Checklist de pilares, renderizado pelo servidor -->
     <div id="pilares-form" style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:8px">
       {{ pilares_html | safe }}
     </div>
   </div>
 </div>
 
-<!-- Cross Sell — card separado -->
+<!-- Cross Sell, card separado -->
 <div class="card">
-  <h2>💼 Cross Sell — Produtos Ativos na Braúna</h2>
+  <h2>💼 Cross Sell, Produtos Ativos na Braúna</h2>
   <p style="font-size:14px;color:#39493F;margin-bottom:12px">Clique nas áreas que o cliente <b style="color:#0A0F0C">já possui</b>. O sistema mostrará oportunidades abertas e sugestões personalizadas.</p>
   <div id="cross-sell-form" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
   <button class="btn" id="btn-ana" onclick="analisar()">Analisar carteira</button>
@@ -3417,7 +3417,7 @@ select option{background:#F5F8F5}
 
   <!-- ── Análise Head de Produtos (HP) ── -->
   <div class="card" id="card-hp" style="display:none;border-color:#F7F1D8">
-    <h2 style="color:#8A6A28">⭐ Análise Head de Produtos — Modelo Levante</h2>
+    <h2 style="color:#8A6A28">⭐ Análise Head de Produtos, Modelo Levante</h2>
 
     <!-- Cabeçalho da conta -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px" id="hp-header"></div>
@@ -3457,7 +3457,7 @@ select option{background:#F5F8F5}
 
     <!-- Proteção de posições perto do preço-alvo -->
     <div id="hp-protecoes-bloco" style="display:none;margin-bottom:12px">
-      <div style="font-size:14px;color:#C0673A;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🛡 Proteção de posições — perto do preço-alvo</div>
+      <div style="font-size:14px;color:#C0673A;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🛡 Proteção de posições, perto do preço-alvo</div>
       <div id="hp-protecoes-lista"></div>
     </div>
 
@@ -3470,7 +3470,7 @@ select option{background:#F5F8F5}
     <!-- Cenário macro HP -->
     <div id="hp-cenario" style="display:none;margin-top:14px">
       <div style="font-size:14px;color:#8A6A28;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between">
-        <span>🌐 Cenário Macro — Head de Produtos</span>
+        <span>🌐 Cenário Macro, Head de Produtos</span>
         <span id="hp-cenario-ref" style="font-size:13px;color:#39493F;font-weight:400;text-transform:none"></span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="hp-cenario-cards"></div>
@@ -3494,8 +3494,8 @@ select option{background:#F5F8F5}
 
   <!-- Rentabilidade: Cliente x Recomendada x CDI -->
   <div class="card" id="card-rent-comp" style="display:none">
-    <h2>Rentabilidade — Cliente × Carteira Recomendada × CDI</h2>
-    <p style="font-size:14px;color:#39493F;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo — os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
+    <h2>Rentabilidade, Cliente × Carteira Recomendada × CDI</h2>
+    <p style="font-size:14px;color:#39493F;margin-bottom:8px">A carteira recomendada é a rentabilidade estimada do modelo, os retornos por classe (cadastrados pela liderança) ponderados pela alocação-alvo deste cliente.</p>
     <div style="display:flex;gap:16px;margin-bottom:8px;font-size:14px;flex-wrap:wrap">
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#A8833C;display:inline-block"></span>Cliente</span>
       <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1F9D77;display:inline-block"></span>Recomendada</span>
@@ -3527,7 +3527,7 @@ select option{background:#F5F8F5}
 
   <!-- Plano de Ação para atingir o objetivo -->
   <div class="card" id="card-plano">
-    <h2>Plano de Ação — Para atingir o modelo <span id="plano-perfil" style="color:#8A6A28;text-transform:capitalize"></span></h2>
+    <h2>Plano de Ação, Para atingir o modelo <span id="plano-perfil" style="color:#8A6A28;text-transform:capitalize"></span></h2>
     <div id="plano-objetivo-box" style="display:none;margin-bottom:12px;padding:10px 14px;background:#F5F8F5;border:1px solid #A8833C;border-radius:8px">
       <p style="font-size:13px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🎯 Objetivo do cliente</p>
       <p id="plano-objetivo-txt" style="font-size:16px;color:#0A0F0C"></p>
@@ -3593,7 +3593,7 @@ select option{background:#F5F8F5}
     </div>
   </div>
 
-  <!-- ── Exportar Análise — ao final ── -->
+  <!-- ── Exportar Análise, ao final ── -->
   <div class="card" style="text-align:center">
     <h2>Exportar Análise</h2>
     <p style="font-size:15px;color:#39493F;margin-bottom:14px">Relatório técnico em PDF para arquivo e registro</p>
@@ -3601,7 +3601,7 @@ select option{background:#F5F8F5}
       <button class="btn" id="btn-b360" onclick="abrirBrauna360()" style="min-width:220px;background:#123047;color:#0A0F0C;border-color:#123047">◎ Abrir Braúna 360°</button>
       <button class="btn btn-out" id="btn-pdf" onclick="baixarPdf()" style="min-width:220px">⬇ Baixar relatório PDF</button>
     </div>
-    <p style="font-size:14px;color:#39493F;margin-top:8px">Braúna 360° — check-up patrimonial premium para apresentar ao cliente.</p>
+    <p style="font-size:14px;color:#39493F;margin-top:8px">Braúna 360°, check-up patrimonial premium para apresentar ao cliente.</p>
   </div>
 
 </div>
@@ -3639,7 +3639,7 @@ select option{background:#F5F8F5}
       });
     }
   } else {
-    // Assessor normal — mostra input readonly com nome do login
+    // Assessor normal, mostra input readonly com nome do login
     const el = document.getElementById("assessor");
     if(el){ el.style.display = ""; }
     const nomeLogin = localStorage.getItem("brauna_nome");
@@ -3803,7 +3803,7 @@ function renderCallsAssessor(){
     const resumo = n>0 ? `<span style="color:#384840;font-size:14px;margin-left:6px">${c.n_detem||0} detêm · ${c.n_compat||0} por perfil</span>` : "";
     const clientesBlock = n>0
       ? `<div id="${gid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #EAF4EC">${resumo}<div style="margin-top:6px">${chips}</div></div>`
-      : `<div id="${gid}" style="display:none;margin-top:10px;color:#384840;font-size:15px;padding-top:10px;border-top:1px solid #EAF4EC">Nenhum cliente com este ativo ou perfil compatível ainda — oportunidade de prospecção.</div>`;
+      : `<div id="${gid}" style="display:none;margin-top:10px;color:#384840;font-size:15px;padding-top:10px;border-top:1px solid #EAF4EC">Nenhum cliente com este ativo ou perfil compatível ainda, oportunidade de prospecção.</div>`;
     return `<div style="background:#EFF3EF;border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:10px">
       <div onclick="callAssessorToggle('${gid}')" style="cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span style="background:${dir.bg};color:${dir.cor};border:1px solid ${dir.cor}44;border-radius:6px;padding:2px 8px;font-size:13px;font-weight:700">${dir.lbl}</span>
@@ -3899,27 +3899,27 @@ renderCrossForm();
 
 const PILARES=[
   {id:"open_investments",nome:"Open Investments",icone:"🔗",importancia:"CRÍTICA",dir:false,
-   desc:"Consentimento OPIN ativo — visão 360° do patrimônio total (XP + outras instituições)",
-   impacto:"Assessor enxerga apenas a parte do cliente na XP. A média XP é 37% do patrimônio nos clientes acima de R$ 300k — significa que 63% do patrimônio está invisível. Sem OPIN, qualquer recomendação de alocação é incompleta e pode duplicar posições.",
-   acao:"Solicitar consentimento pelo app XP: Menu > Open Finance > Conectar outras contas. Pitch: 'Para cuidar do seu patrimônio como um todo e não só da parte na XP, precisamos do Open Investments. São 3 cliques no app — tão simples quanto um Pix. Assim evito duplicar posições e encontro oportunidades hoje invisíveis.'"},
+   desc:"Consentimento OPIN ativo, visão 360° do patrimônio total (XP + outras instituições)",
+   impacto:"Assessor enxerga apenas a parte do cliente na XP. A média XP é 37% do patrimônio nos clientes acima de R$ 300k, significa que 63% do patrimônio está invisível. Sem OPIN, qualquer recomendação de alocação é incompleta e pode duplicar posições.",
+   acao:"Solicitar consentimento pelo app XP: Menu > Open Finance > Conectar outras contas. Pitch: 'Para cuidar do seu patrimônio como um todo e não só da parte na XP, precisamos do Open Investments. São 3 cliques no app, tão simples quanto um Pix. Assim evito duplicar posições e encontro oportunidades hoje invisíveis.'"},
   {id:"financial_planning",nome:"Financial Planning",icone:"🎯",importancia:"CRÍTICA",dir:true,
-   desc:"Planejamento financeiro completo — objetivos, metas e destino financeiro mapeados",
-   impacto:"SEM FINANCIAL PLANNING, NÃO HÁ DESTINO. Toda alocação é arbitrária quando não se sabe para onde o cliente quer ir. Não sabemos: quanto ele precisa para se aposentar, quando quer comprar um imóvel, qual o horizonte de cada objetivo. A carteira existe para realizar sonhos — sem o FP, estamos construindo uma estrada sem destino.",
-   acao:"DIRETRIZ QUALIDADE BRAÚNA — Provocar o cliente AGORA: 'Você sabe exatamente quanto precisa acumular para se aposentar com o padrão de vida que deseja? Você tem um plano financeiro com clareza sobre cada objetivo da sua vida?' Perguntar ao assessor: O Financial Planning deste cliente já foi feito? Quando? Quanto isso é primordial para traçar o caminho do destino que o cliente deseja alcançar."},
+   desc:"Planejamento financeiro completo, objetivos, metas e destino financeiro mapeados",
+   impacto:"SEM FINANCIAL PLANNING, NÃO HÁ DESTINO. Toda alocação é arbitrária quando não se sabe para onde o cliente quer ir. Não sabemos: quanto ele precisa para se aposentar, quando quer comprar um imóvel, qual o horizonte de cada objetivo. A carteira existe para realizar sonhos, sem o FP, estamos construindo uma estrada sem destino.",
+   acao:"DIRETRIZ QUALIDADE BRAÚNA, Provocar o cliente AGORA: 'Você sabe exatamente quanto precisa acumular para se aposentar com o padrão de vida que deseja? Você tem um plano financeiro com clareza sobre cada objetivo da sua vida?' Perguntar ao assessor: O Financial Planning deste cliente já foi feito? Quando? Quanto isso é primordial para traçar o caminho do destino que o cliente deseja alcançar."},
   {id:"ordem_enviada",nome:"Ordem Enviada",icone:"📋",importancia:"ALTA",dir:false,
-   desc:"Última ordem/movimentação executada — carteira ativa e evoluindo",
+   desc:"Última ordem/movimentação executada, carteira ativa e evoluindo",
    impacto:"Carteira estagnada. Cliente sem aportes recentes é critério de ruptura no Índice de Saúde XP (2 pontos). Uma carteira sem movimentação perde oportunidades de realocação e demonstra falta de atenção ativa do assessor.",
    acao:"Verificar última ordem executada. Se não houver movimentação recente: identificar oportunidade de aporte ou realocação compatível com o perfil e gerar proposta concreta com base nos desvios do modelo apresentado neste relatório."},
   {id:"conta_acessada",nome:"Conta Acessada",icone:"📱",importancia:"ALTA",dir:false,
-   desc:"Cliente acessou a plataforma XP nos últimos 30 dias — engajado com seus investimentos",
+   desc:"Cliente acessou a plataforma XP nos últimos 30 dias, engajado com seus investimentos",
    impacto:"Cliente desengajado da plataforma tem maior risco de ruptura e portabilidade. No Índice de Saúde XP, 'Sem Ordens' vale 2 pontos de risco de ruptura. Clientes que não acessam a conta são mais suscetíveis a abordagens de concorrentes.",
    acao:"Entrar em contato ativo para reengajar. Enviar este relatório como conteúdo de valor. Convidar para reunião de revisão de carteira. O engajamento do cliente começa pelo engajamento do assessor."},
   {id:"xperformance",nome:"X-Performance",icone:"📊",importancia:"MÉDIA",dir:false,
    desc:"Relatório XPerformance analisado e discutido com o cliente",
    impacto:"Sem análise do XPerformance, o cliente não tem visão clara da rentabilidade vs. CDI. É impossível ter conversa fundamentada sobre realocação sem este diagnóstico.",
-   acao:"Analisar o XPerformance e agendar reunião de revisão. Mostrar ao cliente como a carteira se compara ao CDI e ao modelo ideal para seu perfil — use este relatório como base."},
+   acao:"Analisar o XPerformance e agendar reunião de revisão. Mostrar ao cliente como a carteira se compara ao CDI e ao modelo ideal para seu perfil, use este relatório como base."},
   {id:"atividade_relacionamento",nome:"Atividade de Relacionamento",icone:"🤝",importancia:"ALTA",dir:false,
-   desc:"Contato ativo nos últimos 30 dias — ligação, reunião ou WhatsApp com conteúdo de valor",
+   desc:"Contato ativo nos últimos 30 dias, ligação, reunião ou WhatsApp com conteúdo de valor",
    impacto:"Cliente silencioso = cliente em risco. A falta de relacionamento ativo é o principal precursor de portabilidade. Concorrentes que abordam o cliente com insights têm vantagem sobre um assessor ausente.",
    acao:"Entrar em contato hoje com um ponto de valor: use este relatório como motivo. 'Fiz uma análise completa da sua carteira e gostaria de conversar sobre algumas oportunidades que identifiquei.'"}
 ];
@@ -3944,7 +3944,7 @@ fetch("/api/admin/mensagem").then(r=>r.json()).then(d=>{
   }
 }).catch(()=>{});
 fetch("/api/admin/contexto-info").then(r=>r.json()).then(d=>{
-  const nome=d.carta&&d.carta.nome?d.carta.nome+" ("+d.carta.atualizado+")":"Nenhuma carta carregada — contate o Admin";
+  const nome=d.carta&&d.carta.nome?d.carta.nome+" ("+d.carta.atualizado+")":"Nenhuma carta carregada, contate o Admin";
   const el=document.getElementById("carta-ativa-nome");
   if(el){ el.textContent=nome; el.style.color=d.carta&&d.carta.nome?"#1F9D77":"#5C7365"; }
 }).catch(()=>{});
@@ -4027,7 +4027,7 @@ function renderPilaresForm(){
           '<div style="background:#FFFFFF;border-radius:6px;padding:8px 10px;border-left:3px solid ' + impCor + ';margin-top:8px">' +
             '<div style="font-size:14px;color:#3B4D43;line-height:1.5;margin-bottom:6px">' + p.impacto + '</div>' +
             '<div style="font-size:14px;color:#8A6A28;padding:6px 8px;background:#F5F8F5;border-radius:5px">→ ' + p.acao + '</div>' +
-            (p.dir ? '<div style="font-size:13px;color:#8A6A28;margin-top:6px;padding:5px 8px;border:1px solid #A8833C;border-radius:5px;background:#F5F8F5">★ 1ª DIRETRIZ BRAÚNA — Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
+            (p.dir ? '<div style="font-size:13px;color:#8A6A28;margin-top:6px;padding:5px 8px;border:1px solid #A8833C;border-radius:5px;background:#F5F8F5">★ 1ª DIRETRIZ BRAÚNA, Financial Planning é obrigatório antes de qualquer alocação.</div>' : "") +
           '</div>' : "") +
       '</div>' +
     '</div>';
@@ -4083,7 +4083,7 @@ if(document.readyState === "loading"){
   else setTimeout(atualizarGraficoServir, 600);
 }
 
-// Cache do portfólio HP — declarado como var para evitar TDZ (chamado antes da inicialização)
+// Cache do portfólio HP, declarado como var para evitar TDZ (chamado antes da inicialização)
 var _hpPortfolios = null;
 (function carregarHpPortfolios(t){
   fetch("/api/hp/portfolios").then(r=>r.json()).then(function(d){ _hpPortfolios = d.perfis||null; atualizarModelo(); renderPerfilCards(); })
@@ -4238,7 +4238,7 @@ function carregarDestaquesMercado(){
 carregarDestaquesMercado();
 setInterval(carregarDestaquesMercado, 900000);
 
-// Retornos por classe (cadastrados pela liderança) — base do comparativo de rentabilidade
+// Retornos por classe (cadastrados pela liderança), base do comparativo de rentabilidade
 var _retornosClasse = {classes:{}, _meta:{}, atualizado_em:""};
 function carregarRetornosClasse(){
   fetch("/api/retornos-classe").then(r=>r.json()).then(d=>{ _retornosClasse = d || {classes:{},_meta:{}}; }).catch(function(){});
@@ -4274,7 +4274,7 @@ function renderChartRent(){
   var nota=document.getElementById("rent-comp-nota");
   if(nota) nota.textContent = temRec
     ? ("Recomendada = retorno médio da casa por classe"+(_retornosClasse._n_clientes?(" ("+_retornosClasse._n_clientes+" carteiras)"):"")+", ponderado pela alocação-alvo deste cliente. Liderança pode sobrescrever na página do Líder. Rentabilidade passada não garante futuro.")
-    : "Sem retornos por classe ainda — importe carteiras (XPerformance) ou cadastre na página do Líder para exibir a carteira recomendada.";
+    : "Sem retornos por classe ainda, importe carteiras (XPerformance) ou cadastre na página do Líder para exibir a carteira recomendada.";
   if(window._chartRentInst) window._chartRentInst.destroy();
   window._chartRentInst=new Chart(cv,{
     type:"line",
@@ -4284,16 +4284,16 @@ function renderChartRent(){
       {label:"CDI",         data:dCdi, borderColor:"#2E86B8", backgroundColor:"#2E86B8", tension:0.3, pointRadius:3, pointHoverRadius:5, borderWidth:2, borderDash:[5,4], spanGaps:true, fill:false},
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+(ctx.parsed.y!=null?ctx.parsed.y.toFixed(2)+"%":"—");}}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+": "+(ctx.parsed.y!=null?ctx.parsed.y.toFixed(2)+"%":"n/d");}}}},
       scales:{y:{ticks:{color:"#7A9A88",callback:function(v){return v+"%";}},grid:{color:"#EAF4EC"}},x:{ticks:{color:"#9BB0A0"},grid:{display:false}}}}
   });
 }
 function _sgNorm(r){ r=(r||"").toUpperCase(); if(r.indexOf("COMPRA")>=0)return "COMPRA"; if(r.indexOf("VENDA")>=0)return "VENDA"; if(r.indexOf("NEUTRO")>=0)return "NEUTRO"; return ""; }
 function _sgCor(r){ var n=_sgNorm(r); return n==="COMPRA"?"#1F9D77":n==="VENDA"?"#D93B3B":n==="NEUTRO"?"#A8833C":"#5F7065"; }
-function _sgBadge(r){ if(!r) return '<span style="color:#39493F">—</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
+function _sgBadge(r){ if(!r) return '<span style="color:#39493F">n/d</span>'; return '<span style="color:'+_sgCor(r)+';font-weight:700">'+r+'</span>'; }
 function _sgUp(v){ if(v==null) return ""; var p=v*100; return ' <span style="color:'+(p>=0?"#1F9D77":"#D93B3B")+';font-size:13px">'+(p>=0?"+":"")+p.toFixed(0)+'%</span>'; }
-function _sgBrl(v){ return v!=null ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; }
-function _sgData(iso){ if(!iso) return "—"; var p=String(iso).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : iso; }
+function _sgBrl(v){ return v!=null ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "n/d"; }
+function _sgData(iso){ if(!iso) return "n/d"; var p=String(iso).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : iso; }
 function _sgRow(a){
   var g = _STOCK_GUIDE.acoes[String(a.ticker||"").toUpperCase()] || null;
   var lev = g && g.levante, xp = g && g.xp;
@@ -4302,10 +4302,10 @@ function _sgRow(a){
   else if(xp){ posHtml=_sgBadge(xp.rating)+' <span style="color:#39493F;font-size:12px">(via XP)</span>'; }
   else { posHtml='<span style="color:#39493F">sem cobertura</span>'; }
   var alvoSrc = lev || xp;
-  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#39493F">—</span>';
+  var alvoHtml = (alvoSrc && alvoSrc.alvo!=null) ? (_sgBrl(alvoSrc.alvo)+_sgUp(alvoSrc.upside)) : '<span style="color:#39493F">n/d</span>';
   var xpHtml;
   if(xp){ xpHtml=_sgBadge(xp.rating); if(xp.consenso) xpHtml+=' <span style="color:#39493F;font-size:12px">'+xp.consenso+'</span>'; xpHtml+=_sgUp(xp.upside); }
-  else { xpHtml='<span style="color:#39493F">—</span>'; }
+  else { xpHtml='<span style="color:#39493F">n/d</span>'; }
   var flag="";
   if(lev && xp && _sgNorm(lev.rating) && _sgNorm(xp.rating) && _sgNorm(lev.rating)!==_sgNorm(xp.rating)){
     flag=' <span title="Levante e XP divergem" style="color:#C0673A">⚠</span>';
@@ -4363,7 +4363,7 @@ function processarProtecoes(acoes){
       return near.map(function(n){
         var p=(hist||[]).find(function(x){ return x.ticker===n.ticker &&
           Math.round((+x.alvo||0)*100)===Math.round((+n.alvo||0)*100); }) || {};
-        return Object.assign({status:"pendente",data:"—",id:null}, p, n,
+        return Object.assign({status:"pendente",data:"n/d",id:null}, p, n,
           {status:p.status||"pendente"});
       });
     }
@@ -4396,9 +4396,9 @@ function renderProtecoes(lista){
   el.innerHTML = lista.map(function(p){
     var st=_PROT_STATUS[p.status]||_PROT_STATUS.pendente;
     var acima=(p.acima!=null)?!!p.acima:(p.upside!=null && p.upside<=0);
-    var up=(p.upside!=null)?((p.upside*100>=0?"+":"")+(p.upside*100).toFixed(0)+"%"):"—";
-    var upTxt=(p.upside!=null)?(acima?(Math.abs(p.upside*100).toFixed(0)+"% acima do alvo"):(up+" de upside")):"—";
-    var alvo=(p.alvo!=null)?("R$ "+Number(p.alvo).toLocaleString("pt-BR",{minimumFractionDigits:2})):"—";
+    var up=(p.upside!=null)?((p.upside*100>=0?"+":"")+(p.upside*100).toFixed(0)+"%"):"n/d";
+    var upTxt=(p.upside!=null)?(acima?(Math.abs(p.upside*100).toFixed(0)+"% acima do alvo"):(up+" de upside")):"n/d";
+    var alvo=(p.alvo!=null)?("R$ "+Number(p.alvo).toLocaleString("pt-BR",{minimumFractionDigits:2})):"n/d";
     var precoTxt=(p.preco!=null)?("R$ "+Number(p.preco).toLocaleString("pt-BR",{minimumFractionDigits:2})):null;
     var atualTxt=precoTxt?(' · atual '+precoTxt+(p.aovivo?' <span style="color:#1F9D77">•ao vivo</span>':'')):'';
     var botoes = p.id ? Object.keys(_PROT_STATUS).map(function(k){
@@ -4410,10 +4410,10 @@ function renderProtecoes(lista){
     var bgCard=acima?"#FBF0E8":"#F5F8F5";
     var msg = acima
       ? '<div style="font-size:13px;color:#0A0F0C;margin:6px 0 8px;line-height:1.5;background:#F8E3D4;border-radius:6px;padding:8px 10px">'
-        +'<b style="color:#C0673A">🎯 Acima do preço-alvo — trave o ganho.</b> Sugestão: '
+        +'<b style="color:#C0673A">🎯 Acima do preço-alvo, trave o ganho.</b> Sugestão: '
         +'<b style="color:#8A6A28">(a)</b> operação estruturada (collar / put de proteção / fence) para proteger o valor já ganho · '
         +'<b style="color:#8A6A28">(b)</b> realizar parte da posição e alocar em caixa (pós-fixado). Envolve custo/prazo e suitability.</div>'
-      : '<div style="font-size:13px;color:#6A5A40;margin:6px 0 8px;line-height:1.5">Upside curto — proteger o ganho. Opções: '
+      : '<div style="font-size:13px;color:#6A5A40;margin:6px 0 8px;line-height:1.5">Upside curto, proteger o ganho. Opções: '
         +'<b style="color:#8A6A28">(a)</b> operação estruturada (collar / put de proteção / fence) · '
         +'<b style="color:#8A6A28">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>';
     return '<div style="border:1px solid '+bordaCard+';background:'+bgCard+';border-radius:8px;padding:10px 12px;margin-bottom:8px">'
@@ -4421,13 +4421,13 @@ function renderProtecoes(lista){
         +'<div><span style="color:#8A6A28;font-weight:700;font-size:15px">'+p.ticker+'</span> '
           +'<span style="color:'+_sgCor(p.rating)+';font-size:13px;font-weight:700">'+(p.rating||"")+'</span> '
           +'<span style="color:#3B4D43;font-size:13px">· '+(p.fonte||"")+' · alvo '+alvo+atualTxt+' <span style="color:#C0673A">('+upTxt+')</span></span></div>'
-        +'<span style="font-size:12px;color:'+st.cor+';font-weight:700">'+st.lbl+(p.data&&p.data!=="—"?' · '+p.data:"")+'</span>'
+        +'<span style="font-size:12px;color:'+st.cor+';font-weight:700">'+st.lbl+(p.data&&p.data!=="n/d"?' · '+p.data:"")+'</span>'
       +'</div>'
       +msg
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'+botoes+'</div>'
     +'</div>';
   }).join("")
-  + '<div style="font-size:12px;color:#39493F;margin-top:2px;line-height:1.5">Gatilho: <b>cotação ao vivo</b> a ≤10% do alvo — ou <b style="color:#C0673A">acima do alvo</b> (destacado), quando entra a sugestão de estruturada para travar o ganho. Alvo pela casa principal (Levante). As recomendações ficam salvas no histórico do cliente.</div>';
+  + '<div style="font-size:12px;color:#39493F;margin-top:2px;line-height:1.5">Gatilho: <b>cotação ao vivo</b> a ≤10% do alvo, ou <b style="color:#C0673A">acima do alvo</b> (destacado), quando entra a sugestão de estruturada para travar o ganho. Alvo pela casa principal (Levante). As recomendações ficam salvas no histórico do cliente.</div>';
 }
 
 function atualizarModelo(){
@@ -4525,7 +4525,7 @@ fetch("/api/macro").then(r=>r.json()).then(d=>{
   if(d.ref_contexto) b.innerHTML+=`<span class="macro-badge" style="color:#39493F">Gestores ref. <span style="color:#3B4D43">${d.ref_contexto}</span></span>`;
 }).catch(()=>{});
 
-// Handler global do input XPerformance — chamado pelo onchange inline no HTML
+// Handler global do input XPerformance, chamado pelo onchange inline no HTML
 function onXpFileChange(input){
   const file = input.files[0];
   if(!file) return;
@@ -4544,7 +4544,7 @@ function onXpFileChange(input){
   identificarCliente(file);
 }
 
-// Descompactador (fflate) sob demanda — só quando há um .zip
+// Descompactador (fflate) sob demanda, só quando há um .zip
 function _carregarFflateXP(){
   return new Promise(function(resolve, reject){
     if(window.fflate) return resolve(window.fflate);
@@ -4613,7 +4613,7 @@ async function processarLoteXP(file){
         ${erros.length?`<div style="background:#FBE9E9;border:1px solid #F7DADA;border-radius:8px;padding:6px 14px;text-align:center"><div style="font-size:21px;font-weight:700;color:#D93B3B">${erros.length}</div><div style="font-size:12px;color:#CF2E2E">erros</div></div>`:""}
       </div>
       <div style="max-height:220px;overflow-y:auto">${linhas}${mais}</div>${errosHtml}
-      <p style="font-size:14px;color:#1F9D77;margin-top:10px">✓ Clientes salvos na memória — role até <b>Clientes salvos</b> e clique para analisar.</p>`;
+      <p style="font-size:14px;color:#1F9D77;margin-top:10px">✓ Clientes salvos na memória, role até <b>Clientes salvos</b> e clique para analisar.</p>`;
     res.style.display="block";
     try{ buscarClientesSalvos(); }catch(e){}
   }catch(e){
@@ -4622,7 +4622,7 @@ async function processarLoteXP(file){
 }
 
 // Upload do XPerformance: apenas clique (o div #drop1 dispara o input via onclick).
-// Drag-and-drop foi removido a pedido — não funcionava de forma confiável.
+// Drag-and-drop foi removido a pedido, não funcionava de forma confiável.
 
 // ── Identificação automática do cliente ao subir o XPerformance ──────────────
 var _clienteIdentificado = null;
@@ -4647,10 +4647,10 @@ async function identificarCliente(file){
     if(fname){
       if(semDados || semComp){
         fname.style.color = "#C0673A";
-        fname.textContent = "⚠️ PDF sem carteira — cliente sem posição na XP nesta data. Preencha os dados manualmente.";
+        fname.textContent = "⚠️ PDF sem carteira, cliente sem posição na XP nesta data. Preencha os dados manualmente.";
       } else {
         fname.style.color = "#1F9D77";
-        fname.textContent = `✓ Carteira lida — Conta ${d.conta} | R$ ${d.patrimonio?.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+        fname.textContent = `✓ Carteira lida, Conta ${d.conta} | R$ ${d.patrimonio?.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
       }
     }
 
@@ -4674,10 +4674,10 @@ async function identificarCliente(file){
       if(_sugHint){
         if(_perfilSalvo){
           _sugHint.style.display = "block";
-          _sugHint.textContent = "✦ Perfil do cliente: " + (_NOMES_PERFIL[_perfilSalvo]||_perfilSalvo) + " (da ficha salva) — confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
+          _sugHint.textContent = "✦ Perfil do cliente: " + (_NOMES_PERFIL[_perfilSalvo]||_perfilSalvo) + " (da ficha salva), confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
         } else if(d.perfil_sugerido){
           _sugHint.style.display = "block";
-          _sugHint.textContent = "✦ Perfil identificado pela carteira atual: " + (_NOMES_PERFIL[d.perfil_sugerido]||d.perfil_sugerido) + " — confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
+          _sugHint.textContent = "✦ Perfil identificado pela carteira atual: " + (_NOMES_PERFIL[d.perfil_sugerido]||d.perfil_sugerido) + ", confirme ou ajuste, e escolha a carteira de referência e a gestora abaixo.";
         } else {
           _sugHint.style.display = "none";
         }
@@ -4726,7 +4726,7 @@ async function identificarCliente(file){
     if(d.conta && d.conta !== "-"){
       const tituloEl = document.getElementById("step2-titulo");
       const nome = d.ficha_salva?.nome || d.nome_cliente || ("Conta " + d.conta);
-      if(tituloEl) tituloEl.textContent = nome + (d.tem_historico ? " — Retorno" : " — Primeiro acesso");
+      if(tituloEl) tituloEl.textContent = nome + (d.tem_historico ? ", Retorno" : ", Primeiro acesso");
     }
 
   }catch(e){
@@ -4758,7 +4758,7 @@ function mostrarPreviewPDF(d){
   if(semComp){
     const fmtBrl = v => "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
     box.style.display = "block";
-    box.innerHTML = `<p style="color:#1F9D77;font-weight:700;font-size:16px;margin-bottom:4px">✓ Conta ${d.conta} identificada — ${fmtBrl(d.patrimonio)}</p>
+    box.innerHTML = `<p style="color:#1F9D77;font-weight:700;font-size:16px;margin-bottom:4px">✓ Conta ${d.conta} identificada, ${fmtBrl(d.patrimonio)}</p>
       <p style="color:#3B4D43;font-size:15px">Composição por classe não disponível neste PDF. A análise continuará com os dados de perfil e carteira de referência selecionados.</p>`;
     return;
   }
@@ -4845,10 +4845,10 @@ function mostrarPreviewPDF(d){
               +'</div>';
           }).join("");
           return '<div style="margin-bottom:10px">'
-            +'<div style="font-size:14px;color:#8A6A28;font-weight:700">'+s.label+' — faltam '+s.gap_pct+'% vs alvo Braúna</div>'
+            +'<div style="font-size:14px;color:#8A6A28;font-weight:700">'+s.label+', faltam '+s.gap_pct+'% vs alvo Braúna</div>'
             + prods +'</div>';
         }).join("")
-      +'<div style="font-size:12px;color:#3A5A48;margin-top:2px;line-height:1.4">Prateleira XP (investidor geral). Confirmar preço, disponibilidade e suitability. DY/taxa não são promessa — comparar sempre no líquido.</div>'
+      +'<div style="font-size:12px;color:#3A5A48;margin-top:2px;line-height:1.4">Prateleira XP (investidor geral). Confirmar preço, disponibilidade e suitability. DY/taxa não são promessa, comparar sempre no líquido.</div>'
       +'</div>';
   }
 
@@ -4871,26 +4871,26 @@ function mostrarPreviewPDF(d){
       +'</div>';
   }
 
-  var fmtBrlS = function(v){ return v ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; };
-  var fmtPctS = function(v){ return v != null ? Number(v).toFixed(1)+"%" : "—"; };
+  var fmtBrlS = function(v){ return v ? "R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "n/d"; };
+  var fmtPctS = function(v){ return v != null ? Number(v).toFixed(1)+"%" : "n/d"; };
 
-  var rfHtml = tblAtivos("Renda Fixa — Posição Detalhada", d.rf_ativos || [], [
-    {key:"nome",      lbl:"Ativo",         cor:"#0A0F0C", fmt:function(v){ return v ? (v.length>38 ? v.slice(0,38)+"…" : v) : "—"; }},
+  var rfHtml = tblAtivos("Renda Fixa, Posição Detalhada", d.rf_ativos || [], [
+    {key:"nome",      lbl:"Ativo",         cor:"#0A0F0C", fmt:function(v){ return v ? (v.length>38 ? v.slice(0,38)+"…" : v) : "n/d"; }},
     {key:"classe",    lbl:"Classe",         cor:"#5F7065"},
     {key:"saldo",     lbl:"Saldo",          cor:"#A8833C", fmt:fmtBrlS},
     {key:"perc",      lbl:"% Carteira",     cor:"#1F9D77", fmt:fmtPctS},
-    {key:"rent_mes",  lbl:"Rent. Mês",      cor:"#2E86B8", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
-    {key:"rent_12m",  lbl:"Rent. 12m",      cor:"#2E86B8", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "—"; }},
+    {key:"rent_mes",  lbl:"Rent. Mês",      cor:"#2E86B8", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "n/d"; }},
+    {key:"rent_12m",  lbl:"Rent. 12m",      cor:"#2E86B8", fmt:function(v){ return v!=null ? (v>=0?"+":"")+Number(v).toFixed(2)+"%" : "n/d"; }},
   ]);
 
-  var rvHtml = tblAtivos("Renda Variável — Posição Detalhada", d.acoes || [], [
+  var rvHtml = tblAtivos("Renda Variável, Posição Detalhada", d.acoes || [], [
     {key:"ticker", lbl:"Ticker",      cor:"#C0673A"},
     {key:"saldo",  lbl:"Saldo",       cor:"#A8833C", fmt:fmtBrlS},
     {key:"qtd",    lbl:"Qtd.",        cor:"#5F7065"},
     {key:"perc",   lbl:"% Carteira",  cor:"#1F9D77", fmt:fmtPctS},
   ]);
 
-  var fiisHtml = tblAtivos("FIIs — Posição Detalhada", d.fiis || [], [
+  var fiisHtml = tblAtivos("FIIs, Posição Detalhada", d.fiis || [], [
     {key:"ticker", lbl:"Ticker",      cor:"#7A5FD0"},
     {key:"saldo",  lbl:"Saldo",       cor:"#A8833C", fmt:fmtBrlS},
     {key:"qtd",    lbl:"Qtd.",        cor:"#5F7065"},
@@ -4910,7 +4910,7 @@ function mostrarPreviewPDF(d){
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
       <div style="font-size:25px">📋</div>
       <div>
-        <p style="font-size:17px;font-weight:700;color:#0A0F0C;margin:0">Carteira identificada — Conta ${d.conta} ${tipoConta ? '<span style="font-size:13px;background:#A9800F;color:#000;padding:2px 7px;border-radius:10px;margin-left:4px;font-weight:700">'+tipoConta+'</span>' : ""}</p>
+        <p style="font-size:17px;font-weight:700;color:#0A0F0C;margin:0">Carteira identificada, Conta ${d.conta} ${tipoConta ? '<span style="font-size:13px;background:#A9800F;color:#000;padding:2px 7px;border-radius:10px;margin-left:4px;font-weight:700">'+tipoConta+'</span>' : ""}</p>
         <p style="font-size:14px;color:#3B4D43;margin:2px 0 0">${assessorNome ? "Assessor: " + assessorNome + "  ·  " : ""}${d.data_ref ? "Ref.: " + d.data_ref : ""}</p>
       </div>
     </div>
@@ -4927,7 +4927,7 @@ function mostrarPreviewPDF(d){
     </div>
     ${alertasHtml}
     ${sugestoesHtml}`;
-    // Posições detalhadas (RF/Ações/FIIs) NÃO entram no preview de identificação —
+    // Posições detalhadas (RF/Ações/FIIs) NÃO entram no preview de identificação,
     // ficam na análise (card "Análise Head de Produtos"). Após os diagnósticos,
     // o fluxo segue direto para o "Perfil do cliente".
 }
@@ -4946,9 +4946,9 @@ function mostrarBotaoProximaEtapa(d){
       const retorno = d.tem_historico && d.ultima_carteira;
       const ico = retorno ? "🔄" : "🆕";
       const tag = retorno ? "Retorno" : "Primeiro acesso";
-      btn.innerHTML = `${ico} Continuar para a Parte 2 — ${nome} (${tag}) →`;
+      btn.innerHTML = `${ico} Continuar para a Parte 2, ${nome} (${tag}) →`;
     } else {
-      btn.innerHTML = "Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →";
+      btn.innerHTML = "Continuar para a Parte 2, Cross Sell &amp; Modelo de Servir →";
     }
   }
 }
@@ -4986,15 +4986,15 @@ function ativarEtapa2(d){
   if(primAccess){
     if(banner){ banner.className="step2-banner first"; }
     if(iconEl) iconEl.textContent = "🆕";
-    if(tituloEl) tituloEl.textContent = nomeCliente + " — Primeiro acesso";
+    if(tituloEl) tituloEl.textContent = nomeCliente + ", Primeiro acesso";
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Preencha o Modelo de Servir e o Cross Sell abaixo";
     if(badgesEl) badgesEl.innerHTML = '<span style="font-size:14px;padding:4px 12px;background:#F5F8F5;color:#8A6A28;border:1px solid #A8833C;border-radius:20px;font-weight:700">Novo cliente</span>';
   } else {
     if(banner){ banner.className="step2-banner return"; }
     if(iconEl) iconEl.textContent = "🔄";
-    if(tituloEl) tituloEl.textContent = nomeCliente + " — Retorno";
+    if(tituloEl) tituloEl.textContent = nomeCliente + ", Retorno";
     const ult = d.ultima_carteira;
-    const ultData = ult?.data_ref || ult?.salvo_em || "—";
+    const ultData = ult?.data_ref || ult?.salvo_em || "n/d";
     const pat = (d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
     if(subEl) subEl.textContent = "Conta " + d.conta + " · Ref. " + d.data_ref + " · Patrimônio R$ " + pat;
     const chk = d.ficha_salva?.checklist || {};
@@ -5049,7 +5049,7 @@ function renderPainelCliente(d){
   if(temFicha){
     html += `
     <div style="background:#EFF3EF;border-radius:8px;padding:10px 14px;margin-bottom:12px;border:1px solid #FFFFFF">
-      <div style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir — salvo em ${d.ficha_salva.atualizado_em||"—"}</div>
+      <div style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Modelo de Servir, salvo em ${d.ficha_salva.atualizado_em||"n/d"}</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${PILARES.map(p=>{
           const feito = !!chk[p.id];
@@ -5069,7 +5069,7 @@ function renderPainelCliente(d){
         </div>` : ""}
     </div>`;
   } else {
-    html += `<div style="font-size:15px;color:#39493F;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso — preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
+    html += `<div style="font-size:15px;color:#39493F;padding:8px 0;margin-bottom:8px">⚠️ Primeiro acesso, preencha o Modelo de Servir abaixo e clique em Analisar para salvar.</div>`;
   }
 
   // ── Painel 3 colunas: Recomendada | Histórico | Atual
@@ -5088,7 +5088,7 @@ function renderPainelCliente(d){
     });
 
     if(classesVisiveis.length){
-      const ultData  = ult ? (ult.data_ref || ult.salvo_em?.split(" ")[0] || "—") : null;
+      const ultData  = ult ? (ult.data_ref || ult.salvo_em?.split(" ")[0] || "n/d") : null;
       const patAnterior = ult ? (ult.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0}) : null;
       const patAtual    = (d.patrimonio||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
       const patDelta    = ult ? (d.patrimonio||0)-(ult.patrimonio||0) : null;
@@ -5104,7 +5104,7 @@ function renderPainelCliente(d){
           </div>
           <div style="text-align:center">
             <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Histórico</div>
-            <div style="font-size:13px;color:#8A6A28;font-weight:700">${ultData || "—"}</div>
+            <div style="font-size:13px;color:#8A6A28;font-weight:700">${ultData || "n/d"}</div>
           </div>
           <div style="text-align:center">
             <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Atual (XP)</div>
@@ -5133,7 +5133,7 @@ function renderPainelCliente(d){
               ${valMod !== null ? `
               <div style="font-size:15px;font-weight:700;color:#4E63C8">${valMod.toFixed(1)}%</div>
               <div style="height:4px;background:#ECEFFB;border-radius:2px;margin:2px 8px 0"><div style="height:4px;background:#4E63C8;border-radius:2px;width:${barMod}%"></div></div>
-              ` : `<span style="font-size:13px;color:#39493F">—</span>`}
+              ` : `<span style="font-size:13px;color:#39493F">n/d</span>`}
             </div>
             <!-- Histórico -->
             <div style="text-align:center">
@@ -5157,7 +5157,7 @@ function renderPainelCliente(d){
         <div style="margin-top:10px;padding-top:8px;border-top:1px solid #FFFFFF;display:grid;grid-template-columns:110px 1fr 1fr 1fr;gap:4px;font-size:14px">
           <span style="color:#39493F">Patrimônio</span>
           <div></div>
-          <div style="text-align:center;color:#8A6A28">${patAnterior ? "R$ "+patAnterior : "—"}</div>
+          <div style="text-align:center;color:#8A6A28">${patAnterior ? "R$ "+patAnterior : "n/d"}</div>
           <div style="text-align:center">
             <span style="color:#1F9D77;font-weight:700">R$ ${patAtual}</span>
             ${patDelta !== null && Math.abs(patDelta) > 0 ? `<span style="color:${patDelta>0?"#1F9D77":"#D93B3B"};margin-left:4px">${patDelta>0?"+":""}R$ ${Math.abs(patDelta).toLocaleString("pt-BR",{maximumFractionDigits:0})}</span>` : ""}
@@ -5277,17 +5277,17 @@ async function buscarUltimoXpPorCodigo(conta){
       const dataRef = ultimo.data_ref || ultimo.salvo_em?.split(" ")[0] || "";
       if(box){
         box.style.display="block";
-        box.innerHTML=`<p style="color:#1F9D77;font-weight:700;font-size:16px;margin-bottom:4px">✓ Último XPerformance carregado — Conta ${conta}${dataRef?" · "+dataRef:""}</p>
+        box.innerHTML=`<p style="color:#1F9D77;font-weight:700;font-size:16px;margin-bottom:4px">✓ Último XPerformance carregado, Conta ${conta}${dataRef?" · "+dataRef:""}</p>
           <p style="color:#8A6A28;font-size:16px;margin-bottom:8px;font-weight:700">${pat?fmtBrl(pat):""}</p>
           <p style="color:#3B4D43;font-size:14px">Composição do último relatório salvo. Faça o upload do XPerformance atual para dados em tempo real.</p>`;
       }
       const fname = document.getElementById("fname-xp");
-      if(fname){ fname.style.color="#A8833C"; fname.textContent="Último XP salvo — "+dataRef; }
+      if(fname){ fname.style.color="#A8833C"; fname.textContent="Último XP salvo, "+dataRef; }
 
       const wBtn = document.getElementById("btn-proxima-etapa-wrap");
       const btn  = document.getElementById("btn-proxima-etapa");
       if(wBtn) wBtn.style.display="block";
-      if(btn){ btn.innerHTML="Continuar para a Parte 2 — Cross Sell &amp; Modelo de Servir →"; btn.disabled=false; btn.style.opacity="1"; }
+      if(btn){ btn.innerHTML="Continuar para a Parte 2, Cross Sell &amp; Modelo de Servir →"; btn.disabled=false; btn.style.opacity="1"; }
     }
 
     if(lbl){
@@ -5333,7 +5333,7 @@ async function excluirClienteIdx(ev, i){
   if(ev) ev.stopPropagation();
   var c=_clientesSalvos[i]; if(!c) return;
   var rot = c.nome || ("#"+(c.conta||""));
-  if(!confirm("Excluir o cliente "+rot+" da memória?\n\nRemove ficha, histórico e snapshots — não dá para desfazer.")) return;
+  if(!confirm("Excluir o cliente "+rot+" da memória?\n\nRemove ficha, histórico e snapshots, não dá para desfazer.")) return;
   try{
     var r=await fetch("/api/ficha",{method:"DELETE",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({conta:c.conta||"", nome:c.nome||"", assessor:c.assessor||""})});
@@ -5585,11 +5585,11 @@ function renderAnaliseHP(xp){
   // Cabeçalho
   const hdr = document.getElementById("hp-header");
   hdr.innerHTML = [
-    ["Conta", xp.conta || "—"],
-    ["Data Ref.", xp.data_ref || "—"],
-    ["Patrimônio", xp.patrimonio ? "R$ " + xp.patrimonio.toLocaleString("pt-BR", {minimumFractionDigits:2}) : "—"],
-    ["Rent. Mês",  xp.rent?.portfolio?.mes  ? xp.rent.portfolio.mes.toFixed(2)+"%" : "—"],
-    ["Rent. 12M",  xp.rent?.portfolio?.["12m"] ? xp.rent.portfolio["12m"].toFixed(2)+"%" : "—"],
+    ["Conta", xp.conta || "n/d"],
+    ["Data Ref.", xp.data_ref || "n/d"],
+    ["Patrimônio", xp.patrimonio ? "R$ " + xp.patrimonio.toLocaleString("pt-BR", {minimumFractionDigits:2}) : "n/d"],
+    ["Rent. Mês",  xp.rent?.portfolio?.mes  ? xp.rent.portfolio.mes.toFixed(2)+"%" : "n/d"],
+    ["Rent. 12M",  xp.rent?.portfolio?.["12m"] ? xp.rent.portfolio["12m"].toFixed(2)+"%" : "n/d"],
   ].map(([lbl,val])=>`
     <div style="background:#EFF3EF;border:1px solid #F7F1D8;border-radius:8px;padding:8px 14px;min-width:90px">
       <div style="font-size:12px;color:#39493F;text-transform:uppercase;letter-spacing:.5px">${lbl}</div>
@@ -5599,7 +5599,7 @@ function renderAnaliseHP(xp){
 
   // Referência e perfil
   document.getElementById("hp-ref").textContent = xp.referencia_modelo || "Levante Asset";
-  document.getElementById("hp-perfil-badge").textContent = "Perfil detectado: " + (xp.perfil_detectado || "—");
+  document.getElementById("hp-perfil-badge").textContent = "Perfil detectado: " + (xp.perfil_detectado || "n/d");
 
   // Alertas relevantes
   // Badge "carteira salva"
@@ -5678,9 +5678,9 @@ function renderAnaliseHP(xp){
     </div>
   `).join("");
 
-  // Renda Fixa — posição detalhada: removida a pedido (já há muita informação na análise)
+  // Renda Fixa, posição detalhada: removida a pedido (já há muita informação na análise)
 
-  // Ações — com posicionamento Braúna (Levante) + visão de mercado (XP)
+  // Ações, com posicionamento Braúna (Levante) + visão de mercado (XP)
   if(xp.acoes && xp.acoes.length){
     document.getElementById("hp-acoes-bloco").style.display = "";
     var _sgMeta = _STOCK_GUIDE._meta || {};
@@ -5729,7 +5729,7 @@ function renderAnaliseHP(xp){
         <tbody>${xp.fiis.map((f,i)=>`
           <tr style="background:${i%2?"#EAF4EC":"#EFF3EF"}">
             <td style="padding:6px 8px;color:#2E86B8;font-weight:700">${f.ticker}</td>
-            <td style="padding:6px 8px;color:#3B4D43;text-align:right">${f.qtd||"—"}</td>
+            <td style="padding:6px 8px;color:#3B4D43;text-align:right">${f.qtd||"n/d"}</td>
             <td style="padding:6px 8px;color:#39493F;text-align:right">R$ ${(f.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</td>
             <td style="padding:6px 8px;text-align:right">${(f.perc||0).toFixed(2)}%</td>
           </tr>`).join("")}
@@ -5748,7 +5748,7 @@ function renderAnaliseHP(xp){
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:13px;background:#FBF3D2;color:#8A6A28;border:1px solid #A8833C;border-radius:10px;padding:1px 8px">${s.label_classe}</span>
             <span style="font-size:15px;color:#D93B3B;font-weight:700">gap ${s.gap.toFixed(1)}%</span>
-            <span style="font-size:16px;font-weight:700;color:#0A0F0C">${p.nome||"—"}</span>
+            <span style="font-size:16px;font-weight:700;color:#0A0F0C">${p.nome||"n/d"}</span>
             ${p.taxa ? `<span style="font-size:14px;color:#1F9D77">${p.taxa}</span>` : ""}
           </div>
           ${p.motivo ? `<p style="font-size:14px;color:#3B4D43;line-height:1.5;margin:0">${p.motivo}</p>` : ""}
@@ -5757,7 +5757,7 @@ function renderAnaliseHP(xp){
     }).join("");
   }
 
-  // Cenário macro HP — 3 cards estruturados
+  // Cenário macro HP, 3 cards estruturados
   const c = xp.cenario_macro;
   if(c && (c.global || c.brasil || c.posicionamento)){
     document.getElementById("hp-cenario").style.display = "";
@@ -5799,12 +5799,12 @@ async function analisar(){
   if(!assessor){alert("Digite seu nome como assessor.");return;}
 
   // Sem PDF novo? Se o cliente já foi carregado (pelo código/lista) e tem composição
-  // salva, analisamos pela última foto — sem precisar re-subir o XPerformance.
+  // salva, analisamos pela última foto, sem precisar re-subir o XPerformance.
   const _comp = _clienteIdentificado && _clienteIdentificado.composicao_atual;
   const temSalvo = !!(_clienteIdentificado && _clienteIdentificado.conta && _comp &&
                       Object.values(_comp).some(v => (+v||0) > 0));
   if(!fileXP && !temSalvo){
-    alert("Selecione o PDF do relatório XP — ou digite o código de um cliente já salvo para usar os dados guardados.");
+    alert("Selecione o PDF do relatório XP, ou digite o código de um cliente já salvo para usar os dados guardados.");
     return;
   }
   const dadosSalvos = (!fileXP && temSalvo) ? JSON.stringify({
@@ -5858,7 +5858,7 @@ async function analisar(){
     // Log de atividade
     const _nomeLog = localStorage.getItem("brauna_nome") || document.getElementById("assessor")?.value || "Assessor";
     fetch("/api/admin/activity",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({role:"assessor",nome:_nomeLog,acao:"análise",detalhe:`Analisou carteira de ${analiseData.nome||"cliente"} — perfil ${analiseData.perfil||""}`})});
+      body:JSON.stringify({role:"assessor",nome:_nomeLog,acao:"análise",detalhe:`Analisou carteira de ${analiseData.nome||"cliente"}, perfil ${analiseData.perfil||""}`})});
 
     // Salva snapshot da carteira para comparativo futuro
     if(_clienteIdentificado?.conta && analiseData._xp){
@@ -5872,7 +5872,7 @@ async function analisar(){
           patrimonio: xp.patrimonio || 0,
           composicao: xp.comp || {},
           rent: xp.rent || {},
-          // Posições individuais — vindas de _clienteIdentificado
+          // Posições individuais, vindas de _clienteIdentificado
           rf_ativos: _clienteIdentificado.rf_ativos || [],
           acoes:     _clienteIdentificado.acoes     || [],
           fiis:      _clienteIdentificado.fiis      || [],
@@ -5881,7 +5881,7 @@ async function analisar(){
     }
 
     // Salva ficha atualizada (modelo de servir + cross-sell)
-    // Salva sempre — usa conta se disponível, senão salva por nome+assessor
+    // Salva sempre, usa conta se disponível, senão salva por nome+assessor
     fetch("/api/ficha", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -5913,20 +5913,20 @@ function renderSugestoes(sg){
     <span style="font-size:23px">💡</span>
     <div>
       <div style="font-size:15px;font-weight:700;color:#8A6A28">${sg.titulo||"Sugestões do Gestor"}</div>
-      <div style="font-size:13px;color:#39493F">Publicado em: ${sg.criado_em||"—"} · Filtrado para o perfil e carteira deste cliente</div>
+      <div style="font-size:13px;color:#39493F">Publicado em: ${sg.criado_em||"n/d"} · Filtrado para o perfil e carteira deste cliente</div>
     </div>
   </div>`;
 
   // ── Renda Fixa ────────────────────────────────────────────
   if(sg.renda_fixa?.length){
-    html += `<div class="sg-bloco"><div class="sg-bloco-title">🏦 Renda Fixa — ${sg.renda_fixa.length} sugestão(ões)</div>`;
+    html += `<div class="sg-bloco"><div class="sg-bloco-title">🏦 Renda Fixa, ${sg.renda_fixa.length} sugestão(ões)</div>`;
     sg.renda_fixa.forEach(item=>{
       const urgCls = item.urgencia==="alta"?"urg-alta":item.urgencia==="media"?"urg-media":"urg-baixa";
       const urgTxt = item.urgencia==="alta"?"🔴 Urgente":item.urgencia==="media"?"🟡 Médio prazo":"🟢 Oportunidade";
       html += `<div class="sg-card ${urgCls}">
         <div class="sg-topo">
           <span class="sg-acao">${item.acao==="substituir"?"↔ Substituir":"+ Alocar"}</span>
-          <span class="sg-produto">${item.para||"—"}</span>
+          <span class="sg-produto">${item.para||"n/d"}</span>
           ${item.indexador?`<span class="sg-idx">${item.indexador}</span>`:""}
           <span style="font-size:13px;color:#39493F">${urgTxt}</span>
         </div>
@@ -5939,7 +5939,7 @@ function renderSugestoes(sg){
 
   // ── Renda Variável ────────────────────────────────────────
   if(sg.renda_variavel?.length){
-    html += `<div class="sg-bloco"><div class="sg-bloco-title">📈 Renda Variável — ${sg.renda_variavel.length} sugestão(ões)</div>`;
+    html += `<div class="sg-bloco"><div class="sg-bloco-title">📈 Renda Variável, ${sg.renda_variavel.length} sugestão(ões)</div>`;
     sg.renda_variavel.forEach(item=>{
       const acaoTxt = item.acao==="comprar"?"▲ Comprar":item.acao==="vender"?"▼ Vender":"↔ Trocar";
       const acaoCor = item.acao==="comprar"?"#1F9D77":item.acao==="vender"?"#D93B3B":"#A9800F";
@@ -5968,14 +5968,14 @@ function renderSugestoes(sg){
   if(sg.internacional?.length){
     const jaTem = sg.tem_intl;
     html += `<div class="sg-bloco">
-      <div class="sg-bloco-title">🌎 Internacional — ${sg.internacional.length} sugestão(ões)</div>
-      ${jaTem?`<div style="font-size:14px;color:#1F9D77;margin-bottom:8px;padding:6px 10px;background:#F5F8F5;border-radius:6px">✓ Cliente já possui alocação internacional — sugestões abaixo para otimização/reposicionamento</div>`:""}`;
+      <div class="sg-bloco-title">🌎 Internacional, ${sg.internacional.length} sugestão(ões)</div>
+      ${jaTem?`<div style="font-size:14px;color:#1F9D77;margin-bottom:8px;padding:6px 10px;background:#F5F8F5;border-radius:6px">✓ Cliente já possui alocação internacional, sugestões abaixo para otimização/reposicionamento</div>`:""}`;
     sg.internacional.forEach(item=>{
       html += `<div class="sg-card ${jaTem?"sg-ja-tem":""}">
-        ${jaTem?`<div class="sg-ja-tem-badge">✓ Já possui internacional — otimizar</div>`:""}
+        ${jaTem?`<div class="sg-ja-tem-badge">✓ Já possui internacional, otimizar</div>`:""}
         <div class="sg-topo">
           <span class="sg-acao">${item.tipo||"ETF"}</span>
-          <span class="sg-produto">${item.ativo||"—"}</span>
+          <span class="sg-produto">${item.ativo||"n/d"}</span>
         </div>
         <div class="sg-motivo">${item.motivo||""}</div>
       </div>`;
@@ -5987,14 +5987,14 @@ function renderSugestoes(sg){
   if(sg.fiis?.length){
     const jaTem = sg.tem_fiis;
     html += `<div class="sg-bloco">
-      <div class="sg-bloco-title">🏢 Fundos Imobiliários — Carteira sugerida</div>
-      ${jaTem?`<div style="font-size:14px;color:#1F9D77;margin-bottom:8px;padding:6px 10px;background:#F5F8F5;border-radius:6px">✓ Cliente já possui FIIs — use as sugestões abaixo para rebalancear a posição</div>`:""}
+      <div class="sg-bloco-title">🏢 Fundos Imobiliários, Carteira sugerida</div>
+      ${jaTem?`<div style="font-size:14px;color:#1F9D77;margin-bottom:8px;padding:6px 10px;background:#F5F8F5;border-radius:6px">✓ Cliente já possui FIIs, use as sugestões abaixo para rebalancear a posição</div>`:""}
       <table class="sg-fii-table">
         <thead><tr><th>Ticker</th><th>Segmento</th><th>% sugerido</th><th>Motivo</th></tr></thead>
         <tbody>${sg.fiis.map(f=>`<tr>
           <td class="fii-ticker">${f.ticker}</td>
-          <td>${f.segmento||"—"}</td>
-          <td>${f.alocacao||"—"}</td>
+          <td>${f.segmento||"n/d"}</td>
+          <td>${f.alocacao||"n/d"}</td>
           <td style="color:#3B4D43">${f.motivo||""}</td>
         </tr>`).join("")}</tbody>
       </table>
@@ -6081,7 +6081,7 @@ function renderClassesAtivos(desvios, patrimonio){
     const desvio = g.real - g.alvo;
     const sinal  = desvio > 0 ? "+" : "";
     const dCor   = Math.abs(desvio)<1.5 ? "#5C7365" : desvio>0 ? "#A9800F" : "#D93B3B";
-    const realVal = patrimonio>0 ? `R$ ${(patrimonio*g.real/100).toLocaleString("pt-BR",{maximumFractionDigits:0})}` : "—";
+    const realVal = patrimonio>0 ? `R$ ${(patrimonio*g.real/100).toLocaleString("pt-BR",{maximumFractionDigits:0})}` : "n/d";
     return `<div style="background:#FFFFFF;border-radius:10px;padding:12px 14px;border:1px solid #FFFFFF">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:21px">${g.icone}</span>
@@ -6186,7 +6186,7 @@ function renderPlanoAcao(desvios, perfil, patrimonio, objetivo){
   } else { pv.innerHTML=""; }
 }
 
-// Plano de Troca — para cada classe subalocada: fonte do recurso (venda) + produtos concretos (compra)
+// Plano de Troca, para cada classe subalocada: fonte do recurso (venda) + produtos concretos (compra)
 function renderPlanoTroca(sugs, plano){
   const el=document.getElementById("plano-troca");
   if(!el) return;
@@ -6194,7 +6194,7 @@ function renderPlanoTroca(sugs, plano){
   // ── Plano concreto venda→compra (com deságio da posição) ──────────────────────
   if(plano && ((plano.movimentacoes&&plano.movimentacoes.length)||(plano.bloqueados&&plano.bloqueados.length)||(plano.monitorar_classes&&plano.monitorar_classes.length)||(plano.previdencia&&plano.previdencia.length))){
     const lim=plano.limite_desagio||3;
-    let h='<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca — o que vender e o que comprar</p>';
+    let h='<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">🔁 Plano de Troca, o que vender e o que comprar</p>';
     h+='<p style="font-size:14px;color:#39493F;margin:0 0 12px">Venda: os de <b>pior rentabilidade</b> primeiro (trim dos laggards), <b>espalhada</b>; trava de <b>deságio > '+lim+'%</b> só em <b>renda fixa/crédito privado</b> (ações e FIIs livres); previdência fica de fora (só portabilidade). Compra: <b>ações e FIIs por Markowitz</b> (peso risco-retorno); <b>renda fixa</b> em títulos diretos respeitando o <b>FGC (R$ 250k/emissor)</b>, até 3 bancários + 3 crédito privado e o excedente em fundos; multi/alternativos em até 5 fundos.</p>';
     if(plano.total_mover>0) h+='<div style="font-size:15px;color:#4E63C8;margin-bottom:10px">Total a realocar: <b style="color:#0A0F0C">'+fmt0(plano.total_mover)+'</b></div>';
     (plano.movimentacoes||[]).forEach(function(m){
@@ -6217,10 +6217,10 @@ function renderPlanoTroca(sugs, plano){
     });
     if(plano.bloqueados&&plano.bloqueados.length){
       h+='<div style="margin-top:12px;border:1px solid #F7DADA;border-radius:10px;padding:11px 13px;background:#FCEBEB">';
-      h+='<div style="font-size:14px;color:#D93B3B;font-weight:700;margin-bottom:7px">⚠ Renda fixa / crédito privado — não vender agora (deságio acima de '+lim+'%)</div>';
+      h+='<div style="font-size:14px;color:#D93B3B;font-weight:700;margin-bottom:7px">⚠ Renda fixa / crédito privado, não vender agora (deságio acima de '+lim+'%)</div>';
       plano.bloqueados.forEach(function(b){
         h+='<div style="font-size:14.5px;color:#E0C8C8;margin-bottom:5px;line-height:1.5">'
-          +'<b style="color:#0A0F0C">'+b.nome+'</b> <span style="color:#39493F">('+b.label+')</span> — deságio de <b style="color:#C0673A">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
+          +'<b style="color:#0A0F0C">'+b.nome+'</b> <span style="color:#39493F">('+b.label+')</span>, deságio de <b style="color:#C0673A">'+Math.abs(b.desagio).toFixed(1)+'%</b> no ano. '
           +'Ainda que fosse o ativo escolhido para a venda, <b>não realizamos a troca</b> para não cristalizar o prejuízo. '
           +'A partir de hoje monitoramos e sinalizamos a troca quando recuperar (deságio abaixo de '+lim+'%).</div>';
       });
@@ -6230,22 +6230,22 @@ function renderPlanoTroca(sugs, plano){
       h+='<div style="margin-top:10px;border:1px solid #FBEEEC;border-radius:10px;padding:11px 13px;background:#FBF3D2">';
       plano.monitorar_classes.forEach(function(mc){
         h+='<div style="font-size:14.5px;color:#7C5D0B;line-height:1.5">🕒 <b>'+mc.label+'</b>: todo o excesso (~'+fmt0(mc.excesso_valor)+') está em ativos com deságio acima de '+lim+'%. '
-          +'Sem opção de venda sem prejuízo — a partir de hoje monitoramos e sinalizamos a troca quando os ativos recuperarem.</div>';
+          +'Sem opção de venda sem prejuízo, a partir de hoje monitoramos e sinalizamos a troca quando os ativos recuperarem.</div>';
       });
       h+='</div>';
     }
     if(plano.previdencia&&plano.previdencia.length){
       h+='<div style="margin-top:10px;border:1px solid #D7DEF5;border-radius:10px;padding:11px 13px;background:#ECEFFB">';
-      h+='<div style="font-size:14px;color:#4E63C8;font-weight:700;margin-bottom:7px">🛡️ Previdência — não entra na venda automática</div>';
+      h+='<div style="font-size:14px;color:#4E63C8;font-weight:700;margin-bottom:7px">🛡️ Previdência, não entra na venda automática</div>';
       plano.previdencia.forEach(function(p){
         const val=p.saldo!=null?' <span style="color:#39493F">('+fmt0(p.saldo)+')</span>':'';
         h+='<div style="font-size:14.5px;color:#39493F;margin-bottom:5px;line-height:1.5">'
-          +'<b style="color:#0A0F0C">'+p.nome+'</b>'+val+' <span style="color:#39493F">('+p.label+')</span> — '
+          +'<b style="color:#0A0F0C">'+p.nome+'</b>'+val+' <span style="color:#39493F">('+p.label+')</span>, '
           +'previdência não se resgata como fundo comum: avaliar <b>portabilidade</b>, regime tributário (regressivo/progressivo), carência e IR antes de qualquer movimento.</div>';
       });
       h+='</div>';
     }
-    h+='<div style="font-size:13px;color:#39493F;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar — validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
+    h+='<div style="font-size:13px;color:#39493F;margin-top:10px;line-height:1.5">Deságio = rentabilidade da posição no ano (marcada a mercado no XPerformance). Ordem de venda: pior rentabilidade primeiro, venda espalhada, previdência de fora; trava de deságio > '+lim+'% só em renda fixa/crédito privado (ações e FIIs livres). Proposta preliminar, validar suitability, liquidez, carência, tributação, vencimentos e disponibilidade. Tetos do Controle Institucional XP aplicáveis.</div>';
     el.innerHTML=h;
     return;
   }
@@ -6253,7 +6253,7 @@ function renderPlanoTroca(sugs, plano){
   if(!sugs.length){ el.innerHTML=""; return; }
   const PRIO={alta:["#D93B3B","🔴 Alta"],media:["#A9800F","🟡 Média"],baixa:["#1F9D77","🟢 Baixa"]};
   const fmt=v=>"R$ "+Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
-  let h='<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca — venda → compra</p>';
+  let h='<p style="font-size:14px;color:#8A6A28;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:6px 0 10px">🔁 Plano de Troca, venda → compra</p>';
   sugs.forEach(function(s){
     const pr=PRIO[s.prioridade]||PRIO.media;
     const fonte=(s.fonte_recurso&&s.fonte_recurso.length)
@@ -6262,13 +6262,13 @@ function renderPlanoTroca(sugs, plano){
     const prods=s.produtos_prateleira.map(function(p){
       const fgc=p.fgc?'<span style="font-size:12px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
       return `<div style="padding:7px 10px;background:#F5F8F5;border:1px solid #F5F8F5;border-left:3px solid #1F9D77;border-radius:0 6px 6px 0;margin-bottom:5px">
-        <div style="font-size:15px;font-weight:700;color:#0A0F0C">${p.nome||"—"}${fgc}
+        <div style="font-size:15px;font-weight:700;color:#0A0F0C">${p.nome||"n/d"}${fgc}
           <span style="font-size:13px;color:#39493F;font-weight:400;margin-left:6px">${p.fonte||""}</span></div>
         <div style="font-size:14px;color:#8A6A28">${p.detalhe||""}</div>
         ${p.obs?`<div style="font-size:13px;color:#39493F;margin-top:2px">${p.obs}</div>`:""}
       </div>`;
     }).join("");
-    const travas=(s.travas||[]).map(t=>`<div style="font-size:13px;color:#7C5D0B;background:#FBF3D2;border:1px solid #FBEEEC;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance — ${t}</div>`).join("");
+    const travas=(s.travas||[]).map(t=>`<div style="font-size:13px;color:#7C5D0B;background:#FBF3D2;border:1px solid #FBEEEC;border-radius:6px;padding:4px 8px;margin-bottom:4px">⚠ Compliance, ${t}</div>`).join("");
     h+=`<div style="border:1px solid #EAF4EC;border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#FFFFFF">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
         <span style="font-size:16px;font-weight:800;color:#0A0F0C">${s.label_classe}</span>
@@ -6281,7 +6281,7 @@ function renderPlanoTroca(sugs, plano){
       ${prods}
     </div>`;
   });
-  h+=`<div style="font-size:13px;color:#39493F;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy — o oficial soma todas as marcas XP + OPIN.</div>`;
+  h+=`<div style="font-size:13px;color:#39493F;margin-top:2px;line-height:1.5">Tetos do Controle Institucional XP (ago/2026). Cliente <b>80+</b>: evitar vencimentos ≥5 anos. AUC aqui usa o patrimônio desta carteira como proxy, o oficial soma todas as marcas XP + OPIN.</div>`;
   el.innerHTML=h;
 }
 
@@ -6292,14 +6292,14 @@ function renderPosicaoConsolidada(data){
   var acoes = data.acoes       || [];
   var fiis  = data.fiis        || [];
   var diags = data.diagnosticos|| [];
-  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#39493F'>Nenhuma posição detalhada disponível — suba o PDF do XPerformance.</p>"; return; }
+  if(!rf.length && !acoes.length && !fiis.length){ el.innerHTML="<p style='color:#39493F'>Nenhuma posição detalhada disponível, suba o PDF do XPerformance.</p>"; return; }
 
   // Mostra aba
   var tabBtn = document.getElementById("tab-btn-posicao");
   if(tabBtn) tabBtn.style.display="";
 
-  var fmt = function(v){ return v!=null&&v!==undefined ? "R$ "+parseFloat(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—"; };
-  var pct = function(v){ return v!=null&&v!==undefined ? parseFloat(v).toFixed(2)+"%" : "—"; };
+  var fmt = function(v){ return v!=null&&v!==undefined ? "R$ "+parseFloat(v).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "n/d"; };
+  var pct = function(v){ return v!=null&&v!==undefined ? parseFloat(v).toFixed(2)+"%" : "n/d"; };
 
   // Alertas de diagnóstico
   var diagHtml = "";
@@ -6330,11 +6330,11 @@ function renderPosicaoConsolidada(data){
     rfHtml += '</tr></thead><tbody>';
     rf.forEach(function(a,i){
       var bg = i%2===0?"#EFF3EF":"#EFF3EF";
-      var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#1F9D77">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#D93B3B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "—";
-      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#D93B3B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#3B4D43">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "—";
+      var rm = a.rent_mes!=null ? (parseFloat(a.rent_mes)>=0?'<span style="color:#1F9D77">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>':'<span style="color:#D93B3B">'+parseFloat(a.rent_mes).toFixed(2)+'%</span>') : "n/d";
+      var ra = a.rent_ano!=null ? (parseFloat(a.rent_ano)< -3?'<span style="color:#D93B3B" title="deságio acima de 3%">'+parseFloat(a.rent_ano).toFixed(2)+'% ⚠</span>':'<span style="color:#3B4D43">'+parseFloat(a.rent_ano).toFixed(2)+'%</span>') : "n/d";
       rfHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
       rfHtml += '<td style="padding:6px 8px;color:#0A0F0C;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.nome+'">'+a.nome+'</td>';
-      rfHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.classe||"—")+'</td>';
+      rfHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.classe||"n/d")+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+fmt(a.saldo)+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+pct(a.perc)+'</td>';
       rfHtml += '<td style="padding:6px 8px;text-align:right">'+rm+'</td>';
@@ -6358,12 +6358,12 @@ function renderPosicaoConsolidada(data){
     acoesHtml += '</tr></thead><tbody>';
     acoes.forEach(function(a,i){
       var bg = i%2===0?"#EFF3EF":"#EFF3EF";
-      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "—";
+      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "n/d";
       acoesHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
       acoesHtml += '<td style="padding:6px 8px;color:#2E86B8;font-weight:700">'+a.ticker+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.nome||"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#0A0F0C">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
-      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#3B4D43">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.nome||"n/d")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#0A0F0C">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"n/d")+'</td>';
+      acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#3B4D43">'+(a.preco_medio!=null?fmt(a.preco_medio):"n/d")+'</td>';
       acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+fmt(a.saldo)+'</td>';
       acoesHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+pct(a.perc)+'</td>';
       acoesHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
@@ -6386,12 +6386,12 @@ function renderPosicaoConsolidada(data){
     fiisHtml += '</tr></thead><tbody>';
     fiis.forEach(function(a,i){
       var bg = i%2===0?"#EFF3EF":"#EFF3EF";
-      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "—";
+      var res = a.resultado!=null ? (parseFloat(a.resultado)>=0?'<span style="color:#1F9D77">'+fmt(a.resultado)+'</span>':'<span style="color:#D93B3B">'+fmt(a.resultado)+'</span>') : "n/d";
       fiisHtml += '<tr style="background:'+bg+';border-bottom:1px solid #F5F8F5">';
       fiisHtml += '<td style="padding:6px 8px;color:#8A6A28;font-weight:700">'+a.ticker+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.nome||"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#0A0F0C">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"—")+'</td>';
-      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#3B4D43">'+(a.preco_medio!=null?fmt(a.preco_medio):"—")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;color:#3B4D43">'+( a.nome||"n/d")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#0A0F0C">'+(a.qtd!=null?parseFloat(a.qtd).toLocaleString("pt-BR"):"n/d")+'</td>';
+      fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#3B4D43">'+(a.preco_medio!=null?fmt(a.preco_medio):"n/d")+'</td>';
       fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+fmt(a.saldo)+'</td>';
       fiisHtml += '<td style="padding:6px 8px;text-align:right;color:#8A6A28">'+pct(a.perc)+'</td>';
       fiisHtml += '<td style="padding:6px 8px;text-align:right">'+res+'</td>';
@@ -6408,7 +6408,7 @@ function renderizar(data){
 
   // Métricas
   const m=document.getElementById("metrics");
-  let pat=patrimonio>0?"R$ "+patrimonio.toLocaleString("pt-BR",{maximumFractionDigits:0}):"—";
+  let pat=patrimonio>0?"R$ "+patrimonio.toLocaleString("pt-BR",{maximumFractionDigits:0}):"n/d";
   let html=`<div class="metric"><div class="lbl">Patrimônio</div><div class="val" style="font-size:19px">${pat}</div></div>`;
   if(rent.portfolio&&rent.cdi){
     const p=rent.portfolio,c=rent.cdi;
@@ -6418,7 +6418,7 @@ function renderizar(data){
     html+=`<div class="metric"><div class="lbl">CDI 12M</div><div class="val">${c["12m"].toFixed(2)}%</div></div>`;
     html+=`<div class="metric"><div class="lbl">% do CDI (12M)</div><div class="val ${cls}">${p12}%</div></div>`;
   }
-  // (Card de métrica "Modelo de Servir" removido — o mesmo dado já aparece
+  // (Card de métrica "Modelo de Servir" removido, o mesmo dado já aparece
   //  completo na seção dedicada "Modelo de Servir" logo abaixo.)
   m.innerHTML=html;
 
@@ -6436,7 +6436,7 @@ function renderizar(data){
   try{ renderPlanoAcao(desvios, data.perfil||"", patrimonio, data.objetivo||""); }catch(e){ console.error("[renderPlanoAcao]",e); }
   try{ renderPlanoTroca((data._xp&&data._xp.sugestoes_por_classe)||data.sugestoes_por_classe||[], (data._xp&&data._xp.plano_troca)||data.plano_troca||null); }catch(e){ console.error("[renderPlanoTroca]",e); }
 
-  // Carteira atual do cliente — exibe no Plano de Ação e ao lado dos Desvios
+  // Carteira atual do cliente, exibe no Plano de Ação e ao lado dos Desvios
   const _compAtual = (_clienteIdentificado && _clienteIdentificado.composicao_atual) || data.composicao_atual || data.composicao || {};
   const _patAtual  = (_clienteIdentificado && _clienteIdentificado.patrimonio) || patrimonio || 0;
   try{ renderCarteiraAtual(_compAtual, _patAtual, "plano-carteira-barras", "plano-carteira-atual"); }catch(e){ console.error("[renderCarteiraAtual plano]",e); }
@@ -6459,7 +6459,7 @@ function renderizar(data){
   if(opors.length){ diag+=`<p style="font-size:13px;color:#39493F;margin:8px 0 4px;text-transform:uppercase">Sobrealocação</p>`; opors.forEach(o=>{diag+=`<div class="alert success">▸ <b>${o.label}</b>: excesso ${o.desvio.toFixed(1)}%</div>`;}); }
   document.getElementById("diagnostico").innerHTML=diag||`<p style="color:#1F9D77">✓ Carteira alinhada ao modelo.</p>`;
 
-  // Recomendações — inclui painel de calls HP
+  // Recomendações, inclui painel de calls HP
   const rl=document.getElementById("recomendacoes-list");
   let recHtml = "";
 
@@ -6507,13 +6507,13 @@ function renderizar(data){
   if(recomendacoes&&recomendacoes.length){
     recHtml+=recomendacoes.map(r=>`
       <div class="rec-card">
-        <div class="rec-header">${r.urgencia} <span style="color:#8A6A28">${r.classe}</span> — falta ${r.falta_pp.toFixed(1)}%</div>
+        <div class="rec-header">${r.urgencia} <span style="color:#8A6A28">${r.classe}</span>, falta ${r.falta_pp.toFixed(1)}%</div>
         <div class="rec-ctx">${r.explicacao}</div>
         ${r.carta_insight?`<div class="rec-carta">📄 Carta da gestão: "${r.carta_insight}"</div>`:""}
         <div class="rec-prods">${(r.produtos||[]).map(p=>`<span class="prod-tag">${p}</span>`).join("")}</div>
       </div>`).join("");
   } else if(!callsRel.length){
-    recHtml+=`<p style="color:#1F9D77;font-size:17px">✓ Nenhuma recomendação necessária — carteira alinhada.</p>`;
+    recHtml+=`<p style="color:#1F9D77;font-size:17px">✓ Nenhuma recomendação necessária, carteira alinhada.</p>`;
   }
   rl.innerHTML = recHtml;
 
@@ -6547,7 +6547,7 @@ function renderizar(data){
           <div class="pilar-result-impacto">${p.impacto_falta}</div>
           <div class="pilar-result-acao">→ ${p.acao}</div>
           ${p.diretriz?`<div style="margin-top:8px;padding:8px;background:#F5F8F5;border:1px solid #A8833C;border-radius:6px;font-size:14px;color:#8A6A28">
-            <b>★ 1ª DIRETRIZ BRAÚNA — QUALIDADE</b><br>Provocar o cliente sobre o Financial Planning. Perguntar ao assessor: O FP deste cliente já foi feito? Quando? Isso é primordial para traçar o caminho do destino que o cliente deseja alcançar.
+            <b>★ 1ª DIRETRIZ BRAÚNA, QUALIDADE</b><br>Provocar o cliente sobre o Financial Planning. Perguntar ao assessor: O FP deste cliente já foi feito? Quando? Isso é primordial para traçar o caminho do destino que o cliente deseja alcançar.
           </div>`:""}
         </div>`;
       });
@@ -6573,7 +6573,7 @@ function renderizar(data){
   if(visao_gestores&&visao_gestores.length){
     gl.innerHTML=visao_gestores.map(g=>`
       <div class="gestor-card">
-        <div class="gestor-nome">${g.gestor} — ${g.tema}</div>
+        <div class="gestor-nome">${g.gestor}, ${g.tema}</div>
         <div class="gestor-msg">${g.mensagem}</div>
         <div class="gestor-impl">→ ${g.implicacao_alocacao}</div>
         <div style="font-size:13px;color:#39493F;margin-top:4px">${g.fonte}</div>
@@ -6601,7 +6601,7 @@ function renderizar(data){
   }
 }
 
-// (Removido: "Gerar Apresentação de Reunião" (.pptx) — substituído pelo Braúna 360°.)
+// (Removido: "Gerar Apresentação de Reunião" (.pptx), substituído pelo Braúna 360°.)
 
 function renderCrossSellResult(areas, tem, naoTem){
   const el=document.getElementById("crosssell-list");
@@ -6637,7 +6637,7 @@ function renderCrossSellResult(areas, tem, naoTem){
     html += `<div style="border:1px solid #A8833C;background:linear-gradient(180deg,#F6EFDA,#FFFFFF);border-radius:12px;padding:14px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:21px">💎</span>
-        <span style="font-size:15px;font-weight:800;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px">Oportunidade — Consórcio via dividendos</span>
+        <span style="font-size:15px;font-weight:800;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px">Oportunidade, Consórcio via dividendos</span>
       </div>
       <div style="font-size:15px;color:#FBEEEC;line-height:1.6">
         Cliente com <b>${brl0(patC)}</b> (acima de R$ 1 mi): dá para estruturar uma <b>carta de consórcio de ${brl0(carta)}</b> (imóvel ou veículo) <b>sustentada pelos dividendos da carteira</b>, sem descapitalizar o principal.
@@ -6646,9 +6646,9 @@ function renderCrossSellResult(areas, tem, naoTem){
           <div style="font-size:13px;color:#39493F;margin-top:3px">Estimativas conservadoras (taxa adm ~17%, ~200 meses; DY de FIIs ~9,6% a.a. e ações ~3,6% a.a.). Confirmar com a administradora e com os proventos reais do cliente.</div>
         </div>
         <div style="margin-top:8px;font-size:14px;color:#39493F">
-          <b>Como conduzir (sem promessas):</b> consórcio é aquisição planejada, <b>sem juros</b> — mas há taxa de administração, fundo de reserva e seguro; a <b>contemplação é por sorteio ou lance</b>, sem data garantida; a parcela é reajustada pelo índice do contrato. O capital segue investido e apenas os proventos sustentam a parcela.
+          <b>Como conduzir (sem promessas):</b> consórcio é aquisição planejada, <b>sem juros</b>, mas há taxa de administração, fundo de reserva e seguro; a <b>contemplação é por sorteio ou lance</b>, sem data garantida; a parcela é reajustada pelo índice do contrato. O capital segue investido e apenas os proventos sustentam a parcela.
         </div>
-        ${aqAtivo?'<div style="margin-top:8px;font-size:14px;color:#1F9D77">✓ Aquisição de Bens já ativa — reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
+        ${aqAtivo?'<div style="margin-top:8px;font-size:14px;color:#1F9D77">✓ Aquisição de Bens já ativa, reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
                  :'<div style="margin-top:8px;font-size:14px;color:#8A6A28">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
       </div>
     </div>`;
@@ -6664,10 +6664,10 @@ function renderCrossSellResult(areas, tem, naoTem){
     // Verifica quando foi a última vez que foi discutido (qualquer entrada no histórico)
     const ultimaEntrada = crossHist.length ? crossHist[crossHist.length-1] : null;
     if(jaEsteve){
-      insights.push({tipo:"atencao", icone:"🔄", texto:`<b>${a.icone} ${a.nome}</b> já esteve ativo — avaliar reativação nesta reunião.`});
+      insights.push({tipo:"atencao", icone:"🔄", texto:`<b>${a.icone} ${a.nome}</b> já esteve ativo, avaliar reativação nesta reunião.`});
     } else if(crossHist.length >= 2){
-      // Nunca foi ativado mesmo com histórico longo — prioridade
-      insights.push({tipo:"oportunidade", icone:"💼", texto:`<b>${a.icone} ${a.nome}</b> nunca ativado em ${crossHist.length} reunião(ões) — oportunidade recorrente em aberto.`});
+      // Nunca foi ativado mesmo com histórico longo, prioridade
+      insights.push({tipo:"oportunidade", icone:"💼", texto:`<b>${a.icone} ${a.nome}</b> nunca ativado em ${crossHist.length} reunião(ões), oportunidade recorrente em aberto.`});
     }
   });
 
@@ -6676,18 +6676,18 @@ function renderCrossSellResult(areas, tem, naoTem){
     const ultimo = crossHist[crossHist.length-1];
     (ultimo.ativados||[]).forEach(id=>{
       const area = CROSS_AREAS.find(a=>a.id===id);
-      if(area) insights.push({tipo:"novidade", icone:"✅", texto:`<b>${area.icone} ${area.nome}</b> ativado em ${ultimo.data} — confirme com o cliente na reunião.`});
+      if(area) insights.push({tipo:"novidade", icone:"✅", texto:`<b>${area.icone} ${area.nome}</b> ativado em ${ultimo.data}, confirme com o cliente na reunião.`});
     });
     (ultimo.desativados||[]).forEach(id=>{
       const area = CROSS_AREAS.find(a=>a.id===id);
-      if(area) insights.push({tipo:"atencao", icone:"⚠️", texto:`<b>${area.icone} ${area.nome}</b> desativado em ${ultimo.data} — verificar motivo.`});
+      if(area) insights.push({tipo:"atencao", icone:"⚠️", texto:`<b>${area.icone} ${area.nome}</b> desativado em ${ultimo.data}, verificar motivo.`});
     });
   }
 
   // Insight 3: cliente com score baixo mas patrimônio alto
   const pat = _clienteIdentificado?.patrimonio || 0;
   if(score <= 1 && pat >= 300000){
-    insights.push({tipo:"urgente", icone:"🚨", texto:`Cliente com R$ ${pat.toLocaleString("pt-BR",{maximumFractionDigits:0})} e apenas ${score} produto ativo — potencial de aprofundamento alto.`});
+    insights.push({tipo:"urgente", icone:"🚨", texto:`Cliente com R$ ${pat.toLocaleString("pt-BR",{maximumFractionDigits:0})} e apenas ${score} produto ativo, potencial de aprofundamento alto.`});
   }
 
   if(insights.length){
@@ -6699,7 +6699,7 @@ function renderCrossSellResult(areas, tem, naoTem){
           <span style="font-size:17px;flex-shrink:0">${i.icone}</span>
           <span style="font-size:15px;color:#39493F;line-height:1.5">${i.texto}</span>
         </div>`).join("")}
-      ${crossHist.length ? `<div style="margin-top:8px;font-size:13px;color:#39493F">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"—"}</div>` : ""}
+      ${crossHist.length ? `<div style="margin-top:8px;font-size:13px;color:#39493F">${crossHist.length} reunião(ões) registradas · Última: ${crossHist[crossHist.length-1]?.data||"n/d"}</div>` : ""}
     </div>`;
   }
 
