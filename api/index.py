@@ -1685,6 +1685,48 @@ def _parse_posicao_consolidada_texto(texto):
             fgc[a["emissor"]] = fgc.get(a["emissor"], 0.0) + a["valor"]
     o["emissores_fgc"] = [{"emissor": k, "valor": round(v, 2), "acima_teto": v > 250000}
                           for k, v in sorted(fgc.items(), key=lambda x: -x[1])]
+    # Fundos de investimento (formato: nome + 1 data + cotas + valor + 3x R$; líquido = último)
+    _FUNDROW = re.compile(r'^(.+?)\s+(\d{2}/\d{2}/\d{4})\s+([\d.]+)\s+([\d.,]+)\s+'
+                          r'R\$\s*[\d.,]+\s+R\$\s*[\d.,]+\s+R\$\s*([\d.]+,\d{2})\s*$')
+    def _classe_fundo(sec):
+        n = (sec or "").lower()
+        if "multimerc" in n: return "Multimercado"
+        if "renda variável" in n or "renda variavel" in n or "ações" in n or "acoes" in n: return "Renda Variável"
+        if "global" in n or "exterior" in n or "cambial" in n or "internacional" in n: return "Internacional"
+        if "imobili" in n: return "Fundos Imobiliários"
+        if "renda fixa" in n or "crédito" in n or "credito" in n: return "Fundos RF"
+        if "previd" in n: return "Previdência"
+        return "Outros fundos"
+    fundos = []; _sec_fundo = None
+    for l in L:
+        ms = re.match(r'^\s*[\d.,]+%?\s*\|?\s*((?:Fundos|Ações|Acoes|Previd)[^\n]*?)\s*$', l)
+        if ms and len(ms.group(1)) < 60:
+            _sec_fundo = ms.group(1).strip()
+        mf = _FUNDROW.match(l.strip())
+        if mf:
+            nome_f = mf.group(1).strip()
+            if re.match(r'^(' + _POS_TIPOS_RF + r'|NTN|LTN|LFT)\b', nome_f):
+                continue
+            fundos.append({"nome": nome_f, "classe": _classe_fundo(_sec_fundo), "valor": _pos_brl("R$ " + mf.group(5))})
+    o["fundos"] = fundos
+    # Composição por classe (R$ e %): caixa + RF (títulos) + fundos + resto (COE/prev.)
+    pt2 = o.get("patrimonio_total") or 0
+    comp = {}
+    if o.get("saldo_conta"): comp["Caixa"] = o["saldo_conta"]
+    _rf_sum = sum(a["valor"] or 0 for a in rf_ativos)
+    if _rf_sum: comp["Renda Fixa"] = _rf_sum
+    for fu in fundos:
+        comp[fu["classe"]] = comp.get(fu["classe"], 0) + (fu["valor"] or 0)
+    if pt2:
+        _resto = pt2 - sum(comp.values())
+        if _resto > pt2 * 0.01:
+            comp["Outros (COE/prev.)"] = round(_resto, 2)
+    o["composicao"] = [{"classe": k, "valor": round(v, 2), "pct": round(100 * v / pt2, 1) if pt2 else 0}
+                       for k, v in sorted(comp.items(), key=lambda x: -x[1])]
+    # Confiável quando o "resto" (tipos não parseados, ex.: Tesouro/COE em carteiras
+    # de crédito complexas) é pequeno. Senão a composição é parcial e não deve ser exibida.
+    _outros = next((c["pct"] for c in o["composicao"] if c["classe"].startswith("Outros (COE")), 0)
+    o["composicao_confiavel"] = bool(pt2) and _outros < 20
     # Risco / suitability (N Pts (Limite: X)) — status numérico confiável
     m = re.search(r'(\d+)\s*Pts\s*\(Limite:\s*(\d+)\)', texto or "")
     if m:
@@ -4732,6 +4774,20 @@ function renderFotoPatrimonial(d){
     }).join("");
     fgh='<div style="margin-top:16px"><p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">Exposição FGC por emissor <span style="color:#5A6A60;font-weight:400;text-transform:none;letter-spacing:0">, teto R$ 250 mil/conglomerado (só emissões bancárias)</span></p><div style="display:flex;flex-wrap:wrap">'+chips+'</div></div>';
   }
+  var ch="";
+  if(d.composicao_confiavel && (d.composicao||[]).length){
+    var _cor={"Caixa":"#B0502F","Renda Fixa":"#8A6A28","Multimercado":"#2E7D5B","Renda Variável":"#123047","Internacional":"#B4833A","Fundos RF":"#B79A5E","Fundos Imobiliários":"#5A6A60","Previdência":"#7A5CC0","Outros (COE/prev.)":"#9AAAA0","Outros fundos":"#9AAAA0"};
+    var rowsC=d.composicao.map(function(c){
+      var cor=_cor[c.classe]||"#8A6A28";
+      return '<div style="display:grid;grid-template-columns:150px 1fr 52px;gap:12px;align-items:center;font-size:13px;margin-bottom:7px">'
+        +'<span style="color:#1E2A22">'+c.classe+'</span>'
+        +'<div style="height:13px;border-radius:4px;background:#F5F8F5;overflow:hidden"><div style="height:100%;width:'+Math.min(100,c.pct)+'%;background:'+cor+';border-radius:4px"></div></div>'
+        +'<span style="text-align:right;color:#5A6A60;font-variant-numeric:tabular-nums">'+c.pct.toFixed(0)+'%</span></div>';
+    }).join("");
+    ch='<div style="margin-top:16px"><p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">Composição do patrimônio</p>'+rowsC+'</div>';
+  } else if((d.fundos||[]).length){
+    ch='<div style="margin-top:14px;font-size:13px;color:#5A6A60">📦 '+d.fundos.length+' fundos identificados. Composição por classe parcial nesta carteira (muitos tipos de ativo, ex.: Tesouro Direto).</div>';
+  }
   function _kpi(t,v,c,sub){ return '<div><p style="font-size:12px;color:#5A6A60;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0">'+t+'</p><p style="font-size:22px;font-weight:800;color:'+(c||"#1E2A22")+';margin:4px 0 0">'+v+'</p>'+(sub||"")+'</div>'; }
   var titulo = xp ? '📊 Análise Combinada' : '🏦 Foto Patrimonial';
   var subt = xp ? 'XPerformance + Posição Consolidada' : 'Posição Consolidada';
@@ -4744,7 +4800,7 @@ function renderFotoPatrimonial(d){
       +_kpi("Investido",_fmtBrlPos(inv))
       +_kpi("Para realocar (caixa + 90d)",_fmtBrlPos(r.oportunidade_90d),"#8A6A28")
     +'</div>'
-    +ph+rs+vh+fgh
+    +ph+rs+ch+vh+fgh
     +'<p style="font-size:12px;color:#5A6A60;margin-top:14px;line-height:1.5">'
       +(xp?'Visão combinada: a performance vem do XPerformance (carteira investida) e a foto patrimonial da Posição Consolidada (patrimônio real, com o caixa).'
           :'Suba também o XPerformance deste cliente para cruzar a performance com esta foto patrimonial.')
