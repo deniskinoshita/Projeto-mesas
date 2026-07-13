@@ -25,19 +25,19 @@ MODELO_SERVIR = [
         "id": "open_investments",
         "nome": "Open Investments",
         "icone": "🔗",
-        "descricao": "Consentimento OPIN ativo — visão 360° do patrimônio total do cliente (XP + outras instituições)",
+        "descricao": "Consentimento OPIN ativo, visão 360° do patrimônio total do cliente (XP + outras instituições)",
         "importancia": "CRÍTICA",
-        "impacto_falta": "Assessor enxerga apenas a parte do cliente na XP. A média XP é 37% do patrimônio total nos clientes acima de R$ 300k — significa que 63% do patrimônio está invisível. Sem OPIN, qualquer recomendação de alocação é incompleta e pode até duplicar posições.",
-        "acao": "Solicitar consentimento OPIN pelo app XP. Pitch: 'Para que eu possa cuidar do seu patrimônio como um todo e não apenas da parte na XP, preciso que você libere o Open Investments. É tão simples quanto um Pix — 3 cliques no app. Assim consigo evitar duplicar posições e encontrar oportunidades que hoje estão invisíveis.'",
+        "impacto_falta": "Assessor enxerga apenas a parte do cliente na XP. A média XP é 37% do patrimônio total nos clientes acima de R$ 300k, significa que 63% do patrimônio está invisível. Sem OPIN, qualquer recomendação de alocação é incompleta e pode até duplicar posições.",
+        "acao": "Solicitar consentimento OPIN pelo app XP. Pitch: 'Para que eu possa cuidar do seu patrimônio como um todo e não apenas da parte na XP, preciso que você libere o Open Investments. É tão simples quanto um Pix, 3 cliques no app. Assim consigo evitar duplicar posições e encontrar oportunidades que hoje estão invisíveis.'",
         "cor": "#D93B3B"
     },
     {
         "id": "financial_planning",
         "nome": "Financial Planning",
         "icone": "🎯",
-        "descricao": "Planejamento financeiro completo realizado — objetivos, metas e destino financeiro do cliente mapeados",
-        "importancia": "CRÍTICA — 1ª DIRETRIZ BRAÚNA",
-        "impacto_falta": "SEM FINANCIAL PLANNING, NÃO HÁ DESTINO. Toda alocação é arbitrária quando não se sabe para onde o cliente quer ir. Não sabemos: quanto ele precisa para se aposentar, quando quer comprar um imóvel, qual o horizonte de cada objetivo. A carteira existe para realizar sonhos — sem o FP, estamos construindo uma estrada sem saber o destino.",
+        "descricao": "Planejamento financeiro completo realizado, objetivos, metas e destino financeiro do cliente mapeados",
+        "importancia": "CRÍTICA, 1ª DIRETRIZ BRAÚNA",
+        "impacto_falta": "SEM FINANCIAL PLANNING, NÃO HÁ DESTINO. Toda alocação é arbitrária quando não se sabe para onde o cliente quer ir. Não sabemos: quanto ele precisa para se aposentar, quando quer comprar um imóvel, qual o horizonte de cada objetivo. A carteira existe para realizar sonhos, sem o FP, estamos construindo uma estrada sem saber o destino.",
         "acao": "DIRETRIZ QUALIDADE BRAÚNA: Provocar o cliente agora. Perguntar diretamente: 'Você sabe exatamente quanto precisa acumular para se aposentar com o padrão de vida que deseja? Você tem um plano financeiro que traga clareza sobre cada objetivo da sua vida?' O Financial Planning é o primeiro passo antes de qualquer outra conversa de investimento.",
         "cor": "#CF2E2E",
         "diretriz": True
@@ -46,7 +46,7 @@ MODELO_SERVIR = [
         "id": "ordem_enviada",
         "nome": "Ordem Enviada",
         "icone": "📋",
-        "descricao": "Última ordem/movimentação executada — cliente está ativo e a carteira está evoluindo",
+        "descricao": "Última ordem/movimentação executada, cliente está ativo e a carteira está evoluindo",
         "importancia": "ALTA",
         "impacto_falta": "Carteira estagnada. Cliente sem aportes recentes é um dos critérios de ruptura no Índice de Saúde XP (2 pontos). Uma carteira sem movimentação perde oportunidades de realocação e demonstra falta de atenção ativa do assessor.",
         "acao": "Verificar última ordem executada. Se não houver movimentação recente: identificar oportunidade de aporte ou realocação compatível com o perfil e gerar uma proposta concreta com base nos desvios do modelo.",
@@ -56,7 +56,7 @@ MODELO_SERVIR = [
         "id": "conta_acessada",
         "nome": "Conta Acessada",
         "icone": "📱",
-        "descricao": "Cliente acessou a plataforma/app XP nos últimos 30 dias — está engajado com seus investimentos",
+        "descricao": "Cliente acessou a plataforma/app XP nos últimos 30 dias, está engajado com seus investimentos",
         "importancia": "ALTA",
         "impacto_falta": "Cliente desengajado da plataforma tem maior risco de ruptura e portabilidade. Clientes que não acessam a conta tendem a estar mais suscetíveis a abordagens de concorrentes. No Índice de Saúde XP, 'Sem Ordens' vale 2 pontos de risco de ruptura.",
         "acao": "Entrar em contato ativo para reengajar o cliente. Enviar uma análise personalizada (este relatório!) como pretexto de valor. Convidar para reunião de revisão de carteira. O engajamento do cliente começa pelo engajamento do assessor.",
@@ -66,17 +66,17 @@ MODELO_SERVIR = [
         "id": "xperformance",
         "nome": "X-Performance",
         "icone": "📊",
-        "descricao": "Relatório XPerformance analisado e discutido com o cliente — base para conversa de alocação e rentabilidade",
+        "descricao": "Relatório XPerformance analisado e discutido com o cliente, base para conversa de alocação e rentabilidade",
         "importancia": "MÉDIA",
         "impacto_falta": "Sem análise do XPerformance, o cliente não tem visão clara da rentabilidade vs. benchmark (CDI). É impossível ter uma conversa fundamentada sobre realocação sem este diagnóstico. O XPerformance é o ponto de partida para toda revisão de carteira.",
-        "acao": "Analisar o XPerformance atual e agendar uma reunião de revisão. Mostrar ao cliente como sua carteira se compara ao CDI e ao modelo ideal para o seu perfil — use este relatório como base da conversa.",
+        "acao": "Analisar o XPerformance atual e agendar uma reunião de revisão. Mostrar ao cliente como sua carteira se compara ao CDI e ao modelo ideal para o seu perfil, use este relatório como base da conversa.",
         "cor": "#8A9A8E"
     },
     {
         "id": "atividade_relacionamento",
         "nome": "Atividade de Relacionamento",
         "icone": "🤝",
-        "descricao": "Contato ativo nos últimos 30 dias — ligação, reunião, WhatsApp com conteúdo de valor",
+        "descricao": "Contato ativo nos últimos 30 dias, ligação, reunião, WhatsApp com conteúdo de valor",
         "importancia": "ALTA",
         "impacto_falta": "Cliente silencioso = cliente em risco. A falta de relacionamento ativo é o principal precursor de portabilidade. Concorrentes que abordam o cliente com insights e atenção têm vantagem sobre um assessor ausente. A régua de relacionamento é o que mantém o cliente fiel mesmo em períodos de rentabilidade ruim.",
         "acao": "Entrar em contato hoje com um ponto de valor: análise de carteira, insight de mercado, ou simplesmente verificar se o cliente tem alguma necessidade. Use este relatório como motivo de contato: 'Fiz uma análise completa da sua carteira e gostaria de conversar sobre algumas oportunidades.'",
@@ -90,10 +90,10 @@ CROSS_SELL = [
         "nome": "Aquisição de Bens",
         "icone": "🏠",
         "descricao": "Financiamento imobiliário, consórcio ou crédito para aquisição de imóveis e veículos",
-        "pitch": "Você tem planos de adquirir algum imóvel ou bem de alto valor nos próximos anos? Posso apresentar as melhores condições de crédito e consórcio disponíveis — muitas vezes com taxas melhores que o mercado tradicional.",
+        "pitch": "Você tem planos de adquirir algum imóvel ou bem de alto valor nos próximos anos? Posso apresentar as melhores condições de crédito e consórcio disponíveis, muitas vezes com taxas melhores que o mercado tradicional.",
         "oportunidades": [
             "Consórcio de imóveis: sem juros, ideal para quem não tem pressa. Taxa de administração de 10-15% vs. juros de financiamento de 10-12% a.a.",
-            "Crédito com garantia de investimentos (home equity): taxas a partir de CDI+1% a.a. — muito abaixo do crédito pessoal.",
+            "Crédito com garantia de investimentos (home equity): taxas a partir de CDI+1% a.a., muito abaixo do crédito pessoal.",
             "Financiamento imobiliário: analisar SAC vs. PRICE, impacto de amortizações extras e FGTS.",
             "Consórcio de veículos: saída inteligente para quem planeja trocar o carro em 2-3 anos sem pagar juros."
         ]
@@ -102,8 +102,8 @@ CROSS_SELL = [
         "id": "gestao_discricionaria",
         "nome": "Gestão Discricionária Prunus",
         "icone": "🌿",
-        "descricao": "Carteira gerida ativamente pela Prunus Asset com mandato discricionário — assessor delega a gestão",
-        "pitch": "Já considerou ter uma gestão profissional e ativa da sua carteira? A Prunus Asset opera com mandato discricionário — você define o perfil e os gestores tomam as decisões do dia a dia, com total transparência e relatórios periódicos.",
+        "descricao": "Carteira gerida ativamente pela Prunus Asset com mandato discricionário, assessor delega a gestão",
+        "pitch": "Já considerou ter uma gestão profissional e ativa da sua carteira? A Prunus Asset opera com mandato discricionário, você define o perfil e os gestores tomam as decisões do dia a dia, com total transparência e relatórios periódicos.",
         "oportunidades": [
             "Gestão ativa por profissionais especializados: acesso ao mesmo nível de gestão de clientes private/institutional.",
             "Sem necessidade de acompanhamento diário pelo cliente: ideal para quem tem agenda cheia e não quer se preocupar com realocações.",
@@ -129,11 +129,11 @@ CROSS_SELL = [
         "nome": "Planejamento Financeiro",
         "icone": "🎯",
         "descricao": "Financial Planning completo: previdência, seguro de vida, proteção de renda e transmissão de bens em vida",
-        "pitch": "Você tem uma estratégia clara para cada fase da sua vida financeira? Previdência, proteção da sua renda e do seu patrimônio, e um plano para transmitir seus bens com o menor custo possível — esses três pilares precisam estar presentes em qualquer planejamento sério.",
+        "pitch": "Você tem uma estratégia clara para cada fase da sua vida financeira? Previdência, proteção da sua renda e do seu patrimônio, e um plano para transmitir seus bens com o menor custo possível, esses três pilares precisam estar presentes em qualquer planejamento sério.",
         "oportunidades": [
-            "PREVIDÊNCIA PRIVADA — PGBL ou VGBL?",
-            "SEGURO DE VIDA — proteção de renda e dependentes",
-            "TRANSMISSÃO DE BENS EM VIDA — doação e sucessão planejada"
+            "PREVIDÊNCIA PRIVADA, PGBL ou VGBL?",
+            "SEGURO DE VIDA, proteção de renda e dependentes",
+            "TRANSMISSÃO DE BENS EM VIDA, doação e sucessão planejada"
         ],
         "especialista": {
             "previdencia": {
@@ -141,7 +141,7 @@ CROSS_SELL = [
                 "icone": "🏦",
                 "diagnostico": "A previdência privada é um dos instrumentos mais eficientes de longo prazo disponíveis no Brasil. A ausência dela é uma das maiores lacunas patrimoniais que existem.",
                 "pgbl_vs_vgbl": {
-                    "pgbl": "PGBL (Plano Gerador de Benefício Livre): ideal para quem declara IR no modelo completo. Deduz até 12% da renda bruta anual tributável — imposto só incide no resgate (sobre o total acumulado). Recomendado para quem tem IR a pagar.",
+                    "pgbl": "PGBL (Plano Gerador de Benefício Livre): ideal para quem declara IR no modelo completo. Deduz até 12% da renda bruta anual tributável, imposto só incide no resgate (sobre o total acumulado). Recomendado para quem tem IR a pagar.",
                     "vgbl": "VGBL (Vida Gerador de Benefício Livre): ideal para quem declara IR simplificado ou já usa o limite do PGBL. Imposto incide só sobre os rendimentos (não sobre o principal). Recomendado como complemento ao PGBL ou para isentos de IR.",
                     "regra": "Regra prática: PGBL para os 12% de dedução, VGBL para o restante dos aportes."
                 },
@@ -154,15 +154,15 @@ CROSS_SELL = [
             "seguro_vida": {
                 "titulo": "Seguro de Vida",
                 "icone": "🛡️",
-                "diagnostico": "O seguro de vida é a ferramenta mais barata e eficiente para proteger quem você ama. A maioria das pessoas subestima o impacto da perda da renda do provedor principal — o seguro resolve exatamente isso.",
+                "diagnostico": "O seguro de vida é a ferramenta mais barata e eficiente para proteger quem você ama. A maioria das pessoas subestima o impacto da perda da renda do provedor principal, o seguro resolve exatamente isso.",
                 "coberturas": [
                     "Morte: garante a continuidade financeira da família. Regra: cobertura de 5x a renda anual bruta do provedor.",
-                    "Invalidez permanente total ou parcial: frequentemente mais importante que morte — você vive, mas não consegue trabalhar.",
-                    "Doenças graves (DIT): diagnóstico de câncer, AVC, infarto — capital para tratamento sem comprometer investimentos.",
+                    "Invalidez permanente total ou parcial: frequentemente mais importante que morte, você vive, mas não consegue trabalhar.",
+                    "Doenças graves (DIT): diagnóstico de câncer, AVC, infarto, capital para tratamento sem comprometer investimentos.",
                     "Perda de renda temporária: proteção de renda durante internações ou recuperações longas."
                 ],
                 "calculo": "Capital segurado mínimo recomendado: 10x a renda anual + total das dívidas (financiamentos, créditos em aberto). Isso garante que a família mantenha o padrão de vida por 10 anos sem depender dos investimentos.",
-                "pitch": "Se algo acontecesse com você amanhã, sua família conseguiria manter o padrão de vida atual por quanto tempo com o patrimônio que tem hoje? O seguro de vida cobre exatamente esse gap — e custa muito menos do que a maioria imagina."
+                "pitch": "Se algo acontecesse com você amanhã, sua família conseguiria manter o padrão de vida atual por quanto tempo com o patrimônio que tem hoje? O seguro de vida cobre exatamente esse gap, e custa muito menos do que a maioria imagina."
             },
             "transmissao_bens": {
                 "titulo": "Transmissão de Bens em Vida",
@@ -171,12 +171,12 @@ CROSS_SELL = [
                 "estrategias": [
                     "Doação com reserva de usufruto: doa os bens em vida, mas mantém o direito de uso e fruto enquanto viver. ITCMD incide sobre o valor da nua-propriedade (menor que o valor total). Evita inventário.",
                     "Holding familiar: concentra os bens em uma pessoa jurídica. A transmissão ocorre por cotas da holding (mais barata que transmissão de imóveis diretamente). Benefício adicional: proteção patrimonial e gestão unificada.",
-                    "Seguro de vida: o capital segurado não entra em inventário e é transmitido diretamente ao beneficiário — isento de ITCMD e fora do alcance de credores.",
+                    "Seguro de vida: o capital segurado não entra em inventário e é transmitido diretamente ao beneficiário, isento de ITCMD e fora do alcance de credores.",
                     "Testamento: fundamental para garantir a vontade do titular, especialmente em famílias reconstituídas ou com herdeiros com necessidades especiais.",
                     "Previdência com beneficiários designados: assim como o seguro, a previdência privada transmite o saldo diretamente aos beneficiários sem inventário."
                 ],
-                "alerta_itcmd": "ITCMD em São Paulo: 4% (em discussão aumento para alíquotas progressivas até 8%). Em MG: até 5%. No RJ: até 8%. Um patrimônio de R$ 2 milhões sem planejamento pode gerar R$ 80.000-200.000 só em ITCMD — fora honorários de inventário.",
-                "pitch": "Você já pensou em quanto vai custar para seus herdeiros receber o que você acumulou ao longo da vida? Com um planejamento adequado, é possível reduzir esse custo significativamente — e garantir que seu patrimônio chegue a quem você quer, da forma que você quer."
+                "alerta_itcmd": "ITCMD em São Paulo: 4% (em discussão aumento para alíquotas progressivas até 8%). Em MG: até 5%. No RJ: até 8%. Um patrimônio de R$ 2 milhões sem planejamento pode gerar R$ 80.000-200.000 só em ITCMD, fora honorários de inventário.",
+                "pitch": "Você já pensou em quanto vai custar para seus herdeiros receber o que você acumulou ao longo da vida? Com um planejamento adequado, é possível reduzir esse custo significativamente, e garantir que seu patrimônio chegue a quem você quer, da forma que você quer."
             }
         }
     },
@@ -187,11 +187,11 @@ CROSS_SELL = [
         "descricao": "Diversificação em ativos internacionais: renda fixa global, ações estrangeiras, ETFs e BDRs",
         "pitch": "Você tem parte do seu patrimônio protegido em dólar ou outra moeda forte? Com o real historicamente volátil, ter exposição internacional é uma das formas mais eficientes de proteger poder de compra de longo prazo.",
         "oportunidades": [
-            "Renda fixa global hedgeada (ex: Trend Global Bonds, Sparta): retorno em dólar com proteção cambial — diversificação sem risco de câmbio excessivo.",
+            "Renda fixa global hedgeada (ex: Trend Global Bonds, Sparta): retorno em dólar com proteção cambial, diversificação sem risco de câmbio excessivo.",
             "BDRs (Brazilian Depositary Receipts): acesso a ações de Apple, Amazon, Google e outras diretamente na B3, em reais.",
             "ETFs internacionais (IVVB11, BNDX11): exposição ampla ao mercado americano e renda fixa global com liquidez diária.",
-            "Contas no exterior: para patrimônios acima de R$ 1 milhão, considerar conta em corretora internacional (Interactive Brokers, Charles Schwab) — acesso direto a mercados globais.",
-            "Fundos de investimento no exterior: estrutura local com gestão de ativos internacionais — simplifica a declaração de IR."
+            "Contas no exterior: para patrimônios acima de R$ 1 milhão, considerar conta em corretora internacional (Interactive Brokers, Charles Schwab), acesso direto a mercados globais.",
+            "Fundos de investimento no exterior: estrutura local com gestão de ativos internacionais, simplifica a declaração de IR."
         ]
     }
 ]
@@ -286,13 +286,13 @@ def _enviar_email_reset(destinatario: str, nome: str, token: str):
     base  = os.environ.get("APP_URL", "https://analise-carteiras-brauna.vercel.app")
 
     if not user or not pwd:
-        app.logger.warning("SMTP não configurado — e-mail de reset não enviado")
+        app.logger.warning("SMTP não configurado, e-mail de reset não enviado")
         return False
 
     link = f"{base}/reset-senha?token={token}"
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Braúna Investimentos — Redefinição de senha"
+    msg["Subject"] = "Braúna Investimentos, Redefinição de senha"
     msg["From"]    = frm
     msg["To"]      = destinatario
 
@@ -305,7 +305,7 @@ Clique no link abaixo para criar uma nova senha:
 
 Este link expira em 1 hora.
 
-Se você não solicitou a redefinição, ignore este e-mail — sua senha continua a mesma.
+Se você não solicitou a redefinição, ignore este e-mail, sua senha continua a mesma.
 
 Braúna Investimentos
 """
@@ -327,7 +327,7 @@ Braúna Investimentos
     </a>
   </div>
   <p style="color:#5C7365;font-size:11px;text-align:center">Este link expira em <strong>1 hora</strong>.<br>
-  Se não foi você, ignore este e-mail — sua senha continua a mesma.</p>
+  Se não foi você, ignore este e-mail, sua senha continua a mesma.</p>
   <hr style="border:none;border-top:1px solid #F5F8F5;margin:24px 0">
   <p style="color:#D9E3DB;font-size:10px;text-align:center">Braúna Investimentos · Uso interno · Acesso restrito</p>
 </div>
@@ -353,9 +353,9 @@ def _entry_hash(entry):
         return entry.get("hash", "")
     return entry or ""
 
-# ── Portfólios Modelo default (Levante Asset — Junho 2026) ────────────────────
+# ── Portfólios Modelo default (Levante Asset, Junho 2026) ────────────────────
 HP_PORTFOLIOS_DEFAULT = {
-    "referencia": "Levante Asset — Junho 2026",
+    "referencia": "Levante Asset, Junho 2026",
     "publicado_em": "2026-06-19",
     "classes": ["pos_fixado","inflacao","pre_fixado","acoes","fiis","multimercado","alternativos","internacional","criptomoedas"],
     "labels":  {"pos_fixado":"Pós Fixado","inflacao":"Inflação","pre_fixado":"Pré Fixado","acoes":"Ações","fiis":"FIIs","multimercado":"Multimercado","alternativos":"Alternativos","internacional":"Internacional","criptomoedas":"Criptomoedas"},
@@ -369,11 +369,11 @@ HP_PORTFOLIOS_DEFAULT = {
 }
 
 HP_CENARIO_DEFAULT = {
-    "referencia": "Levante Asset — Junho 2026",
+    "referencia": "Levante Asset, Junho 2026",
     "publicado_em": "2026-06-19",
     "global": "Persistência inflacionária global impulsionada por conflito no Oriente Médio (Brent US$ 92,5/barril). Fed hawkish: juros elevados por mais tempo, possível retomada de altas. PCE abril 3,8% a/a. Dólar forte frente às demais moedas. Bolsas globais avançaram em maio (S&P 500 +5,1%, Nasdaq +8,3%), puxadas por IA.",
-    "brasil": "Selic deve encerrar ciclo de corte na próxima reunião com pausa para avaliação prospectiva. IPCA-15 maio 0,62% acima do esperado, núcleos e serviços ainda pressionados. Risco fiscal relevante: medidas contábeis do governo afetam dívida. Ibovespa -7,2% em maio por saída de estrangeiro e ruído político — precificação mais atraente para médio/longo prazo.",
-    "posicionamento": "Reduzindo FIIs e Multimercados. Aumentando Renda Variável (correção recente traz valor). Crédito: spreads estabilizando — Idex-DI 1,8%, Idex-Infra 42bps. Curvas de juros e inflação implícita em alta em toda extensão. Duration curta na renda fixa.",
+    "brasil": "Selic deve encerrar ciclo de corte na próxima reunião com pausa para avaliação prospectiva. IPCA-15 maio 0,62% acima do esperado, núcleos e serviços ainda pressionados. Risco fiscal relevante: medidas contábeis do governo afetam dívida. Ibovespa -7,2% em maio por saída de estrangeiro e ruído político, precificação mais atraente para médio/longo prazo.",
+    "posicionamento": "Reduzindo FIIs e Multimercados. Aumentando Renda Variável (correção recente traz valor). Crédito: spreads estabilizando, Idex-DI 1,8%, Idex-Infra 42bps. Curvas de juros e inflação implícita em alta em toda extensão. Duration curta na renda fixa.",
     "vieses": {
         "pos_fixado": "neutro",
         "inflacao": "positivo",
@@ -437,19 +437,19 @@ HP_CARTEIRA_BRAUNA_DEFAULT = {
             {"id":"valora_guardian","nome":"Valora Guardian Advisory FIC FIM CP","taxa":"CDI","tipo":"fundo","gestora":"Valora","rent_12m":"15,77%","resgate":"D+75","caracteristica":"RF High Yield","perfis":["moderada","arrojada"],"motivo":""},
             {"id":"jgp_strategy","nome":"JGP Strategy Advisory FIC FIM","taxa":"CDI","tipo":"fundo","gestora":"JGP","rent_12m":"11,43%","resgate":"D+30","caracteristica":"Multimercado Macro","perfis":["moderada","arrojada"],"motivo":""},
         ]},
-        {"id":"acoes","nome":"Ações — Carteira Racional","produtos":[
-            {"id":"eqtl3","nome":"EQTL3 — Equatorial Energia","ticker":"EQTL3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 46,00","rating_hp":"Compra","motivo":"Temos recomendação de Compra para Equatorial Energia (EQTL3) com preço-alvo de R$ 46/ação e TIR real de 12%, refletindo a aquisição de 15% de participação na Sabesp. A empresa é um case de sucesso no segmento de distribuição, conhecida por adquirir ativos com dificuldades e implementar programas de turnaround bem-sucedidos, reduzindo perdas e inadimplência, cortando opex e melhorando indicadores de qualidade.","perfis":["moderada","arrojada"]},
-            {"id":"itub4","nome":"ITUB4 — Itaú Unibanco","ticker":"ITUB4","peso_moderada":"15%","peso_arrojada":"15%","preco_alvo":"R$ 51,00","rating_hp":"Compra","motivo":"O Itaú entregou um sólido 4T25, com resultados em linha com as expectativas e ROE acima de 24%. Atualmente, Itaú oferece o maior dividend yield do setor (12,25%), além dos melhores indicadores de eficiência, endividamento e rentabilidade. Mantemos recomendação de Compra e ITUB4 como nossa top pick, com preço-alvo de R$ 51,00.","perfis":["moderada","arrojada"]},
-            {"id":"vale3","nome":"VALE3 — Vale","ticker":"VALE3","peso_moderada":"12,5%","peso_arrojada":"12,5%","preco_alvo":"R$ 112,00","rating_hp":"Compra","motivo":"Apesar de um contexto desafiador, o minério de ferro segue negociado entre US$ 90 e US$ 100 por tonelada — níveis que garantem boa rentabilidade às operações da Vale. As ações são negociadas a EV/EBITDA de 4,5x, patamar atrativo. Dividend yield tendendo a 10% a.a. Preço-alvo: R$ 112,00.","perfis":["moderada","arrojada"]},
-            {"id":"engi11","nome":"ENGI11 — Energisa","ticker":"ENGI11","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 93,50","rating_hp":"Compra","motivo":"Recomendação de Compra para Energisa (ENGI11) com preço-alvo de R$ 93,50/ação e TIR real de 17,1%. Na TIR atual (17,1% real, spread de 400 bps em relação à EQTL), vemos a ENGI como um bom veículo para exposição a queda de juros em uma empresa previsível e com caminho estratégico claro.","perfis":["moderada","arrojada"]},
-            {"id":"petr4","nome":"PETR4 — Petrobras","ticker":"PETR4","peso_moderada":"12,5%","peso_arrojada":"12,5%","preco_alvo":"R$ 47,00","rating_hp":"Compra","motivo":"A Petrobras oferece combinação de rendimentos correntes e crescimento futuro. O plano de negócios estima pagamentos de USD 45 a USD 55 bilhões em dividendos entre 2025 e 2029. A tese oferece bom retorno via geração de caixa livre e dividendos que podem passar de 10% ao ano se os preços de petróleo permanecerem acima de USD 65/bbl. Preço-alvo: R$ 47,00.","perfis":["moderada","arrojada"]},
-            {"id":"cxse3","nome":"CXSE3 — Caixa Seguridade","ticker":"CXSE3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 20,00","rating_hp":"Compra","motivo":"Optamos por Caixa Seguridade com foco em produtos de seguros, previdência e capitalização. Modelo asset light, forte geração de caixa e política de dividendos. A companhia sustenta os indicadores de valuation e endividamento mais atrativos do setor, incluindo dividend yield na casa dos dígitos altos. Preço-alvo: R$ 20,00.","perfis":["moderada","arrojada"]},
-            {"id":"sbsp3","nome":"SBSP3 — Sabesp","ticker":"SBSP3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 40,00","rating_hp":"Compra","motivo":"Recomendação de Compra para Sabesp (SBSP3) com preço justo de R$ 40,00. A companhia reportou resultado sólido no 1T26, com forte expansão operacional e EBITDA acima das projeções. Investiu R$ 3,7 bilhões no trimestre (+31% a/a), mantendo ritmo acelerado de expansão da infraestrutura voltada à universalização.","perfis":["moderada","arrojada"]},
-            {"id":"vivt3","nome":"VIVT3 — Vivo / Telefônica","ticker":"VIVT3","peso_moderada":"7,5%","peso_arrojada":"7,5%","preco_alvo":"R$ 64,00","rating_hp":"Compra","motivo":"Recomendação de Compra e preço-alvo de R$ 64,00 para Vivo (VIVT3). A tese é defendida por impulsionadores estruturais no setor de Telecom: redução do ICMS, consolidação do mercado criou ambiente competitivo mais racional e eficiência aprimorada da infraestrutura por meio de redes neutras e compartilhamento 5G.","perfis":["moderada","arrojada"]},
-            {"id":"ivvb11","nome":"IVVB11 — ETF S&P 500","ticker":"IVVB11","peso_moderada":"7,5%","peso_arrojada":"7,5%","rating_hp":"Compra","motivo":"IVVB11 é um ETF que busca desempenho igual ou superior ao S&P 500. O fundo investe no mínimo 95% do seu patrimônio em ações do S&P 500. Excelente alternativa de mitigação de risco cambial, com exposição às maiores empresas do mundo.","perfis":["moderada","arrojada"]},
-            {"id":"gold11","nome":"GOLD11 — Ouro","ticker":"GOLD11","peso_moderada":"5%","peso_arrojada":"5%","rating_hp":"Compra","motivo":"Selecionado como forma de diversificar o portfólio e compor a classe de ativos alternativos. O ouro tende a ser alternativa de proteção contra a inflação no longo prazo, contribui para reduzir a correlação entre as classes da carteira e é associado ao papel de 'porto seguro' em momentos de elevada percepção de risco global.","perfis":["moderada","arrojada"]},
+        {"id":"acoes","nome":"Ações, Carteira Racional","produtos":[
+            {"id":"eqtl3","nome":"EQTL3, Equatorial Energia","ticker":"EQTL3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 46,00","rating_hp":"Compra","motivo":"Temos recomendação de Compra para Equatorial Energia (EQTL3) com preço-alvo de R$ 46/ação e TIR real de 12%, refletindo a aquisição de 15% de participação na Sabesp. A empresa é um case de sucesso no segmento de distribuição, conhecida por adquirir ativos com dificuldades e implementar programas de turnaround bem-sucedidos, reduzindo perdas e inadimplência, cortando opex e melhorando indicadores de qualidade.","perfis":["moderada","arrojada"]},
+            {"id":"itub4","nome":"ITUB4, Itaú Unibanco","ticker":"ITUB4","peso_moderada":"15%","peso_arrojada":"15%","preco_alvo":"R$ 51,00","rating_hp":"Compra","motivo":"O Itaú entregou um sólido 4T25, com resultados em linha com as expectativas e ROE acima de 24%. Atualmente, Itaú oferece o maior dividend yield do setor (12,25%), além dos melhores indicadores de eficiência, endividamento e rentabilidade. Mantemos recomendação de Compra e ITUB4 como nossa top pick, com preço-alvo de R$ 51,00.","perfis":["moderada","arrojada"]},
+            {"id":"vale3","nome":"VALE3, Vale","ticker":"VALE3","peso_moderada":"12,5%","peso_arrojada":"12,5%","preco_alvo":"R$ 112,00","rating_hp":"Compra","motivo":"Apesar de um contexto desafiador, o minério de ferro segue negociado entre US$ 90 e US$ 100 por tonelada, níveis que garantem boa rentabilidade às operações da Vale. As ações são negociadas a EV/EBITDA de 4,5x, patamar atrativo. Dividend yield tendendo a 10% a.a. Preço-alvo: R$ 112,00.","perfis":["moderada","arrojada"]},
+            {"id":"engi11","nome":"ENGI11, Energisa","ticker":"ENGI11","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 93,50","rating_hp":"Compra","motivo":"Recomendação de Compra para Energisa (ENGI11) com preço-alvo de R$ 93,50/ação e TIR real de 17,1%. Na TIR atual (17,1% real, spread de 400 bps em relação à EQTL), vemos a ENGI como um bom veículo para exposição a queda de juros em uma empresa previsível e com caminho estratégico claro.","perfis":["moderada","arrojada"]},
+            {"id":"petr4","nome":"PETR4, Petrobras","ticker":"PETR4","peso_moderada":"12,5%","peso_arrojada":"12,5%","preco_alvo":"R$ 47,00","rating_hp":"Compra","motivo":"A Petrobras oferece combinação de rendimentos correntes e crescimento futuro. O plano de negócios estima pagamentos de USD 45 a USD 55 bilhões em dividendos entre 2025 e 2029. A tese oferece bom retorno via geração de caixa livre e dividendos que podem passar de 10% ao ano se os preços de petróleo permanecerem acima de USD 65/bbl. Preço-alvo: R$ 47,00.","perfis":["moderada","arrojada"]},
+            {"id":"cxse3","nome":"CXSE3, Caixa Seguridade","ticker":"CXSE3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 20,00","rating_hp":"Compra","motivo":"Optamos por Caixa Seguridade com foco em produtos de seguros, previdência e capitalização. Modelo asset light, forte geração de caixa e política de dividendos. A companhia sustenta os indicadores de valuation e endividamento mais atrativos do setor, incluindo dividend yield na casa dos dígitos altos. Preço-alvo: R$ 20,00.","perfis":["moderada","arrojada"]},
+            {"id":"sbsp3","nome":"SBSP3, Sabesp","ticker":"SBSP3","peso_moderada":"10%","peso_arrojada":"10%","preco_alvo":"R$ 40,00","rating_hp":"Compra","motivo":"Recomendação de Compra para Sabesp (SBSP3) com preço justo de R$ 40,00. A companhia reportou resultado sólido no 1T26, com forte expansão operacional e EBITDA acima das projeções. Investiu R$ 3,7 bilhões no trimestre (+31% a/a), mantendo ritmo acelerado de expansão da infraestrutura voltada à universalização.","perfis":["moderada","arrojada"]},
+            {"id":"vivt3","nome":"VIVT3, Vivo / Telefônica","ticker":"VIVT3","peso_moderada":"7,5%","peso_arrojada":"7,5%","preco_alvo":"R$ 64,00","rating_hp":"Compra","motivo":"Recomendação de Compra e preço-alvo de R$ 64,00 para Vivo (VIVT3). A tese é defendida por impulsionadores estruturais no setor de Telecom: redução do ICMS, consolidação do mercado criou ambiente competitivo mais racional e eficiência aprimorada da infraestrutura por meio de redes neutras e compartilhamento 5G.","perfis":["moderada","arrojada"]},
+            {"id":"ivvb11","nome":"IVVB11, ETF S&P 500","ticker":"IVVB11","peso_moderada":"7,5%","peso_arrojada":"7,5%","rating_hp":"Compra","motivo":"IVVB11 é um ETF que busca desempenho igual ou superior ao S&P 500. O fundo investe no mínimo 95% do seu patrimônio em ações do S&P 500. Excelente alternativa de mitigação de risco cambial, com exposição às maiores empresas do mundo.","perfis":["moderada","arrojada"]},
+            {"id":"gold11","nome":"GOLD11, Ouro","ticker":"GOLD11","peso_moderada":"5%","peso_arrojada":"5%","rating_hp":"Compra","motivo":"Selecionado como forma de diversificar o portfólio e compor a classe de ativos alternativos. O ouro tende a ser alternativa de proteção contra a inflação no longo prazo, contribui para reduzir a correlação entre as classes da carteira e é associado ao papel de 'porto seguro' em momentos de elevada percepção de risco global.","perfis":["moderada","arrojada"]},
         ]},
-        {"id":"fiis","nome":"FIIs — Carteira Levante Híbrida","produtos":[
+        {"id":"fiis","nome":"FIIs, Carteira Levante Híbrida","produtos":[
             {"id":"knuq11","nome":"Kinea Unique CDI","ticker":"KNUQ11","exposicao":"10,5%","segmento":"Recebíveis","dy_12m":"14,62%","pvp":"1,04x","motivo":"Fundo de Recebíveis High Yield voltado ao CDI da Kinea. PL de R$ 2,2 bilhões. Taxa média de aquisição dos CRIs: CDI + 4,85%. Prazo médio dos ativos: 3,2 anos. Setores: Residencial Pulverizado (40%), Residencial (33%), Galpões Logísticos (13%). Reserva de resultados: R$ 0,57/cota.","perfis":["moderada","arrojada"]},
             {"id":"mcre11","nome":"Mauá Capital Real Estate","ticker":"MCRE11","exposicao":"9,0%","segmento":"Multiestratégia","dy_12m":"14,30%","pvp":"0,91x","motivo":"Fundo multiestratégia da Mauá Capital. PL de R$ 1,15 bilhão. Distribuição: crédito (45%), imóvel + estruturados (44%). Exposição: IPCA (92%). Taxa média de carrego: IPCA + 9,8% a.a.","perfis":["moderada","arrojada"]},
             {"id":"pcip11","nome":"Pátria Índice de Preços","ticker":"PCIP11","exposicao":"8,5%","segmento":"Recebíveis","dy_12m":"13,19%","pvp":"0,89x","motivo":"Fundo de recebíveis do Patria (ex-VBI). PL de R$ 1,6 bilhão, com 107 CRIs. Carteira: 90% indexada ao IPCA (IPCA + 10,4% a.a.). LTV médio ponderado de 56% e reserva acumulada de R$ 0,40/cota.","perfis":["moderada","arrojada"]},
@@ -461,7 +461,7 @@ HP_CARTEIRA_BRAUNA_DEFAULT = {
             {"id":"juro11","nome":"Sparta FI-Infra IPCA","ticker":"JURO11","exposicao":"7,0%","segmento":"FI-Infra","dy_12m":"12,05%","pvp":"1,01x","motivo":"Fundo de infraestrutura que aloca em debêntures, com meta de IPCA + 2% acima do IMA-B5. PL de R$ 2,1 bilhões. Taxa de carrego: IPCA + 9,4% a.a. Duration: 3,0 anos. Principais setores: Geração de Energia (27%), Saneamento (11%) e Rodovias (10%).","perfis":["moderada","arrojada"]},
             {"id":"vcjr11","nome":"Vectis Juros Real","ticker":"VCJR11","exposicao":"7,0%","segmento":"Recebíveis","dy_12m":"13,60%","pvp":"0,83x","motivo":"Fundo de recebíveis imobiliários com foco em juros reais (IPCA+), agora gerido pelo Patria. Carteira com 40 CRIs, LTV médio de 61% e exposição majoritária ao IPCA (96%). Taxas médias: IPCA + 10,6% e CDI + 5,5% (MTM). Duration IPCA: 4,1 anos.","perfis":["moderada","arrojada"]},
             {"id":"hsaf11","nome":"HSI Ativos Financeiros","ticker":"HSAF11","exposicao":"6,5%","segmento":"Recebíveis","dy_12m":"13,90%","pvp":"0,92x","motivo":"Fundo de recebíveis da HSI. Spread médio: IPCA + 8,64% a.a. e CDI + 4,66% a.a. Alocação: CRIs (62%), FIIs (24%) e caixa (14%). Resultado contábil acumulado não distribuído: R$ 0,37/cota.","perfis":["moderada","arrojada"]},
-            {"id":"kcre11","nome":"Kinea Creditas","ticker":"KCRE11","exposicao":"6,0%","segmento":"Recebíveis","dy_12m":"12,37%","pvp":"0,99x","motivo":"Fundo desenvolvido em parceria com a fintech Creditas, com foco em CRIs no segmento pulverizado (home equity). Taxa média de carrego: IPCA + 9,93%. Estrutura com subordinação em três níveis, sendo a cota Júnior retida pela Creditas para absorver a inadimplência — historicamente não ultrapassou 4,1%.","perfis":["moderada","arrojada"]},
+            {"id":"kcre11","nome":"Kinea Creditas","ticker":"KCRE11","exposicao":"6,0%","segmento":"Recebíveis","dy_12m":"12,37%","pvp":"0,99x","motivo":"Fundo desenvolvido em parceria com a fintech Creditas, com foco em CRIs no segmento pulverizado (home equity). Taxa média de carrego: IPCA + 9,93%. Estrutura com subordinação em três níveis, sendo a cota Júnior retida pela Creditas para absorver a inadimplência, historicamente não ultrapassou 4,1%.","perfis":["moderada","arrojada"]},
             {"id":"kfof11","nome":"Kinea FoF","ticker":"KFOF11","exposicao":"3,0%","segmento":"FoF","dy_12m":"11,68%","pvp":"0,87x","motivo":"FoF da Kinea com PL de R$ 654 milhões. Alocação: FIIs (76,2%), CRIs (4,6%) e caixa/equivalentes (19,2%). Por estratégia: imobiliária (53,7%), tática (27,1%) e caixa (19,2%). Principais segmentos: FIIs de CRI (18,7%), Shopping/Varejo (18,0%) e Logística (11,9%).","perfis":["moderada","arrojada"]},
             {"id":"sapi11","nome":"Santander Recebíveis IPCA","ticker":"SAPI11","exposicao":"3,0%","segmento":"Recebíveis","dy_12m":"15,52%","pvp":"0,93x","motivo":"Fundo de recebíveis indexado ao IPCA do Santander. PL de R$ 296 milhões. Portfólio: CRIs (84%), caixa (9%). Diversificação setorial: logístico (20%), residencial (25%) e energia (7%). Saldo acumulado não distribuído: R$ 0,10/cota.","perfis":["moderada","arrojada"]},
             {"id":"rbhg11","nome":"Rio Bravo Crédito High Grade","ticker":"RBHG11","exposicao":"0,0%","segmento":"Recebíveis","dy_12m":"14,61%","pvp":"0,76x","motivo":"Fundo de recebíveis imobiliários com foco em crédito high grade. Incluso na carteira por seu perfil defensivo e exposição a operações de alta qualidade creditícia, servindo como componente de estabilização da carteira de FIIs.","perfis":["moderada","arrojada"]},
@@ -474,7 +474,7 @@ HP_CARTEIRA_BRAUNA_DEFAULT = {
             {"id":"oaktree_credit","nome":"Oaktree Global Credit Fund (R)","tipo":"Mutual Fund","liquidez":"D+2","retorno_esperado":"USD + 7%","aplic_min":"US$1.020","caracteristica":"RF Global High Yield","perfis":["conservadora","moderada","arrojada"],"motivo":""},
             {"id":"iau_ouro","nome":"iShares Gold Trust (IAU)","tipo":"ETF","liquidez":"D+1","retorno_esperado":"USD + 27,7%","aplic_min":"US$5,00","caracteristica":"Ouro","perfis":["moderada","arrojada"],"motivo":""},
         ]},
-        {"id":"alternativos","nome":"Alternativos — Nexa Resources","produtos":[
+        {"id":"alternativos","nome":"Alternativos, Nexa Resources","produtos":[
             {"id":"nxcod29","nome":"NXCOD29-4","taxa":"17,00%","vencimento":"01/04/2029","perfis":["moderada","arrojada"],"motivo":""},
             {"id":"nxcoa27","nome":"NXCOA27-10","taxa":"CDI + 2%","vencimento":"01/01/2027","perfis":["moderada","arrojada"],"motivo":""},
             {"id":"nxfgtsb31","nome":"NXFGTSB31-2","taxa":"16,00%","vencimento":"01/02/2031","perfis":["moderada","arrojada"],"motivo":""},
@@ -550,7 +550,7 @@ def _portfolios_validos(port):
 
 def _modelo_gestora(gestora_id, perfil):
     """Retorna o modelo (alocação por classe) da gestora escolhida para o perfil.
-    Retorna None se a gestora não existe — chamador deve cair p/ o modelo Levante."""
+    Retorna None se a gestora não existe, chamador deve cair p/ o modelo Levante."""
     if not gestora_id:
         return None
     g = _load(_HP_GESTORAS2_FILE, {}).get(gestora_id)
@@ -597,7 +597,7 @@ def _norm_nome(s):
 
 def _parse_carteira_rec(texto, nome=""):
     """Extrai itens recomendados de um PDF de carteira/research: tickers (RV/FII) e
-    nomes de fundos; detecta o tipo. Não inventa — só o que o texto traz."""
+    nomes de fundos; detecta o tipo. Não inventa, só o que o texto traz."""
     up = (texto or "").upper()
     tickers = _extrair_tickers(texto)
     fii   = [t for t in tickers if t.endswith("11")]
@@ -867,7 +867,7 @@ def carregar_contexto():
         return {}
 
 
-# ── SAA — alocação-alvo por perfil (régua do rebalanceamento; casa = Braúna) ──────
+# ── SAA, alocação-alvo por perfil (régua do rebalanceamento; casa = Braúna) ──────
 _SAA_JSON_CACHE = None
 def _saa_json():
     global _SAA_JSON_CACHE
@@ -885,7 +885,7 @@ def saa_alvo(perfil, gestora="brauna"):
     saa_referencia.json. Retorna {} se não houver alvo para o perfil."""
     if not perfil:
         return {}
-    # 1) fonte viva (gest2 editável) — só usa se tiver soma > 0
+    # 1) fonte viva (gest2 editável), só usa se tiver soma > 0
     try:
         viva = _load(_HP_GESTORAS2_FILE, {}).get(gestora, {}).get("perfis", {}).get(perfil)
         if viva and any(float(v or 0) for v in viva.values()):
@@ -917,10 +917,10 @@ def _fpct(v):
     try:
         return f"{float(v):.2f}%"
     except Exception:
-        return "—"
+        return "n/d"
 
 def _sug_rf(filtro, obs, n, excluir=None):
-    """RF tradicional (suitability Geral) — isentos primeiro, depois por rating.
+    """RF tradicional (suitability Geral), isentos primeiro, depois por rating.
     Exclui o que o cliente já tem e diversifica emissor entre produtos com FGC (teto)."""
     xs = [p for p in _prat("rf_tradicional_br.json").get("produtos", [])
           if (p.get("publico") or "").startswith("Investidor Geral") and filtro(p)]
@@ -951,7 +951,7 @@ def _sug_rf(filtro, obs, n, excluir=None):
     return out
 
 def _sug_fund(classes, obs, n, excluir=None):
-    """Fundos (suitability Geral) — prioriza track record 24/36m e menor taxa
+    """Fundos (suitability Geral), prioriza track record 24/36m e menor taxa
     (evita 'chasing' do 12m); exclui o que o cliente já tem."""
     def _base(p):
         for k in ("rent_36m", "rent_24m", "rent_12m"):
@@ -981,7 +981,7 @@ def _sug_intl(n, excluir=None):
     xs = [p for p in _prat("rf_internacional.json").get("produtos", [])
           if p.get("tipo") in ("treasury", "bond") and isinstance(p.get("rentab_aa"), (int, float))
           and not (excluir and (p.get("ativo") or "").upper() in excluir)]
-    # Treasuries (soberano) primeiro — núcleo conservador; depois bonds por yield.
+    # Treasuries (soberano) primeiro, núcleo conservador; depois bonds por yield.
     xs.sort(key=lambda p: (p.get("tipo") != "treasury", -(p.get("rentab_aa") or 0)))
     return [{"nome": f"{p.get('ativo')} ({p.get('vencimento')})",
              "detalhe": f"{_fpct(p.get('rentab_aa'))} a.a. USD · {p.get('rating') or ''}".strip(" ·"),
@@ -995,7 +995,7 @@ def _sug_cetip(filtro, obs, n, excluir=None):
              "fonte": "Cetipado", "obs": obs} for f in xs[:n]]
 
 def _travas_institucionais(cls, gap_valor, auc, prods_prat):
-    """Tetos do Controle Institucional de Alocação XP (vigência ago/2026) — NUNCA exceder.
+    """Tetos do Controle Institucional de Alocação XP (vigência ago/2026), NUNCA exceder.
     Retorna a lista de avisos aplicáveis à sugestão desta classe. Ver memória
     'limites-alocacao-institucional-xp'. AUC aqui = patrimônio da carteira (proxy;
     o AUC oficial soma todas as marcas XP + OPIN)."""
@@ -1013,21 +1013,21 @@ def _travas_institucionais(cls, gap_valor, auc, prods_prat):
     # nota comercial, FIDC. NÃO inclui emissão bancária nem título público.
     is_cred_priv = (not is_banco and not is_tesouro) and bool(
         _re.search(r"\b(DEB[ÊE]NTURE|CRI|CRA|NOTA\s+COMERCIAL|FIDC|CDCA|CDA)\b", nome))
-    # 1) Crédito privado — máx 5% do AUC por emissor
+    # 1) Crédito privado, máx 5% do AUC por emissor
     if is_cred_priv:
         lim = 0.05 * auc
         if gap_valor > lim:
             n = int(gap_valor // lim) + (1 if gap_valor % lim else 0)
-            travas.append(f"Crédito privado: máx 5% do AUC ({_brl(lim)}) por emissor — dividir em ~{n} emissores.")
-    # 2) NTN-B com vencimento ≥ 2040 — máx 15% do AUC
+            travas.append(f"Crédito privado: máx 5% do AUC ({_brl(lim)}) por emissor, dividir em ~{n} emissores.")
+    # 2) NTN-B com vencimento ≥ 2040, máx 15% do AUC
     if is_tesouro and "NTN" in nome:
         m = _re.search(r"(20\d{2})", nome)
         if m and int(m.group(1)) >= 2040:
             travas.append(f"NTN-B ≥2040: concentração máx 15% do AUC ({_brl(0.15*auc)}).")
-    # 3) Emissão bancária — FGC cobre até R$ 250k por emissor/conglomerado
+    # 3) Emissão bancária, FGC cobre até R$ 250k por emissor/conglomerado
     if is_banco and gap_valor > 250000:
         n = int(gap_valor // 250000) + (1 if gap_valor % 250000 else 0)
-        travas.append(f"Emissão bancária: FGC cobre até R$ 250k por emissor/conglomerado — dividir em ~{n} emissores para manter a cobertura (se high yield, teto de R$ 180k).")
+        travas.append(f"Emissão bancária: FGC cobre até R$ 250k por emissor/conglomerado, dividir em ~{n} emissores para manter a cobertura (se high yield, teto de R$ 180k).")
     return travas
 
 def _sugerir_por_classe(cat, n=3, excluir=None):
@@ -1040,7 +1040,7 @@ def _sugerir_por_classe(cat, n=3, excluir=None):
     if cat == "inflacao":
         r = _sug_rf(lambda p: "IPC" in up(p.get("indexador")), "Proteção inflacionária (IPCA+).", n, excluir)
         return r or _sug_cetip(lambda f: f.get("exposicao", {}).get("IPCA", 0) >= 50,
-                               "FII Infra/imobiliário IPCA — atenção à liquidez.", n, excluir)
+                               "FII Infra/imobiliário IPCA, atenção à liquidez.", n, excluir)
     if cat == "pre_fixado":
         return _sug_rf(lambda p: "PRÉ" in up(p.get("indexador")) or "PREF" in up(p.get("indexador")),
                        "Prefixado tático; aceita marcação a mercado.", n, excluir)
@@ -1049,7 +1049,7 @@ def _sugerir_por_classe(cat, n=3, excluir=None):
                          "Ações via fundo; IR 15% no resgate, sem come-cotas.", n, excluir)
     if cat == "fiis":
         return _sug_cetip(lambda f: "FII" in up(f.get("exposicao", {}) and "") or f.get("categoria") in ("Fundos Imobiliários", "FII Infra"),
-                          "FII — renda; rendimento isento PF (requisitos).", n, excluir) \
+                          "FII, renda; rendimento isento PF (requisitos).", n, excluir) \
                or _sug_fund(["Fundo Listado"], "FII/listados via fundo.", n, excluir)
     if cat == "multimercado":
         return _sug_fund(["Macro Alta Vol", "Macro Média Vol", "Multiestratégia", "Macro Baixa Vol"],
@@ -1059,7 +1059,7 @@ def _sugerir_por_classe(cat, n=3, excluir=None):
                                          "Internacionalização; 15% anual no exterior.", n, excluir)
     if cat == "alternativos":
         return _sug_fund(["Alternativo Ilíquido", "Multiestratégia"],
-                         "Alternativos; prêmio de iliquidez — checar prazo/suitability.", n, excluir)
+                         "Alternativos; prêmio de iliquidez, checar prazo/suitability.", n, excluir)
     return []
 
 def sugestoes_realocacao(comp, perfil, max_classes=3, por_classe=3):
@@ -1205,13 +1205,13 @@ def _parse_ret_classe(texto):
         return None
     def _num(s):
         s = s.strip().replace("%", "")
-        if s in ("-", "", "–", "—"):
+        if s in ("-", "", "–", "n/d"):
             return None
         try:
             return float(s.replace(".", "").replace(",", "."))
         except Exception:
             return None
-    # nome (pct%) R$ saldo  <mes> <ano> <12m> <24m>  — .match tolera lixo antes (ex.: "% total investido")
+    # nome (pct%) R$ saldo  <mes> <ano> <12m> <24m> , .match tolera lixo antes (ex.: "% total investido")
     linha = re.compile(r"(.*?)\((\d[\d,]*)%\)\s+R\$\s*([\d\.]+,\d{2})\s+(.+)")
     out = {}
     for l in texto.splitlines():
@@ -1336,13 +1336,13 @@ def extrair_xperformance(pdf_bytes):
         for p in pdf.pages:
             texto += (p.extract_text() or "") + "\n"
 
-    # Dados do cabeçalho — suporta encoding com ? no lugar de acentos
+    # Dados do cabeçalho, suporta encoding com ? no lugar de acentos
     conta_m = re.search(r"Conta\s+Assessor\s+Data.*?\n(\d+)\s+(.+?)\s+(\d{2}/\d{2}/\d{4})", texto, re.DOTALL)
     conta    = conta_m.group(1).strip() if conta_m else ""
     assessor = conta_m.group(2).strip() if conta_m else ""
     data_ref = conta_m.group(3).strip() if conta_m else ""
 
-    # Patrimônio — cabeçalho e valor podem estar em linhas separadas
+    # Patrimônio, cabeçalho e valor podem estar em linhas separadas
     patrimonio = 0.0
     idx_pat = texto.find("TOTAL BRUTO")
     if idx_pat != -1:
@@ -1359,7 +1359,7 @@ def extrair_xperformance(pdf_bytes):
     if mp: rent["portfolio"] = {k: float(mp.group(i+1).replace(",",".")) for i,k in enumerate(["mes","ano","12m","24m"])}
     if mc: rent["cdi"]       = {k: float(mc.group(i+1).replace(",",".")) for i,k in enumerate(["mes","ano","12m","24m"])}
 
-    # Composição — suporta acentos normais E substituídos por ? (encoding pdfplumber)
+    # Composição, suporta acentos normais E substituídos por ? (encoding pdfplumber)
     # Mapa amplo: nomes como aparecem no PDF (com e sem acento)
     comp_map = [
         (r"[Pp].s\s*[Ff]ix",               "pos_fixado"),    # Pós Fixado / P?s Fixado
@@ -1667,7 +1667,7 @@ def _carregar_compliance():
     except Exception:
         return ""
 
-# Regras extraídas do compliance XP — usadas como guardrail hard-coded para análise offline
+# Regras extraídas do compliance XP, usadas como guardrail hard-coded para análise offline
 _COMPLIANCE_RULES = [
     # Concentração máxima por ativo/emissor
     {"regra": "max_ativo_pct", "valor": 20,
@@ -1693,7 +1693,7 @@ def aplicar_compliance(recomendacoes, alertas, comp, perfil):
     for cat, pct in comp.items():
         if cat == "alternativos" and pct > 15:
             compliance_alertas.append(
-                f"⚠️ Alerta de suitability: Alternativos em {pct:.1f}% — para o perfil {perfil.title()}, a exposição a ativos ilíquidos merece reavaliação (liquidez e prazo de resgate).")
+                f"⚠️ Alerta de suitability: Alternativos em {pct:.1f}%, para o perfil {perfil.title()}, a exposição a ativos ilíquidos merece reavaliação (liquidez e prazo de resgate).")
         if cat == "acoes" and perfil not in ("arrojada", "agressiva") and pct > 30:
             compliance_alertas.append(
                 f"⚠️ Alerta de suitability: a exposição em Renda Variável ({pct:.1f}%) é elevada para o perfil {perfil.title()} informado e merece reavaliação.")
@@ -1702,13 +1702,13 @@ def aplicar_compliance(recomendacoes, alertas, comp, perfil):
     classes_com_posicao = sum(1 for v in comp.values() if v >= 1.0)
     if classes_com_posicao < 3:
         compliance_alertas.append(
-            "⚠️ Diversificação: a carteira concentra-se em menos de 3 classes de ativos — a diversificação pode ser ampliada.")
+            "⚠️ Diversificação: a carteira concentra-se em menos de 3 classes de ativos, a diversificação pode ser ampliada.")
 
     # Regra: liquidez mínima (pós fixado + caixa)
     liquidez = comp.get("pos_fixado", 0)
     if liquidez < 10:
         compliance_alertas.append(
-            f"⚠️ Liquidez: parcela pós-fixada em {liquidez:.1f}% — avaliar a reserva efetivamente disponível em D+0/D+1 (nem todo pós-fixado tem liquidez diária).")
+            f"⚠️ Liquidez: parcela pós-fixada em {liquidez:.1f}%, avaliar a reserva efetivamente disponível em D+0/D+1 (nem todo pós-fixado tem liquidez diária).")
 
     # Injeta alertas de compliance NO INÍCIO da lista de alertas
     alertas = compliance_alertas + alertas
@@ -1719,7 +1719,7 @@ def aplicar_compliance(recomendacoes, alertas, comp, perfil):
         # Bloqueia sugestão de aumentar alternativos se já está no limite
         if rec.get("classe","").lower() in ("alternativos","estruturados") and comp.get("alternativos",0) >= 15:
             rec["bloqueado_compliance"] = True
-            rec["compliance_nota"] = "Limite XP de 15% em Alternativos atingido — sugestão bloqueada pelo compliance."
+            rec["compliance_nota"] = "Limite XP de 15% em Alternativos atingido, sugestão bloqueada pelo compliance."
         # Bloqueia sugestão de RV para perfil conservador/super_conservador
         if rec.get("classe","").lower() in ("ações / rv","ações","acoes") and perfil in ("conservadora","super_conservadora"):
             rec["bloqueado_compliance"] = True
@@ -1768,7 +1768,7 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
 
         if cat == "inflacao":
             macro_txt = f"IPCA 12M em {ipca:.1f}%" if ipca else "IPCA elevado"
-            explicacao = f"{macro_txt} — cliente sem proteção inflacionária ({f['real']:.1f}% vs. alvo {f['alvo']:.1f}%). {ctx_gestor}"
+            explicacao = f"{macro_txt}, cliente sem proteção inflacionária ({f['real']:.1f}% vs. alvo {f['alvo']:.1f}%). {ctx_gestor}"
         elif cat == "pre_fixado":
             macro_txt = f"Selic em {selic:.2f}%" if selic else "Selic elevada"
             explicacao = f"{macro_txt} próxima do pico. Pré-fixado de médio prazo pode capturar ganho de capital com início de ciclo de queda. {ctx_gestor}"
@@ -1797,11 +1797,11 @@ def gerar_recomendacoes(desvios, perfil, macro, contexto, carta_texto="", comp=N
     for o in opors:
         cat = o["cat"]
         if cat == "alternativos" and o["desvio"] > 5:
-            alertas.append(f"⚠️ {o['label']} com {o['real']:.1f}% vs. alvo {o['alvo']:.1f}% — Absolute alerta: fundos alternativos ilíquidos (FIPs) inadequados para perfil {perfil}. Verificar liquidez e prazo de resgate.")
+            alertas.append(f"⚠️ {o['label']} com {o['real']:.1f}% vs. alvo {o['alvo']:.1f}%, Absolute alerta: fundos alternativos ilíquidos (FIPs) inadequados para perfil {perfil}. Verificar liquidez e prazo de resgate.")
         elif cat == "pos_fixado" and o["desvio"] > 5:
-            alertas.append(f"⚠️ {o['label']} com {o['real']:.1f}% vs. alvo {o['alvo']:.1f}% — XP Asset e Verde alertam para concentração excessiva em pós-fixado. Realocar gradualmente para inflação.")
+            alertas.append(f"⚠️ {o['label']} com {o['real']:.1f}% vs. alvo {o['alvo']:.1f}%, XP Asset e Verde alertam para concentração excessiva em pós-fixado. Realocar gradualmente para inflação.")
         else:
-            alertas.append(f"⚠️ {o['label']} com excesso de {o['desvio']:.1f}% — candidato à realocação.")
+            alertas.append(f"⚠️ {o['label']} com excesso de {o['desvio']:.1f}%, candidato à realocação.")
 
     # Aplica guardrails de compliance antes de retornar
     if comp:
@@ -1838,11 +1838,11 @@ _CLASSE_INSIGHT = {
         "conc": "Renda variável é a classe mais volátil da carteira e a que mais sofre em episódios de estresse. "
                 "Uma concentração desse porte expõe o cliente a quedas expressivas (drawdowns) e a decisões emocionais nas correções. "
                 "A tese em ações exige horizonte longo, gestão de risco ativa e, quando as posições se aproximam do preço-alvo, "
-                "avaliação de proteção (estruturadas) ou realização parcial — como detalhado no posicionamento por ação deste relatório.",
+                "avaliação de proteção (estruturadas) ou realização parcial, como detalhado no posicionamento por ação deste relatório.",
         "papel": "renda variável para crescimento de longo prazo, capturando o prêmio de risco das empresas",
     },
     "inflacao": {
-        "conc": "Os títulos atrelados ao IPCA (NTN-B, CRIs e debêntures IPCA+) travam um juro real elevado — hoje acima de 6% a.a., "
+        "conc": "Os títulos atrelados ao IPCA (NTN-B, CRIs e debêntures IPCA+) travam um juro real elevado, hoje acima de 6% a.a., "
                 "historicamente atrativo. Porém carregam marcação a mercado: quando a curva de juros abre (ruído fiscal, incerteza eleitoral), "
                 "o valor cai no curto prazo, mesmo com o carrego preservado até o vencimento. Concentração excessiva em inflação amplia a "
                 "volatilidade da renda fixa e a sensibilidade à trajetória fiscal do país.",
@@ -1862,11 +1862,11 @@ _CLASSE_INSIGHT = {
     },
     "internacional": {
         "conc": "A exposição internacional é o principal hedge cambial da carteira. Concentração aqui deve respeitar o perfil, mas raramente é o problema.",
-        "papel": "internacional como hedge cambial e diversificação geográfica — proteção contra o risco-Brasil e a volatilidade do real",
+        "papel": "internacional como hedge cambial e diversificação geográfica, proteção contra o risco-Brasil e a volatilidade do real",
     },
     "fiis": {
         "conc": "FIIs entregam renda mensal (isenta de IR para pessoa física) e diversificação real, mas são sensíveis ao juro real, pois competem com a NTN-B.",
-        "papel": "FIIs para renda mensal recorrente e diversificação imobiliária — atrativos como ponto de entrada em juro alto",
+        "papel": "FIIs para renda mensal recorrente e diversificação imobiliária, atrativos como ponto de entrada em juro alto",
     },
     "multimercado": {
         "conc": "Multimercados adicionam descorrelação, mas dependem da mão do gestor; concentração exige acompanhar consistência e drawdown.",
@@ -1883,7 +1883,7 @@ _CLASSE_INSIGHT = {
 }
 
 def _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl):
-    """Retorna blocos (tipo, texto) para o 'Olhar de Mercado' — análise completa da
+    """Retorna blocos (tipo, texto) para o 'Olhar de Mercado', análise completa da
     alocação do cliente + conhecimento por classe + cenário macro/eleitoral 2026."""
     if not desvios:
         return []
@@ -1901,7 +1901,7 @@ def _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl):
         blocos.append(("p",
             f"A carteira está desenhada de forma desbalanceada em relação ao modelo {modelo_lbl} para o perfil {perfil_lbl}. "
             f"A maior concentração está em <b>{maior['label']}</b>, que responde por {maior['real']:.1f}% do patrimônio contra "
-            f"{maior['alvo']:.1f}% do modelo — um excesso de {maior['desvio']:.1f} pontos percentuais. Concentrar tanto risco em "
+            f"{maior['alvo']:.1f}% do modelo, um excesso de {maior['desvio']:.1f} pontos percentuais. Concentrar tanto risco em "
             f"um único indexador significa que o resultado da carteira passa a depender quase inteiramente do comportamento de um "
             f"único fator, reduzindo a diversificação e ampliando a oscilação em momentos de estresse."))
     else:
@@ -1926,7 +1926,7 @@ def _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl):
                 f"A sub-alocação nessa classe reduz a diversificação e a capacidade de reposicionamento da carteira."))
 
     # 4) Cenário macro e eleições 2026
-    blocos.append(("sub", "Cenário 2026 — ano eleitoral, juros e câmbio"))
+    blocos.append(("sub", "Cenário 2026, ano eleitoral, juros e câmbio"))
     _macro_txt = (f"Com a Selic meta em {selic} e o IPCA acumulando {ipca} em 12 meses, "
                   if (macro and macro.get('selic_meta') and macro.get('ipca_12m')) else "")
     blocos.append(("p",
@@ -1944,16 +1944,16 @@ def _olhar_mercado_blocos(desvios, caixa, macro, modelo_lbl, perfil_lbl):
     # 5) Fragilidades
     frags = []
     if maior.get("desvio", 0) > 5:
-        frags.append(f"Concentração de {maior['real']:.1f}% em {maior['label']} — risco dependente de um único fator.")
+        frags.append(f"Concentração de {maior['real']:.1f}% em {maior['label']}, risco dependente de um único fator.")
     if any(_classe_slug(g['label']) == "internacional" for g in gaps):
-        frags.append("Sem hedge cambial (internacional sub-alocado) — patrimônio 100% exposto ao risco-Brasil.")
+        frags.append("Sem hedge cambial (internacional sub-alocado), patrimônio 100% exposto ao risco-Brasil.")
     if all(_classe_slug(g['label']) != "acoes" for g in gaps) and maior.get("desvio",0)<=5:
         pass
     divers = [g for g in gaps if _classe_slug(g['label']) in ("multimercado", "fiis", "alternativos")]
     if divers:
-        frags.append("Ausência de diversificadores (multimercado/FIIs) — menor descorrelação em cenários adversos.")
+        frags.append("Ausência de diversificadores (multimercado/FIIs), menor descorrelação em cenários adversos.")
     if caixa and caixa >= 5:
-        frags.append(f"{caixa:.1f}% em caixa fora do modelo — capital ocioso a ser realocado.")
+        frags.append(f"{caixa:.1f}% em caixa fora do modelo, capital ocioso a ser realocado.")
     if not frags:
         frags.append("Ajustes pontuais de alocação para alinhar a carteira ao modelo e ao perfil.")
     blocos.append(("sub", "Principais fragilidades"))
@@ -1966,8 +1966,8 @@ def _texto_racional_modelo(modelo_lbl, perfil_lbl):
     """Racional das recomendações: explora o modelo escolhido e seus benefícios."""
     return (
         f"As recomendações a seguir seguem o modelo <b>{modelo_lbl}</b>, selecionado para o perfil {perfil_lbl}. "
-        f"Esse modelo distribui a carteira por indexador — pós-fixado, inflação (IPCA+), pré-fixado, internacional e "
-        f"diversificadores — buscando equilibrar proteção e retorno ao longo do ciclo econômico. O objetivo é aproximar "
+        f"Esse modelo distribui a carteira por indexador, pós-fixado, inflação (IPCA+), pré-fixado, internacional e "
+        f"diversificadores, buscando equilibrar proteção e retorno ao longo do ciclo econômico. O objetivo é aproximar "
         f"a carteira atual desse modelo: corrigir as concentrações, preencher as lacunas e, com isso, melhorar a relação "
         f"risco/retorno e a resiliência a diferentes cenários de mercado."
     )
@@ -2012,10 +2012,10 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     import matplotlib.pyplot as plt
     import numpy as np
 
-    PRETO=colors.HexColor("#081F18"); DOURADO=colors.HexColor("#C9A96E"); DESC=colors.HexColor("#A07840")
-    CESC=colors.HexColor("#1A1A1A"); CMED=colors.HexColor("#2C2C2C"); BRANCO=colors.white
-    VERM=colors.HexColor("#FF6B6B"); VERDE=colors.HexColor("#5DCAA5"); AMARELO=colors.HexColor("#FFD966")
-    LARANJA=colors.HexColor("#FF8C00")
+    PRETO=colors.HexColor("#17271E"); DOURADO=colors.HexColor("#8A6A28"); DESC=colors.HexColor("#A07840")
+    CESC=colors.HexColor("#FFFFFF"); CMED=colors.HexColor("#F4F6F4"); BRANCO=colors.HexColor("#17271E")
+    VERM=colors.HexColor("#C0392B"); VERDE=colors.HexColor("#2E7D5B"); AMARELO=colors.HexColor("#B4833A")
+    LARANJA=colors.HexColor("#C0673A")
 
     buf=io.BytesIO()
     doc=SimpleDocTemplate(buf,pagesize=A4,leftMargin=2*cm,rightMargin=2*cm,topMargin=2*cm,bottomMargin=2*cm)
@@ -2031,12 +2031,12 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     s_opor=S("O",fontSize=9,leading=13,tc=VERDE)
     s_sug=S("Su",fontSize=9,leading=14,tc=DOURADO)
     s_bold=S("Sb",fontSize=9,leading=13,tc=BRANCO,fontName="Helvetica-Bold")
-    s_gest=S("Sg",fontSize=8,leading=12,tc=colors.HexColor("#AAAAAA"))
+    s_gest=S("Sg",fontSize=8,leading=12,tc=colors.HexColor("#5A6A60"))
     s_crit=S("Sc",fontSize=9,leading=13,tc=VERM,fontName="Helvetica-Bold")
     s_warn=S("Sw",fontSize=9,leading=13,tc=AMARELO)
     s_ok=S("Sok",fontSize=9,leading=13,tc=VERDE)
     s_olh_h=S("Oh",fontSize=9.5,leading=12,tc=DOURADO,fontName="Helvetica-Bold",spaceBefore=7,spaceAfter=2)
-    s_olh_b=S("Ob",fontSize=9,leading=14,tc=colors.HexColor("#DDDDDD"),spaceAfter=3)
+    s_olh_b=S("Ob",fontSize=9,leading=14,tc=colors.HexColor("#2C2C2C"),spaceAfter=3)
     s_frag2=S("Fr",fontSize=9,leading=13,tc=AMARELO)
 
     modelo_lbl = (modelo_nome or "").strip() or "Levante Asset"
@@ -2066,7 +2066,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         ("FONTSIZE",(0,0),(-1,-1),8),("TEXTCOLOR",(0,0),(-1,-1),BRANCO),
         ("TEXTCOLOR",(0,0),(0,-1),DOURADO),("TEXTCOLOR",(2,0),(2,-1),DOURADO),
         ("ROWBACKGROUNDS",(0,0),(-1,-1),[CESC,CMED]),
-        ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),("PADDING",(0,0),(-1,-1),4),
+        ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#D9E3DB")),("PADDING",(0,0),(-1,-1),4),
     ]))
     elems.append(tm); elems.append(Spacer(1,0.3*cm))
 
@@ -2108,7 +2108,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             ("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
             ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
             ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),
-            ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+            ("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#D9E3DB")),
             ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),
             ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
         ]))
@@ -2120,21 +2120,21 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     lbs=[d["label"] for d in _dv]; rea=[d["real"] for d in _dv]; alv=[d["alvo"] for d in _dv]
     y=np.arange(len(lbs)); h=0.38
     fig,ax=plt.subplots(figsize=(10,max(2.4,0.62*len(lbs)+1)))
-    fig.patch.set_facecolor("#081F18"); ax.set_facecolor("#1A1A1A")
-    b1=ax.barh(y+h/2,rea,h,color="#C9A96E",zorder=3,label="Atual")
-    b2=ax.barh(y-h/2,alv,h,color="#2A5A3A",zorder=3,label="Modelo")
-    ax.set_yticks(y); ax.set_yticklabels(lbs,color="white",fontsize=9); ax.invert_yaxis()
-    ax.tick_params(colors="white"); ax.spines[:].set_color("#2C2C2C")
-    ax.xaxis.grid(True,color="#1C4A34",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="white")
+    fig.patch.set_facecolor("#FFFFFF"); ax.set_facecolor("#FFFFFF")
+    b1=ax.barh(y+h/2,rea,h,color="#8A6A28",zorder=3,label="Atual")
+    b2=ax.barh(y-h/2,alv,h,color="#2E7D5B",zorder=3,label="Modelo")
+    ax.set_yticks(y); ax.set_yticklabels(lbs,color="#17271E",fontsize=9); ax.invert_yaxis()
+    ax.tick_params(colors="#17271E"); ax.spines[:].set_color("#D9E3DB")
+    ax.xaxis.grid(True,color="#E4E8E7",zorder=0); ax.set_axisbelow(True); ax.set_xlabel("%",color="#17271E")
     _mx=max(rea+alv+[1])
     for bars in (b1,b2):
         for r in bars:
             wv=r.get_width()
-            if wv>0: ax.text(wv+_mx*0.01,r.get_y()+r.get_height()/2,f"{wv:.0f}%",va="center",color="white",fontsize=7.5)
+            if wv>0: ax.text(wv+_mx*0.01,r.get_y()+r.get_height()/2,f"{wv:.0f}%",va="center",color="#17271E",fontsize=7.5)
     ax.set_xlim(0,_mx*1.13)
-    ax.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="lower right")
+    ax.legend(facecolor="#FFFFFF",edgecolor="#D9E3DB",labelcolor="#17271E",fontsize=8,loc="lower right")
     fig.tight_layout(pad=1)
-    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#081F18"); plt.close(fig); ib.seek(0)
+    ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#FFFFFF"); plt.close(fig); ib.seek(0)
     _hh=max(3.2,0.72*len(lbs)+1.2)
     elems.append(Image(ib,width=15*cm,height=_hh*cm)); elems.append(Spacer(1,0.3*cm))
 
@@ -2160,22 +2160,22 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                        else "Rentabilidade da Carteira vs. CDI")
             elems.append(Paragraph(_titulo,s_sec))
             figr,axr=plt.subplots(figsize=(10,3.8))
-            figr.patch.set_facecolor("#081F18"); axr.set_facecolor("#1A1A1A")
+            figr.patch.set_facecolor("#FFFFFF"); axr.set_facecolor("#FFFFFF")
             _xs=np.arange(len(_pers))
-            _series=[(_cli_vals,"#C9A96E","Carteira")]
-            if _tem_rec: _series.append((_rec_vals,"#5DCAA5","Carteira-Modelo"))
-            _series.append((_cdi_vals,"#7DCFEF","CDI"))
+            _series=[(_cli_vals,"#8A6A28","Carteira")]
+            if _tem_rec: _series.append((_rec_vals,"#2E7D5B","Carteira-Modelo"))
+            _series.append((_cdi_vals,"#2E6DA4","CDI"))
             _n=len(_series); _bw=0.8/_n
             for _k,(vals,cor,lbl) in enumerate(_series):
                 _vv=[float(v) if v is not None else 0.0 for v in vals]
                 axr.bar(_xs+(_k-(_n-1)/2)*_bw,_vv,_bw,color=cor,label=lbl,zorder=3)
-            axr.axhline(0,color="#3A3A3A",linewidth=0.8)
-            axr.set_xticks(_xs); axr.set_xticklabels([p[1] for p in _pers],color="white",fontsize=9)
-            axr.tick_params(colors="white"); axr.spines[:].set_color("#2C2C2C")
-            axr.yaxis.grid(True,color="#1C4A34"); axr.set_axisbelow(True); axr.set_ylabel("%",color="white")
-            axr.legend(facecolor="#1A1A1A",edgecolor="#2C2C2C",labelcolor="white",fontsize=8,loc="best")
+            axr.axhline(0,color="#C9CFCB",linewidth=0.8)
+            axr.set_xticks(_xs); axr.set_xticklabels([p[1] for p in _pers],color="#17271E",fontsize=9)
+            axr.tick_params(colors="#17271E"); axr.spines[:].set_color("#D9E3DB")
+            axr.yaxis.grid(True,color="#E4E8E7"); axr.set_axisbelow(True); axr.set_ylabel("%",color="#17271E")
+            axr.legend(facecolor="#FFFFFF",edgecolor="#D9E3DB",labelcolor="#17271E",fontsize=8,loc="best")
             figr.tight_layout(pad=1)
-            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#081F18"); plt.close(figr); ibr.seek(0)
+            ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#FFFFFF"); plt.close(figr); ibr.seek(0)
             elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.3*cm))
     except Exception:
         pass
@@ -2186,7 +2186,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     td=Table(dd,colWidths=[5*cm,3.5*cm,3.5*cm,3.5*cm])
     est=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
          ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
-         ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+         ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#D9E3DB")),
          ("ALIGN",(1,0),(-1,-1),"CENTER"),("PADDING",(0,0),(-1,-1),4),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold")]
     for i,d in enumerate(desvios,1):
         _ad=abs(d["desvio"])
@@ -2292,7 +2292,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm])
             est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
                      ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
-                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#3A3A3A")),
+                     ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#D9E3DB")),
                      ("ALIGN",(1,0),(1,-1),"CENTER"),("ALIGN",(3,0),(4,-1),"CENTER"),
                      ("PADDING",(0,0),(-1,-1),3),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
                      ("TEXTCOLOR",(0,1),(0,-1),DOURADO),("VALIGN",(0,0),(-1,-1),"MIDDLE")]
@@ -2371,10 +2371,10 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         "Este material tem caráter informativo e não constitui recomendação individualizada de investimento, oferta ou promessa "
         "de rentabilidade. Rentabilidade passada não garante resultados futuros. A adequação de qualquer produto depende do perfil "
         "(suitability), dos objetivos e da situação financeira do investidor. Braúna Investimentos, escritório vinculado à XP Investimentos.",
-        S("Disc",fontSize=8,leading=11,tc=colors.HexColor("#8AA79A"),alignment=TA_CENTER)))
+        S("Disc",fontSize=8,leading=11,tc=colors.HexColor("#5A6A60"),alignment=TA_CENTER)))
 
     def fundo(canvas,doc):
-        canvas.saveState(); canvas.setFillColor(PRETO)
+        canvas.saveState(); canvas.setFillColor(colors.HexColor("#FBFBFA"))
         canvas.rect(0,0,A4[0],A4[1],fill=1,stroke=0); canvas.restoreState()
 
     # Marcador invisível: registra em que página e altura o conteúdo terminou.
