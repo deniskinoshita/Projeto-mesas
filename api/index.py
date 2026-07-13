@@ -2341,7 +2341,8 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     # Rentabilidade, Cliente vs. Carteira Recomendada vs. CDI (linha)
     try:
         _rc = (carregar_retornos() or {}).get("classes", {})
-        _pers = [("mes","Mês"),("ano","Ano"),("12m","12M"),("24m","24M")]
+        # Eixo do passado (24M) até o mês atual
+        _pers = [("24m","24M"),("12m","12M"),("ano","Ano"),("mes","Mês")]
         _port = (rent.get("portfolio") or {}); _cdi = (rent.get("cdi") or {})
         def _rec_pdf(pk):
             sw = sr = 0.0
@@ -4491,7 +4492,8 @@ function renderChartRent(){
   var rent=analiseData.rent||{}; var port=rent.portfolio||{}, cdi=rent.cdi||{};
   var desvios=(analiseData._xp&&analiseData._xp.desvios)||analiseData.desvios||[];
   var retCls=(_retornosClasse&&_retornosClasse.classes)||{};
-  var PER=[["mes","Mês"],["ano","Ano"],["12m","12M"],["24m","24M"]];
+  // Eixo do passado (24M, à esquerda) até o mês atual (à direita)
+  var PER=[["24m","24M"],["12m","12M"],["ano","Ano"],["mes","Mês"]];
   function recomendada(pk){
     var somaW=0, somaR=0;
     desvios.forEach(function(d){
