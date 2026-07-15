@@ -6221,8 +6221,25 @@ function renderAnaliseHP(xp){
   }
 
   const alertasDiv = document.getElementById("hp-alertas");
-  const alertas    = xp.alertas_relevantes || [];
-  const nMercado   = (xp.alertas_mercado || []).length;
+  const _alertasRaw = xp.alertas_relevantes || [];
+  // Consolidação: o consenso e a notícia de uma AÇÃO vão para o card da ação (Carteira de Ações),
+  // então não repetimos aqui. Mantém nos "pontos para atenção" o que é FII/RF/fundo e alertas gerais.
+  var _stockTks = new Set((xp.acoes||[]).map(a=>(a.ticker||"").toUpperCase()));
+  var _consensoAcao = {}, _newsAcao = {};
+  _alertasRaw.forEach(function(a){
+    var pk=(a.produto||"").toUpperCase();
+    if(!_stockTks.has(pk)) return;
+    if((a.id||"").indexOf("kb_consenso_")===0){ _consensoAcao[pk]=a; }
+    else if(a.origem_tipo==="mercado"){ _newsAcao[pk]=a; }
+  });
+  const alertas = _alertasRaw.filter(function(a){
+    var pk=(a.produto||"").toUpperCase();
+    if(!_stockTks.has(pk)) return true;
+    if((a.id||"").indexOf("kb_consenso_")===0) return false;   // consenso da ação → card da ação
+    if(a.origem_tipo==="mercado") return false;                 // notícia da ação → card da ação
+    return true;
+  });
+  const nMercado = alertas.filter(function(a){return a.origem_tipo==="mercado";}).length;
 
   if(alertas.length){
     const ACOR  = {info:"#1F9D77", atencao:"#A8833C", urgente:"#D93B3B"};
@@ -6293,32 +6310,39 @@ function renderAnaliseHP(xp){
   if(xp.acoes && xp.acoes.length){
     document.getElementById("hp-acoes-bloco").style.display = "";
     var _sgMeta = _STOCK_GUIDE._meta || {};
-    document.getElementById("hp-acoes-table").innerHTML = `
-      <table style="width:100%;border-collapse:collapse;font-size:14px">
-        <thead><tr style="background:#EFF3EF">
-          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Ativo</th>
-          <th style="text-align:right;padding:6px 8px;color:#39493F;font-size:13px">% Cart.</th>
-          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Posição Braúna (Levante)</th>
-          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Alvo / Upside</th>
-          <th style="text-align:left;padding:6px 8px;color:#39493F;font-size:13px">Mercado (XP)</th>
-        </tr></thead>
-        <tbody>${xp.acoes.map((a,i)=>{ var sv=_sgRow(a); return `
-          <tr style="background:${i%2?"#EAF4EC":"#EFF3EF"}">
-            <td style="padding:6px 8px">
-              <span style="color:#8A6A28;font-weight:700">${a.ticker}</span>
-              ${sv.nome?`<span style="color:#39493F;font-size:12px;display:block">${sv.nome}</span>`:""}
-              <span style="color:#3B4D43;font-size:12px">${a.qtd?("Qtd "+a.qtd+" · "):""}R$ ${(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
-            </td>
-            <td style="padding:6px 8px;text-align:right;color:#1F9D77">${(a.perc||0).toFixed(2)}%</td>
-            <td style="padding:6px 8px">${sv.posHtml}</td>
-            <td style="padding:6px 8px;color:#39493F">${sv.alvoHtml}</td>
-            <td style="padding:6px 8px">${sv.xpHtml}</td>
-          </tr>`}).join("")}
-        </tbody>
-      </table>
-      <div style="font-size:12px;color:#39493F;margin-top:6px;line-height:1.5">
-        <b style="color:#8A6A28">Levante</b> = casa principal do posicionamento (${_sgData(_sgMeta.fonte_levante_data)}) · <b style="color:#2E86B8">XP</b> = como o mercado está vendo (${_sgData(_sgMeta.fonte_xp_data)}). O preço-alvo é referência; o preço vivo vem do XPerformance. <span style="color:#C0673A">⚠</span> = Levante e XP divergem.
-      </div>`;
+    document.getElementById("hp-acoes-table").innerHTML =
+      xp.acoes.map(function(a,i){
+        var sv=_sgRow(a); var tk=(a.ticker||"").toUpperCase();
+        var news=_newsAcao[tk], cons=_consensoAcao[tk];
+        // Notícia da ação (acionável) — inline
+        var newsHtml = news ? '<div style="margin-top:8px;padding:7px 10px;background:#ECEFFB;border-left:3px solid #5BA8D4;border-radius:0 6px 6px 0;font-size:13px;color:#3B4D43;line-height:1.5">📰 '+(news.mensagem||"")+'</div>' : '';
+        // Consenso da casa como OBSERVAÇÃO recolhível (docs só quando abre)
+        var consHtml = "";
+        if(cons){
+          var _cid="cons-"+tk+"-"+i;
+          var docsBtns=(cons.docs&&cons.docs.length)? '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">'+cons.docs.map(function(dd){return '<button onclick="abrirMaterial(\''+(dd.id||'')+'\',\''+encodeURIComponent(dd.nome||"")+'\')" style="font-size:11px;padding:2px 7px;border-radius:7px;border:1px solid #5DCAA555;background:#EAF4EC;color:#1F9D77;cursor:pointer">👁 '+((dd.nome||"material").replace(/</g,"&lt;"))+'</button>';}).join("")+'</div>':'';
+          consHtml = '<div style="margin-top:7px">'
+            +'<span onclick="var e=document.getElementById(\''+_cid+'\');e.style.display=e.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'i\').textContent=e.style.display===\'none\'?\'▾\':\'▴\';" style="font-size:12px;color:#8A6A28;cursor:pointer;user-select:none">📚 Análise da casa (observação) <i style="font-style:normal">▾</i></span>'
+            +'<div id="'+_cid+'" style="display:none;margin-top:5px;font-size:13px;color:#3B4D43;line-height:1.5;padding:8px 10px;background:#EAF4EC;border-radius:6px">'+(cons.mensagem||"")+docsBtns+'</div>'
+            +'</div>';
+        }
+        return '<div style="border:1px solid #D9E3DB;border-radius:10px;padding:12px 14px;margin-bottom:8px;background:#FFFFFF">'
+          +'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">'
+          +'<span style="color:#8A6A28;font-weight:700;font-size:16px">'+a.ticker+'</span>'
+          +(sv.nome?'<span style="color:#39493F;font-size:13px">'+sv.nome+'</span>':'')
+          +'<span style="flex:1"></span>'
+          +'<span style="color:#1F9D77;font-weight:700;font-size:14px">'+(a.perc||0).toFixed(2)+'% cart.</span>'
+          +'</div>'
+          +'<div style="color:#3B4D43;font-size:12px;margin-top:2px">'+(a.qtd?("Qtd "+a.qtd+" · "):"")+'R$ '+(a.saldo||0).toLocaleString("pt-BR",{minimumFractionDigits:2})+'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:8px;font-size:13px">'
+          +'<div><span style="color:#39493F;font-size:12px">Braúna (Levante): </span>'+sv.posHtml+'</div>'
+          +'<div><span style="color:#39493F;font-size:12px">Alvo/Upside: </span>'+sv.alvoHtml+'</div>'
+          +'<div><span style="color:#39493F;font-size:12px">Mercado (XP): </span>'+sv.xpHtml+'</div>'
+          +'</div>'
+          + newsHtml + consHtml
+          +'</div>';
+      }).join("")
+      +'<div style="font-size:12px;color:#39493F;margin-top:6px;line-height:1.5"><b style="color:#8A6A28">Levante</b> = casa principal ('+_sgData(_sgMeta.fonte_levante_data)+') · <b style="color:#2E86B8">XP</b> = visão de mercado ('+_sgData(_sgMeta.fonte_xp_data)+'). Preço-alvo é referência; preço vivo vem do XPerformance. <span style="color:#C0673A">⚠</span> = Levante e XP divergem.</div>';
   }
 
   // Proteção de posições perto do preço-alvo (usa as ações + o stock guide)
