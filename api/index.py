@@ -8168,16 +8168,14 @@ def _quote_yahoo_simples(sym_b3: str):
     except Exception:
         return None
 
-@app.route("/api/mercado-destaques", methods=["GET"])
-def mercado_destaques():
-    """Painel de destaques: top 5 ações e top 5 FIIs em maior alta no dia + dólar.
-    Busca o universo líquido em paralelo (Yahoo). Cache em memória por 15 min."""
+def _mercado_destaques_data():
+    """Top 5 ações e top 5 FIIs em maior alta no dia + dólar. Busca o universo líquido
+    em paralelo (Yahoo). Cache em memória por 15 min. Reutilizado pelo Morning Call."""
     import time as _t
     from concurrent.futures import ThreadPoolExecutor
-    cache = mercado_destaques.__dict__.setdefault("_cache", {"ts": 0, "data": None})
+    cache = _mercado_destaques_data.__dict__.setdefault("_cache", {"ts": 0, "data": None})
     if cache["data"] and (_t.time() - cache["ts"] < 900):
-        return jsonify(cache["data"])
-
+        return cache["data"]
     universo = _DESTAQUES_ACOES + _DESTAQUES_FIIS
     cot = {}
     try:
@@ -8187,18 +8185,14 @@ def mercado_destaques():
                     cot[res["ticker"]] = res
     except Exception:
         pass
-
     def _top(lista):
         vals = [cot[t] for t in lista if t in cot]
         vals.sort(key=lambda x: x["variacao"], reverse=True)
         return vals[:5]
-
-    # Dólar (mesma fonte do ticker)
     dolar = None
     d = _quote_yahoo_simples_par("USDBRL=X")
     if d:
         dolar = {"preco": d["preco"], "variacao": d["variacao"]}
-
     data = {
         "acoes":     _top(_DESTAQUES_ACOES),
         "fiis":      _top(_DESTAQUES_FIIS),
@@ -8207,7 +8201,12 @@ def mercado_destaques():
     }
     if data["acoes"] or data["fiis"]:
         cache["data"] = data; cache["ts"] = _t.time()
-    return jsonify(data)
+    return data
+
+@app.route("/api/mercado-destaques", methods=["GET"])
+def mercado_destaques():
+    """Painel de destaques: top 5 ações e top 5 FIIs em maior alta no dia + dólar."""
+    return jsonify(_mercado_destaques_data())
 
 def _quote_yahoo_simples_par(sym_full: str):
     """Cotação de um símbolo Yahoo completo (ex.: USDBRL=X) — sem sufixo .SA."""
@@ -8406,14 +8405,53 @@ def _gerar_morning_call(assessor, forcar=False):
                     noticias.append(r)
     except Exception:
         pass
+    # Destaques de mercado (dólar + maiores altas do dia) — reusa o painel de destaques
+    try: dest = _mercado_destaques_data()
+    except Exception: dest = {}
+    dolar = dest.get("dolar"); top_acoes = (dest.get("acoes") or [])[:3]; top_fiis = (dest.get("fiis") or [])[:3]
+    _v2 = lambda v: f"{v:.2f}".replace(".", ",")
+    _p1 = lambda v: f"{v:+.1f}".replace(".", ",")
+
+    # Abertura por IA (2-3 linhas) — 1x por assessor/dia (o morning call é cacheado)
+    intro = ""
+    if noticias and os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            import anthropic as _a_mc
+            manchetes = "\n".join(f"- {n['ticker']}: {n['noticias'][0]['titulo']}" for n in noticias[:8])
+            _ind = []
+            if selic is not None: _ind.append(f"Selic {selic:.2f}%")
+            if ipca  is not None: _ind.append(f"IPCA 12m {ipca:.2f}%")
+            if dolar: _ind.append(f"Dólar R$ {_v2(dolar['preco'])} ({_p1(dolar['variacao'])}%)")
+            _cli = _a_mc.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+            _r = _cli.messages.create(model="claude-haiku-4-5-20251001", max_tokens=280,
+                messages=[{"role": "user", "content":
+                    "Escreva a ABERTURA de um morning call em 2 a 3 linhas, tom profissional e acolhedor, para ser "
+                    "encaminhada a clientes de investimentos. Sintetize o clima de mercado a partir dos indicadores e "
+                    "manchetes abaixo. NÃO invente dados nem cite preço que não esteja aqui. Sem saudação inicial. "
+                    "Português.\n\n" f"Indicadores: {', '.join(_ind) or 'n/d'}\nManchetes:\n{manchetes}"}])
+            intro = (_r.content[0].text or "").strip()
+        except Exception as _e_mc:
+            app.logger.warning(f"morning-call intro IA: {_e_mc}")
+
     # Texto pronto para WhatsApp (client-safe)
     data_br = agora_br().strftime("%d/%m/%Y")
     L = [f"☀️ *Morning Call Braúna* — {data_br}", ""]
+    if intro:
+        L += [intro, ""]
     L.append("📊 *Panorama de mercado*")
-    if selic is not None:
-        L.append(f"• Selic {selic:.2f}% a.a." + (f"  ·  IPCA 12m {ipca:.2f}%" if ipca is not None else ""))
-    else:
-        L.append("• Indicadores de mercado atualizados ao longo do dia")
+    _pan = []
+    if selic is not None: _pan.append(f"Selic {_v2(selic)}% a.a.")
+    if ipca  is not None: _pan.append(f"IPCA 12m {_v2(ipca)}%")
+    if _pan: L.append("• " + "  ·  ".join(_pan))
+    if dolar:
+        _seta = "▲" if (dolar.get("variacao", 0) >= 0) else "▼"
+        L.append(f"• Dólar R$ {_v2(dolar['preco'])} {_seta} {_v2(abs(dolar['variacao']))}%")
+    if top_acoes:
+        L.append("• Maiores altas (ações): " + "  ·  ".join(f"{a.get('ticker')} {_p1(a.get('variacao',0))}%" for a in top_acoes))
+    if top_fiis:
+        L.append("• Maiores altas (FIIs): " + "  ·  ".join(f"{a.get('ticker')} {_p1(a.get('variacao',0))}%" for a in top_fiis))
+    if not _pan and not dolar:
+        L.append("• Indicadores atualizados ao longo do dia")
     L.append("")
     if noticias:
         L.append("📰 *Destaques dos ativos em carteira*")
@@ -8427,7 +8465,8 @@ def _gerar_morning_call(assessor, forcar=False):
     texto = "\n".join(L)
     mc = {"assessor": assessor, "data": data_br,
           "gerado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
-          "texto": texto, "macro": {"selic": selic, "ipca": ipca},
+          "texto": texto, "intro": intro, "macro": {"selic": selic, "ipca": ipca},
+          "destaques": {"dolar": dolar, "top_acoes": top_acoes, "top_fiis": top_fiis},
           "noticias": noticias, "n_ativos": len(noticias)}
     dia[ak] = mc
     _save(_MORNING_FILE, {hoje: dia})   # mantém só o dia corrente
@@ -8482,11 +8521,22 @@ def morning_call_pdf():
     flow = [Paragraph("Morning Call Braúna", h1),
             Paragraph(mc.get("data", ""), sub),
             HRFlowable(width="100%", color=GOLD, thickness=1.2), Spacer(1, 8)]
-    m = mc.get("macro", {})
+    _v2p = lambda v: f"{v:.2f}".replace(".", ",")
+    _p1p = lambda v: f"{v:+.1f}".replace(".", ",")
+    if mc.get("intro"):
+        flow.append(Paragraph(mc["intro"], body)); flow.append(Spacer(1, 8))
+    m = mc.get("macro", {}); dq = mc.get("destaques", {}) or {}
     flow.append(Paragraph("Panorama de mercado", sec))
     if m.get("selic") is not None:
-        _mx = f"Selic {m['selic']:.2f}% a.a." + (f" &nbsp;·&nbsp; IPCA 12m {m['ipca']:.2f}%" if m.get("ipca") is not None else "")
+        _mx = f"Selic {_v2p(m['selic'])}% a.a." + (f" &nbsp;·&nbsp; IPCA 12m {_v2p(m['ipca'])}%" if m.get("ipca") is not None else "")
         flow.append(Paragraph(_mx, body))
+    if dq.get("dolar"):
+        _d = dq["dolar"]; _seta = "&#9650;" if _d.get("variacao", 0) >= 0 else "&#9660;"
+        flow.append(Paragraph(f"Dólar R$ {_v2p(_d['preco'])} {_seta} {_v2p(abs(_d['variacao']))}%", body))
+    if dq.get("top_acoes"):
+        flow.append(Paragraph("<b>Maiores altas (ações):</b> " + " &nbsp;·&nbsp; ".join(f"{a.get('ticker')} {_p1p(a.get('variacao',0))}%" for a in dq["top_acoes"]), body))
+    if dq.get("top_fiis"):
+        flow.append(Paragraph("<b>Maiores altas (FIIs):</b> " + " &nbsp;·&nbsp; ".join(f"{a.get('ticker')} {_p1p(a.get('variacao',0))}%" for a in dq["top_fiis"]), body))
     if mc.get("noticias"):
         flow.append(Paragraph("Destaques dos ativos em carteira", sec))
         for n in mc["noticias"]:
