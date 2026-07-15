@@ -11221,45 +11221,60 @@ def analyze_xp():
         material_por_ticker[tk].sort(key=lambda m: (not m["primario"]))
         material_por_ticker[tk] = material_por_ticker[tk][:5]
 
-    # Consenso por ticker (resumo IA, até 5 linhas, ancorado nos docs — prioriza os primários)
+    # Consenso por ativo (resumo IA, até 5 linhas, ancorado nos docs). CACHE por ativo/dia:
+    # não reprocessa o mesmo ativo no mesmo dia — economiza crédito, inclusive ENTRE clientes.
     consenso_por_ticker = {}
     if material_por_ticker and os.environ.get("ANTHROPIC_API_KEY"):
-        try:
-            import anthropic as _anthropic_kb, json as _json_kb
-            blocos_kb = []
-            for tk, mats in material_por_ticker.items():
-                docs_lst = " | ".join(dict.fromkeys(m["nome"] for m in mats if m["nome"]))
-                trechos  = "\n".join(f"- ({m['nome']}): {m['trecho']}" for m in mats[:3])
-                blocos_kb.append(f"ATIVO {tk}\nDocumentos: {docs_lst}\nTrechos:\n{trechos}")
-            material_txt = "\n\n".join(blocos_kb)
-            _ai_kb = _anthropic_kb.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
-            _resp_kb = _ai_kb.messages.create(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=2400,
-                messages=[{"role": "user", "content":
-                    "Você é analista de investimentos escrevendo para um assessor. Com base APENAS no material abaixo "
-                    "(relatórios da própria casa), escreva para CADA ativo um CONSENSO em no máximo 5 linhas. O ativo "
-                    "pode ser ação, FII, ETF, título de renda fixa (debênture/CDB/CRI/CRA) ou fundo — adapte a leitura: "
-                    "para ações/FIIs foque tese e momento operacional; para renda fixa foque qualidade de crédito do "
-                    "emissor, indexador e risco; para fundos foque estratégia, gestora e consistência. Priorize LEITURA "
-                    "QUALITATIVA com o MÍNIMO de números. NÃO invente dados fora do material. Se o material for pobre "
-                    "para um ativo, diga isso em 1 linha. Português, tom profissional e direto.\n\n"
-                    f"MATERIAL:\n{material_txt}\n\n"
-                    'Responda APENAS com JSON (sem markdown): '
-                    '[{"ativo":"NOME OU TICKER","consenso":"texto de até 5 linhas"}]'
-                }]
-            )
-            _raw_kb = _resp_kb.content[0].text.strip()
-            if _raw_kb.startswith("```"):
-                _raw_kb = _raw_kb.split("```")[1]
-                if _raw_kb.lower().startswith("json"): _raw_kb = _raw_kb[4:]
-                _raw_kb = _raw_kb.strip()
-            for _it in _json_kb.loads(_raw_kb):
-                _chave = _it.get("ativo") or _it.get("ticker") if isinstance(_it, dict) else None
-                if _chave:
-                    consenso_por_ticker[str(_chave).upper()] = (_it.get("consenso") or "").strip()
-        except Exception as _e_kb:
-            app.logger.warning(f"Consenso KB (IA) falhou: {_e_kb}")
+        _CACHE_F = "/tmp/brauna_consenso_cache.json"
+        _hoje_kb = agora_br().strftime("%Y-%m-%d")
+        _cache_dia = _load(_CACHE_F, {}).get(_hoje_kb, {})
+        _pendentes = {}
+        for tk, mats in material_por_ticker.items():
+            _ck = str(tk).upper()
+            if _cache_dia.get(_ck):
+                consenso_por_ticker[_ck] = _cache_dia[_ck]        # reaproveita do cache do dia
+            else:
+                _pendentes[tk] = mats
+        if _pendentes:                                           # só chama a IA para o que falta
+            try:
+                import anthropic as _anthropic_kb, json as _json_kb
+                blocos_kb = []
+                for tk, mats in _pendentes.items():
+                    docs_lst = " | ".join(dict.fromkeys(m["nome"] for m in mats if m["nome"]))
+                    trechos  = "\n".join(f"- ({m['nome']}): {m['trecho']}" for m in mats[:3])
+                    blocos_kb.append(f"ATIVO {tk}\nDocumentos: {docs_lst}\nTrechos:\n{trechos}")
+                material_txt = "\n\n".join(blocos_kb)
+                _ai_kb = _anthropic_kb.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+                _resp_kb = _ai_kb.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=2400,
+                    messages=[{"role": "user", "content":
+                        "Você é analista de investimentos escrevendo para um assessor. Com base APENAS no material abaixo "
+                        "(relatórios da própria casa), escreva para CADA ativo um CONSENSO em no máximo 5 linhas. O ativo "
+                        "pode ser ação, FII, ETF, título de renda fixa (debênture/CDB/CRI/CRA) ou fundo — adapte a leitura: "
+                        "para ações/FIIs foque tese e momento operacional; para renda fixa foque qualidade de crédito do "
+                        "emissor, indexador e risco; para fundos foque estratégia, gestora e consistência. Priorize LEITURA "
+                        "QUALITATIVA com o MÍNIMO de números. NÃO invente dados fora do material. Se o material for pobre "
+                        "para um ativo, diga isso em 1 linha. Português, tom profissional e direto.\n\n"
+                        f"MATERIAL:\n{material_txt}\n\n"
+                        'Responda APENAS com JSON (sem markdown): '
+                        '[{"ativo":"NOME OU TICKER","consenso":"texto de até 5 linhas"}]'
+                    }]
+                )
+                _raw_kb = _resp_kb.content[0].text.strip()
+                if _raw_kb.startswith("```"):
+                    _raw_kb = _raw_kb.split("```")[1]
+                    if _raw_kb.lower().startswith("json"): _raw_kb = _raw_kb[4:]
+                    _raw_kb = _raw_kb.strip()
+                for _it in _json_kb.loads(_raw_kb):
+                    _chave = _it.get("ativo") or _it.get("ticker") if isinstance(_it, dict) else None
+                    if _chave:
+                        _cv = (_it.get("consenso") or "").strip()
+                        consenso_por_ticker[str(_chave).upper()] = _cv
+                        _cache_dia[str(_chave).upper()] = _cv     # grava no cache do dia
+                _save(_CACHE_F, {_hoje_kb: _cache_dia})           # mantém só o dia corrente
+            except Exception as _e_kb:
+                app.logger.warning(f"Consenso KB (IA) falhou: {_e_kb}")
 
     for tk, mats in material_por_ticker.items():
         data_kb = next((m["data"] for m in mats if m.get("data")), "")
