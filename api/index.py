@@ -4857,14 +4857,26 @@ function renderProtecoes(lista){
       }).join("") : '<span style="font-size:12px;color:#395542">Identifique o cliente para salvar o histórico</span>';
     var bordaCard=acima?"#E8A87C":"#FBEEEC";
     var bgCard=acima?"#FBF0E8":"#F5F8F5";
-    var msg = acima
-      ? '<div style="font-size:13px;color:#0A0F0C;margin:6px 0 8px;line-height:1.5;background:#F8E3D4;border-radius:6px;padding:8px 10px">'
-        +'<b style="color:#C0673A">🎯 Acima do preço-alvo, trave o ganho.</b> Sugestão: '
-        +'<b style="color:#8A6A28">(a)</b> operação estruturada (collar / put de proteção / fence) para proteger o valor já ganho · '
-        +'<b style="color:#8A6A28">(b)</b> realizar parte da posição e alocar em caixa (pós-fixado). Envolve custo/prazo e suitability.</div>'
-      : '<div style="font-size:13px;color:#6A5A40;margin:6px 0 8px;line-height:1.5">Upside curto, proteger o ganho. Opções: '
-        +'<b style="color:#8A6A28">(a)</b> operação estruturada (collar / put de proteção / fence) · '
-        +'<b style="color:#8A6A28">(b)</b> realizar a posição e alocar em caixa (pós-fixado).</div>';
+    // Escolha DIRETA para o assessor (adaptada ao perfil + se está acima do alvo) e o porquê
+    var _pf=(function(){var s=document.getElementById("perfil");var p=(s&&s.value)||"";
+      if(!p&&typeof _clienteIdentificado!=="undefined"&&_clienteIdentificado){p=(_clienteIdentificado.ficha_salva&&_clienteIdentificado.ficha_salva.perfil)||_clienteIdentificado.perfil_sugerido||"";}
+      return (p||"").toLowerCase();})();
+    var _arroj=(_pf.indexOf("arroj")>=0||_pf.indexOf("agress")>=0);
+    var _pfTxt=_pf?("o perfil "+_pf.replace(/_/g," ")):"o perfil do cliente";
+    var _rec,_why;
+    if(!_arroj){
+      _rec="Realizar a posição e alocar em caixa (pós-fixado)";
+      _why="Para "+_pfTxt+", trava o ganho de forma simples e sem custo. A estruturada (collar/fence) tem custo, prazo e limita o ganho — não compensa aqui.";
+    } else if(acima){
+      _rec="Realizar (total ou parcial) e alocar em caixa";
+      _why="O preço já passou o alvo — cristalizar o ganho é o mais seguro. Se quiser manter a exposição, a alternativa é uma estruturada de proteção (fence). Validar tributação e suitability.";
+    } else {
+      _rec="Operação estruturada (collar / fence)";
+      _why="Para "+_pfTxt+", mantém a exposição com o ganho protegido. Envolve custo, prazo e limita o ganho — validar suitability.";
+    }
+    var msg='<div style="font-size:13px;color:#0A0F0C;margin:6px 0 8px;line-height:1.5;background:'+(acima?"#F8E3D4":"#EAF4EC")+';border-radius:6px;padding:8px 10px">'
+      +'<b style="color:#1F9D77">✅ Recomendação:</b> <b>'+_rec+'.</b> '
+      +'<span style="color:#3B4D43">'+_why+'</span></div>';
     return '<div style="border:1px solid '+bordaCard+';background:'+bgCard+';border-radius:8px;padding:10px 12px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">'
         +'<div><span style="color:#8A6A28;font-weight:700;font-size:15px">'+p.ticker+'</span> '
@@ -6883,35 +6895,46 @@ function renderPlanoTroca(sugs, plano){
     var _mv=plano.movimentacoes||[];
     if(_mv.length){
       var _tot=_mv.reduce(function(a,m){return a+(m.valor||0);},0);
+      var _nOrig=new Set(_mv.map(function(m){return m.origem_nome;})).size;
       var _porProd={};
       _mv.forEach(function(m){ var k=m.destino_produto||'—'; _porProd[k]=(_porProd[k]||0)+(m.valor||0); });
       var _compras=Object.keys(_porProd).sort(function(a,b){return _porProd[b]-_porProd[a];})
         .map(function(k){return '<b style="color:var(--text-primary)">'+k+'</b> '+fmt0(_porProd[k]);}).join(' &nbsp;·&nbsp; ');
       h+='<div style="background:var(--surface-raised);border:1px solid var(--border-default);border-radius:10px;padding:12px 14px;margin-bottom:12px">'
         +'<div style="display:flex;gap:22px;flex-wrap:wrap;margin-bottom:6px">'
-        +'<span style="font-size:15px;color:var(--danger-default)">↓ Total a vender: <b style="color:var(--text-primary)">'+fmt0(_tot)+'</b> <span style="font-size:13px;color:var(--text-secondary)">('+_mv.length+' ativos)</span></span>'
+        +'<span style="font-size:15px;color:var(--danger-default)">↓ Total a vender: <b style="color:var(--text-primary)">'+fmt0(_tot)+'</b> <span style="font-size:13px;color:var(--text-secondary)">('+_nOrig+' ativo'+(_nOrig>1?'s':'')+')</span></span>'
         +'<span style="font-size:15px;color:var(--success-default)">↑ Total a comprar: <b style="color:var(--text-primary)">'+fmt0(_tot)+'</b></span>'
         +'</div>'
         +'<div style="font-size:13px;color:var(--text-tertiary);line-height:1.6">Compra concentrada em: '+_compras+'</div>'
         +'</div>';
     }
+    // Agrupa por ATIVO DE SAÍDA (direto, sem repetir): total a sair + por que sair + as compras
+    var _grp={};
     (plano.movimentacoes||[]).forEach(function(m){
-      const des=m.origem_desagio;
-      const desTxt = (des==null) ? '' :
-        (des<0 ? '<span style="color:#C0673A">no ano '+des.toFixed(1)+'%</span>'
-               : '<span style="color:#1F9D77">no ano +'+des.toFixed(1)+'%</span>');
-      const fgc=m.destino_fgc?'<span style="font-size:12px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px;margin-left:4px">FGC</span>':"";
+      var k=m.origem_nome||'—';
+      if(!_grp[k]) _grp[k]={nome:m.origem_nome,label:m.origem_label,desagio:m.origem_desagio,motivo:m.motivo_venda,total:0,buys:{}};
+      _grp[k].total+=(m.valor||0);
+      var dk=m.destino_produto||'—';
+      if(!_grp[k].buys[dk]) _grp[k].buys[dk]={produto:m.destino_produto,label:m.destino_label,fgc:m.destino_fgc,motivo:m.motivo_compra,valor:0};
+      _grp[k].buys[dk].valor+=(m.valor||0);
+    });
+    Object.keys(_grp).sort(function(a,b){return _grp[b].total-_grp[a].total;}).forEach(function(k){
+      var g=_grp[k], des=g.desagio;
+      var desTxt=(des==null)?'':(des<0?' <span style="color:#C0673A">· no ano '+des.toFixed(1)+'%</span>':' <span style="color:#1F9D77">· no ano +'+des.toFixed(1)+'%</span>');
+      var buys=Object.keys(g.buys).sort(function(a,b){return g.buys[b].valor-g.buys[a].valor;}).map(function(dk){
+        var b=g.buys[dk];
+        var fgc=b.fgc?' <span style="font-size:11px;background:#F5F8F5;color:#1F9D77;border:1px solid #C6D6C9;border-radius:8px;padding:1px 6px">FGC</span>':'';
+        return '<div style="padding:6px 0;border-top:1px solid #F5F8F5">'
+          +'<span style="font-size:14px;color:#1F9D77;font-weight:700">↑ COMPRAR '+fmt0(b.valor)+'</span> '
+          +'<span style="font-size:14px;color:#0A0F0C">em <b>'+b.produto+'</b>'+fgc+' <span style="color:#39493F;font-size:13px">('+b.label+')</span></span>'
+          +(b.motivo?'<div style="font-size:12px;color:#8A6A28;margin-top:2px;line-height:1.4">↳ Por que entrar: '+b.motivo+'</div>':'')
+          +'</div>';
+      }).join('');
       h+='<div style="border:1px solid #EAF4EC;border-radius:10px;padding:11px 13px;margin-bottom:8px;background:#FFFFFF">'
-        +'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-        +'<div style="flex:1;min-width:150px"><span style="font-size:13px;color:#D93B3B;font-weight:700">↓ VENDER</span> '
-        +'<span style="font-size:16px;font-weight:800;color:#0A0F0C">'+fmt0(m.valor)+'</span> '
-        +'<span style="font-size:14px;color:#3B4D43">de <b>'+m.origem_nome+'</b> <span style="color:#39493F">('+m.origem_label+')</span></span> '+desTxt+'</div>'
-        +'<div style="font-size:19px;color:#39493F">→</div>'
-        +'<div style="flex:1;min-width:150px;text-align:right"><span style="font-size:13px;color:#1F9D77;font-weight:700">↑ COMPRAR</span> '
-        +'<span style="font-size:16px;font-weight:800;color:#0A0F0C">'+fmt0(m.valor)+'</span> '
-        +'<span style="font-size:14px;color:#3B4D43">em <b>'+m.destino_produto+'</b>'+fgc+' <span style="color:#39493F">('+m.destino_label+')</span></span>'
-        +(m.destino_detalhe?' <span style="font-size:13px;color:#8A6A28">'+m.destino_detalhe+'</span>':'')+'</div>'
-        +'</div></div>';
+        +'<div style="font-size:15px;color:#0A0F0C"><span style="color:#D93B3B;font-weight:700">↓ SAIR de</span> <b>'+g.nome+'</b> <span style="color:#39493F;font-size:13px">('+g.label+')</span> — <b>'+fmt0(g.total)+'</b>'+desTxt+'</div>'
+        +(g.motivo?'<div style="font-size:12px;color:#B0502F;margin-top:3px;line-height:1.4">Por que sair: '+g.motivo+'</div>':'')
+        +'<div style="margin-top:4px">'+buys+'</div>'
+        +'</div>';
     });
     if(plano.bloqueados&&plano.bloqueados.length){
       h+='<div style="margin-top:12px;border:1px solid #F7DADA;border-radius:10px;padding:11px 13px;background:#FCEBEB">';
@@ -11097,13 +11120,24 @@ def _plano_troca(desvios, patrimonio, dados, destinos, perfil=None):
                 mov = min(need, f["restante"], v["restante"])
                 if mov < 500:                     # ignora migalhas
                     continue
+                _des = v["desagio"]
+                _mv_venda = f"{f['label']} está acima do alvo — saída pelo ativo de menor rentabilidade da classe (trim do laggard)."
+                if _des is not None and _des > 0:
+                    _mv_venda += f" Posição no positivo (+{_des:.1f}% no ano), realização sem prejuízo."
+                _mv_compra = f"Fecha o gap de {dest.get('label_classe','')} (classe abaixo do alvo)."
+                _dd = (prod.get("detalhe", "") or "").strip()
+                if prod.get("fgc"):
+                    _mv_compra += " Emissão bancária com FGC."
+                if _dd:
+                    _mv_compra += f" {_dd}."
                 movimentacoes.append({
                     "origem_nome": v["nome"], "origem_classe": f["classe"], "origem_label": f["label"],
-                    "origem_desagio": (round(v["desagio"], 2) if v["desagio"] is not None else None),
+                    "origem_desagio": (round(_des, 2) if _des is not None else None),
                     "valor": round(mov, 2),
                     "destino_produto": prod.get("nome", "—"), "destino_classe": dest.get("classe"),
                     "destino_label": dest.get("label_classe", ""), "destino_detalhe": prod.get("detalhe", ""),
                     "destino_fgc": bool(prod.get("fgc")),
+                    "motivo_venda": _mv_venda, "motivo_compra": _mv_compra,
                 })
                 need -= mov; f["restante"] -= mov; v["restante"] -= mov
 
