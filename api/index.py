@@ -8387,24 +8387,37 @@ def _gerar_morning_call(assessor, forcar=False):
     try: macro = buscar_macro_bcb()
     except Exception: macro = {}
     selic = macro.get("selic_meta"); ipca = macro.get("ipca_12m")
-    # Notícias dos ativos do assessor (mais clientes primeiro)
+    # Notícias dos ativos do assessor (mais clientes primeiro) — ações/FIIs + fundos
     hold = _holdings_assessor(ak, incluir_fundos=True)
-    itens = sorted([kv for kv in hold.items() if kv[1]["tipo"] in ("acao", "fii")],
-                   key=lambda kv: len(kv[1]["holders"]), reverse=True)[:10]
+    _rv  = sorted([kv for kv in hold.items() if kv[1]["tipo"] in ("acao", "fii")],
+                  key=lambda kv: len(kv[1]["holders"]), reverse=True)[:10]
+    _fnd = sorted([kv for kv in hold.items() if kv[1]["tipo"] == "fundo"],
+                  key=lambda kv: len(kv[1]["holders"]), reverse=True)[:4]
+    itens = _rv + _fnd
     def _f(item):
         chave, info = item
         nome = (info.get("nome") or "").strip()
-        q = chave + ((" " + nome.split()[0]) if nome else "")
-        return {"ticker": chave, "nome": nome, "n_holders": len(info["holders"]),
-                "noticias": _google_news(q, limit=1)}
+        if info["tipo"] == "fundo":                       # fundo: casa por gestora/nome, janela maior
+            rotulo = (info.get("query") or nome)[:30]
+            nots = _google_news(info.get("query") or nome, limit=1, dias_max=30)
+        else:
+            rotulo = chave
+            nots = _google_news(chave + ((" " + nome.split()[0]) if nome else ""), limit=1)
+        return {"ticker": rotulo, "tipo": info["tipo"], "nome": nome,
+                "n_holders": len(info["holders"]), "noticias": nots}
     noticias = []
     try:
-        with ThreadPoolExecutor(max_workers=10) as ex:
+        with ThreadPoolExecutor(max_workers=12) as ex:
             for r in ex.map(_f, itens):
                 if r["noticias"]:
                     noticias.append(r)
     except Exception:
         pass
+    # Agenda do dia (Copom, resultados, dados econômicos) — de notícias reais, sem inventar
+    try:
+        agenda = _google_news("agenda do dia mercado brasil economia balanços Copom", limit=2, dias_max=2)
+    except Exception:
+        agenda = []
     # Destaques de mercado (dólar + maiores altas do dia) — reusa o painel de destaques
     try: dest = _mercado_destaques_data()
     except Exception: dest = {}
@@ -8414,21 +8427,24 @@ def _gerar_morning_call(assessor, forcar=False):
 
     # Abertura por IA (2-3 linhas) — 1x por assessor/dia (o morning call é cacheado)
     intro = ""
-    if noticias and os.environ.get("ANTHROPIC_API_KEY"):
+    if (noticias or agenda) and os.environ.get("ANTHROPIC_API_KEY"):
         try:
             import anthropic as _a_mc
             manchetes = "\n".join(f"- {n['ticker']}: {n['noticias'][0]['titulo']}" for n in noticias[:8])
+            _ag = "\n".join(f"- {a['titulo']}" for a in (agenda or [])[:2])
             _ind = []
             if selic is not None: _ind.append(f"Selic {selic:.2f}%")
             if ipca  is not None: _ind.append(f"IPCA 12m {ipca:.2f}%")
             if dolar: _ind.append(f"Dólar R$ {_v2(dolar['preco'])} ({_p1(dolar['variacao'])}%)")
             _cli = _a_mc.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
-            _r = _cli.messages.create(model="claude-haiku-4-5-20251001", max_tokens=280,
+            _r = _cli.messages.create(model="claude-haiku-4-5-20251001", max_tokens=300,
                 messages=[{"role": "user", "content":
                     "Escreva a ABERTURA de um morning call em 2 a 3 linhas, tom profissional e acolhedor, para ser "
-                    "encaminhada a clientes de investimentos. Sintetize o clima de mercado a partir dos indicadores e "
-                    "manchetes abaixo. NÃO invente dados nem cite preço que não esteja aqui. Sem saudação inicial. "
-                    "Português.\n\n" f"Indicadores: {', '.join(_ind) or 'n/d'}\nManchetes:\n{manchetes}"}])
+                    "encaminhada a clientes de investimentos. Sintetize o clima de mercado a partir dos indicadores, "
+                    "manchetes e agenda abaixo. NÃO invente dados nem cite preço/evento que não esteja aqui. Sem "
+                    "saudação inicial. Português.\n\n"
+                    f"Indicadores: {', '.join(_ind) or 'n/d'}\nManchetes:\n{manchetes}"
+                    + (f"\nAgenda do dia:\n{_ag}" if _ag else "")}])
             intro = (_r.content[0].text or "").strip()
         except Exception as _e_mc:
             app.logger.warning(f"morning-call intro IA: {_e_mc}")
@@ -8453,6 +8469,11 @@ def _gerar_morning_call(assessor, forcar=False):
     if not _pan and not dolar:
         L.append("• Indicadores atualizados ao longo do dia")
     L.append("")
+    if agenda:
+        L.append("🗓️ *Agenda do dia*")
+        for a in agenda:
+            L.append(f"• {a['titulo']}" + (f"  _({a['fonte']})_" if a.get("fonte") else ""))
+        L.append("")
     if noticias:
         L.append("📰 *Destaques dos ativos em carteira*")
         for n in noticias:
@@ -8467,7 +8488,7 @@ def _gerar_morning_call(assessor, forcar=False):
           "gerado_em": agora_br().strftime("%d/%m/%Y %H:%M"),
           "texto": texto, "intro": intro, "macro": {"selic": selic, "ipca": ipca},
           "destaques": {"dolar": dolar, "top_acoes": top_acoes, "top_fiis": top_fiis},
-          "noticias": noticias, "n_ativos": len(noticias)}
+          "agenda": agenda, "noticias": noticias, "n_ativos": len(noticias)}
     dia[ak] = mc
     _save(_MORNING_FILE, {hoje: dia})   # mantém só o dia corrente
     return mc
@@ -8537,6 +8558,11 @@ def morning_call_pdf():
         flow.append(Paragraph("<b>Maiores altas (ações):</b> " + " &nbsp;·&nbsp; ".join(f"{a.get('ticker')} {_p1p(a.get('variacao',0))}%" for a in dq["top_acoes"]), body))
     if dq.get("top_fiis"):
         flow.append(Paragraph("<b>Maiores altas (FIIs):</b> " + " &nbsp;·&nbsp; ".join(f"{a.get('ticker')} {_p1p(a.get('variacao',0))}%" for a in dq["top_fiis"]), body))
+    if mc.get("agenda"):
+        flow.append(Paragraph("Agenda do dia", sec))
+        for a in mc["agenda"]:
+            _fs = f' <font color="#5C7365">({a.get("fonte","")})</font>' if a.get("fonte") else ""
+            flow.append(Paragraph(f'{a.get("titulo","")}{_fs}', body))
     if mc.get("noticias"):
         flow.append(Paragraph("Destaques dos ativos em carteira", sec))
         for n in mc["noticias"]:
