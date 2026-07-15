@@ -7584,6 +7584,26 @@ def reset_senha_pessoal():
         return jsonify({"ok": True, "resetada": identity})
     return jsonify({"ok": False, "msg": "Identidade sem senha cadastrada"}), 404
 
+@app.route("/api/admin/limpar-base", methods=["POST"])
+def admin_limpar_base():
+    """Admin zera a base de clientes para recomeçar: XPerformances
+    (clientes/fichas/histórico) e Posições Consolidadas. PRESERVA carteiras
+    recomendadas, OKR, mensagens e senhas. Requer a senha de admin no corpo."""
+    d = request.get_json() or {}
+    if SENHAS.get("admin") != d.get("admin_senha", ""):
+        return jsonify({"ok": False, "msg": "Não autorizado"}), 401
+    antes = {
+        "clientes": len(_load(_DATA_FILE, [])),
+        "fichas": len(_load(_FICHA_FILE, {})),
+        "historico": len(_load(_HIST_FILE, {})),
+        "posicoes": len(_load(_POSICAO_FILE, {})),
+    }
+    _save(_DATA_FILE, [])
+    _save(_FICHA_FILE, {})
+    _save(_HIST_FILE, {})
+    _save(_POSICAO_FILE, {})
+    return jsonify({"ok": True, "limpo": antes})
+
 @app.route("/api/login-pessoal", methods=["POST"])
 def login_pessoal():
     """Etapa 2: cria (1º acesso) ou valida a senha pessoal individual."""
@@ -14543,6 +14563,13 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:#1F9D77}
     <div id="head-clientes"><div style="color:#5C7365;font-size:12px">Carregando...</div></div>
   </div>
 
+  <div class="card" style="border-color:#FBE9E9">
+    <div class="card-title" style="color:#D93B3B">🧹 Zona de perigo, recomeçar a base</div>
+    <div style="font-size:12px;color:#5C7365;line-height:1.5;margin-bottom:12px">Apaga <b>todos os XPerformance salvos</b> (clientes, fichas, histórico) e <b>todas as Posições Consolidadas</b>, para recomeçar do zero por assessor. Preserva carteiras recomendadas, OKR, mensagens e senhas. <b style="color:#D93B3B">Não tem como desfazer.</b></div>
+    <button class="btn" onclick="limparBaseClientes()" style="background:#D93B3B;color:#fff">🧹 Limpar base de clientes</button>
+    <span id="limpar-base-st" style="font-size:12px;margin-left:10px"></span>
+  </div>
+
 </div>
 
 <!-- ═══════ TAB: CONFIGURAÇÕES ═══════ -->
@@ -14988,6 +15015,23 @@ async function salvarMensagem(){
     init();
     setTimeout(()=>st.textContent="", 3000);
   } catch(e){ st.innerHTML = '<span class="status-err">Erro ao salvar.</span>'; }
+}
+
+async function limparBaseClientes(){
+  if(!confirm("Isto vai APAGAR todos os XPerformance e Posições salvos (clientes, fichas, histórico, posições) para recomeçar. Não tem como desfazer. Continuar?")) return;
+  const senha = prompt("Digite a senha de admin para confirmar:");
+  if(!senha) return;
+  const st = document.getElementById("limpar-base-st");
+  if(st) st.innerHTML='<span style="color:#A8833C">⏳ Limpando...</span>';
+  try{
+    const r = await fetch("/api/admin/limpar-base",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({admin_senha:senha})});
+    const d = await r.json();
+    if(d.ok){
+      const l = d.limpo||{};
+      if(st) st.innerHTML='<span style="color:#1F9D77">✅ Base limpa: '+(l.clientes||0)+' clientes, '+(l.fichas||0)+' fichas, '+(l.historico||0)+' históricos, '+(l.posicoes||0)+' posições.</span>';
+      try{ init(); }catch(e){}
+    } else if(st){ st.innerHTML='<span style="color:#D93B3B">'+(d.msg||"Erro")+'</span>'; }
+  } catch(e){ if(st) st.innerHTML='<span style="color:#D93B3B">'+e.message+'</span>'; }
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
