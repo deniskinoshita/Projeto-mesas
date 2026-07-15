@@ -10,6 +10,9 @@
       "memory": 1024
     }
   },
+  "crons": [
+    { "path": "/api/cron/morning-call", "schedule": "0 11 * * *" }
+  ],
   "routes": [
     { "src": "^/$",                          "dest": "api/auth/login.js" },
     { "src": "^/reset-senha$",               "dest": "api/auth/login.js" },
