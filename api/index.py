@@ -610,6 +610,24 @@ def _parse_carteira_rec(texto, nome=""):
            and not re.match(r"^[\d%R\$]", s):
             nomes.append(s)
     nomes = list(dict.fromkeys(nomes))[:80]
+    # Pesos por ticker: percentual na MESMA linha do ticker (peso-alvo da carteira).
+    pesos = {}
+    _tset = set(tickers)
+    for ln in (texto or "").split("\n"):
+        mt = re.search(r"\b([A-Z]{4}\d{1,2})\b", ln)
+        if not mt:
+            continue
+        tk = mt.group(1).upper()
+        if tk not in _tset or tk in pesos:
+            continue
+        mp = re.search(r"(\d{1,2}(?:[.,]\d{1,2})?)\s*%", ln)
+        if mp:
+            try:
+                w = float(mp.group(1).replace(",", "."))
+                if 0 < w <= 100:
+                    pesos[tk] = w
+            except Exception:
+                pass
     if len(fii) >= 4:
         tipo = "fii"
     elif len(acoes) >= 4:
@@ -622,7 +640,7 @@ def _parse_carteira_rec(texto, nome=""):
         tipo = "alocacao"
     else:
         tipo = "outro"
-    return {"tipo": tipo, "tickers": tickers, "fii": fii, "acoes": acoes, "nomes": nomes}
+    return {"tipo": tipo, "tickers": tickers, "fii": fii, "acoes": acoes, "nomes": nomes, "pesos": pesos}
 
 def _recomendados():
     """(tickers:set, nomes:set) recomendados de todas as carteiras salvas (cacheado leve)."""
@@ -9805,13 +9823,16 @@ def hp_carteira_rec_upload():
         return jsonify({"error": "PDF inválido ou protegido por senha. Exporte novamente como PDF."}), 400
     nome = request.form.get("nome", (pdf_file.filename or "Carteira Recomendada")).replace(".pdf", "").strip()
     ref  = request.form.get("referencia", "").strip()
+    perfil = request.form.get("perfil", "").strip().lower()   # perfil-alvo desta carteira (ou "" = todos)
     parsed = _parse_carteira_rec(texto, nome)
     if not (parsed["tickers"] or parsed["nomes"]):
         return jsonify({"error": "Não encontrei ativos/fundos recomendados no texto (tickers ou nomes de fundos)."}), 400
     carts = [c for c in _load(_HP_CARTEIRAS_REC_FILE, []) if c.get("nome") != nome]  # substitui mesmo nome
     item = {"id": str(uuid.uuid4())[:8], "nome": nome, "referencia": ref, "tipo": parsed["tipo"],
+            "perfil": perfil,
             "tickers": parsed["tickers"], "fii": parsed["fii"], "acoes": parsed["acoes"],
-            "nomes": parsed["nomes"], "qtd": len(parsed["tickers"]) + len(parsed["nomes"]),
+            "nomes": parsed["nomes"], "pesos": parsed.get("pesos", {}),
+            "qtd": len(parsed["tickers"]) + len(parsed["nomes"]),
             "data": agora_br().strftime("%d/%m/%Y %H:%M")}
     carts.append(item)
     _save(_HP_CARTEIRAS_REC_FILE, carts)
@@ -10210,13 +10231,49 @@ def _alocar_rf(classe, valor, held):
                             "fgc": False, "tipo": "fundo", "fonte": "Fundo XP"})
     return out
 
-def _rec_tickers(classe, held):
+_PERFIL_PALAVRAS = {
+    "super_conservadora": ["super conserv", "preserv"], "conservadora": ["conservad"],
+    "moderada": ["moderad"], "arrojada": ["arrojad"], "agressiva": ["agressiv"],
+}
+
+def _carteiras_para_perfil(perfil):
+    """Carteiras recomendadas aplicáveis ao perfil: filtra pelo campo 'perfil' da
+    carteira (ou infere do nome). Se nenhuma casar, devolve todas (retrocompat)."""
+    carts = _load(_HP_CARTEIRAS_REC_FILE, [])
+    p = (perfil or "").lower()
+    if not p:
+        return carts
+    palavras = _PERFIL_PALAVRAS.get(p, [p])
+    match = []
+    for c in carts:
+        cp = (c.get("perfil") or "").lower()
+        nome = (c.get("nome") or "").lower()
+        if cp:
+            if cp in ("todos", "todas", "geral") or p in cp or cp in p:
+                match.append(c)
+        elif any(w in nome for w in palavras):
+            match.append(c)
+    return match or carts
+
+def _rec_pesos(perfil=None):
+    """{ticker: peso%} agregado das carteiras do perfil (para alocação ponderada)."""
+    pesos = {}
+    for c in _carteiras_para_perfil(perfil):
+        for tk, w in (c.get("pesos") or {}).items():
+            try:
+                pesos[str(tk).upper()] = float(w)
+            except Exception:
+                pass
+    return pesos
+
+def _rec_tickers(classe, held, perfil=None):
     """Tickers da carteira recomendada (subida pelo Head) para a classe, sem os que o
-    cliente já tem. classe='acoes' → ações; 'fiis' → FIIs (tickers terminados em 11)."""
+    cliente já tem, filtrando pela carteira do perfil. classe='acoes' → ações;
+    'fiis' → FIIs (tickers terminados em 11)."""
     key = "acoes" if classe == "acoes" else "fii"
     held = held or set()
     tks = []
-    for c in _load(_HP_CARTEIRAS_REC_FILE, []):
+    for c in _carteiras_para_perfil(perfil):
         for t in (c.get(key) or []):
             tu = (t or "").upper()
             if tu and tu not in held and tu not in tks:
@@ -10238,11 +10295,22 @@ def _alocar_compra(classe, valor, held, perfil=None):
     if classe in ("acoes", "fiis"):
         # Só perfis arrojado/agressivo, acima de R$25k: segue a CARTEIRA RECOMENDADA
         # (nomes), peso igual entre eles. Demais perfis (ou <R$25k): fundo.
-        rec = _rec_tickers(classe, held)
+        rec = _rec_tickers(classe, held, perfil)
         if valor > RV_REC_MINIMO and rec and (perfil or "") in _PERFIS_RV_REC:
             rec = rec[:12]
-            w = valor / len(rec)
             tipo = "acao" if classe == "acoes" else "fii"
+            # Respeita os PESOS da carteira recomendada; se não houver, peso igual.
+            pesos = _rec_pesos(perfil)
+            ws = {t: pesos.get(t, 0.0) for t in rec}
+            soma = sum(ws.values())
+            if soma > 0:
+                det = "Carteira recomendada (peso-alvo)"
+                out = [{"nome": t, "valor": round(valor * ws[t] / soma, 2), "detalhe": det,
+                        "fgc": False, "tipo": tipo, "fonte": "Carteira recomendada"}
+                       for t in rec if ws[t] > 0 and valor * ws[t] / soma >= 500]
+                if out:
+                    return out
+            w = valor / len(rec)   # fallback: peso igual
             return [{"nome": t, "valor": round(w, 2), "detalhe": "Carteira recomendada",
                      "fgc": False, "tipo": tipo, "fonte": "Carteira recomendada"}
                     for t in rec if w >= 500]
@@ -15675,6 +15743,13 @@ textarea{resize:vertical}
   <div style="background:#F5F8F5;border:1px solid #F5EFD9;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
     <span style="font-size:11px;color:#8A7A5A;flex:1;line-height:1.5">Suba os PDFs das carteiras recomendadas (RF, Fundos, FIIs, Alocação). O sistema extrai os ativos e passa a marcar <b style="color:#A8833C">⭐ Recomendado XP</b> nas sugestões que o assessor recebe na análise do cliente.</span>
     <input type="file" id="cartrec-input" accept=".pdf" style="display:none" onchange="uploadCarteiraRec(this)">
+    <select id="cartrec-perfil" style="font-size:12px;padding:6px 8px;border:1px solid #EAF4EC;border-radius:8px;color:#39493F" title="Perfil-alvo desta carteira">
+      <option value="">Perfil, todos</option>
+      <option value="conservadora">Conservadora</option>
+      <option value="moderada">Moderada</option>
+      <option value="arrojada">Arrojada</option>
+      <option value="agressiva">Agressiva</option>
+    </select>
     <button class="btn btn-sm" onclick="document.getElementById('cartrec-input').click()" style="white-space:nowrap">📂 Subir carteira (PDF)</button>
     <span id="cartrec-st" style="font-size:11px;min-width:110px"></span>
   </div>
@@ -16186,9 +16261,10 @@ async function uploadCarteiraRec(input){
   st.innerHTML='<span style="color:#A8833C">⏳ Processando...</span>';
   try{
     const fd=new FormData(); fd.append("pdf",file); fd.append("nome",file.name.replace(/\.pdf$/i,""));
+    var _pf=document.getElementById("cartrec-perfil"); if(_pf&&_pf.value) fd.append("perfil",_pf.value);
     const r=await fetch("/api/hp/carteira-rec-upload",{method:"POST",body:fd});
     const d=await r.json();
-    if(d.ok){ st.innerHTML='<span style="color:#1F9D77">✅ '+d.item.qtd+' ativos ('+d.item.tipo+')</span>'; carregarCarteirasRec(); setTimeout(()=>st.textContent="",5000); }
+    if(d.ok){ var _p=d.item.perfil?(' · '+d.item.perfil):''; st.innerHTML='<span style="color:#1F9D77">✅ '+d.item.qtd+' ativos ('+d.item.tipo+')'+_p+'</span>'; carregarCarteirasRec(); setTimeout(()=>st.textContent="",5000); }
     else st.innerHTML='<span style="color:#D93B3B">'+(d.error||"erro")+'</span>';
   }catch(e){ st.innerHTML='<span style="color:#D93B3B">'+e.message+'</span>'; }
 }
@@ -16200,9 +16276,12 @@ async function carregarCarteirasRec(){
     const TIPOS={rf:"Renda Fixa",fundos:"Fundos",fii:"FIIs",acoes:"Ações",alocacao:"Alocação",outro:"Outro"};
     box.innerHTML=carts.map(function(c){
       var amostra=(c.tickers||[]).slice(0,6).join(", ")+((c.tickers||[]).length>6?"…":"");
+      var _pfb=c.perfil?('<span style="font-size:9px;color:#2E7D5B;background:#E6F0EA;border-radius:8px;padding:1px 7px;margin-left:4px">'+c.perfil+'</span>'):'';
+      var _npesos=c.pesos?Object.keys(c.pesos).length:0;
+      var _pesosb=_npesos?(' · <span style="color:#A8833C">com pesos ('+_npesos+')</span>'):' · peso igual';
       return '<div style="background:#F5F8F5;border:1px solid #F5EFD9;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px">'
-        +'<div style="flex:1"><div style="font-size:12px;color:#D9E3DB;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#A8833C;background:#FBF3D2;border:1px solid #F5EFD9;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span></div>'
-        +'<div style="font-size:10px;color:#5A7A6A">'+c.qtd+' ativos'+(c.referencia?" · "+c.referencia:"")+' · '+c.data+(amostra?" · "+amostra:"")+'</div></div>'
+        +'<div style="flex:1"><div style="font-size:12px;color:#D9E3DB;font-weight:600">'+c.nome+' <span style="font-size:9px;color:#A8833C;background:#FBF3D2;border:1px solid #F5EFD9;border-radius:8px;padding:1px 7px;margin-left:4px">'+(TIPOS[c.tipo]||c.tipo)+'</span>'+_pfb+'</div>'
+        +'<div style="font-size:10px;color:#5A7A6A">'+c.qtd+' ativos'+(c.referencia?" · "+c.referencia:"")+' · '+c.data+_pesosb+(amostra?" · "+amostra:"")+'</div></div>'
         +'<button onclick="deleteCarteiraRec(\''+c.id+'\')" style="background:none;border:none;color:#FBE9E9;cursor:pointer;font-size:14px" title="Remover">🗑</button></div>';
     }).join("");
   }catch(e){}
