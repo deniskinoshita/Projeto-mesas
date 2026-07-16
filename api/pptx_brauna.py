@@ -13,17 +13,29 @@ from pptx.oxml.ns import qn
 from lxml import etree
 
 # ── Paleta de cores ────────────────────────────────────────────────────────────
-C_BG      = RGBColor(0x02, 0x3B, 0x40)   # fundo principal
+# Fundo escuro teal (C_BG) é intencional — relatório premium para cliente.
+# C_GOLD e C_GREEN são versões "on-dark" da identidade Braúna (verde-petróleo
+# #006057 / dourado #8A6A28): o hex cru falha em fundo escuro (lightness band e
+# chroma floor — ver skill dataviz, references/color-formula.md), então aqui
+# eles foram re-clareados/re-saturados mantendo a família de matiz, e validados
+# com scripts/validate_palette.js --mode dark --surface "#023B40" (fundo real
+# deste PPTX). C_GREEN/C_AMBER/C_RED formam a "status palette" (ok/atenção/
+# crítico) — reservada, nunca reaproveitada como cor categórica solta; todo uso
+# de status neste arquivo vem acompanhado de ícone/seta/sinal, nunca só cor
+# (ver _status_icon, _desvio_cor e os "+"/"▲"/"▼" nos textos).
+C_BG      = RGBColor(0x02, 0x3B, 0x40)   # fundo principal (surface de validação)
 C_BAND    = RGBColor(0x00, 0x43, 0x49)   # banda/header
-C_GOLD    = RGBColor(0xFD, 0xE0, 0xB5)   # dourado champagne (título, destaque)
+C_GOLD    = RGBColor(0xD9, 0xB1, 0x5B)   # dourado on-dark (brand #8A6A28, H~85° preservado) — título/destaque
 C_WHITE   = RGBColor(0xFF, 0xFF, 0xFF)   # branco
 C_TEAL    = RGBColor(0xB0, 0xD4, 0xD6)   # teal claro (subtítulo, corpo)
 C_GRAY    = RGBColor(0xA6, 0xA6, 0xA6)   # cinza rodapé
 C_WMARK   = RGBColor(0xBE, 0xBE, 0xBE)   # marca d'água
 C_CARD    = RGBColor(0x0A, 0x3A, 0x40)   # card escuro
-C_GREEN   = RGBColor(0x5D, 0xCA, 0xA5)   # positivo/ok
-C_RED     = RGBColor(0xFF, 0x6B, 0x6B)   # crítico/alerta
-C_AMBER   = RGBColor(0xF5, 0x9E, 0x0B)   # atenção
+C_GREEN   = RGBColor(0x00, 0x9C, 0x76)   # verde-petróleo on-dark (brand #006057) — status OK / positivo
+C_AMBER   = RGBColor(0xD0, 0x75, 0x0A)   # status atenção
+C_RED     = RGBColor(0xE0, 0x44, 0x6A)   # status crítico/negativo
+C_ROW_ALT     = RGBColor(0x05, 0x3B, 0x42)   # faixa alternada de linha (tabelas)
+C_ROW_HILITE  = RGBColor(0x10, 0x45, 0x4C)   # linha em destaque (maior desvio)
 
 # Mapeamento classe → label legível
 CLS_LABEL = {
@@ -66,6 +78,12 @@ def _status_label(status: str) -> str:
     return m.get(status, status.title())
 
 
+def _status_icon(status: str) -> str:
+    """Símbolo que SEMPRE acompanha a cor de status (nunca só cor)."""
+    m = {"ok": "✓", "atencao": "⚠", "critico": "✕"}
+    return m.get(status, "•")
+
+
 def _desvio_cor(desvio: float) -> RGBColor:
     """Verde ±2pp, amarelo ±2-5pp, vermelho >5pp."""
     abs_d = abs(desvio)
@@ -74,6 +92,15 @@ def _desvio_cor(desvio: float) -> RGBColor:
     elif abs_d <= 5:
         return C_AMBER
     return C_RED
+
+
+def _desvio_seta(desvio: float) -> str:
+    """Seta de direção do desvio — sinal visual além da cor (nunca só cor)."""
+    if desvio > 0:
+        return "▲"
+    elif desvio < 0:
+        return "▼"
+    return "—"
 
 
 def _data_proxima_analise(data_ref: str) -> str:
@@ -288,14 +315,18 @@ def _slide_resumo(prs: Presentation, dados: dict):
             "cor":   C_GOLD,
         },
         {
+            # Delta sempre com seta + sinal explícito — nunca só a cor (▲/▼ +/-).
             "label": "Rentabilidade 12m",
-            "valor": f"{r12m:.2f}%".replace(".", ","),
+            "valor": (
+                f"{'▲' if r12m > 0 else '▼' if r12m < 0 else '●'} "
+                f"{'+' if r12m > 0 else ''}{r12m:.2f}%".replace(".", ",")
+            ),
             "sub":   f"{cdi_pct:.1f}% do CDI".replace(".", ","),
             "cor":   C_GREEN if r12m >= 0 else C_RED,
         },
         {
             "label": "Status da Carteira",
-            "valor": _status_label(status),
+            "valor": f"{_status_icon(status)} {_status_label(status)}",
             "sub":   "",
             "cor":   _status_cor(status),
         },
@@ -390,7 +421,23 @@ def _slide_resumo(prs: Presentation, dados: dict):
 
 
 def _slide_alocacao(prs: Presentation, dados: dict):
-    """Slide 3 — Alocação Atual vs Modelo."""
+    """Slide 3 — Alocação Atual vs Modelo.
+
+    A comparação atual-vs-alvo ganhou um encoding visual direto: uma barra fina
+    (mark spec da skill dataviz — ≤0.16in de espessura, pontas arredondadas,
+    cresce de uma baseline única em 0%) mostra o % atual sobre um track neutro,
+    com um marcador vertical dourado sobreposto na posição do modelo (alvo).
+    Isso comunica a distância atual↔alvo geometricamente, não só pela cor do
+    texto de desvio — a cor (verde/âmbar/vermelho) permanece, mas sempre
+    acompanhada da seta ▲/▼ e do sinal +/-, nunca sozinha (ver _desvio_seta).
+    Optei por desenho manual (não native add_chart do python-pptx) porque o
+    layout é uma barra única por linha embutida numa tabela de 5 colunas — um
+    gráfico nativo exigiria um plot separado e perderia o alinhamento por linha
+    com Atual%/Modelo%/Desvio; o desenho manual também é o que já dá controle
+    fino sobre o marcador de alvo sobreposto, que add_chart não expõe.
+    """
+    import math
+
     slide = _blank_slide(prs)
     _slide_bg(slide, prs)
     _add_watermark(slide, prs)
@@ -400,10 +447,10 @@ def _slide_alocacao(prs: Presentation, dados: dict):
     modelo     = dados.get("modelo", {})
     classes    = list(CLS_LABEL.keys())
 
-    # Cabeçalho da tabela
-    headers  = ["Classe de Ativo", "Atual %", "Modelo %", "Desvio"]
-    col_x    = [Inches(0.35), Inches(5.8), Inches(7.6), Inches(9.4)]
-    col_w    = [Inches(5.3),  Inches(1.7), Inches(1.7), Inches(2.1)]
+    # Cabeçalho da tabela — coluna 2 vira a área da barra comparativa.
+    headers  = ["Classe de Ativo", "Atual vs. Modelo", "Atual %", "Modelo %", "Desvio"]
+    col_x    = [Inches(0.35), Inches(2.75), Inches(8.05), Inches(9.30), Inches(10.55)]
+    col_w    = [Inches(2.30), Inches(5.20), Inches(1.15), Inches(1.15), Inches(1.50)]
     row_h    = Inches(0.38)
     start_y  = Inches(1.55)
 
@@ -436,31 +483,63 @@ def _slide_alocacao(prs: Presentation, dados: dict):
             maior_desvio_abs = abs(desvio)
             maior_desvio_idx = len(rows_data) - 1
 
+    # Escala comum da barra (uma única "baseline" em 0% para todas as linhas),
+    # arredondada para um número "limpo" acima do maior valor, com piso de 30%
+    # para não esticar demais as barras quando a carteira é bem diversificada.
+    maior_valor = max(
+        [max(atual, alvo) for _, atual, alvo, _ in rows_data] + [0]
+    )
+    escala_max = max(30, math.ceil(maior_valor / 10.0) * 10)
+
+    bar_track_x = col_x[1]
+    bar_track_w = col_w[1]
+    bar_h       = Inches(0.16)
+
     for i, (cls, atual, alvo, desvio) in enumerate(rows_data):
         y = start_y + (i + 1) * row_h
         # Fundo alternado, destaque na linha com maior desvio
         if i == maior_desvio_idx:
-            bg = RGBColor(0x10, 0x45, 0x4C)
+            bg = C_ROW_HILITE
         elif i % 2 == 0:
-            bg = RGBColor(0x05, 0x3B, 0x42)
+            bg = C_ROW_ALT
         else:
             bg = C_CARD
         _add_rect(slide, Inches(0.25), y, Inches(11.8), row_h, bg)
 
         desvio_cor = _desvio_cor(desvio)
+        seta       = _desvio_seta(desvio)
         sinal      = "+" if desvio > 0 else ""
-        desvio_str = f"{sinal}{desvio:.1f} pp".replace(".", ",") if desvio != 0 else "—"
+        desvio_str = f"{seta} {sinal}{desvio:.1f} pp".replace(".", ",") if desvio != 0 else "—"
+
+        # ── Barra comparativa: track neutro + barra do atual + marcador do alvo ──
+        bar_y = y + (row_h - bar_h) // 2
+        _add_rect(slide, bar_track_x, bar_y, bar_track_w, bar_h, C_BAND, radius=True)
+        if atual > 0:
+            largura_atual = max(Inches(0.05), int(bar_track_w * min(atual, escala_max) / escala_max))
+            _add_rect(slide, bar_track_x, bar_y, largura_atual, bar_h, desvio_cor, radius=True)
+        # Marcador de alvo (dourado) sobreposto na posição do modelo — encoding
+        # direto da comparação atual↔alvo, além da cor do texto de desvio.
+        marker_x = bar_track_x + int(bar_track_w * min(alvo, escala_max) / escala_max)
+        marker_x = min(marker_x, bar_track_x + bar_track_w - Inches(0.02))
+        _add_rect(
+            slide, marker_x, bar_y - Inches(0.05),
+            Inches(0.03), bar_h + Inches(0.10),
+            C_GOLD
+        )
 
         vals = [
             CLS_LABEL.get(cls, cls),
+            "",  # coluna 2 é a barra desenhada acima, sem texto
             f"{atual:.1f}%".replace(".", ","),
             f"{alvo:.1f}%".replace(".", ","),
             desvio_str,
         ]
-        cores = [C_WHITE, C_TEAL, C_TEAL, desvio_cor]
-        bolds = [False, False, False, True]
+        cores = [C_WHITE, C_WHITE, C_TEAL, C_TEAL, desvio_cor]
+        bolds = [False, False, False, False, True]
 
         for j, (val, cor, bold) in enumerate(zip(vals, cores, bolds)):
+            if j == 1:
+                continue  # coluna da barra: nenhum texto sobreposto
             _add_text_box(
                 slide, val,
                 col_x[j], y + Inches(0.04),
@@ -472,9 +551,10 @@ def _slide_alocacao(prs: Presentation, dados: dict):
     # Legenda
     _add_text_box(
         slide,
-        "Verde ±2pp  |  Amarelo ±2–5pp  |  Vermelho >5pp",
+        "Barra = % atual  |  Marcador ouro = % modelo (alvo)  |  "
+        "Verde ±2pp · Âmbar ±2–5pp · Vermelho >5pp  (▲ acima / ▼ abaixo)",
         Inches(0.35), Inches(6.72),
-        Inches(8.0), Inches(0.35),
+        Inches(11.5), Inches(0.4),
         font_size=10, color=C_GRAY,
         align=PP_ALIGN.LEFT
     )
@@ -517,7 +597,7 @@ def _slide_rv(prs: Presentation, dados: dict):
             ticker = item.get("ticker", "")
             nome   = item.get("nome", "")
             pct    = item.get("pct", 0)
-            bg = C_CARD if idx % 2 == 0 else RGBColor(0x05, 0x3B, 0x42)
+            bg = C_CARD if idx % 2 == 0 else C_ROW_ALT
             _add_rect(slide, Inches(0.25), y_cur, Inches(11.8), row_h, bg)
             # Ticker
             _add_text_box(
@@ -582,7 +662,7 @@ def _slide_rf(prs: Presentation, dados: dict):
     total_rf = 0
     for i, ativo in enumerate(exibir):
         y   = start_y + (i + 1) * row_h
-        bg  = C_CARD if i % 2 == 0 else RGBColor(0x05, 0x3B, 0x42)
+        bg  = C_CARD if i % 2 == 0 else C_ROW_ALT
         _add_rect(slide, Inches(0.25), y, Inches(11.8), row_h, bg)
 
         nome   = ativo.get("nome", "")
@@ -682,10 +762,10 @@ def _slide_servir(prs: Presentation, dados: dict):
 
         label  = ITEM_LABELS.get(key, key.replace("_", " ").title())
         ok     = bool(val)
-        icone  = "[OK]" if ok else "[!]"
+        icone  = "✓" if ok else "✕"
         cor    = C_GREEN if ok else C_RED
 
-        bg = C_CARD if row % 2 == 0 else RGBColor(0x05, 0x3B, 0x42)
+        bg = C_CARD if row % 2 == 0 else C_ROW_ALT
         _add_rect(slide, x, y, col_w, row_h - Inches(0.04), bg)
 
         _add_text_box(
@@ -780,7 +860,7 @@ def _slide_proximos_passos(prs: Presentation, dados: dict):
     start_y = Inches(1.55)
     for i, acao in enumerate(acoes[:6]):
         y  = start_y + i * row_h
-        bg = C_CARD if i % 2 == 0 else RGBColor(0x05, 0x3B, 0x42)
+        bg = C_CARD if i % 2 == 0 else C_ROW_ALT
         _add_rect(slide, Inches(0.25), y, Inches(11.8), row_h - Inches(0.04), bg)
         # Número
         _add_text_box(

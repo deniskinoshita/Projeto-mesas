@@ -1,6 +1,6 @@
 import io, re, json, os, uuid, time
 from datetime import datetime, timezone, timedelta
-from flask import Flask, request, jsonify, send_file, render_template_string, Response
+from flask import Flask, request, jsonify, send_file, render_template_string, Response, g
 
 # Horário de Brasília (servidor roda em UTC). BRT = UTC-3 fixo (sem horário de verão desde 2019).
 _TZ_BR = timezone(timedelta(hours=-3))
@@ -387,16 +387,24 @@ HP_CENARIO_DEFAULT = {
 }
 
 # ── persistência ──────────────────────────────────────────────────────────────
+_KV_CLIENT_CACHE = None  # singleton por instância/processo quente (env vars não mudam em runtime)
+_KV_CLIENT_TRIED = False
+
 def _kv_client():
+    global _KV_CLIENT_CACHE, _KV_CLIENT_TRIED
+    if _KV_CLIENT_TRIED:
+        return _KV_CLIENT_CACHE
+    _KV_CLIENT_TRIED = True
     url   = os.environ.get("KV_REST_API_URL")
     token = os.environ.get("KV_REST_API_TOKEN")
     if not url or not token:
         return None
     try:
         from upstash_redis import Redis
-        return Redis(url=url, token=token)
+        _KV_CLIENT_CACHE = Redis(url=url, token=token)
     except Exception:
-        return None
+        _KV_CLIENT_CACHE = None
+    return _KV_CLIENT_CACHE
 
 HP_CARTEIRA_BRAUNA_DEFAULT = {
     "data_ref": "30/06/2026",
@@ -489,23 +497,47 @@ def _key(path: str) -> str:
     name = os.path.basename(path).replace("brauna_", "").replace(".json", "")
     return f"brauna:{name}"
 
+def _req_cache():
+    """Cache vivo apenas durante a requisição atual (flask.g).
+    Evita repetir round-trips ao Redis quando a mesma rota chama _load()
+    várias vezes para o mesmo path. Nunca vaza entre requisições."""
+    if not hasattr(g, "_kv_cache"):
+        g._kv_cache = {}
+    return g._kv_cache
+
 def _load(path, default):
+    try:
+        cache = _req_cache()
+        if path in cache:
+            return cache[path]
+    except RuntimeError:
+        cache = None  # fora de contexto de request (ex.: script standalone)
     kv = _kv_client()
     if kv:
         try:
             val = kv.get(_key(path))
             if val is not None:
-                return json.loads(val) if isinstance(val, str) else val
+                result = json.loads(val) if isinstance(val, str) else val
+                if cache is not None:
+                    cache[path] = result
+                return result
         except Exception:
             pass
     # Fallback: arquivo local /tmp (para desenvolvimento)
     try:
         with open(path, encoding="utf-8") as f:
-            return json.load(f)
+            result = json.load(f)
     except Exception:
-        return default
+        result = default
+    if cache is not None:
+        cache[path] = result
+    return result
 
 def _save(path, data):
+    try:
+        _req_cache()[path] = data  # mantém a requisição atual coerente com a escrita
+    except RuntimeError:
+        pass
     kv = _kv_client()
     if kv:
         try:
@@ -895,13 +927,19 @@ def msg_horas_restantes(m):
     return max(0, int(resta // 3600))
 
 
+_CONTEXTO_MERCADO_CACHE = None
 def carregar_contexto():
-    try:
-        path = os.path.join(ROOT, "contexto_mercado.json")
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    """contexto_mercado.json é um arquivo estático do bundle (só muda em novo deploy),
+    igual _PRAT_CACHE/_STOCK_GUIDE_CACHE: lê o disco uma vez por instância quente."""
+    global _CONTEXTO_MERCADO_CACHE
+    if _CONTEXTO_MERCADO_CACHE is None:
+        try:
+            path = os.path.join(ROOT, "contexto_mercado.json")
+            with open(path, encoding="utf-8") as f:
+                _CONTEXTO_MERCADO_CACHE = json.load(f)
+        except Exception:
+            _CONTEXTO_MERCADO_CACHE = {}
+    return _CONTEXTO_MERCADO_CACHE
 
 
 # ── SAA, alocação-alvo por perfil (régua do rebalanceamento; casa = Braúna) ──────
@@ -956,12 +994,62 @@ def _fpct(v):
     except Exception:
         return "n/d"
 
+def _ir_aliquota_regressiva(dias):
+    """Alíquota de IR regressiva (RF), pelo prazo em dias — tabela de tributacao.json
+    (ir_regressiva_rf.faixas). None se não der para determinar o prazo."""
+    if not dias or dias <= 0:
+        return None
+    faixas = (_prat("tributacao.json").get("ir_regressiva_rf") or {}).get("faixas") or []
+    for f in faixas:
+        if "acima_dias" in f and dias > f["acima_dias"]:
+            return f["aliquota"]
+        if "de_dias" in f and "ate_dias" in f and f["de_dias"] <= dias <= f["ate_dias"]:
+            return f["aliquota"]
+        if "ate_dias" in f and "de_dias" not in f and dias <= f["ate_dias"]:
+            return f["aliquota"]
+    return None
+
+def _parse_pct_cdi(s):
+    """'104,00% CDI' -> 104.0 ; None se a string não for um percentual de CDI."""
+    m = re.search(r"([\d.,]+)\s*%\s*CDI", s or "", re.I)
+    if not m:
+        return None
+    try:
+        return float(m.group(1).replace(",", "."))
+    except Exception:
+        return None
+
+def _liquido_pct_cdi_equivalente(p):
+    """%CDI LÍQUIDO equivalente do produto (tributacao.json: nunca comparar bruto/isento
+    direto). Isento: tax_max já é líquido (0% IR) — devolve o próprio bruto. Tributável:
+    aplica a alíquota regressiva pelo prazo (campo 'carencia', em dias, até o vencimento)
+    sobre o bruto. None se não for %CDI ou faltar prazo para determinar a alíquota."""
+    bruto = _parse_pct_cdi(p.get("tax_max") or p.get("tax_min"))
+    if bruto is None:
+        return None
+    if p.get("isento"):
+        return bruto
+    aliquota = _ir_aliquota_regressiva(p.get("carencia"))
+    if aliquota is None:
+        return None
+    return bruto * (1 - aliquota)
+
 def _sug_rf(filtro, obs, n, excluir=None):
-    """RF tradicional (suitability Geral), isentos primeiro, depois por rating.
-    Exclui o que o cliente já tem e diversifica emissor entre produtos com FGC (teto)."""
+    """RF tradicional (suitability Geral). Ordena pelo retorno LÍQUIDO equivalente em
+    %CDI (tributacao.json: nunca comparar taxa bruta/isenta direto — isento já é líquido,
+    tributável desconta a alíquota regressiva pelo prazo). Produtos fora do padrão %CDI
+    (ex.: IPCA+, que exigiria projetar IPCA para netar) caem no critério antigo (isento
+    primeiro, depois risco) como fallback. Exclui o que o cliente já tem e diversifica
+    emissor entre produtos com FGC (teto)."""
     xs = [p for p in _prat("rf_tradicional_br.json").get("produtos", [])
           if (p.get("publico") or "").startswith("Investidor Geral") and filtro(p)]
-    xs.sort(key=lambda p: (not p.get("isento"), str(p.get("risco") or "99")))
+    def _sort_key(p):
+        liq = _liquido_pct_cdi_equivalente(p)
+        risco_n = float(p.get("risco")) if isinstance(p.get("risco"), (int, float)) else 99.0
+        if liq is not None:
+            return (0, -liq, risco_n)
+        return (1, not p.get("isento"), risco_n)
+    xs.sort(key=_sort_key)
     _vistos, _emis, sel = set(), set(), []
     for p in xs:
         at = p.get("ativo")
@@ -983,6 +1071,10 @@ def _sug_rf(filtro, obs, n, excluir=None):
         det = p.get("tax_max") or p.get("tax_min") or ""
         if p.get("isento") and p.get("grossup_max"):
             det = f"{det} · isento (≈{p['grossup_max']} bruto)"
+        else:
+            liq = _liquido_pct_cdi_equivalente(p)
+            if liq is not None:
+                det = f"{det} bruto · líquido ≈{liq:.2f}% CDI"
         out.append({"nome": p.get("ativo"), "detalhe": det, "fonte": "RF XP",
                     "fgc": p.get("fgc"), "obs": obs})
     return out
@@ -1441,7 +1533,11 @@ def extrair_xperformance(pdf_bytes):
             if re.search(r"[Cc]aixa|[Pp]rovento|100,00", nome_cat): caixa_perc = perc; continue
             for pat, key in comp_map:
                 if re.search(pat, nome_cat, re.I):
-                    comp[key] = max(comp[key], perc); break
+                    # Duas linhas do PDF podem cair na mesma categoria interna (ex.:
+                    # "Pós Fixado" + "Previdência" -> pos_fixado; "Fundos Estruturados"
+                    # + "Alternativo" -> alternativos). Somar as parcelas, não pegar o maior
+                    # (era bug: `max` descartava uma das duas linhas e subestimava a classe).
+                    comp[key] = comp.get(key, 0.0) + perc; break
 
     # Fallback: parser genérico se composição não encontrada
     if sum(comp.values()) < 1:
@@ -1654,6 +1750,178 @@ def _pos_brl(s):
     m = re.search(r'R\$\s*([\d.]+,\d{2})', s or "")
     return float(m.group(1).replace(".", "").replace(",", ".")) if m else None
 
+
+# ── FGC: exposição unificada por CONGLOMERADO (fonte única de verdade) ────────
+# Existiam duas heurísticas divergentes (uma em parse_posicao_consolidada, outra em
+# alertas_fgc), nenhuma agrupando por conglomerado financeiro nem projetando o
+# vencimento. As regras/fórmulas abaixo seguem fgc.json (ler esse arquivo para o
+# desenho completo: status OK→ESTOURO_FUTURO, fórmulas de projeção).
+#
+# Instrumentos com garantia ordinária do FGC (fgc.json/elegibilidade.tem_fgc).
+# LF, LFSN e LIG ficaram de fora de propósito: Letra Financeira não é garantida
+# pelo FGC, e LIG (Lei 13.097/2015) é garantida por patrimônio de afetação, não
+# pelo FGC — o parser antigo de posicao_consolidada os incluía por engano.
+_FGC_INSTRUMENTOS = ("CDB", "RDB", "LCI", "LCA", "LC", "LCD")
+
+def _fgc_grupo_explicito(nome_upper):
+    """'(Grupo Simpar)' etc. anotado no próprio nome do ativo é o sinal mais confiável
+    de conglomerado: bancos do mesmo grupo emitem sob razões sociais diferentes que não
+    compartilham nenhuma palavra em comum, então normalizar só o nome do emissor não
+    seria suficiente para agrupá-los sob o mesmo teto do FGC."""
+    m = re.search(r"\(\s*GRUPO\s+([A-ZÀ-Ú0-9 &]+?)\s*\)", nome_upper)
+    return ("GRUPO " + m.group(1).strip()) if m else None
+
+def _fgc_emissor_conglomerado(nome, tipo=None):
+    """(emissor, conglomerado) a partir do nome do ativo (ex.: 'CDB Banco BBC (Grupo
+    Simpar) - JUN/2028'). conglomerado = grupo anotado no nome quando presente, senão
+    o próprio emissor normalizado (mesma base de nome = mesmo conglomerado).
+    `tipo`, se fornecido (ex.: parser da Posição Consolidada, que já sabe o tipo
+    estruturado), é usado só para checar elegibilidade — o emissor/conglomerado
+    ainda é derivado do texto do nome, para que a mesma instituição normalize para
+    a mesma chave não importa de qual PDF (XPerformance ou Posição Consolidada) veio.
+    Retorna (None, None) se o instrumento não tem garantia do FGC."""
+    if not nome:
+        return None, None
+    u = re.sub(r"\s+", " ", nome.upper()).strip()
+    if tipo and tipo.upper() not in _FGC_INSTRUMENTOS:
+        return None, None
+    instr = tipo.upper() if tipo else next(
+        (k for k in _FGC_INSTRUMENTOS if re.search(r"\b" + k + r"\b", u) or u.replace(" ", "").startswith(k)), None)
+    if not instr:
+        return None, None
+    grupo = _fgc_grupo_explicito(u)
+    resto = u.split(instr, 1)[1] if instr in u else u
+    resto = re.sub(r"\([^)]*\)", " ", resto)  # tira "(Grupo X)" do texto-base do emissor
+    resto = re.split(r"\s[-–]\s|\b(?:JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)[/ ]?20\d\d|\d{2}/\d{2}/20\d\d", resto)[0]
+    resto = re.sub(r"[^A-ZÀ-Ú0-9 &]", " ", resto)
+    palavras = [p for p in resto.split()
+                if p not in ("S", "A", "SA", "CFI", "FINANCEIRA", "BANCO", "S.A", "DE", "DO", "DA", "CONSIGNADO")]
+    emissor = " ".join(palavras[:2]).strip() or instr
+    return emissor, (grupo or emissor)
+
+def _fgc_parse_data(v):
+    """Aceita date/datetime já prontos ou string 'dd/mm/aaaa'. None se não der para parsear."""
+    if v is None or isinstance(v, str) and not v.strip():
+        return None
+    if hasattr(v, "year") and hasattr(v, "month"):
+        return v
+    try:
+        return datetime.strptime(str(v).strip(), "%d/%m/%Y").date()
+    except Exception:
+        return None
+
+def _fgc_projetar_valor(valor_atual, vencimento=None, taxa_aa=None, indexador=None,
+                         cdi_estimado=None, ipca_estimado=None, ref=None):
+    """Projeta principal + juros até o vencimento (fgc.json/projecao_valor_vencimento,
+    juros compostos em dias úteis). SEM vencimento e taxa/indexador suficientes NÃO
+    inventa: devolve (valor_atual, False) — quem chama trata como dado insuficiente
+    para fins de status futuro (fgc.json/status: DADOS_INSUFICIENTES)."""
+    if not valor_atual:
+        return 0.0, False
+    dv = _fgc_parse_data(vencimento)
+    if not dv or (taxa_aa is None and not indexador):
+        return valor_atual, False
+    ref = ref or agora_br().date()
+    try:
+        dias_corridos = (dv - ref).days
+    except Exception:
+        return valor_atual, False
+    if dias_corridos <= 0:
+        return valor_atual, False
+    du = dias_corridos * (252.0 / 365.0)  # aproximação sem calendário de feriados
+    try:
+        if taxa_aa is not None:
+            projetado = valor_atual * (1 + taxa_aa) ** (du / 252.0)
+        elif indexador == "cdi" and cdi_estimado is not None:
+            projetado = valor_atual * (1 + cdi_estimado) ** (du / 252.0)
+        elif indexador == "ipca" and ipca_estimado is not None:
+            projetado = valor_atual * (1 + ipca_estimado) ** (du / 252.0)
+        else:
+            return valor_atual, False
+        return projetado, True
+    except Exception:
+        return valor_atual, False
+
+def calcular_exposicao_fgc(ativos):
+    """Fonte única de cálculo de exposição ao FGC (fgc.json). Agrupa por CONGLOMERADO
+    (não só por emissor — bancos do mesmo grupo compartilham o teto), aplica o teto de
+    R$250 mil por conglomerado e reporta a exposição total do CPF/CNPJ para referência
+    ao teto global de R$1 milhão a cada 4 anos (aproximado: como a plataforma não tem
+    histórico de valores já RECEBIDOS do FGC nos últimos 4 anos, a exposição total é
+    informativa, não um veredito definitivo sobre o teto global). Projeta valor no
+    vencimento quando há dados (vencimento + taxa/indexador); sem dados, mantém o
+    valor atual e marca `projecao_confiavel: False` — nunca inventa taxa/vencimento.
+
+    `ativos`: lista de dicts. Aceita tanto o formato do XPerformance (nome, saldo)
+    quanto o da Posição Consolidada (nome, tipo, valor), e opcionalmente vencimento,
+    taxa_aa, indexador, cdi_estimado, ipca_estimado por ativo, quando disponíveis.
+    """
+    _fgc_json = _prat("fgc.json")
+    LIM_CONGLOMERADO = float((_fgc_json.get("limites") or {}).get("por_conglomerado", 250000.0))
+    LIM_GLOBAL = float((_fgc_json.get("limites") or {}).get("global_cpf_cnpj", 1000000.0))
+
+    por_grupo = {}
+    for a in ativos:
+        nome = a.get("nome") or a.get("emissor_raw") or ""
+        valor = a.get("valor") if a.get("valor") is not None else a.get("saldo")
+        if not valor or valor <= 0:
+            continue
+        emissor, conglomerado = _fgc_emissor_conglomerado(nome, tipo=a.get("tipo"))
+        if not conglomerado:
+            continue
+        projetado, tem_projecao = _fgc_projetar_valor(
+            valor, vencimento=a.get("vencimento"), taxa_aa=a.get("taxa_aa"),
+            indexador=a.get("indexador"), cdi_estimado=a.get("cdi_estimado"),
+            ipca_estimado=a.get("ipca_estimado"))
+        g = por_grupo.setdefault(conglomerado, {"emissores": {}, "atual": 0.0, "projetado": 0.0, "projecao_confiavel": True})
+        g["emissores"][emissor] = g["emissores"].get(emissor, 0.0) + valor
+        g["atual"] += valor
+        g["projetado"] += projetado
+        if not tem_projecao:
+            g["projecao_confiavel"] = False
+
+    resultado = []
+    exposicao_total = 0.0
+    for grupo, d in sorted(por_grupo.items(), key=lambda x: -x[1]["atual"]):
+        atual, projetado = d["atual"], d["projetado"]
+        exposicao_total += atual
+        margem_atual  = LIM_CONGLOMERADO - atual
+        margem_futura = LIM_CONGLOMERADO - projetado
+        excesso_atual  = max(0.0, atual - LIM_CONGLOMERADO)
+        excesso_futuro = max(0.0, projetado - LIM_CONGLOMERADO)
+        if atual > LIM_CONGLOMERADO:
+            status = "ESTOURO_ATUAL"
+        elif projetado > LIM_CONGLOMERADO:
+            status = "ESTOURO_FUTURO" if d["projecao_confiavel"] else "ATENCAO"
+        elif projetado > 0.9 * LIM_CONGLOMERADO or margem_futura < 0.1 * LIM_CONGLOMERADO:
+            status = "ATENCAO"
+        else:
+            status = "OK"
+        resultado.append({
+            "conglomerado": grupo,
+            "emissores": d["emissores"],
+            "exposicao_atual": round(atual, 2),
+            "exposicao_projetada": round(projetado, 2),
+            "limite_conglomerado": LIM_CONGLOMERADO,
+            "margem_atual": round(margem_atual, 2),
+            "margem_futura": round(margem_futura, 2),
+            "excesso_atual": round(excesso_atual, 2),
+            "excesso_futuro": round(excesso_futuro, 2),
+            "aporte_maximo_hoje": round(max(0.0, LIM_CONGLOMERADO - projetado), 2),
+            "status": status,
+            "projecao_confiavel": d["projecao_confiavel"],
+        })
+    return {
+        "por_conglomerado": resultado,
+        "exposicao_total_fgc": round(exposicao_total, 2),
+        "limite_global": LIM_GLOBAL,
+        "limite_global_obs": ("Teto global de R$1 milhão a cada 4 anos também soma valores já "
+                               "RECEBIDOS do FGC nesse período, dado que a plataforma não tem hoje — "
+                               "o total acima é só a exposição das aplicações vigentes, não o consumo "
+                               "real do teto global."),
+    }
+
+
 def parse_posicao_consolidada(pdf_bytes):
     """Foto patrimonial a partir da Posição Consolidada (XP): patrimônio real,
     caixa parado em conta, vencimentos, risco/suitability e emissores (FGC)."""
@@ -1732,18 +2000,21 @@ def _parse_posicao_consolidada_texto(texto):
         tm = re.match(r'^(' + _POS_TIPOS_RF + r')\s+(.+?)\s+-(?:\s|$)', nome_ativo)
         rf_ativos.append({"tipo": tm.group(1) if tm else None,
                           "emissor": _norm_emis(tm.group(2)) if tm else None,
-                          "classe": classe_atual, "vencimento": m.group(3),
+                          "nome": nome_ativo, "classe": classe_atual, "vencimento": m.group(3),
                           "valor": _pos_brl(m.group(11))})
     o["rf_ativos"] = rf_ativos
-    # FGC por emissor: só emissões bancárias cobertas (CDB/RDB/LCI/LCA/LC/LIG/LFSN/LF).
-    # CRA, CRI, CDCA, DEB, COE e Tesouro (NTN/LTN/LFT) NÃO têm FGC.
-    _FGC_TIPOS = {"CDB", "RDB", "LCI", "LCA", "LC", "LIG", "LFSN", "LF"}
-    fgc = {}
-    for a in rf_ativos:
-        if a["tipo"] in _FGC_TIPOS and a["emissor"] and a["valor"]:
-            fgc[a["emissor"]] = fgc.get(a["emissor"], 0.0) + a["valor"]
-    o["emissores_fgc"] = [{"emissor": k, "valor": round(v, 2), "acima_teto": v > 250000}
-                          for k, v in sorted(fgc.items(), key=lambda x: -x[1])]
+    # FGC: exposição por CONGLOMERADO (fonte única — ver calcular_exposicao_fgc/fgc.json).
+    # CRA, CRI, CDCA, DEB, COE e Tesouro (NTN/LTN/LFT) NÃO têm FGC e já saem excluídos
+    # (calcular_exposicao_fgc só reconhece CDB/RDB/LCI/LCA/LC/LCD como elegíveis).
+    _fgc_calc = calcular_exposicao_fgc(rf_ativos)
+    o["fgc_por_conglomerado"] = _fgc_calc["por_conglomerado"]
+    o["fgc_exposicao_total"] = _fgc_calc["exposicao_total_fgc"]
+    o["fgc_limite_global"] = _fgc_calc["limite_global"]
+    # Compatibilidade com o template existente (chips "emissores_fgc"): cada item agora
+    # representa um CONGLOMERADO (pode agregar mais de um emissor/razão social).
+    o["emissores_fgc"] = [{"emissor": g["conglomerado"], "valor": g["exposicao_atual"],
+                           "acima_teto": g["status"] in ("ESTOURO_ATUAL", "ESTOURO_FUTURO")}
+                          for g in _fgc_calc["por_conglomerado"]]
     # Fundos de investimento (formato: nome + 1 data + cotas + valor + 3x R$; líquido = último)
     _FUNDROW = re.compile(r'^(.+?)\s+(\d{2}/\d{2}/\d{4})\s+([\d.]+)\s+([\d.,]+)\s+'
                           r'R\$\s*[\d.,]+\s+R\$\s*[\d.,]+\s+R\$\s*([\d.]+,\d{2})\s*$')
@@ -2312,7 +2583,9 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     # Só mostra a linha macro quando houver dado real (nunca "n/d")
     if macro.get('selic_meta') and macro.get('ipca_12m'):
         meta.append(["Selic meta:",f"{macro['selic_meta']:.2f}%","IPCA 12M:",f"{macro['ipca_12m']:.2f}%"])
-    tm=Table(meta,colWidths=[2.6*cm,7*cm,2.6*cm,5*cm])
+    # Larguras somam 16.8cm (área útil é 17cm com margens de 2cm) -- antes somavam 17.2cm e
+    # estouravam a margem direita da página.
+    tm=Table(meta,colWidths=[2.6*cm,6.8*cm,2.6*cm,4.8*cm],hAlign="CENTER")
     tm.setStyle(TableStyle([
         ("FONTSIZE",(0,0),(-1,-1),8),("TEXTCOLOR",(0,0),(-1,-1),BRANCO),
         ("TEXTCOLOR",(0,0),(0,-1),DOURADO),("TEXTCOLOR",(2,0),(2,-1),DOURADO),
@@ -2386,7 +2659,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                 continue
             rd.append([_lb,_pct(p.get(_k)),_pct(c.get(_k)),_dpp(p.get(_k),c.get(_k))])
         elems.append(Paragraph("Rentabilidade vs. CDI",s_sec))
-        tr=Table(rd,colWidths=[3*cm,4*cm,4*cm,4*cm])
+        tr=Table(rd,colWidths=[3*cm,4*cm,4*cm,4*cm],hAlign="CENTER")
         tr.setStyle(TableStyle([
             ("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
             ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
@@ -2419,7 +2692,8 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
     fig.tight_layout(pad=1)
     ib=io.BytesIO(); fig.savefig(ib,format="png",dpi=150,facecolor="#FFFFFF"); plt.close(fig); ib.seek(0)
     _hh=max(3.2,0.72*len(lbs)+1.2)
-    elems.append(Image(ib,width=15*cm,height=_hh*cm)); elems.append(Spacer(1,0.3*cm))
+    _img1=Image(ib,width=15*cm,height=_hh*cm); _img1.hAlign="CENTER"
+    elems.append(_img1); elems.append(Spacer(1,0.3*cm))
 
     # Rentabilidade, Cliente vs. Carteira Recomendada vs. CDI (linha)
     try:
@@ -2460,14 +2734,15 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
             axr.legend(facecolor="#FFFFFF",edgecolor="#D9E3DB",labelcolor="#17271E",fontsize=8,loc="best")
             figr.tight_layout(pad=1)
             ibr=io.BytesIO(); figr.savefig(ibr,format="png",dpi=150,facecolor="#FFFFFF"); plt.close(figr); ibr.seek(0)
-            elems.append(Image(ibr,width=15*cm,height=5.7*cm)); elems.append(Spacer(1,0.3*cm))
+            _img2=Image(ibr,width=15*cm,height=5.7*cm); _img2.hAlign="CENTER"
+            elems.append(_img2); elems.append(Spacer(1,0.3*cm))
     except Exception:
         pass
 
     elems.append(Paragraph("Desvios por Indexador",s_sec))
     dd=[["Indexador","Atual (%)","Modelo (%)","Desvio (%)"]]
     for d in desvios: dd.append([d["label"],f'{d["real"]:.2f}',f'{d["alvo"]:.2f}',f'{d["desvio"]:+.2f}'])
-    td=Table(dd,colWidths=[5*cm,3.5*cm,3.5*cm,3.5*cm])
+    td=Table(dd,colWidths=[5*cm,3.5*cm,3.5*cm,3.5*cm],repeatRows=1,hAlign="CENTER")
     est=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
          ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),8),
          ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#D9E3DB")),
@@ -2478,7 +2753,12 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         elif _ad>=1.5:est.append(("TEXTCOLOR",(3,i),(3,i),AMARELO))  # desvio moderado
         else:         est.append(("TEXTCOLOR",(3,i),(3,i),VERDE))    # dentro da faixa
     td.setStyle(TableStyle(est))
-    elems.append(td); elems.append(Spacer(1,0.3*cm))
+    elems.append(td); elems.append(Spacer(1,0.1*cm))
+    elems.append(Paragraph(
+        "<font color=\"#C0392B\">■</font> desvio ≥ 10 p.p. (crítico) &nbsp;&nbsp;"
+        "<font color=\"#B4833A\">■</font> entre 1,5 e 10 p.p. (moderado) &nbsp;&nbsp;"
+        "<font color=\"#2E7D5B\">■</font> dentro da faixa", s_gest))
+    elems.append(Spacer(1,0.25*cm))
 
     if alertas:
         elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
@@ -2573,7 +2853,7 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         if len(linhas_pos) > 1:
             elems.append(HRFlowable(width="100%",thickness=0.5,color=DESC,spaceAfter=4))
             elems.append(Paragraph("Posicionamento das Ações, Levante (casa principal) + XP (visão de mercado)",s_sec))
-            tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm])
+            tp=Table(linhas_pos,colWidths=[2.3*cm,1.6*cm,3.8*cm,2.6*cm,2.6*cm,3.6*cm],repeatRows=1,hAlign="CENTER")
             est_pos=[("BACKGROUND",(0,0),(-1,0),DESC),("TEXTCOLOR",(0,0),(-1,0),PRETO),
                      ("TEXTCOLOR",(0,1),(-1,-1),BRANCO),("FONTSIZE",(0,0),(-1,-1),7.5),
                      ("ROWBACKGROUNDS",(0,1),(-1,-1),[CESC,CMED]),("GRID",(0,0),(-1,-1),0.3,colors.HexColor("#D9E3DB")),
@@ -2582,7 +2862,12 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
                      ("TEXTCOLOR",(0,1),(0,-1),DOURADO),("VALIGN",(0,0),(-1,-1),"MIDDLE")]
             est_pos+=estilo_extra
             tp.setStyle(TableStyle(est_pos))
-            elems.append(tp); elems.append(Spacer(1,0.15*cm))
+            elems.append(tp); elems.append(Spacer(1,0.1*cm))
+            elems.append(Paragraph(
+                "<font color=\"#2E7D5B\">■</font> compra &nbsp;&nbsp;"
+                "<font color=\"#B4833A\">■</font> neutro &nbsp;&nbsp;"
+                "<font color=\"#C0392B\">■</font> venda", s_gest))
+            elems.append(Spacer(1,0.05*cm))
             elems.append(Paragraph("A visão Levante é uma das referências externas desta análise e não substitui a avaliação individual do assessor. O preço-alvo é referência; o preço vigente vem do XPerformance.",s_gest))
             elems.append(Spacer(1,0.3*cm))
 
@@ -2699,6 +2984,164 @@ def gerar_pdf(nome, perfil, desvios, rent, patrimonio, caixa, data_ref, recomend
         pass
 
     buf.seek(0); return buf
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  Export XLSX, Posição/Alocação (planilha do assessor, uso fora da plataforma)
+# ═══════════════════════════════════════════════════════════════════════════════
+def gerar_xlsx(nome, perfil, desvios, patrimonio, caixa, data_ref, conta="", assessor="",
+               modelo_nome="", recomendacoes=None, rent=None):
+    """Planilha de posição/alocação do cliente para o assessor baixar (anexar em e-mail,
+    importar em outra ferramenta). Usa os MESMOS dados que alimentam gerar_pdf/apresentações
+    (composição por classe vs. modelo, desvio, ação sugerida) -- não recalcula nada, só formata
+    o que já foi calculado em analyze-xp.
+    """
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    # Normaliza os desvios: mesma tolerância de chaves do gerar_pdf (analyze-xp usa 'atual'/'cls').
+    desvios = [{**d,
+                "real": d.get("real", d.get("atual", 0)),
+                "cat": d.get("cat", d.get("cls")),
+                "label": d.get("label") or LABELS.get(d.get("cat", d.get("cls")), d.get("cat", d.get("cls")) or "")}
+               for d in (desvios or [])]
+
+    # Cores de marca (mesmas do PDF): verde-petróleo primário, dourado para títulos/destaques.
+    VERDE_PETROLEO = "FF006057"; DOURADO = "FF8A6A28"
+    BRANCO = "FFFFFFFF"; CINZA_CLARO = "FFF4F6F4"; TXT_ESCURO = "FF17271E"
+    VERM = "FFC0392B"; VERDE = "FF2E7D5B"; AMARELO = "FFB4833A"; CINZA_TXT = "FF5A6A60"
+
+    f_titulo = Font(name="Calibri", size=14, bold=True, color=BRANCO)
+    f_sub    = Font(name="Calibri", size=10, italic=True, color=CINZA_TXT)
+    f_cab    = Font(name="Calibri", size=10, bold=True, color=BRANCO)
+    f_label  = Font(name="Calibri", size=10, bold=True, color=DOURADO)
+    f_corpo  = Font(name="Calibri", size=10, color=TXT_ESCURO)
+    fill_titulo = PatternFill("solid", fgColor=VERDE_PETROLEO)
+    fill_cab    = PatternFill("solid", fgColor=DOURADO)
+    fill_par    = PatternFill("solid", fgColor=CINZA_CLARO)
+    borda = Border(left=Side(style="thin", color="FFD9E3DB"), right=Side(style="thin", color="FFD9E3DB"),
+                    top=Side(style="thin", color="FFD9E3DB"), bottom=Side(style="thin", color="FFD9E3DB"))
+
+    perfil_pt = {"super_conservadora": "Super Conservadora", "conservadora": "Conservadora",
+                 "moderada": "Moderada", "arrojada": "Arrojada", "agressiva": "Agressiva"}
+    perfil_lbl = perfil_pt.get(perfil, perfil)
+    modelo_lbl = (modelo_nome or "").strip() or "Levante Asset"
+    _conta = str(conta or "").strip(); _nome = str(nome or "").strip()
+    cliente_txt = (f"{_conta}, {_nome}" if (_conta and _nome) else (_conta or _nome or "n/d"))
+
+    wb = Workbook()
+
+    # ── Aba 1: Resumo ──────────────────────────────────────────────────────
+    ws = wb.active
+    ws.title = "Resumo"
+    ws.sheet_view.showGridLines = False
+    ws.merge_cells("A1:B1")
+    ws["A1"] = "BRAÚNA INVESTIMENTOS"
+    ws["A1"].font = f_titulo; ws["A1"].fill = fill_titulo
+    ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[1].height = 26
+    ws.merge_cells("A2:B2")
+    ws["A2"] = f"Posição e Alocação, Modelo {modelo_lbl}"
+    ws["A2"].font = f_sub; ws["A2"].alignment = Alignment(horizontal="center")
+
+    linhas_resumo = [
+        ("Cliente", cliente_txt), ("Assessor", str(assessor or "").strip() or "n/d"),
+        ("Perfil", perfil_lbl), ("Data de referência", data_ref or "n/d"),
+        ("Patrimônio", float(patrimonio or 0)), ("Caixa (excluído do modelo)", float(caixa or 0) / 100.0),
+    ]
+    r = 4
+    for label, valor in linhas_resumo:
+        c1 = ws.cell(row=r, column=1, value=label); c1.font = f_label; c1.border = borda
+        c2 = ws.cell(row=r, column=2, value=valor); c2.font = f_corpo; c2.border = borda
+        if label == "Patrimônio":
+            c2.number_format = 'R$ #,##0.00'
+        elif "Caixa" in label:
+            c2.number_format = '0.0%'
+        r += 1
+    ws.column_dimensions["A"].width = 26
+    ws.column_dimensions["B"].width = 32
+
+    # ── Aba 2: Alocação por Classe (composição vs. modelo, desvio, ação sugerida) ──
+    ws2 = wb.create_sheet("Alocação por Classe")
+    cab = ["Classe", "Atual (%)", "Modelo (%)", "Desvio (p.p.)", "Ação sugerida", "Valor do gap (R$)"]
+    ws2.append(cab)
+    for col_i in range(1, len(cab) + 1):
+        cell = ws2.cell(row=1, column=col_i)
+        cell.font = f_cab; cell.fill = fill_cab; cell.border = borda
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    ws2.row_dimensions[1].height = 20
+    ws2.freeze_panes = "A2"
+
+    row_i = 2
+    for d in desvios:
+        real = float(d.get("real") or 0); alvo = float(d.get("alvo") or 0)
+        desvio = float(d.get("desvio", real - alvo) or 0)
+        if desvio <= -1.5:
+            acao = "Aumentar alocação"
+        elif desvio >= 1.5:
+            acao = "Reduzir alocação"
+        else:
+            acao = "Manter"
+        valor_gap = float(patrimonio or 0) * (abs(desvio) / 100.0)
+        vals = [d.get("label") or d.get("cat") or "", real / 100.0, alvo / 100.0, desvio / 100.0, acao, valor_gap]
+        for col_i, v in enumerate(vals, 1):
+            cell = ws2.cell(row=row_i, column=col_i, value=v)
+            cell.font = f_corpo; cell.border = borda
+            if col_i in (2, 3, 4):
+                cell.number_format = '0.00%'
+                cell.alignment = Alignment(horizontal="center")
+            elif col_i == 6:
+                cell.number_format = 'R$ #,##0.00'
+            if row_i % 2 == 0:
+                cell.fill = fill_par
+            if col_i == 4:   # cor do desvio, mesma régua do PDF (>=10pp crítico, >=1.5pp moderado)
+                ad = abs(desvio)
+                cor = VERM if ad >= 10 else (AMARELO if ad >= 1.5 else VERDE)
+                cell.font = Font(name="Calibri", size=10, bold=True, color=cor)
+        row_i += 1
+
+    for i, w in enumerate([26, 12, 12, 14, 20, 18], 1):
+        ws2.column_dimensions[get_column_letter(i)].width = w
+
+    legenda_row = row_i + 1
+    ws2.cell(row=legenda_row, column=1, value="Legenda do desvio (mesma régua do PDF):").font = Font(bold=True, size=9, color=CINZA_TXT)
+    ws2.cell(row=legenda_row + 1, column=1, value="Vermelho: desvio >= 10 p.p. (crítico)").font = Font(size=9, color=VERM)
+    ws2.cell(row=legenda_row + 2, column=1, value="Amarelo: desvio entre 1,5 e 10 p.p. (moderado)").font = Font(size=9, color=AMARELO)
+    ws2.cell(row=legenda_row + 3, column=1, value="Verde: desvio < 1,5 p.p. (dentro da faixa)").font = Font(size=9, color=VERDE)
+
+    # ── Aba 3: Recomendações (opcional, só se houver) ───────────────────────
+    if recomendacoes:
+        ws3 = wb.create_sheet("Recomendações")
+        cab3 = ["Prioridade", "Classe", "Gap (p.p.)", "Valor sugerido (R$)", "Justificativa", "Produtos sugeridos"]
+        ws3.append(cab3)
+        for col_i in range(1, len(cab3) + 1):
+            cell = ws3.cell(row=1, column=col_i)
+            cell.font = f_cab; cell.fill = fill_cab; cell.border = borda
+            cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws3.row_dimensions[1].height = 20
+        ws3.freeze_panes = "A2"
+        r3 = 2
+        for rec in recomendacoes:
+            falta = float(rec.get("falta_pp", 0) or 0)
+            valor = float(patrimonio or 0) * (falta / 100.0)
+            produtos = ", ".join(rec.get("produtos", []) or [])
+            vals = [rec.get("urgencia", ""), rec.get("classe", ""), falta / 100.0, valor, rec.get("explicacao", ""), produtos]
+            for col_i, v in enumerate(vals, 1):
+                cell = ws3.cell(row=r3, column=col_i, value=v)
+                cell.font = f_corpo; cell.border = borda
+                cell.alignment = Alignment(wrap_text=True, vertical="top")
+                if col_i == 3: cell.number_format = '0.00%'
+                if col_i == 4: cell.number_format = 'R$ #,##0.00'
+                if r3 % 2 == 0: cell.fill = fill_par
+            r3 += 1
+        for i, w in enumerate([18, 16, 12, 18, 55, 35], 1):
+            ws3.column_dimensions[get_column_letter(i)].width = w
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return buf
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -3270,7 +3713,7 @@ HTML = r"""<!DOCTYPE html>
   --brauna-teal:#207870;           /* [~] */
   --brauna-green:#2E7D57;          /* [~] verde vivo                */
   --brauna-gold:#A8833C;           /* dourado de marca (já em uso)  */
-  --brauna-gold-dark:#8A6A28;      /* dourado escuro (títulos)      */
+  --brauna-gold-dark:#755A22;      /* dourado escuro (títulos) — escurecido p/ 4.5:1 (era #8A6A28, 4.49:1 no bg-primary) */
   --brauna-gold-light:#C0B058;     /* [~] */
 
   /* — Neutros — */
@@ -3324,14 +3767,14 @@ HTML = r"""<!DOCTYPE html>
   --accent-gold-default:var(--brauna-gold);
 
   /* — Semânticos: estados — */
-  --success-default:#1F9D77;
+  --success-default:#187D5F;       /* escurecido p/ 4.5:1 como texto (era #1F9D77, 3.42:1 no branco) */
   --success-subtle:var(--mint-50);
-  --danger-default:#D93B3B;
+  --danger-default:#B83232;        /* escurecido p/ 4.5:1 como texto (era #D93B3B, 3.87:1 no danger-subtle-2) */
   --danger-strong:#CF2E2E;
   --danger-bright:#FF2222;
   --danger-subtle:#FCEBEB;
   --danger-subtle-2:#FBE9E9;
-  --warning-default:#A9800F;
+  --warning-default:#7E600B;       /* escurecido p/ 4.5:1 como texto (era #A9800F, 3.26:1 no warning-subtle) */
   --warning-strong:#7C5D0B;
   --warning-subtle:#FBF3D2;
 
@@ -3435,15 +3878,15 @@ select option{background:var(--surface-raised)}
 .pilar-toggle.pending-crit{border-color:var(--danger-subtle-2);background:var(--danger-subtle-2)}
 .pilar-toggle.pending-high{border-color:var(--warning-subtle);background:var(--warning-subtle)}
 .pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
-.pilar-check.checked{background:var(--success-default);border-color:var(--success-default);color:var(--black);font-weight:700}
+.pilar-check.checked{background:var(--success-default);border-color:var(--success-default);color:var(--white);font-weight:700}
 .pilar-icon{font-size:23px;flex-shrink:0}
 .pilar-info{flex:1}
 .pilar-nome{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:2px;display:flex;align-items:center;gap:8px}
 .pilar-nome .badge{font-size:13px;padding:2px 8px;border-radius:10px;font-weight:700}
 .badge-crit{background:var(--danger-bright);color:var(--white)}
-.badge-high{background:var(--warning-default);color:var(--black)}
+.badge-high{background:var(--warning-default);color:var(--white)}
 .badge-med{background:var(--border-strong);color:var(--text-tertiary)}
-.badge-dir{background:var(--primary-default);color:var(--black)}
+.badge-dir{background:var(--primary-default);color:var(--white)}
 .pilar-desc{font-size:14px;color:var(--text-secondary);line-height:1.4}
 .pilar-falta{display:none;margin-top:10px;padding:10px;background:var(--bg-primary);border-radius:8px;border-left:3px solid var(--danger-default)}
 .pilar-falta.show{display:block}
@@ -3542,7 +3985,7 @@ select option{background:var(--surface-raised)}
 .step-item.done{background:var(--bg-secondary);border-color:var(--mint-100)}
 .step-circle{width:26px;height:26px;border-radius:50%;background:var(--border-default);border:2px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--text-secondary);flex-shrink:0;transition:all .3s}
 .step-item.active .step-circle{background:var(--primary-default);border-color:var(--text-brand);color:var(--bg-primary)}
-.step-item.done .step-circle{background:var(--success-default);border-color:var(--success-default);color:var(--black)}
+.step-item.done .step-circle{background:var(--success-default);border-color:var(--success-default);color:var(--white)}
 .step-label{font-size:15px;font-weight:700;color:var(--text-secondary);letter-spacing:.3px;transition:all .3s}
 .step-item.active .step-label{color:var(--text-brand)}
 .step-item.done .step-label{color:var(--success-default)}
@@ -7626,47 +8069,27 @@ def _pilar_html_inicial(p):
   </div>
 </div>'''
 
-_FGC_INSTR = ("CDB", "RDB", "LCI", "LCA", "LCD")  # instrumentos com cobertura do FGC
-def _fgc_emissor(nome):
-    """Retorna o emissor normalizado se o ativo for RF bancária elegível ao FGC; senão None.
-    Deriva do próprio nome do XPerformance (ex.: 'CDB Banco BBC (Grupo Simpar) - JUN/2028')."""
-    if not nome:
-        return None
-    u = nome.upper()
-    instr = next((k for k in _FGC_INSTR if re.search(r"\b" + k + r"\b", u) or u.replace(" ", "").startswith(k)), None)
-    if not instr:
-        return None
-    # texto após o instrumento, antes do sufixo de vencimento (" - MES/ANO" ou data)
-    resto = u.split(instr, 1)[1] if instr in u else u
-    resto = re.sub(r"\([^)]*\)", " ", resto)  # remove "(Grupo Simpar)" etc. para agrupar o mesmo emissor
-    resto = re.split(r"\s[-–]\s|\b(?:JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)[/ ]?20\d\d|\d{2}/\d{2}/20\d\d", resto)[0]
-    resto = re.sub(r"[^A-ZÀ-Ú0-9 &]", " ", resto)
-    palavras = [p for p in resto.split() if p not in ("S", "A", "SA", "CFI", "FINANCEIRA", "BANCO", "S.A", "DE", "DO", "DA", "CONSIGNADO")]
-    emissor = " ".join(palavras[:2]).strip()
-    return emissor or instr
-
 def alertas_fgc(rf_ativos):
-    """Exposição FGC ATUAL por emissor (soma de saldo dos ativos elegíveis). Alerta > R$ 250k.
-    Projeção futura não é feita: o XPerformance não traz a taxa contratada (só rentabilidade)."""
-    LIM = 250000.0
-    por_emissor = {}
-    for a in rf_ativos:
-        emis = _fgc_emissor(a.get("nome", ""))
-        if emis and (a.get("saldo") or 0) > 0:
-            por_emissor[emis] = por_emissor.get(emis, 0.0) + float(a["saldo"])
+    """Exposição FGC por CONGLOMERADO (fonte única — ver calcular_exposicao_fgc/fgc.json).
+    rf_ativos aqui vem do XPerformance ({"nome","saldo",...}), sem vencimento/taxa
+    contratada — a projeção futura cai no fallback "dados insuficientes" (status
+    fica ATENCAO em vez de ESTOURO_FUTURO quando o valor atual já está perto do teto)."""
+    _fgc_calc = calcular_exposicao_fgc(rf_ativos)
     def _brl(v):
         return "R$ " + f"{v:,.0f}".replace(",", ".")
     out = []
-    for emis, total in sorted(por_emissor.items(), key=lambda x: -x[1]):
-        if total > LIM:
+    for g in _fgc_calc["por_conglomerado"]:
+        total = g["exposicao_atual"]
+        conglomerado = g["conglomerado"].title()
+        if g["status"] in ("ESTOURO_ATUAL", "ESTOURO_FUTURO"):
             out.append({
                 "tipo": "fgc", "nivel": "alto", "classe": "pos_fixado",
-                "msg": f"FGC: exposição de {_brl(total)} em {emis.title()} — acima do limite de R$ 250 mil. Excedente de {_brl(total-LIM)} é risco direto do emissor, sem garantia do FGC.",
+                "msg": f"FGC: exposição de {_brl(total)} em {conglomerado} — acima do limite de R$ 250 mil por conglomerado. Excedente de {_brl(g['excesso_atual'])} é risco direto do emissor, sem garantia do FGC.",
             })
-        elif total >= 225000:
+        elif g["status"] == "ATENCAO":
             out.append({
                 "tipo": "fgc", "nivel": "medio", "classe": "pos_fixado",
-                "msg": f"FGC: exposição de {_brl(total)} em {emis.title()} — próximo do limite de R$ 250 mil. Evitar novos aportes neste emissor.",
+                "msg": f"FGC: exposição de {_brl(total)} em {conglomerado} — próximo do limite de R$ 250 mil por conglomerado. Evitar novos aportes nesse grupo.",
             })
     return out
 
@@ -13268,6 +13691,21 @@ def pdf_endpoint():
     return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=nome_arq)
 
 
+@app.route("/api/xlsx", methods=["POST"])
+def xlsx_endpoint():
+    """Export XLSX de posição/alocação para o assessor (mesmos dados do /api/pdf)."""
+    d = request.get_json()
+    buf = gerar_xlsx(
+        d.get("nome",""), d.get("perfil","conservadora"),
+        d.get("desvios",[]), d.get("patrimonio",0), d.get("caixa",0),
+        d.get("data_ref",""), d.get("conta",""), d.get("assessor",""),
+        d.get("modelo_nome",""), d.get("recomendacoes"), d.get("rent"),
+    )
+    nome_arq = f"{d.get('nome','cliente').replace(' ','-').lower()}_{d.get('data_ref','')}_alocacao.xlsx"
+    return send_file(buf, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                      as_attachment=True, download_name=nome_arq)
+
+
 @app.route("/api/brauna360", methods=["POST"])
 def brauna360_endpoint():
     """Gera o documento BRAÚNA 360° (HTML) a partir dos dados da análise do cliente."""
@@ -13448,6 +13886,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s;
 }
 .role-card:hover{border-color:var(--primary-default);transform:translateY(-3px);box-shadow:0 8px 32px rgba(214,178,122,.12)}
+.role-card:focus-visible{outline:2px solid var(--primary-default);outline-offset:3px}
 .role-card.selected{transform:translateY(-3px)}
 
 /* Assessor */
@@ -13459,7 +13898,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 /* Head */
 .role-card.head.selected{border-color:var(--primary-default);box-shadow:0 8px 32px rgba(232,201,107,.18);background:var(--warning-subtle)}
 .role-card.head:hover{border-color:var(--primary-default)}
-.head .role-check{background:var(--primary-default);color:var(--black)}
+.head .role-check{background:var(--primary-default);color:var(--white)}
 /* Admin */
 .role-card.admin.selected{border-color:var(--success-default);box-shadow:0 8px 32px rgba(93,202,165,.18);background:var(--mint-100)}
 .role-card.admin:hover{border-color:var(--success-default)}
@@ -13474,9 +13913,9 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
   font-size:10px;font-weight:900;
   opacity:0;transition:opacity .2s;
 }
-.assessor .role-check{background:var(--primary-default);color:var(--black)}
-.lider .role-check{background:#4E63C8;color:var(--black)}
-.admin .role-check{background:var(--success-default);color:var(--black)}
+.assessor .role-check{background:var(--primary-default);color:var(--white)}
+.lider .role-check{background:#4E63C8;color:var(--white)}
+.admin .role-check{background:var(--success-default);color:var(--white)}
 .role-card.selected .role-check{opacity:1}
 
 /* Caixa de senha */
@@ -13527,25 +13966,25 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 
 <!-- Escolha de papel -->
 <div class="roles">
-  <div class="role-card assessor" onclick="selRole('assessor')" id="card-assessor">
+  <div class="role-card assessor" onclick="selRole('assessor')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selRole('assessor')}" id="card-assessor" tabindex="0" role="button" aria-pressed="false">
     <div class="role-check">✓</div>
     <span class="role-icon">📊</span>
     <div class="role-name" style="color:#A8833C">Assessor</div>
     <div class="role-desc">Análise de carteiras e atendimento ao cliente</div>
   </div>
-  <div class="role-card lider" onclick="selRole('lider')" id="card-lider">
+  <div class="role-card lider" onclick="selRole('lider')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selRole('lider')}" id="card-lider" tabindex="0" role="button" aria-pressed="false">
     <div class="role-check">✓</div>
     <span class="role-icon">👥</span>
     <div class="role-name" style="color:#4E63C8">Líder</div>
     <div class="role-desc">Visão da equipe, OKRs e orientação aos assessores</div>
   </div>
-  <div class="role-card head" onclick="selRole('head')" id="card-head">
+  <div class="role-card head" onclick="selRole('head')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selRole('head')}" id="card-head" tabindex="0" role="button" aria-pressed="false">
     <div class="role-check">✓</div>
     <span class="role-icon">🏛️</span>
     <div class="role-name" style="color:#A8833C">Head de Produtos</div>
     <div class="role-desc">Portfólios modelo, cenário macro e produtos em destaque</div>
   </div>
-  <div class="role-card admin" onclick="selRole('admin')" id="card-admin">
+  <div class="role-card admin" onclick="selRole('admin')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selRole('admin')}" id="card-admin" tabindex="0" role="button" aria-pressed="false">
     <div class="role-check">✓</div>
     <span class="role-icon">⚙️</span>
     <div class="role-name" style="color:#1F9D77">Administração</div>
@@ -13620,8 +14059,9 @@ const ROLES = {
 
 function selRole(role){
   roleAtual = role;
-  document.querySelectorAll(".role-card").forEach(c=>c.classList.remove("selected"));
+  document.querySelectorAll(".role-card").forEach(c=>{c.classList.remove("selected");c.setAttribute("aria-pressed","false");});
   document.getElementById("card-"+role).classList.add("selected");
+  document.getElementById("card-"+role).setAttribute("aria-pressed","true");
 
   const r = ROLES[role];
   document.documentElement.style.setProperty("--role-color", r.color);
@@ -13640,7 +14080,10 @@ function selRole(role){
 
 function toggleSenha(){
   const inp = document.getElementById("senha");
-  inp.type = inp.type === "password" ? "text" : "password";
+  const mostrando = inp.type === "password";
+  inp.type = mostrando ? "text" : "password";
+  const btn = inp.parentElement.querySelector(".toggle-pw");
+  if(btn){ btn.textContent = mostrando ? "🙈" : "👁"; btn.setAttribute("aria-label", mostrando ? "Ocultar senha" : "Mostrar senha"); }
 }
 
 let _sessaoPendente = null;   // {role, nome, codigo, identity}
@@ -13768,7 +14211,10 @@ async function entrarPessoal(){
 
 function togglePessoal(id){
   const inp = document.getElementById(id);
-  inp.type = inp.type === "password" ? "text" : "password";
+  const mostrando = inp.type === "password";
+  inp.type = mostrando ? "text" : "password";
+  const btn = inp.parentElement.querySelector(".toggle-pw");
+  if(btn){ btn.textContent = mostrando ? "🙈" : "👁"; btn.setAttribute("aria-label", mostrando ? "Ocultar senha" : "Mostrar senha"); }
 }
 
 function voltarLogin(){
@@ -13858,7 +14304,7 @@ header p{font-size:11px;color:var(--border-strong);margin-top:2px}
 .nav{display:flex;gap:8px;align-items:center}
 .nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #ECEFFB;color:var(--border-strong);text-decoration:none;transition:all .2s}
 .nav a:hover{border-color:#4E63C8;color:#4E63C8}
-.nav a.active{background:#4E63C8;color:var(--black);border-color:#4E63C8;font-weight:700}
+.nav a.active{background:#4E63C8;color:var(--white);border-color:#4E63C8;font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
 .card{background:#ECEFFB;border:1px solid #ECEFFB;border-radius:12px;padding:20px;margin-bottom:16px}
 .card h2{font-size:11px;color:#4E63C8;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px}
@@ -15003,7 +15449,7 @@ header p{font-size:10px;color:var(--border-strong);margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
 .nav a{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--surface-raised);color:var(--border-strong);text-decoration:none;transition:all .2s}
 .nav a:hover{border-color:var(--success-default);color:var(--success-default)}
-.nav a.active{background:var(--success-default);color:var(--black);border-color:var(--success-default);font-weight:700}
+.nav a.active{background:var(--success-default);color:var(--white);border-color:var(--success-default);font-weight:700}
 .container{max-width:1280px;margin:0 auto;padding:24px 20px}
 
 /* Tabs principais */
@@ -15019,7 +15465,7 @@ header p{font-size:10px;color:var(--border-strong);margin-top:2px}
 label{font-size:11px;color:var(--border-strong);display:block;margin-bottom:5px}
 input[type=text],textarea,select{width:100%;background:var(--bg-primary);border:1px solid var(--surface-raised);border-radius:7px;padding:8px 10px;color:#17271E;font-size:13px;outline:none;font-family:inherit}
 input[type=text]:focus,textarea:focus,select:focus{border-color:var(--success-default)}
-.btn{display:inline-flex;align-items:center;gap:6px;background:var(--success-default);color:var(--black);border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--success-default);color:var(--white);border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn:hover{opacity:.85}.btn:disabled{opacity:.35;cursor:not-allowed}
 .btn-out{background:transparent;color:var(--success-default);border:1px solid var(--success-default)}
 .btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
@@ -15080,7 +15526,7 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:var(--success-de
 .upload-area p{font-size:12px;color:var(--border-strong)}
 .upload-area .fname{color:var(--success-default);font-weight:600;font-size:12px;margin-top:4px;min-height:18px}
 .tab-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:var(--bg-primary);border:1px dashed var(--surface-raised);border-radius:8px;margin-bottom:12px}
-.tab-toolbar .lbl{font-size:11px;color:var(--mint-100);flex:1;min-width:120px}
+.tab-toolbar .lbl{font-size:11px;color:var(--border-strong);flex:1;min-width:120px}
 .btn-file-wrap{position:relative;overflow:hidden;display:inline-flex}
 .btn-file-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .pdf-preview{background:var(--bg-primary);border:1px solid var(--success-default);border-radius:8px;padding:12px;margin-bottom:12px;display:none}
@@ -15090,11 +15536,11 @@ input[type=text]:focus,textarea:focus,select:focus{border-color:var(--success-de
 .pdf-preview .pdf-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .sg-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .sg-tab{padding:7px 16px;border-radius:8px;border:1px solid var(--surface-raised);background:var(--bg-primary);color:var(--border-strong);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
-.sg-tab.active{background:var(--success-default);color:var(--black);border-color:var(--success-default);font-weight:700}
+.sg-tab.active{background:var(--success-default);color:var(--white);border-color:var(--success-default);font-weight:700}
 .sg-panel{display:none}.sg-panel.active{display:block}
 .sg-item{background:var(--bg-primary);border:1px solid var(--surface-raised);border-radius:8px;padding:12px 14px;margin-bottom:8px;position:relative;animation:fadeIn .15s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.sg-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--mint-100);cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
+.sg-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--border-strong);cursor:pointer;font-size:16px;padding:2px 6px;transition:color .2s;border-radius:4px}
 .sg-del:hover{color:var(--danger-default);background:var(--danger-subtle-2)}
 .sg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .sg-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
@@ -16325,7 +16771,7 @@ header p{font-size:11px;color:var(--border-strong);margin-top:2px}
 .nav{display:flex;gap:8px;flex-wrap:wrap}
 .nav a,.nav button{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #F7F1D8;color:var(--border-strong);text-decoration:none;background:none;cursor:pointer;transition:all .2s;font-family:inherit}
 .nav a:hover,.nav button:hover{border-color:var(--primary-default);color:var(--primary-default)}
-.nav a.active{background:var(--primary-default);color:var(--black);border-color:var(--primary-default);font-weight:700}
+.nav a.active{background:var(--primary-default);color:var(--white);border-color:var(--primary-default);font-weight:700}
 .container{max-width:1200px;margin:0 auto;padding:24px 20px}
 .card{background:var(--mint-100);border:1px solid #F7F1D8;border-radius:12px;padding:22px;margin-bottom:18px}
 .card-title{font-size:11px;color:var(--primary-default);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
@@ -16333,7 +16779,7 @@ header p{font-size:11px;color:var(--border-strong);margin-top:2px}
 /* Tabs */
 .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
 .tab{padding:7px 16px;border-radius:8px;border:1px solid #F7F1D8;background:var(--bg-primary);color:var(--border-strong);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
-.tab.active{background:var(--primary-default);color:var(--black);border-color:var(--primary-default);font-weight:700}
+.tab.active{background:var(--primary-default);color:var(--white);border-color:var(--primary-default);font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
 /* Portfólio modelo — tabela */
 .porto-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -16363,16 +16809,16 @@ textarea{resize:vertical}
 .prod-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .prod-mini label{font-size:10px;color:var(--border-strong);margin-bottom:3px}
 /* Botões */
-.btn{display:inline-flex;align-items:center;gap:6px;background:var(--primary-default);color:var(--black);border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--primary-default);color:var(--white);border:none;border-radius:7px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn:hover{opacity:.88;transform:translateY(-1px)}
 .btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
 .btn-out{background:transparent;color:var(--primary-default);border:1px solid var(--primary-default)}
-.btn-out:hover{background:var(--primary-default);color:var(--black)}
+.btn-out:hover{background:var(--primary-default);color:var(--white)}
 .btn-sm{padding:6px 14px;font-size:12px}
 .btn-ghost{background:transparent;border:1px solid #F7F1D8;color:var(--border-strong);border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-ghost:hover{border-color:var(--primary-default);color:var(--primary-default)}
 .btn-add{background:var(--warning-subtle);color:var(--primary-default);border:1px solid var(--primary-default);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all .2s;margin-bottom:10px;font-family:inherit}
-.btn-add:hover{background:var(--primary-default);color:var(--black)}
+.btn-add:hover{background:var(--primary-default);color:var(--white)}
 /* Status */
 .status-ok{color:var(--success-default)}.status-err{color:var(--danger-default)}
 .info-box{background:var(--bg-primary);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--border-strong);line-height:1.6;border:1px solid #F7F1D8}
@@ -16950,7 +17396,7 @@ textarea{resize:vertical}
 
 <style>
 .know-cls-btn{padding:4px 10px;border-radius:12px;border:1px solid #F7F1D8;background:var(--bg-primary);color:var(--border-strong);font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
-.know-cls-btn.sel{background:var(--primary-default);color:var(--black);border-color:var(--primary-default);font-weight:700}
+.know-cls-btn.sel{background:var(--primary-default);color:var(--white);border-color:var(--primary-default);font-weight:700}
 .know-doc-card{background:var(--bg-primary);border:1px solid var(--warning-subtle);border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
 .know-doc-card:hover{border-color:#F7F1D8}
 .know-tipo-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
@@ -19383,7 +19829,7 @@ body{padding:0 0 60px}
 .empty-state{text-align:center;padding:60px 20px;color:#C6D6C9}
 .empty-icon{font-size:48px;margin-bottom:12px}
 .empty-msg{font-size:15px;color:var(--border-strong)}
-.empty-sub{font-size:12px;color:var(--mint-100);margin-top:6px}
+.empty-sub{font-size:12px;color:var(--border-strong);margin-top:6px}
 
 .spinner-wrap{text-align:center;padding:60px;color:var(--border-strong)}
 .spin{width:36px;height:36px;border:3px solid var(--mint-100);border-top-color:var(--primary-default);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
