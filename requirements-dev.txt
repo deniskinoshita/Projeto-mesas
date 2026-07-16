@@ -1,0 +1,6 @@
+# Dependências só de desenvolvimento/teste — NÃO faz parte do bundle de deploy
+# (nem requirements.txt raiz, nem api/requirements.txt). Instalar com:
+#   pip install -r requirements-dev.txt
+# antes de rodar `pytest` localmente.
+-r api/requirements.txt
+pytest>=8.0.0

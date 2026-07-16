@@ -3807,6 +3807,11 @@ HTML = r"""<!DOCTYPE html>
   --shadow-2xl:0 25px 50px rgba(10,15,12,.18);
 }
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-base);min-height:100vh}
 header{background:var(--surface-default);border-bottom:1px solid var(--border-default);padding:14px 28px;display:flex;align-items:center;gap:12px}
 header h1{font-size:21px;color:var(--text-brand);font-weight:700;letter-spacing:.5px}
@@ -3868,6 +3873,7 @@ select option{background:var(--surface-raised)}
 .chart-wrap{position:relative;width:100%;height:250px}
 .tab-btns{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .tab-btn{background:var(--surface-raised);border:1px solid var(--border-default);border-radius:8px;padding:6px 14px;font-size:15px;color:var(--text-tertiary);cursor:pointer;transition:all .2s}
+.tab-btn:hover:not(.active){border-color:var(--primary-default);color:var(--primary-default)}
 .tab-btn.active{background:var(--primary-default);color:var(--bg-primary);border-color:var(--text-brand);font-weight:700}
 .tab-panel{display:none}.tab-panel.active{display:block}
 .rodape{text-align:center;font-size:14px;color:var(--text-secondary);margin-top:32px;padding-top:14px;border-top:1px solid var(--surface-raised)}
@@ -3878,6 +3884,7 @@ select option{background:var(--surface-raised)}
 .pilar-toggle.pending-crit{border-color:var(--danger-subtle-2);background:var(--danger-subtle-2)}
 .pilar-toggle.pending-high{border-color:var(--warning-subtle);background:var(--warning-subtle)}
 .pilar-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;cursor:pointer}
+.pilar-check:hover{border-color:var(--primary-default)}
 .pilar-check.checked{background:var(--success-default);border-color:var(--success-default);color:var(--white);font-weight:700}
 .pilar-icon{font-size:23px;flex-shrink:0}
 .pilar-info{flex:1}
@@ -3977,6 +3984,7 @@ select option{background:var(--surface-raised)}
 .sg-fii-table .fii-ticker{color:var(--text-brand);font-weight:700}
 .sg-header-box{background:var(--surface-raised);border:1px solid var(--primary-default);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .sg-vazio{font-size:16px;color:var(--success-default);padding:16px;text-align:center}
+@media(max-width:1024px){.container{padding:22px 16px}.grid-3,.grid-4{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
 /* ── Fluxo em 2 etapas ── */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
@@ -13734,6 +13742,11 @@ HTML_RESET_SENHA = r"""<!DOCTYPE html>
 <title>Braúna — Redefinir Senha</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 html,body{height:100%;background:var(--bg-primary);font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .card{background:var(--surface-default);border:1px solid var(--border-default);border-radius:16px;padding:36px 32px;width:100%;max-width:400px}
@@ -13865,6 +13878,11 @@ HTML_LOGIN = r"""<!DOCTYPE html>
 <title>Braúna Investimentos — Acesso</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 html,body{height:100%;background:var(--bg-primary);font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 
@@ -14297,6 +14315,11 @@ HTML_LIDER = r"""<!DOCTYPE html>
 <title>Braúna — Painel do Líder</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 body{background:#ECEFFB;color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:#ECEFFB;border-bottom:1px solid #ECEFFB;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:17px;color:#4E63C8;font-weight:700}
@@ -15442,6 +15465,11 @@ HTML_ADMIN = r"""<!DOCTYPE html>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 body{background:var(--mint-100);color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:var(--mint-100);border-bottom:2px solid var(--border-default);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header h1{font-size:16px;color:var(--success-default);font-weight:700;letter-spacing:.5px}
@@ -16764,6 +16792,11 @@ HTML_HEAD = r"""<!DOCTYPE html>
 <title>Braúna — Head de Produtos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 body{background:var(--bg-primary);color:#17271E;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{background:var(--mint-100);border-bottom:1px solid #F7F1D8;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 header h1{font-size:17px;color:var(--primary-default);font-weight:700}
@@ -19741,6 +19774,11 @@ HTML_PAINEL = r"""<!DOCTYPE html>
 <title>Painel de Carteiras — Braúna</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* Feedback de foco/teclado consistente — vários inputs/botões abaixo têm outline:none
+   inline e nenhum indicador alternativo; isto cobre todos com !important só onde
+   necessário (input/select/textarea), sem alterar layout (apenas contorno). */
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary-default) !important;outline-offset:1px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--primary-default);outline-offset:2px}
 html,body{min-height:100%;background:var(--bg-primary);font-family:'Segoe UI',system-ui,sans-serif;color:#17271E}
 body{padding:0 0 60px}
 
@@ -19835,6 +19873,9 @@ body{padding:0 0 60px}
 .spin{width:36px;height:36px;border:3px solid var(--mint-100);border-top-color:var(--primary-default);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+@media(max-width:1024px){
+  .container{padding:20px 12px}
+}
 @media(max-width:600px){
   .cliente-header{gap:8px}
   .desvio-nums{display:none}
