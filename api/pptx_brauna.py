@@ -13,29 +13,64 @@ from pptx.oxml.ns import qn
 from lxml import etree
 
 # ── Paleta de cores ────────────────────────────────────────────────────────────
-# Fundo escuro teal (C_BG) é intencional — relatório premium para cliente.
-# C_GOLD e C_GREEN são versões "on-dark" da identidade Braúna (verde-petróleo
-# #006057 / dourado #8A6A28): o hex cru falha em fundo escuro (lightness band e
-# chroma floor — ver skill dataviz, references/color-formula.md), então aqui
-# eles foram re-clareados/re-saturados mantendo a família de matiz, e validados
-# com scripts/validate_palette.js --mode dark --surface "#023B40" (fundo real
-# deste PPTX). C_GREEN/C_AMBER/C_RED formam a "status palette" (ok/atenção/
-# crítico) — reservada, nunca reaproveitada como cor categórica solta; todo uso
-# de status neste arquivo vem acompanhado de ícone/seta/sinal, nunca só cor
-# (ver _status_icon, _desvio_cor e os "+"/"▲"/"▼" nos textos).
-C_BG      = RGBColor(0x02, 0x3B, 0x40)   # fundo principal (surface de validação)
-C_BAND    = RGBColor(0x00, 0x43, 0x49)   # banda/header
-C_GOLD    = RGBColor(0xD9, 0xB1, 0x5B)   # dourado on-dark (brand #8A6A28, H~85° preservado) — título/destaque
-C_WHITE   = RGBColor(0xFF, 0xFF, 0xFF)   # branco
-C_TEAL    = RGBColor(0xB0, 0xD4, 0xD6)   # teal claro (subtítulo, corpo)
-C_GRAY    = RGBColor(0xA6, 0xA6, 0xA6)   # cinza rodapé
-C_WMARK   = RGBColor(0xBE, 0xBE, 0xBE)   # marca d'água
-C_CARD    = RGBColor(0x0A, 0x3A, 0x40)   # card escuro
-C_GREEN   = RGBColor(0x00, 0x9C, 0x76)   # verde-petróleo on-dark (brand #006057) — status OK / positivo
-C_AMBER   = RGBColor(0xD0, 0x75, 0x0A)   # status atenção
-C_RED     = RGBColor(0xE0, 0x44, 0x6A)   # status crítico/negativo
-C_ROW_ALT     = RGBColor(0x05, 0x3B, 0x42)   # faixa alternada de linha (tabelas)
-C_ROW_HILITE  = RGBColor(0x10, 0x45, 0x4C)   # linha em destaque (maior desvio)
+# DECISÃO 17/07/2026: tema claro unificado. O PDF técnico (gerar_pdf, em
+# api/index.py) e o Braúna 360° (gerar_brauna360_html / _B360_CSS, em
+# api/index.py) migraram para tema claro em 13/07/2026. Este arquivo tinha
+# ficado, isoladamente, em fundo escuro teal (#023B40) por uma decisão de
+# 16/07/2026 ("premium para cliente") — revisada e revertida por Denis: os 3
+# documentos entregues ao mesmo cliente (PDF + 360° + PPTX) precisam ter a
+# MESMA identidade visual, não só os mesmos números. Os hex abaixo foram
+# copiados literalmente das custom properties do _B360_CSS (fonte de verdade
+# da paleta) — não são re-tonalizados como antes.
+#
+# Exceção proposital: a capa (_slide_capa) mantém fundo --marinho (escuro) com
+# texto creme, replicando o padrão já usado no Braúna 360° para as seções
+# .cover/.close — dá o toque premium sem contradizer o tema claro do miolo.
+# É o ÚNICO slide com fundo escuro; os outros 6 usam --paper/--card.
+#
+# Notas de contraste (WCAG AA — 4.5:1 texto normal, 3:1 texto grande ≥14pt
+# bold ou ≥18pt regular), conferidas à mão para cada par texto/fundo usado
+# neste arquivo:
+#   - Sobre fundo claro (--paper/--card): C_INK, C_MUTED, C_PETROLEO, C_GOLD
+#     e os status C_GOOD/C_CRIT passam confortavelmente em qualquer tamanho
+#     usado aqui. C_WARN (~3,4:1 sobre branco) só atinge o critério de "texto
+#     grande" — por isso os dois lugares onde aparece como texto (coluna de
+#     desvio da tabela de alocação e a linha de "Pendências" do slide Modelo
+#     de Servir) usam 14pt bold. C_FAINT (~4,3:1) fica reservado só para a
+#     marca d'água (14pt bold rotacionado, onde a exigência cai para 3:1);
+#     rodapé/legendas/textos pequenos usam C_MUTED, que folga o 4.5:1 em
+#     qualquer tamanho.
+#   - Sobre fundo escuro (--marinho na capa; --petroleo nas bandas de tabela
+#     e na linha "Total Renda Fixa"): SEMPRE texto creme (C_CREAM /
+#     C_CREAM_SOFT / C_CREAM_MUTE). C_GOLD bruto sobre --marinho ou
+#     --petroleo dá ~2,4:1 — falha até o critério de texto grande — por isso
+#     título/nome/rótulos da capa e das bandas escuras nunca usam dourado ou
+#     tinta, só creme. Dourado nessas áreas fica restrito a elementos
+#     decorativos sem texto (ex.: a linha divisória da capa).
+# C_GOOD/C_WARN/C_CRIT formam a "status palette" (ok/atenção/crítico) —
+# reservada, nunca reaproveitada como cor categórica solta; todo uso de
+# status neste arquivo vem acompanhado de ícone/seta/sinal, nunca só cor (ver
+# _status_icon, _desvio_cor e os "+"/"▲"/"▼" nos textos — regra pré-existente,
+# mantida).
+C_PAPER      = RGBColor(0xF6, 0xF7, 0xF6)   # fundo de página (6 dos 7 slides)
+C_CARD       = RGBColor(0xFF, 0xFF, 0xFF)   # fundo de cards/tabelas
+C_INK        = RGBColor(0x17, 0x27, 0x1E)   # texto principal
+C_MUTED      = RGBColor(0x4F, 0x5E, 0x66)   # texto secundário (labels, rodapé, legendas)
+C_FAINT      = RGBColor(0x6E, 0x7C, 0x82)   # reservado à marca d'água — ver nota de contraste acima
+C_LINE       = RGBColor(0xE4, 0xE8, 0xE7)   # bordas / track neutro de barra
+C_LINE_SOFT  = RGBColor(0xEE, 0xF1, 0xF0)   # linha alternada de tabela (zebra)
+C_PETROLEO   = RGBColor(0x0E, 0x3A, 0x54)   # accent primário — "Atual" em barras/gráficos, bandas de tabela
+C_GOLD       = RGBColor(0x8A, 0x6A, 0x28)   # accent dourado — "Alvo", destaque, kicker (só sobre fundo claro)
+C_GOLD_SOFT  = RGBColor(0xC7, 0xAC, 0x80)   # dourado suave — base do tingimento de C_ROW_HILITE
+C_MARINHO    = RGBColor(0x12, 0x30, 0x47)   # navy — SÓ capa (_slide_capa)
+C_CREAM      = RGBColor(0xED, 0xE7, 0xDA)   # texto sobre marinho/petróleo
+C_CREAM_SOFT = RGBColor(0xF3, 0xEE, 0xE4)   # texto sobre marinho/petróleo (ênfase/título)
+C_CREAM_MUTE = RGBColor(0xB9, 0xC7, 0xCD)   # texto sobre marinho/petróleo (secundário)
+C_GOOD       = RGBColor(0x3E, 0x7A, 0x5E)   # status ok
+C_WARN       = RGBColor(0xB4, 0x83, 0x3A)   # status atenção — usar em texto ≥14pt bold (ver nota de contraste)
+C_CRIT       = RGBColor(0xA5, 0x53, 0x3E)   # status crítico
+C_ROW_ALT    = C_LINE_SOFT                  # faixa alternada de linha (tabelas)
+C_ROW_HILITE = RGBColor(0xF1, 0xEA, 0xDF)   # linha em destaque (maior desvio) — tingimento ~25% de C_GOLD_SOFT sobre branco
 
 # Mapeamento classe → label legível
 CLS_LABEL = {
@@ -69,8 +104,8 @@ def _format_brl(valor: float) -> str:
 
 def _status_cor(status: str) -> RGBColor:
     """Retorna cor RGB conforme status: ok, atencao, critico."""
-    m = {"ok": C_GREEN, "atencao": C_AMBER, "critico": C_RED}
-    return m.get(status, C_AMBER)
+    m = {"ok": C_GOOD, "atencao": C_WARN, "critico": C_CRIT}
+    return m.get(status, C_WARN)
 
 
 def _status_label(status: str) -> str:
@@ -85,13 +120,13 @@ def _status_icon(status: str) -> str:
 
 
 def _desvio_cor(desvio: float) -> RGBColor:
-    """Verde ±2pp, amarelo ±2-5pp, vermelho >5pp."""
+    """Verde ±2pp, âmbar ±2-5pp, vermelho >5pp."""
     abs_d = abs(desvio)
     if abs_d <= 2:
-        return C_GREEN
+        return C_GOOD
     elif abs_d <= 5:
-        return C_AMBER
-    return C_RED
+        return C_WARN
+    return C_CRIT
 
 
 def _desvio_seta(desvio: float) -> str:
@@ -131,12 +166,16 @@ def _blank_slide(prs: Presentation):
     return prs.slides.add_slide(blank)
 
 
-def _slide_bg(slide, prs: Presentation):
-    """Preenche o fundo do slide com C_BG (#023B40)."""
+def _slide_bg(slide, prs: Presentation, color: RGBColor = None):
+    """Preenche o fundo do slide. Default = C_PAPER (tema claro do miolo); a
+    capa (_slide_capa) é a única que passa C_MARINHO explicitamente — ver
+    racional da "exceção proposital" no cabeçalho do módulo."""
+    if color is None:
+        color = C_PAPER
     bg = slide.background
     fill = bg.fill
     fill.solid()
-    fill.fore_color.rgb = C_BG
+    fill.fore_color.rgb = color
 
 
 def _add_rect(slide, x, y, w, h, fill_color: RGBColor, line_color=None, radius=False):
@@ -157,7 +196,7 @@ def _add_rect(slide, x, y, w, h, fill_color: RGBColor, line_color=None, radius=F
 
 
 def _add_text_box(slide, text, x, y, w, h,
-                  font_size=14, bold=False, color=C_WHITE,
+                  font_size=14, bold=False, color=C_INK,
                   align=PP_ALIGN.LEFT, italic=False, wrap=True):
     """Adiciona caixa de texto e retorna o frame."""
     txBox = slide.shapes.add_textbox(x, y, w, h)
@@ -175,8 +214,17 @@ def _add_text_box(slide, text, x, y, w, h,
     return txBox
 
 
-def _add_watermark(slide, prs: Presentation):
-    """Adiciona '#SomosBraúna' vertical na direita + rodapé URL."""
+def _add_watermark(slide, prs: Presentation, on_dark: bool = False):
+    """Adiciona '#SomosBraúna' vertical na direita + rodapé URL.
+
+    on_dark=True (só a capa, fundo --marinho) usa creme; on_dark=False (os
+    outros 6 slides, fundo --paper) usa C_FAINT para a marca d'água (14pt
+    bold rotacionado — exigência de contraste WCAG cai para 3:1, ver nota no
+    topo do arquivo) e C_MUTED para o rodapé (10pt, precisa do 4.5:1 cheio).
+    """
+    wm_color     = C_CREAM_MUTE if on_dark else C_FAINT
+    footer_color = C_CREAM_MUTE if on_dark else C_MUTED
+
     # Marca d'água vertical
     wm = slide.shapes.add_textbox(
         Inches(12.35), Inches(0.5),
@@ -189,7 +237,7 @@ def _add_watermark(slide, prs: Presentation):
     run.text = "#SomosBraúna"
     run.font.size = Pt(14)
     run.font.bold = True
-    run.font.color.rgb = C_WMARK
+    run.font.color.rgb = wm_color
     run.font.name = "Calibri"
     # Rotacionar 90° via XML
     sp = wm._element
@@ -206,24 +254,27 @@ def _add_watermark(slide, prs: Presentation):
         slide, "braunainvestimentos.com.br",
         Inches(3.5), Inches(7.22),
         Inches(6.33), Inches(0.25),
-        font_size=10, bold=True, color=C_GRAY,
+        font_size=10, bold=True, color=footer_color,
         align=PP_ALIGN.CENTER
     )
 
 
 def _add_header_band(slide, prs: Presentation, titulo: str, subtitulo: str = ""):
-    """Banda de título teal escuro no topo + texto dourado."""
-    # Retângulo da banda
+    """Banda de título em tema claro: card branco com borda sutil (--paper e
+    --card são quase idênticos em luminância, a borda C_LINE é o que
+    diferencia a banda da página), título em tinta e subtítulo em dourado
+    ("kicker" — passa 4.5:1 sobre branco)."""
+    # Retângulo do card do cabeçalho
     _add_rect(slide,
               Inches(0.09), Inches(0.07),
               Inches(12.2), Inches(1.1),
-              C_BAND)
+              C_CARD, line_color=C_LINE)
     # Título
     _add_text_box(
         slide, titulo,
         Inches(0.25), Inches(0.10),
         Inches(11.8), Inches(0.9),
-        font_size=36, bold=True, color=C_GOLD,
+        font_size=36, bold=True, color=C_INK,
         align=PP_ALIGN.LEFT
     )
     # Subtítulo
@@ -232,7 +283,7 @@ def _add_header_band(slide, prs: Presentation, titulo: str, subtitulo: str = "")
             slide, subtitulo,
             Inches(0.25), Inches(1.15),
             Inches(11.8), Inches(0.35),
-            font_size=14, bold=True, color=C_WHITE,
+            font_size=14, bold=True, color=C_GOLD,
             align=PP_ALIGN.LEFT
         )
 
@@ -240,17 +291,19 @@ def _add_header_band(slide, prs: Presentation, titulo: str, subtitulo: str = "")
 # ── Slides ─────────────────────────────────────────────────────────────────────
 
 def _slide_capa(prs: Presentation, dados: dict):
-    """Slide 1 — Capa."""
+    """Slide 1 — Capa. Único slide em fundo escuro (--marinho); todo o texto
+    usa tons creme (nunca dourado/tinta — ver nota de contraste no topo do
+    arquivo). O dourado fica restrito à linha divisória, puramente decorativa."""
     slide = _blank_slide(prs)
-    _slide_bg(slide, prs)
-    _add_watermark(slide, prs)
+    _slide_bg(slide, prs, C_MARINHO)
+    _add_watermark(slide, prs, on_dark=True)
 
     # Nome empresa
     _add_text_box(
         slide, "BRAÚNA INVESTIMENTOS",
         Inches(1.5), Inches(1.8),
         Inches(10.3), Inches(1.0),
-        font_size=48, bold=True, color=C_GOLD,
+        font_size=48, bold=True, color=C_CREAM_SOFT,
         align=PP_ALIGN.CENTER
     )
 
@@ -259,11 +312,11 @@ def _slide_capa(prs: Presentation, dados: dict):
         slide, "Análise de Carteira de Investimentos",
         Inches(1.5), Inches(2.75),
         Inches(10.3), Inches(0.6),
-        font_size=22, bold=False, color=C_WHITE,
+        font_size=22, bold=False, color=C_CREAM,
         align=PP_ALIGN.CENTER
     )
 
-    # Linha divisória — retângulo fino dourado
+    # Linha divisória — retângulo fino dourado (decorativo, sem texto sobreposto)
     _add_rect(slide,
               Inches(2.5), Inches(3.45),
               Inches(8.33), Inches(0.04),
@@ -275,7 +328,7 @@ def _slide_capa(prs: Presentation, dados: dict):
         slide, nome,
         Inches(1.5), Inches(3.55),
         Inches(10.3), Inches(0.75),
-        font_size=30, bold=True, color=C_GOLD,
+        font_size=30, bold=True, color=C_CREAM_SOFT,
         align=PP_ALIGN.CENTER
     )
 
@@ -288,7 +341,7 @@ def _slide_capa(prs: Presentation, dados: dict):
         slide, info_line,
         Inches(1.0), Inches(4.4),
         Inches(11.0), Inches(0.5),
-        font_size=14, color=C_TEAL,
+        font_size=14, color=C_CREAM_MUTE,
         align=PP_ALIGN.CENTER
     )
 
@@ -322,7 +375,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
                 f"{'+' if r12m > 0 else ''}{r12m:.2f}%".replace(".", ",")
             ),
             "sub":   f"{cdi_pct:.1f}% do CDI".replace(".", ","),
-            "cor":   C_GREEN if r12m >= 0 else C_RED,
+            "cor":   C_GOOD if r12m >= 0 else C_CRIT,
         },
         {
             "label": "Status da Carteira",
@@ -334,7 +387,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
             "label": "Modelo de Servir",
             "valor": f"{score:.1f} / 5,0".replace(".", ","),
             "sub":   "Score geral",
-            "cor":   C_TEAL,
+            "cor":   C_PETROLEO,
         },
     ]
 
@@ -347,8 +400,9 @@ def _slide_resumo(prs: Presentation, dados: dict):
     for i, c in enumerate(cards):
         x = start_x + i * (card_w + gap)
 
-        # Fundo do card
-        rect = _add_rect(slide, x, start_y, card_w, card_h, C_CARD, radius=False)
+        # Fundo do card (branco sobre --paper; borda sutil para diferenciar
+        # as duas superfícies, que têm luminância quase idêntica).
+        rect = _add_rect(slide, x, start_y, card_w, card_h, C_CARD, line_color=C_LINE, radius=False)
         # Borda de cor na borda superior (retângulo fino)
         _add_rect(slide, x, start_y, card_w, Inches(0.06), c["cor"])
 
@@ -357,7 +411,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
             slide, c["label"],
             x + Inches(0.15), start_y + Inches(0.15),
             card_w - Inches(0.3), Inches(0.4),
-            font_size=13, bold=False, color=C_TEAL,
+            font_size=13, bold=False, color=C_MUTED,
             align=PP_ALIGN.LEFT
         )
         # Valor principal
@@ -374,7 +428,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
                 slide, c["sub"],
                 x + Inches(0.15), start_y + Inches(1.65),
                 card_w - Inches(0.3), Inches(0.4),
-                font_size=12, color=C_GRAY,
+                font_size=12, color=C_MUTED,
                 align=PP_ALIGN.LEFT
             )
 
@@ -385,7 +439,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
             slide, f"Objetivo: {objetivo}",
             Inches(0.55), Inches(4.25),
             Inches(11.5), Inches(0.4),
-            font_size=13, color=C_TEAL,
+            font_size=13, color=C_MUTED,
             align=PP_ALIGN.LEFT
         )
 
@@ -403,7 +457,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
         slide, perf_txt,
         Inches(0.55), Inches(4.7),
         Inches(11.5), Inches(0.4),
-        font_size=13, bold=True, color=C_WHITE,
+        font_size=13, bold=True, color=C_INK,
         align=PP_ALIGN.LEFT
     )
 
@@ -416,7 +470,7 @@ def _slide_resumo(prs: Presentation, dados: dict):
             slide, alerta_str,
             Inches(0.55), Inches(5.3),
             Inches(11.5), Inches(0.5),
-            font_size=12, bold=True, color=C_RED,
+            font_size=12, bold=True, color=C_CRIT,
             align=PP_ALIGN.LEFT
         )
 
@@ -436,6 +490,12 @@ def _slide_alocacao(prs: Presentation, dados: dict):
     gráfico nativo exigiria um plot separado e perderia o alinhamento por linha
     com Atual%/Modelo%/Desvio; o desenho manual também é o que já dá controle
     fino sobre o marcador de alvo sobreposto, que add_chart não expõe.
+
+    Paleta: coluna "Atual %" em C_PETROLEO e "Modelo %" em C_GOLD — mapeamento
+    direto dos papéis definidos na paleta (petróleo = Atual, dourado = Alvo).
+    A coluna de Desvio usa 14pt (em vez de 13pt) para que o texto em C_WARN
+    (~3,4:1 sobre branco) se qualifique como "texto grande" no critério WCAG
+    AA — ver nota de contraste no topo do arquivo.
     """
     import math
 
@@ -459,13 +519,13 @@ def _slide_alocacao(prs: Presentation, dados: dict):
     _add_rect(slide,
               Inches(0.25), start_y,
               Inches(11.8), row_h,
-              C_BAND)
+              C_PETROLEO)
     for j, h in enumerate(headers):
         _add_text_box(
             slide, h,
             col_x[j], start_y + Inches(0.05),
             col_w[j], row_h - Inches(0.05),
-            font_size=13, bold=True, color=C_GOLD,
+            font_size=13, bold=True, color=C_CREAM_SOFT,
             align=PP_ALIGN.LEFT if j == 0 else PP_ALIGN.CENTER
         )
 
@@ -514,12 +574,14 @@ def _slide_alocacao(prs: Presentation, dados: dict):
 
         # ── Barra comparativa: track neutro + barra do atual + marcador do alvo ──
         bar_y = y + (row_h - bar_h) // 2
-        _add_rect(slide, bar_track_x, bar_y, bar_track_w, bar_h, C_BAND, radius=True)
+        _add_rect(slide, bar_track_x, bar_y, bar_track_w, bar_h, C_LINE, radius=True)
         if atual > 0:
             largura_atual = max(Inches(0.05), int(bar_track_w * min(atual, escala_max) / escala_max))
             _add_rect(slide, bar_track_x, bar_y, largura_atual, bar_h, desvio_cor, radius=True)
         # Marcador de alvo (dourado) sobreposto na posição do modelo — encoding
         # direto da comparação atual↔alvo, além da cor do texto de desvio.
+        # Puramente decorativo (sem texto sobreposto), então o dourado bruto
+        # não tem restrição de contraste de texto aqui.
         marker_x = bar_track_x + int(bar_track_w * min(alvo, escala_max) / escala_max)
         marker_x = min(marker_x, bar_track_x + bar_track_w - Inches(0.02))
         _add_rect(
@@ -535,17 +597,18 @@ def _slide_alocacao(prs: Presentation, dados: dict):
             f"{alvo:.1f}%".replace(".", ","),
             desvio_str,
         ]
-        cores = [C_WHITE, C_WHITE, C_TEAL, C_TEAL, desvio_cor]
+        cores = [C_INK, C_INK, C_PETROLEO, C_GOLD, desvio_cor]
         bolds = [False, False, False, False, True]
 
         for j, (val, cor, bold) in enumerate(zip(vals, cores, bolds)):
             if j == 1:
                 continue  # coluna da barra: nenhum texto sobreposto
+            fsize = 14 if j == 4 else 13  # coluna de desvio em 14pt (ver docstring)
             _add_text_box(
                 slide, val,
                 col_x[j], y + Inches(0.04),
                 col_w[j], row_h - Inches(0.06),
-                font_size=13, bold=bold, color=cor,
+                font_size=fsize, bold=bold, color=cor,
                 align=PP_ALIGN.LEFT if j == 0 else PP_ALIGN.CENTER
             )
 
@@ -556,7 +619,7 @@ def _slide_alocacao(prs: Presentation, dados: dict):
         "Verde ±2pp · Âmbar ±2–5pp · Vermelho >5pp  (▲ acima / ▼ abaixo)",
         Inches(0.35), Inches(6.72),
         Inches(11.5), Inches(0.4),
-        font_size=10, color=C_GRAY,
+        font_size=10, color=C_MUTED,
         align=PP_ALIGN.LEFT
     )
 
@@ -576,7 +639,7 @@ def _slide_rv(prs: Presentation, dados: dict):
             slide, "Sem exposição em Renda Variável nesta carteira.",
             Inches(0.5), Inches(3.0),
             Inches(11.5), Inches(0.6),
-            font_size=18, color=C_TEAL,
+            font_size=18, color=C_MUTED,
             align=PP_ALIGN.CENTER
         )
         return
@@ -612,14 +675,14 @@ def _slide_rv(prs: Presentation, dados: dict):
                 slide, nome,
                 Inches(2.0), y_cur + Inches(0.04),
                 Inches(7.5), row_h,
-                font_size=13, color=C_WHITE
+                font_size=13, color=C_INK
             )
             # Percentual
             _add_text_box(
                 slide, f"{pct:.1f}%".replace(".", ","),
                 Inches(9.7), y_cur + Inches(0.04),
                 Inches(1.8), row_h,
-                font_size=13, bold=True, color=C_TEAL,
+                font_size=13, bold=True, color=C_PETROLEO,
                 align=PP_ALIGN.RIGHT
             )
             y_cur += row_h
@@ -647,7 +710,7 @@ def _slide_rf(prs: Presentation, dados: dict):
     start_y = Inches(1.55)
 
     # Cabeçalho
-    _add_rect(slide, Inches(0.25), start_y, Inches(11.8), row_h, C_BAND)
+    _add_rect(slide, Inches(0.25), start_y, Inches(11.8), row_h, C_PETROLEO)
     for txt, x, w, align in [
         ("Ativo", Inches(0.4),  Inches(7.0), PP_ALIGN.LEFT),
         ("Saldo", Inches(7.5),  Inches(2.3), PP_ALIGN.RIGHT),
@@ -657,7 +720,7 @@ def _slide_rf(prs: Presentation, dados: dict):
             slide, txt,
             x, start_y + Inches(0.04),
             w, row_h,
-            font_size=13, bold=True, color=C_GOLD, align=align
+            font_size=13, bold=True, color=C_CREAM_SOFT, align=align
         )
 
     total_rf = 0
@@ -675,7 +738,7 @@ def _slide_rf(prs: Presentation, dados: dict):
             slide, nome,
             Inches(0.4), y + Inches(0.04),
             Inches(7.0), row_h,
-            font_size=13, color=C_WHITE
+            font_size=13, color=C_INK
         )
         _add_text_box(
             slide, _format_brl(saldo),
@@ -688,7 +751,7 @@ def _slide_rf(prs: Presentation, dados: dict):
             slide, CLS_LABEL.get(classe, classe),
             Inches(9.9), y + Inches(0.04),
             Inches(1.9), row_h,
-            font_size=12, color=C_TEAL,
+            font_size=12, color=C_MUTED,
             align=PP_ALIGN.CENTER
         )
 
@@ -699,24 +762,25 @@ def _slide_rf(prs: Presentation, dados: dict):
             slide, f"...e outros {restantes} ativos não listados",
             Inches(0.4), extra_y,
             Inches(8.0), Inches(0.35),
-            font_size=12, color=C_GRAY
+            font_size=12, color=C_MUTED
         )
         extra_y += Inches(0.4)
 
-    # Total RF
+    # Total RF — linha em C_PETROLEO: texto SEMPRE creme aqui (dourado/tinta
+    # falham o contraste sobre esse fundo escuro, ver nota no topo do arquivo).
     if total_rf > 0:
-        _add_rect(slide, Inches(0.25), extra_y, Inches(11.8), Inches(0.44), C_BAND)
+        _add_rect(slide, Inches(0.25), extra_y, Inches(11.8), Inches(0.44), C_PETROLEO)
         _add_text_box(
             slide, "Total Renda Fixa listada:",
             Inches(0.4), extra_y + Inches(0.04),
             Inches(7.5), Inches(0.38),
-            font_size=13, bold=True, color=C_WHITE
+            font_size=13, bold=True, color=C_CREAM_SOFT
         )
         _add_text_box(
             slide, _format_brl(total_rf),
             Inches(7.5), extra_y + Inches(0.04),
             Inches(4.4), Inches(0.38),
-            font_size=13, bold=True, color=C_GOLD,
+            font_size=13, bold=True, color=C_CREAM_SOFT,
             align=PP_ALIGN.RIGHT
         )
 
@@ -764,7 +828,7 @@ def _slide_servir(prs: Presentation, dados: dict):
         label  = ITEM_LABELS.get(key, key.replace("_", " ").title())
         ok     = bool(val)
         icone  = "✓" if ok else "✕"
-        cor    = C_GREEN if ok else C_RED
+        cor    = C_GOOD if ok else C_CRIT
 
         bg = C_CARD if row % 2 == 0 else C_ROW_ALT
         _add_rect(slide, x, y, col_w, row_h - Inches(0.04), bg)
@@ -779,7 +843,8 @@ def _slide_servir(prs: Presentation, dados: dict):
         if not ok:
             pendentes_criticos.append(label)
 
-    # Recomendação se houver pendências
+    # Recomendação se houver pendências — 14pt para C_WARN se qualificar como
+    # "texto grande" no critério de contraste WCAG AA (ver nota no topo do arquivo).
     if pendentes_criticos:
         recom_y = start_y + ((len(items) + 1) // col_count + 1) * row_h
         recom_y = max(recom_y, Inches(5.85))
@@ -788,7 +853,7 @@ def _slide_servir(prs: Presentation, dados: dict):
             f"Pendências: ativar — {', '.join(pendentes_criticos[:3])}",
             Inches(0.35), recom_y,
             Inches(11.8), Inches(0.6),
-            font_size=12, bold=True, color=C_AMBER
+            font_size=14, bold=True, color=C_WARN
         )
 
     # Cross-sell
@@ -801,7 +866,7 @@ def _slide_servir(prs: Presentation, dados: dict):
             slide, cross_str,
             Inches(0.35), Inches(6.55),
             Inches(11.5), Inches(0.38),
-            font_size=11, color=C_TEAL
+            font_size=11, color=C_MUTED
         )
 
 
@@ -876,7 +941,7 @@ def _slide_proximos_passos(prs: Presentation, dados: dict):
             slide, acao,
             Inches(1.0), y + Inches(0.06),
             Inches(10.8), row_h,
-            font_size=14, color=C_WHITE
+            font_size=14, color=C_INK
         )
 
     # Data próxima análise
@@ -1000,7 +1065,7 @@ if __name__ == "__main__":
 
     resultado = gerar_pptx_cliente(dados_exemplo)
 
-    destino = r"C:\Users\Perfil\Downloads\teste_brauna.pptx"
+    destino = "./teste_brauna.pptx"
     with open(destino, "wb") as f:
         f.write(resultado)
 
