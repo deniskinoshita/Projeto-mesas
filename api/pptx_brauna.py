@@ -410,7 +410,8 @@ def _slide_resumo(prs: Presentation, dados: dict):
     # Alertas
     alertas = dados.get("alertas", [])
     if alertas:
-        alerta_str = "  ⚠  " + "   |   ".join(alertas)
+        alertas_txt = [a.get("mensagem", "") if isinstance(a, dict) else str(a) for a in alertas]
+        alerta_str = "  ⚠  " + "   |   ".join(t for t in alertas_txt if t)
         _add_text_box(
             slide, alerta_str,
             Inches(0.55), Inches(5.3),
