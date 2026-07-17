@@ -82,6 +82,7 @@ def test_identificacao_e_premissas(resultado):
     assert resultado["idade_atual"] == 45
     assert resultado["expectativa_vida"] == 95
     assert resultado["politica_investimentos"] == "Estrategista"
+    assert resultado["qtd_filhos"] == 2
 
 
 def test_renda_despesa_media_e_declarada(resultado):

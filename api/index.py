@@ -2256,6 +2256,10 @@ def _parse_planejamento_financeiro_texto(texto):
     o["idade_atual"] = int(m.group(1)) if m else None
     m = re.search(r'Estado Civil\s+(.+?)\s+Filhos', texto)
     o["estado_civil"] = m.group(1).strip() if m else ""
+    m = re.search(r'Filhos\s+(.+?)\s+Expectativa de Vida', texto)
+    filhos_raw = m.group(1).strip() if m else ""
+    o["filhos_raw"] = filhos_raw
+    o["qtd_filhos"] = int(filhos_raw) if filhos_raw.isdigit() else 0
     m = re.search(r'Expectativa de Vida\s+(\d+)\s*anos', texto)
     o["expectativa_vida"] = int(m.group(1)) if m else None
     m = re.search(r'Pol[ií]tica de Investimentos\s+(.+?)\s+Renda M[ée]dia', texto)
@@ -8111,7 +8115,7 @@ function renderizar(data){
   }
 
   // Cross Sell
-  renderCrossSellResult(data.cross_sell||[], data.cross_tem||[], data.cross_nao_tem||[]);
+  renderCrossSellResult(data.cross_sell||[], data.cross_tem||[], data.cross_nao_tem||[], data.oportunidades_planejamento||{}, data.planejamento_resumo||null);
 
   // Posição Consolidada + Diagnósticos Automáticos
   try{ renderPosicaoConsolidada(data); }catch(e){ console.error("[renderPosicaoConsolidada]",e); }
@@ -8133,7 +8137,8 @@ function renderizar(data){
 
 // (Removido: "Gerar Apresentação de Reunião" (.pptx), substituído pelo Braúna 360°.)
 
-function renderCrossSellResult(areas, tem, naoTem){
+function renderCrossSellResult(areas, tem, naoTem, oportunidades, planejamentoResumo){
+  oportunidades = oportunidades || {};
   const el=document.getElementById("crosssell-list");
   if(!areas||!areas.length){ el.innerHTML=""; return; }
 
@@ -8164,6 +8169,18 @@ function renderCrossSellResult(areas, tem, naoTem){
     const rendaMes= patC*((compC.fiis||0)/100)*0.008 + patC*((compC.acoes||0)/100)*0.003; // dividendos estimados (conservador)
     const cob     = rendaMes>0 ? Math.round(rendaMes/parcela*100) : 0;
     const aqAtivo = !!crossSell["aquisicao_bens"];
+    // Idade e objetivos do Planejamento (quando existir) enriquecem o pitch, sem
+    // mudar a conta: prazos de ~200 meses (~16-17 anos) pesam mais para quem já
+    // está perto da aposentadoria, e um objetivo de compra de bem no Planejamento
+    // reforça a oportunidade em vez de ser só uma hipótese genérica.
+    const idadePl = planejamentoResumo && planejamentoResumo.idade_atual;
+    const objBem = planejamentoResumo && (planejamentoResumo.objetivos||[]).find(o=>/im[óo]vel|casa|ve[íi]culo|carro/i.test(o.label||""));
+    let obsIdade = "";
+    if(idadePl!=null && idadePl >= 60){
+      obsIdade = `<div style="margin-top:8px;font-size:13px;color:#B0502F">⚠ Cliente com ${idadePl} anos: o prazo típico de ~200 meses do consórcio (~16-17 anos) passa da expectativa de uso do bem para esse perfil, avaliar prazos mais curtos ou outra estrutura.</div>`;
+    } else if(objBem){
+      obsIdade = `<div style="margin-top:8px;font-size:13px;color:#1F9D77">🎯 Alinhado ao objetivo "${objBem.label}" do Planejamento Financeiro.</div>`;
+    }
     html += `<div style="border:1px solid #A8833C;background:linear-gradient(180deg,#F6EFDA,#FFFFFF);border-radius:12px;padding:14px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:21px">💎</span>
@@ -8178,9 +8195,63 @@ function renderCrossSellResult(areas, tem, naoTem){
         <div style="margin-top:8px;font-size:14px;color:#39493F">
           <b>Como conduzir (sem promessas):</b> consórcio é aquisição planejada, <b>sem juros</b>, mas há taxa de administração, fundo de reserva e seguro; a <b>contemplação é por sorteio ou lance</b>, sem data garantida; a parcela é reajustada pelo índice do contrato. O capital segue investido e apenas os proventos sustentam a parcela.
         </div>
+        ${obsIdade}
         ${aqAtivo?'<div style="margin-top:8px;font-size:14px;color:#1F9D77">✓ Aquisição de Bens já ativa, reforce a estratégia de carta paga por dividendos nesta reunião.</div>'
                  :'<div style="margin-top:8px;font-size:14px;color:#8A6A28">➕ Ative <b>Aquisição de Bens</b> no Cross Sell para registrar esta frente.</div>'}
       </div>
+    </div>`;
+  }
+
+  // ── Oportunidades personalizadas do Planejamento Financeiro (idade, objetivos,
+  // família): previdência, seguro de vida e de onde tirar o recurso. Só existe
+  // quando o cliente tem Planejamento salvo (ver avaliar_oportunidades_planejamento).
+  const brlOp = function(v){ return v==null ? "n/d" : "R$ "+Math.round(v).toLocaleString("pt-BR"); };
+  const prev = oportunidades.previdencia;
+  if(prev){
+    const anos = prev.anos_ate_aposentadoria;
+    html += `<div style="border:1px solid #7A5CC0;background:#F5F2FB;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:21px">🏦</span>
+        <span style="font-size:15px;font-weight:800;color:#5A3D9E;text-transform:uppercase;letter-spacing:.5px">Oportunidade, Previdência Privada</span>
+      </div>
+      <div style="font-size:15px;color:#1E2A22;line-height:1.6">
+        ${prev.gap_confirmado ? "0% do patrimônio na XP está em previdência" : "Ainda não vimos a Posição Consolidada deste cliente para confirmar"}${anos!=null?`, e faltam <b>${anos} anos</b> para a aposentadoria planejada`:''}.
+        Tabela <b>${prev.tabela_recomendada}</b> é a mais indicada para esse prazo.
+        <div style="margin-top:8px;padding:8px 10px;background:#FFFFFF;border-radius:8px;font-size:14px">
+          ${prev.teto_pgbl_anual!=null?`Teto de dedução PGBL (12% da renda bruta anual) <b>≈ ${brlOp(prev.teto_pgbl_anual)}/ano</b><br>`:''}
+          ${prev.aporte_mensal_sugerido!=null?`Capacidade de aporte do próprio Planejamento <b>≈ ${brlOp(prev.aporte_mensal_sugerido)}/mês</b> — dá para direcionar parte dela à previdência.`:''}
+        </div>
+        ${!prev.gap_confirmado?'<div style="margin-top:8px;font-size:13px;color:#8A6A28">Confirmar com a Posição Consolidada antes de afirmar o gap ao cliente.</div>':''}
+      </div>
+    </div>`;
+  }
+  const seg = oportunidades.seguro_vida;
+  if(seg){
+    const cor = seg.necessidade_provavel ? "#B0502F" : "#5A6A60";
+    html += `<div style="border:1px solid ${seg.necessidade_provavel?'#C0673A':'#D9E3DB'};background:${seg.necessidade_provavel?'#FBF2E9':'#F5F8F5'};border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:21px">🛡️</span>
+        <span style="font-size:15px;font-weight:800;color:${cor};text-transform:uppercase;letter-spacing:.5px">Seguro de Vida${seg.necessidade_provavel?', a confirmar com prioridade':''}</span>
+      </div>
+      <div style="font-size:15px;color:#1E2A22;line-height:1.6">
+        ${seg.necessidade_provavel
+          ? `Planejamento indica ${seg.qtd_filhos>0?(seg.qtd_filhos+' filho(s)'):'cônjuge/união'}, provável dependente financeiro. Vale confirmar se já existe cobertura.`
+          : 'Sem indício de dependente direto no Planejamento (sem filhos/cônjuge mapeado) — prioridade menor, mas ainda vale confirmar sucessão e cobertura.'}
+        <div style="margin-top:8px;padding:8px 10px;background:#FFFFFF;border-radius:8px;font-size:14px">
+          Capital sugerido: <b>${brlOp(seg.capital_sugerido_5x_renda)}</b> (regra 5x renda anual) a <b>${brlOp(seg.capital_sugerido_10x_renda)}</b> (regra 10x renda + manutenção do padrão de vida).
+        </div>
+        <div style="margin-top:6px;font-size:13px;color:#8A6A28">Nunca afirmar que o cliente não tem seguro — é pergunta para levar à reunião.</div>
+      </div>
+    </div>`;
+  }
+  const fontes = oportunidades.fontes_recurso || [];
+  if(fontes.length){
+    html += `<div style="border:1px solid #D9E3DB;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:13px;color:#39493F;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px">💰 De onde pode vir o recurso</div>
+      ${fontes.map(f=>`<div style="display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:4px 0;border-top:1px solid #F5F8F5">
+          <span style="color:#1E2A22">${f.label}<div style="font-size:12px;color:#8C9A92">${f.obs}</div></span>
+          <span style="font-weight:700;color:#1E2A22;white-space:nowrap">${f.valor_mensal!=null?(brlOp(f.valor_mensal)+'/mês'):brlOp(f.valor)}</span>
+        </div>`).join("")}
     </div>`;
   }
 
@@ -8483,6 +8554,79 @@ def diagnosticar_aporte(xp_parsed, planejamento):
         "divergencia_mensal": round(real_mensal_12m - necessario_atual, 2),
         "status": status,
     }
+
+def avaliar_oportunidades_planejamento(planejamento, posicao=None):
+    """Cruza idade, objetivos e composição familiar do Planejamento Financeiro com
+    a posição atual (quando disponível) para gerar oportunidades de Cross Sell
+    PERSONALIZADAS — previdência, seguro de vida — em vez do pitch genérico do
+    CROSS_SELL, e identifica de onde podem vir os recursos para bancar essas
+    alocações (caixa parado, vencimentos próximos, capacidade de aporte nova).
+
+    Nunca afirma que o cliente NÃO tem seguro ou previdência em outra
+    instituição — o app só enxerga a XP (sem OPIN). Sinaliza como necessidade
+    PROVÁVEL / gap a confirmar, nunca como fato. Retorna {} se faltar a idade
+    (dado mínimo para qualquer um dos cálculos abaixo)."""
+    if not planejamento or planejamento.get("idade_atual") is None:
+        return {}
+    idade         = planejamento["idade_atual"]
+    objetivos     = planejamento.get("objetivos") or []
+    aporte_mensal = planejamento.get("capacidade_aporte_mensal")
+    renda_anual   = planejamento.get("renda_media_anual")
+    qtd_filhos    = planejamento.get("qtd_filhos", 0) or 0
+    estado_civil  = (planejamento.get("estado_civil") or "").lower()
+    out = {}
+
+    # ── Previdência privada: usa o objetivo de aposentadoria (se houver) para
+    # personalizar prazo/tabela/teto de dedução, em vez do pitch genérico.
+    obj_aposentadoria = next((o for o in objetivos if "aposentador" in (o.get("label") or "").lower()), None)
+    tem_previdencia, dados_posicao_disponiveis = False, bool(posicao)
+    if posicao:
+        tem_previdencia = any(f.get("classe") == "Previdência" and (f.get("valor") or 0) > 0
+                              for f in (posicao.get("fundos") or []))
+    if not tem_previdencia:
+        anos_ate = (obj_aposentadoria["idade_atingimento"] - idade) if obj_aposentadoria else None
+        out["previdencia"] = {
+            "gap_confirmado": dados_posicao_disponiveis,  # False = ainda não vimos a Posição, é hipótese
+            "anos_ate_aposentadoria": anos_ate,
+            "tabela_recomendada": "regressiva" if (anos_ate is not None and anos_ate >= 10) else "progressiva",
+            "teto_pgbl_anual": round(0.12 * renda_anual, 2) if renda_anual else None,
+            "aporte_mensal_sugerido": aporte_mensal,
+        }
+
+    # ── Seguro de vida: sinaliza necessidade PROVÁVEL quando há filhos ou
+    # casamento/união (maior chance de dependente financeiro), com o capital já
+    # calculado pelas 2 regras práticas do especialista (10x renda + 5x renda).
+    # Nunca afirma que falta seguro — é pergunta a levar para a reunião.
+    if renda_anual:
+        tem_dependente_provavel = qtd_filhos > 0 or any(p in estado_civil for p in ("casad", "uni"))
+        out["seguro_vida"] = {
+            "necessidade_provavel": tem_dependente_provavel,
+            "motivo": ("filhos" if qtd_filhos > 0 else ("estado_civil" if tem_dependente_provavel else None)),
+            "qtd_filhos": qtd_filhos,
+            "capital_sugerido_10x_renda": round(10 * renda_anual, 2),
+            "capital_sugerido_5x_renda": round(5 * renda_anual, 2),
+        }
+
+    # ── Fontes de recurso: de onde pode vir o dinheiro para bancar as alocações
+    # acima (ou qualquer realocação) — separa dinheiro NOVO (aporte) de dinheiro
+    # que já está no patrimônio (caixa parado, vencimentos próximos).
+    fontes = []
+    if aporte_mensal:
+        fontes.append({"fonte": "capacidade_aporte", "label": "Capacidade de aporte (novo)",
+                       "valor_mensal": aporte_mensal,
+                       "obs": "Dinheiro novo, não mexe na alocação atual."})
+    if posicao:
+        caixa = posicao.get("saldo_conta")
+        if caixa and caixa > 1000:
+            fontes.append({"fonte": "caixa_parado", "label": "Caixa parado em conta",
+                           "valor": caixa, "obs": "Recurso já disponível, parado sem render."})
+        venc90 = (posicao.get("resumo") or {}).get("venc_90d")
+        if venc90:
+            fontes.append({"fonte": "vencimentos_90d", "label": "Vencimentos nos próximos 90 dias",
+                           "valor": venc90,
+                           "obs": "Libera em breve, sem precisar mexer no que está alocado hoje."})
+    out["fontes_recurso"] = fontes
+    return out
 
 def gerar_diagnosticos(xp_parsed, perfil="", planejamento=None):
     """Gera diagnósticos automáticos a partir dos ativos individuais do XPerformance.
@@ -13493,6 +13637,14 @@ def analyze():
     checklist_servir, score_servir, pendentes_criticos, pendentes_altos = avaliar_modelo_servir(checklist_input)
     cross_sell_result, cross_tem, cross_nao_tem = avaliar_cross_sell(cross_input)
 
+    # Oportunidades personalizadas a partir do Planejamento Financeiro (idade,
+    # objetivos, família) — previdência, seguro de vida e de onde tirar o
+    # recurso. Só roda se o cliente tiver Planejamento salvo; nunca inventa.
+    conta_cli = xp_parsed.get("conta", "")
+    planejamento_salvo = carregar_planejamento(conta_cli) if conta_cli else None
+    posicao_salva = carregar_posicao(conta_cli) if conta_cli else None
+    oportunidades_planejamento = avaliar_oportunidades_planejamento(planejamento_salvo, posicao_salva) if planejamento_salvo else {}
+
     # Determina status geral
     rent12 = 0
     if (rent.get("portfolio") and rent.get("cdi") and rent["cdi"].get("12m",0)>0
@@ -13618,6 +13770,10 @@ def analyze():
         "cross_sell": cross_sell_result,
         "cross_tem": cross_tem,
         "cross_nao_tem": cross_nao_tem,
+        "oportunidades_planejamento": oportunidades_planejamento,
+        "planejamento_resumo": ({"idade_atual": planejamento_salvo.get("idade_atual"),
+                                  "objetivos": planejamento_salvo.get("objetivos", [])}
+                                 if planejamento_salvo else None),
         "carta_info": {"nome": carta_info.get("nome",""), "atualizado": carta_info.get("atualizado","")},
         "sugestoes": sugestoes_filtradas,
         # Posição consolidada e diagnósticos
