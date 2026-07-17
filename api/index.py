@@ -229,6 +229,7 @@ _MSG_FILE   = "/tmp/brauna_msg.json"
 _FICHA_FILE = "/tmp/brauna_ficha.json"
 _HIST_FILE  = "/tmp/brauna_historico.json"
 _POSICAO_FILE = "/tmp/brauna_posicao.json"
+_PLANEJAMENTO_FILE = "/tmp/brauna_planejamento.json"
 _SUGE_FILE  = "/tmp/brauna_sugestoes.json"
 _HP_PORT_FILE   = "/tmp/brauna_hp_portfolios.json"
 _HP_CENARIO_FILE= "/tmp/brauna_hp_cenario.json"
@@ -850,6 +851,12 @@ def carregar_posicao(conta):
     if not conta:
         return None
     return _load(_POSICAO_FILE, {}).get(str(conta).strip())
+
+def carregar_planejamento(conta):
+    """Planejamento Financeiro salvo por conta (objetivos, aporte, projeção) ou None."""
+    if not conta:
+        return None
+    return _load(_PLANEJAMENTO_FILE, {}).get(str(conta).strip())
 
 def _posicao_validade(salvo_em):
     """Status de validade (3 dias) a partir de 'salvo_em' (YYYY-MM-DD HH:MM)."""
@@ -1728,8 +1735,72 @@ def extrair_xperformance(pdf_bytes):
         "rf_ativos": rf_ativos,
         "ret_classe": _parse_ret_classe(texto),
         "private":   private,
+        "movimentacoes_mensais": _parse_movimentacoes_mensais(texto),
+        "resumo_periodo": _parse_resumo_periodo(texto),
         "texto_completo": texto[:1500],
     }
+
+# ── Movimentações (Evolução Patrimonial por Período): aporte/retirada real do
+# cliente mês a mês. Usado para cruzar com o aporte NECESSÁRIO do Planejamento
+# Financeiro (ver diagnosticar_aporte) — um cliente pode ter um plano de
+# aposentadoria que só funciona com aporte, e uma conta que só teve saques nos
+# últimos 12 meses, e nenhum dos dois relatórios sozinho mostra essa contradição.
+_XP_MOV_ROW = re.compile(
+    r'^([a-zç]{3})\.?/(\d{2})\s+(-?R\$\s*[\d.]+,\d{2})\s+(-?R\$\s*[\d.]+,\d{2})\s+'
+    r'(-?R\$\s*[\d.]+,\d{2})\s+(-?R\$\s*[\d.]+,\d{2})\s+(-?R\$\s*[\d.]+,\d{2})\s+'
+    r'(-?R\$\s*[\d.]+,\d{2})\s+([-\d,]+)%\s+([-\d,]+)%\s*$', re.I)
+_XP_MES_PT = {"jan": 1, "fev": 2, "mar": 3, "abr": 4, "mai": 5, "jun": 6,
+              "jul": 7, "ago": 8, "set": 9, "out": 10, "nov": 11, "dez": 12}
+
+def _xp_brl_signed(s):
+    """Como _pos_brl, mas preserva o sinal de negativo (ex.: '-R$ 667,44')."""
+    v = _pos_brl(s)
+    if v is not None and str(s).strip().startswith("-"):
+        v = -v
+    return v
+
+def _parse_movimentacoes_mensais(texto):
+    """Tabela 'Evolução Patrimonial por Período (12 meses)': patrimônio
+    inicial/final, movimentações (aporte/retirada), IR, IOF, ganho e rent. por
+    mês. Ordem cronológica crescente (mês mais antigo primeiro)."""
+    linhas = []
+    for l in (texto or "").splitlines():
+        m = _XP_MOV_ROW.match(l.strip())
+        if not m:
+            continue
+        mes_abr = m.group(1).lower()
+        if mes_abr not in _XP_MES_PT:
+            continue
+        linhas.append({
+            "mes": mes_abr, "ano": 2000 + int(m.group(2)), "mes_num": _XP_MES_PT[mes_abr],
+            "patrimonio_inicial": _xp_brl_signed(m.group(3)),
+            "movimentacoes":      _xp_brl_signed(m.group(4)),
+            "ir":                 _xp_brl_signed(m.group(5)),
+            "iof":                _xp_brl_signed(m.group(6)),
+            "patrimonio_final":   _xp_brl_signed(m.group(7)),
+            "ganho_financeiro":   _xp_brl_signed(m.group(8)),
+            "rent_pct": float(m.group(9).replace(",", ".")),
+            "pct_cdi":  float(m.group(10).replace(",", ".")),
+        })
+    linhas.sort(key=lambda x: (x["ano"], x["mes_num"]))
+    return linhas
+
+def _parse_resumo_periodo(texto):
+    """Tabela 'Resumo de Informações da Carteira': ganho/rentabilidade/%CDI/
+    movimentações agregados por MÊS/ANO/12M/24M — fonte mais direta que somar
+    movimentacoes_mensais na mão (ex.: ANO e 12M não coincidem em ano-calendário)."""
+    o = {}
+    for chave in ("MÊS", "ANO", "12M", "24M"):
+        pat = r'\b' + re.escape(chave) + r'\s+(R\$\s*[\d.]+,\d{2})\s+([-\d,]+)%\s+([-\d,]+)%\s+(-?R\$\s*[\d.]+,\d{2})'
+        m = re.search(pat, texto or "")
+        if m:
+            o[chave.lower().replace("ê", "e")] = {
+                "ganho_financeiro": _xp_brl_signed(m.group(1)),
+                "rentabilidade_pct": float(m.group(2).replace(",", ".")),
+                "pct_cdi": float(m.group(3).replace(",", ".")),
+                "movimentacoes": _xp_brl_signed(m.group(4)),
+            }
+    return o
 
 
 def extrair_texto_pdf(pdf_bytes):
@@ -1922,6 +1993,62 @@ def calcular_exposicao_fgc(ativos):
     }
 
 
+def calcular_concentracao_emissor(rf_ativos, auc):
+    """Concentração por EMISSOR DE CRÉDITO (não por produto) frente ao teto do
+    Controle Institucional XP: máx 5% do AUC por emissor (ver memória
+    'limites-alocacao-institucional-xp'). Diferente de calcular_exposicao_fgc:
+    aqui entra qualquer emissor de crédito (CRI/CRA/Debênture/CDCA/CDB...), não só
+    instrumentos com garantia do FGC, e o teto é 5% do AUC, não R$250k por
+    conglomerado. Um mesmo emissor pode aparecer em vários produtos diferentes
+    (ex.: CRA e CRI da mesma empresa) — nenhum dos parsers atuais soma isso hoje,
+    então um emissor pode estourar o teto sem que nenhuma linha individual acuse.
+
+    `rf_ativos`: lista de dicts com pelo menos "emissor" e "valor" (formato do
+    parser da Posição Consolidada — _norm_emis já normaliza o nome do emissor).
+    `auc`: patrimônio/AUC de referência (proxy; o AUC oficial soma todas as
+    marcas XP + OPIN, que o app não tem acesso).
+    """
+    LIMITE_PCT = 0.05
+    if not auc or auc <= 0:
+        return {"por_emissor": [], "limite_pct": LIMITE_PCT, "auc_referencia": auc or 0}
+    por_emissor = {}
+    for a in (rf_ativos or []):
+        emissor = a.get("emissor")
+        valor = a.get("valor")
+        if not emissor or not valor or valor <= 0:
+            continue
+        d = por_emissor.setdefault(emissor, {"produtos": [], "total": 0.0})
+        d["produtos"].append({"nome": a.get("nome"), "valor": round(valor, 2),
+                               "vencimento": a.get("vencimento")})
+        d["total"] += valor
+
+    limite_valor = LIMITE_PCT * auc
+    resultado = []
+    for emissor, d in sorted(por_emissor.items(), key=lambda x: -x[1]["total"]):
+        pct = d["total"] / auc
+        if pct > LIMITE_PCT:
+            status = "acima_do_limite"
+        elif pct >= 0.8 * LIMITE_PCT:
+            status = "proximo_do_limite"
+        else:
+            status = "ok"
+        resultado.append({
+            "emissor": emissor,
+            "produtos": sorted(d["produtos"], key=lambda p: -(p["valor"] or 0)),
+            "exposicao_total": round(d["total"], 2),
+            "pct_auc": round(100 * pct, 2),
+            "limite_valor": round(limite_valor, 2),
+            "excesso": round(max(0.0, d["total"] - limite_valor), 2),
+            "status": status,
+        })
+    return {
+        "por_emissor": resultado,
+        "limite_pct": LIMITE_PCT,
+        "auc_referencia": auc,
+        "emissores_acima_do_limite": sum(1 for r in resultado if r["status"] == "acima_do_limite"),
+    }
+
+
 def parse_posicao_consolidada(pdf_bytes):
     """Foto patrimonial a partir da Posição Consolidada (XP): patrimônio real,
     caixa parado em conta, vencimentos, risco/suitability e emissores (FGC)."""
@@ -2015,6 +2142,10 @@ def _parse_posicao_consolidada_texto(texto):
     o["emissores_fgc"] = [{"emissor": g["conglomerado"], "valor": g["exposicao_atual"],
                            "acima_teto": g["status"] in ("ESTOURO_ATUAL", "ESTOURO_FUTURO")}
                           for g in _fgc_calc["por_conglomerado"]]
+    # Concentração por emissor de crédito (teto institucional 5% do AUC) — ver
+    # calcular_concentracao_emissor. Roda aqui porque rf_ativos já tem "emissor"
+    # (_norm_emis) e "patrimonio_total" já foi resolvido acima.
+    o["concentracao_emissor"] = calcular_concentracao_emissor(rf_ativos, o.get("patrimonio_total"))
     # Fundos de investimento (formato: nome + 1 data + cotas + valor + 3x R$; líquido = último)
     _FUNDROW = re.compile(r'^(.+?)\s+(\d{2}/\d{2}/\d{4})\s+([\d.]+)\s+([\d.,]+)\s+'
                           r'R\$\s*[\d.,]+\s+R\$\s*[\d.,]+\s+R\$\s*([\d.]+,\d{2})\s*$')
@@ -2081,6 +2212,147 @@ def _parse_posicao_consolidada_texto(texto):
     o["resumo"] = {"caixa_pct": round(100 * cx / pt, 1) if pt else 0,
                    "venc_30d": round(d30, 2), "venc_60d": round(d60, 2), "venc_90d": round(d90, 2),
                    "oportunidade_90d": round(cx + d90, 2)}
+    return o
+
+
+# ── Planejamento Financeiro (XP): objetivos, capacidade de aporte e os 3 ──────
+# cenários de projeção patrimonial (atual/consumo/preservação). Terceiro tipo de
+# relatório de cliente, ao lado do XPerformance (performance) e da Posição
+# Consolidada (foto patrimonial) — este traz a visão de METAS. Usado sobretudo
+# para cruzar aporte real (XPerformance) x aporte necessário (aqui) — ver
+# diagnosticar_aporte. Layout validado com 1 PDF real (1 objetivo só); revisar
+# a extração de "objetivos" quando aparecer um cliente com mais de uma meta.
+def parse_planejamento_financeiro(pdf_bytes):
+    """Leitura do relatório Planejamento Financeiro (XP)."""
+    try:
+        texto = extrair_texto_pdf(pdf_bytes)
+    except Exception:
+        return {"fonte": "planejamento_financeiro", "erro": "falha ao ler o PDF"}
+    return _parse_planejamento_financeiro_texto(texto)
+
+_PLAN_OBJ_ROW = re.compile(
+    r'^(.+?)\s+(\d{1,3})\s+(Mensal|Anual|Semestral|Trimestral|[ÚU]nic[oa])\s+(\d+)\s+'
+    r'(R\$\s*[\d.,]+)\s*/?\s*(m[êe]s|ano)?\s*$')
+# Idade + 3 valores R$ (uma coluna por cenário) — formato idêntico nas tabelas
+# 4 (Fluxo Financeiro: entradas/saídas/capacidade de aporte) e 6 (Projeção:
+# atual/consumo/preservação). Distinguidas pelo cabeçalho de tabela mais
+# recente visto (ver _tabela_atual abaixo).
+_PLAN_IDADE_ROW = re.compile(
+    r'^(\d{2,3})\s+(-?R\$\s*[\d.,]+)\s+(-?R\$\s*[\d.,]+)\s+(-?R\$\s*[\d.,]+)\s*$')
+
+def _parse_planejamento_financeiro_texto(texto):
+    texto = texto or ""
+    L = [l.strip() for l in texto.split("\n") if l.strip()]
+    o = {"fonte": "planejamento_financeiro"}
+
+    m = re.search(r'Conta\s+(\d{4,})', texto)
+    o["conta"] = m.group(1) if m else ""
+    m = re.search(r'Assessor:\s+(.+?)\s+Data de Refer', texto)
+    o["assessor"] = m.group(1).strip() if m else ""
+    m = re.search(r'Data de Refer[êe]ncia:\s+(\d{2}/\d{2}/\d{4})', texto)
+    o["data_ref"] = m.group(1) if m else ""
+
+    m = re.search(r'Idade atual\s+(\d+)', texto)
+    o["idade_atual"] = int(m.group(1)) if m else None
+    m = re.search(r'Estado Civil\s+(.+?)\s+Filhos', texto)
+    o["estado_civil"] = m.group(1).strip() if m else ""
+    m = re.search(r'Expectativa de Vida\s+(\d+)\s*anos', texto)
+    o["expectativa_vida"] = int(m.group(1)) if m else None
+    m = re.search(r'Pol[ií]tica de Investimentos\s+(.+?)\s+Renda M[ée]dia', texto)
+    o["politica_investimentos"] = m.group(1).strip() if m else ""
+
+    m = re.search(r'Renda M[ée]dia Anual\s*/\s*Mensal\s+(R\$\s*[\d.,]+)\s*/\s*(R\$\s*[\d.,]+)', texto)
+    o["renda_media_anual"]  = _pos_brl(m.group(1)) if m else None
+    o["renda_media_mensal"] = _pos_brl(m.group(2)) if m else None
+    m = re.search(r'Despesa M[ée]dia Anual\s*/\s*Mensal\s+(R\$\s*[\d.,]+)\s*/\s*(R\$\s*[\d.,]+)', texto)
+    o["despesa_media_anual"]  = _pos_brl(m.group(1)) if m else None
+    o["despesa_media_mensal"] = _pos_brl(m.group(2)) if m else None
+    m = re.search(r'Investimento Inicial Nacional\s*\(R\$\)\s+(R\$\s*[\d.,]+)', texto)
+    o["investimento_inicial_nacional"] = _pos_brl(m.group(1)) if m else None
+
+    # Valor de renda/despesa DECLARADO na entrevista (Tabela 2/3) — pode divergir
+    # da "média" acima (que já projeta crescimento até a aposentadoria).
+    m = re.search(r'Receita Mensal.+?(R\$\s*[\d.,]+)\s+Mensal', texto)
+    o["receita_atual_mensal"] = _pos_brl(m.group(1)) if m else None
+    m = re.search(r'Despesa Mensal.+?(R\$\s*[\d.,]+)\s+Mensal', texto)
+    o["despesa_atual_mensal"] = _pos_brl(m.group(1)) if m else None
+
+    m = re.search(r'APORTE M[ÉE]DIO MENSAL\s+APORTE M[ÉE]DIO ANUAL\s+(R\$[\d.,]+)\s+(R\$[\d.,]+)', texto)
+    o["capacidade_aporte_mensal"] = _pos_brl(m.group(1)) if m else None
+    o["capacidade_aporte_anual"]  = _pos_brl(m.group(2)) if m else None
+
+    # Tabela 1: Objetivos (descrição+categoria vêm grudados no layout do PDF —
+    # sem separador confiável entre os dois com uma única linha de amostra).
+    objetivos = []
+    for l in L:
+        mo = _PLAN_OBJ_ROW.match(l)
+        if mo:
+            objetivos.append({
+                "label": mo.group(1).strip(),
+                "idade_atingimento": int(mo.group(2)),
+                "frequencia": mo.group(3),
+                "ocorrencias": int(mo.group(4)),
+                "valor": _pos_brl(mo.group(5)),
+                "unidade": (mo.group(6) or "").lower(),
+            })
+    o["objetivos"] = objetivos
+
+    # Tabela 5: Outros bens mapeados
+    outros_bens = {}
+    for l in L:
+        mb = re.match(r'^(BENS M[ÓO]VEIS|BENS IM[ÓO]VEIS|FGTS|PREVID[ÊE]NCIA)\s+(R\$\s*[\d.,]+)$', l)
+        if mb:
+            outros_bens[mb.group(1).title()] = _pos_brl(mb.group(2))
+    o["outros_bens"] = outros_bens
+
+    # Tabelas 4 (Fluxo Financeiro) e 6 (Projeção Financeira): mesmo formato de
+    # linha (idade + 3 valores R$); o cabeçalho mais recente diz a qual tabela
+    # a linha pertence.
+    fluxo, projecao = [], []
+    tabela_atual = None
+    for l in L:
+        if re.match(r'^Tabela 4:\s*Fluxo Financeiro', l, re.I) or l.upper().startswith("IDADE ENTRADAS"):
+            tabela_atual = "fluxo"; continue
+        if re.match(r'^Tabela 6:\s*Proje[çc][ãa]o Financeira', l, re.I) or l.upper().startswith("IDADE PROJE"):
+            tabela_atual = "projecao"; continue
+        mi = _PLAN_IDADE_ROW.match(l)
+        if not mi or tabela_atual is None:
+            continue
+        idade = int(mi.group(1))
+        v1, v2, v3 = _pos_brl(mi.group(2)), _pos_brl(mi.group(3)), _pos_brl(mi.group(4))
+        # _pos_brl não capta o sinal de negativo (regex só pega dígitos) —
+        # reaplica o sinal olhando o prefixo "-R$" de cada grupo.
+        if mi.group(2).strip().startswith("-") and v1 is not None: v1 = -v1
+        if mi.group(3).strip().startswith("-") and v2 is not None: v2 = -v2
+        if mi.group(4).strip().startswith("-") and v3 is not None: v3 = -v3
+        if tabela_atual == "fluxo":
+            fluxo.append({"idade": idade, "entradas": v1, "saidas": v2, "capacidade_aporte": v3})
+        else:
+            projecao.append({"idade": idade, "atual": v1, "consumo": v2, "preservacao": v3})
+    o["fluxo_financeiro"] = fluxo
+    o["projecao"] = projecao
+
+    # Diagnóstico: patrimônio-alvo e aporte necessário nos 3 cenários (a mesma
+    # ordem atual/consumo/preservação se repete nos dois blocos de 3 colunas).
+    diagnostico = {}
+    m = re.search(r'Patrim[ôo]nio projetado aos (\d+) anos.+?\n'
+                  r'(R\$\s*[\d.,]+)\s+(R\$\s*[\d.,]+)\s+(R\$\s*[\d.,]+)', texto)
+    if m:
+        diagnostico["idade_alvo"] = int(m.group(1))
+        diagnostico["patrimonio_alvo"] = {
+            "atual": _pos_brl(m.group(2)), "consumo": _pos_brl(m.group(3)), "preservacao": _pos_brl(m.group(4)),
+        }
+    m2 = re.search(
+        r'Capacidade de aporte m[ée]dio mensal/anual.+?\n'
+        r'(R\$\s*[\d.,]+)\s*/\s*(R\$\s*[\d.,]+)\s+(R\$\s*[\d.,]+)\s*/\s*(R\$\s*[\d.,]+)\s+(R\$\s*[\d.,]+)\s*/\s*(R\$\s*[\d.,]+)', texto)
+    if m2:
+        diagnostico["aporte_necessario_mensal"] = {
+            "atual": _pos_brl(m2.group(1)), "consumo": _pos_brl(m2.group(3)), "preservacao": _pos_brl(m2.group(5)),
+        }
+        diagnostico["aporte_necessario_anual"] = {
+            "atual": _pos_brl(m2.group(2)), "consumo": _pos_brl(m2.group(4)), "preservacao": _pos_brl(m2.group(6)),
+        }
+    o["diagnostico"] = diagnostico
     return o
 
 
@@ -8101,8 +8373,40 @@ def alertas_fgc(rf_ativos):
             })
     return out
 
-def gerar_diagnosticos(xp_parsed, perfil=""):
-    """Gera diagnósticos automáticos a partir dos ativos individuais do XPerformance."""
+def diagnosticar_aporte(xp_parsed, planejamento):
+    """Cruza o aporte REAL do cliente (movimentações do XPerformance, resumo dos
+    últimos 12M) com o aporte NECESSÁRIO do Planejamento Financeiro (cenário
+    "atual" — a mesma capacidade de aporte que o Planejamento já assume como
+    premissa). Nenhum dos dois relatórios sozinho mostra essa divergência: o
+    Planejamento não sabe o que aconteceu na conta, o XPerformance não sabe que
+    existe uma meta por trás do número. Retorna None se faltar dado de qualquer
+    lado — nunca estima aporte necessário nem movimentação que não veio do PDF."""
+    m12 = ((xp_parsed or {}).get("resumo_periodo") or {}).get("12m")
+    necessario = ((planejamento or {}).get("diagnostico") or {}).get("aporte_necessario_mensal")
+    if not m12 or m12.get("movimentacoes") is None or not necessario or necessario.get("atual") is None:
+        return None
+    real_mensal_12m = round(m12["movimentacoes"] / 12, 2)
+    necessario_atual = necessario["atual"]
+    if real_mensal_12m < 0:
+        status = "critico"
+    elif real_mensal_12m < necessario_atual:
+        status = "abaixo_do_necessario"
+    else:
+        status = "ok"
+    return {
+        "real_mensal_12m": real_mensal_12m,
+        "real_total_12m": m12["movimentacoes"],
+        "necessario_mensal_atual": necessario_atual,
+        "necessario_mensal_consumo": necessario.get("consumo"),
+        "necessario_mensal_preservacao": necessario.get("preservacao"),
+        "divergencia_mensal": round(real_mensal_12m - necessario_atual, 2),
+        "status": status,
+    }
+
+def gerar_diagnosticos(xp_parsed, perfil="", planejamento=None):
+    """Gera diagnósticos automáticos a partir dos ativos individuais do XPerformance.
+    `planejamento` (opcional): dict de parse_planejamento_financeiro do mesmo
+    cliente — quando presente, cruza aporte real x necessário (diagnosticar_aporte)."""
     rf_ativos  = xp_parsed.get("rf_ativos", [])
     acoes_list = xp_parsed.get("acoes", [])
     fiis_list  = xp_parsed.get("fiis", [])
@@ -8111,6 +8415,25 @@ def gerar_diagnosticos(xp_parsed, perfil=""):
 
     # Exposição ao FGC por emissor (atual)
     alertas.extend(alertas_fgc(rf_ativos))
+
+    # Aporte real (XPerformance, últimos 12M) x aporte necessário (Planejamento
+    # Financeiro) — só roda se o cliente também tiver Planejamento Financeiro.
+    aporte_diag = diagnosticar_aporte(xp_parsed, planejamento) if planejamento else None
+    if aporte_diag:
+        if aporte_diag["status"] == "critico":
+            alertas.append({
+                "tipo": "aporte_divergente", "nivel": "alto",
+                "msg": (f"Planejamento Financeiro precisa de {_fmt_brl(aporte_diag['necessario_mensal_atual'])}/mês de aporte, "
+                        f"mas a conta teve RETIRADA líquida média de {_fmt_brl(abs(aporte_diag['real_mensal_12m']))}/mês "
+                        f"nos últimos 12M (total de {_fmt_brl(aporte_diag['real_total_12m'])}) — o objetivo de "
+                        f"aposentadoria fica em risco se o padrão continuar."),
+            })
+        elif aporte_diag["status"] == "abaixo_do_necessario":
+            alertas.append({
+                "tipo": "aporte_divergente", "nivel": "medio",
+                "msg": (f"Aporte real médio ({_fmt_brl(aporte_diag['real_mensal_12m'])}/mês, últimos 12M) abaixo do "
+                        f"necessário pelo Planejamento Financeiro ({_fmt_brl(aporte_diag['necessario_mensal_atual'])}/mês)."),
+            })
 
     # Dedup: o mesmo título (emissor+vencimento) costuma aparecer em VÁRIAS tranches
     # com taxas levemente diferentes (ex.: DEB CSN MINERAÇÃO JUL/2037 a 6,95%/7,05%/7,15%).
@@ -8228,6 +8551,7 @@ def gerar_diagnosticos(xp_parsed, perfil=""):
         "total_rv":   round(total_rv, 2),
         "total_fiis": round(total_fiis, 2),
         "qtd_ativos": len(rf_ativos) + len(acoes_list) + len(fiis_list),
+        "aporte_diagnostico": aporte_diag,
     }
 
 
@@ -9135,6 +9459,45 @@ def posicao_consolidada_endpoint():
         app.logger.warning(f"merge/persist Posicao: {e}")
     return jsonify(dados)
 
+@app.route("/api/planejamento-financeiro", methods=["GET", "POST"])
+def planejamento_financeiro_endpoint():
+    """Recebe o PDF do Planejamento Financeiro e devolve objetivos, capacidade de
+    aporte e os 3 cenários de projeção. Se o cliente já tiver XPerformance salvo
+    (resumo_periodo_xp na ficha), calcula o cruzamento aporte real x necessário
+    (bloco 'aporte_diagnostico' — ver diagnosticar_aporte).
+    GET ?conta=X devolve o Planejamento salvo ou {existe:false}."""
+    if request.method == "GET":
+        conta = (request.args.get("conta", "") or "").strip()
+        d = carregar_planejamento(conta)
+        if not d:
+            return jsonify({"existe": False})
+        d = dict(d)
+        d["existe"] = True
+        return jsonify(d)
+    f = request.files.get("pdf") or request.files.get("file")
+    if not f:
+        return jsonify({"erro": "envie o PDF no campo 'pdf'"}), 400
+    try:
+        dados = parse_planejamento_financeiro(f.read())
+    except Exception as e:
+        app.logger.warning(f"planejamento_financeiro parse: {e}")
+        return jsonify({"erro": "falha ao processar o PDF"}), 500
+    try:
+        if dados.get("conta"):
+            ficha = load_fichas().get(f"conta:{dados['conta']}") or {}
+            resumo_xp = ficha.get("resumo_periodo_xp")
+            if resumo_xp:
+                aporte_diag = diagnosticar_aporte({"resumo_periodo": resumo_xp}, dados)
+                if aporte_diag:
+                    dados["aporte_diagnostico"] = aporte_diag
+            dados["salvo_em"] = agora_br().strftime("%Y-%m-%d %H:%M")
+            store = _load(_PLANEJAMENTO_FILE, {})
+            store[str(dados["conta"]).strip()] = dados
+            _save(_PLANEJAMENTO_FILE, store)
+    except Exception as e:
+        app.logger.warning(f"merge/persist Planejamento: {e}")
+    return jsonify(dados)
+
 @app.route("/api/macro", methods=["GET"])
 def macro_endpoint():
     macro = buscar_macro_bcb()
@@ -9431,6 +9794,11 @@ def xp_identificar():
         ficha["data_ultimo_xp"] = agora_br().strftime("%Y-%m-%d")
         if xp.get("private"):
             ficha["private"] = True   # marca Private (sticky: segmento é estável)
+        # Guarda o resumo de movimentações (não o XPerformance inteiro) para o
+        # cruzamento aporte real x necessário quando o Planejamento Financeiro
+        # for enviado depois — ver diagnosticar_aporte / planejamento_financeiro_endpoint.
+        if xp.get("resumo_periodo"):
+            ficha["resumo_periodo_xp"] = xp["resumo_periodo"]
         fichas[_key] = ficha
         save_fichas(fichas)
 
