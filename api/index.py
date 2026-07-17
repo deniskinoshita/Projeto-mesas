@@ -4467,6 +4467,23 @@ select option{background:var(--surface-raised)}
   <!-- Foto patrimonial (Posição Consolidada) -->
   <div id="foto-patrimonial-card" class="card" style="display:none;background:#FFFFFF;margin-bottom:14px"></div>
 
+  <!-- LINHA 2c: Upload Planejamento Financeiro (objetivos + aporte + projeção) -->
+  <div style="margin-bottom:14px">
+    <label>Planejamento Financeiro (PDF) <span style="font-size:13px;color:#39493F;font-weight:400">, objetivos e aporte necessário</span></label>
+    <div class="upload-area" id="drop-plano" onclick="document.getElementById('pdf-plano').click()" style="cursor:pointer;padding:14px 10px">
+      <input type="file" id="pdf-plano" accept=".pdf"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
+        onchange="onPlanejamentoFileChange(this)">
+      <div class="icon" style="font-size:25px;margin-bottom:4px">🎯</div>
+      <p style="font-size:15px;margin:0">Planejamento Financeiro, clique para ver metas e aporte necessário</p>
+      <p style="font-size:13px;color:#39493F;margin:3px 0 0">Cruza com o XPerformance para checar se o cliente está aportando o que o próprio plano precisa.</p>
+      <p class="fname" id="fname-plano" style="font-size:14px;margin:2px 0 0"></p>
+    </div>
+  </div>
+
+  <!-- Resumo do Planejamento Financeiro -->
+  <div id="planejamento-resumo-card" class="card" style="display:none;background:#FFFFFF;margin-bottom:14px"></div>
+
   <!-- Preview dos dados extraídos do PDF -->
   <div id="box-preview-pdf" style="display:none;margin-bottom:14px;background:#EAF4EC;border:1.5px solid #1C6B67;border-radius:12px;padding:16px 18px"></div>
 
@@ -5731,6 +5748,68 @@ function onPosicaoFileChange(input){
     }catch(e){ console.error("auto-perfil posicao:",e); }
   }).catch(function(){ if(fn){ fn.textContent="Falha ao processar o PDF"; fn.style.color="#C0673A"; } });
 }
+
+// ── Planejamento Financeiro: objetivos, aporte necessário e aporte real x necessário ──
+function onPlanejamentoFileChange(input){
+  var file=input.files[0]; if(!file) return;
+  var fn=document.getElementById("fname-plano"); if(fn){ fn.textContent="Lendo "+file.name+"..."; fn.style.color="#8A6A28"; }
+  var fd=new FormData(); fd.append("pdf", file);
+  fetch("/api/planejamento-financeiro",{method:"POST",body:fd}).then(function(r){return r.json();}).then(function(d){
+    if(!d || d.erro){ if(fn){ fn.textContent=(d&&d.erro)||"Não foi possível ler o PDF"; fn.style.color="#C0673A"; } return; }
+    if(fn){ fn.textContent="✓ Conta "+d.conta+(d.data_ref?(" · ref. "+d.data_ref):""); fn.style.color="#1F9D77"; }
+    try{ renderPlanejamentoResumo(d); }catch(e){ console.error("renderPlanejamentoResumo:",e); }
+  }).catch(function(){ if(fn){ fn.textContent="Falha ao processar o PDF"; fn.style.color="#C0673A"; } });
+}
+// Ao carregar um cliente, busca o Planejamento salvo (ou mostra que ainda não foi enviado)
+function carregarPlanejamentoSalvo(conta){
+  var card=document.getElementById("planejamento-resumo-card"); if(!card||!conta) return;
+  fetch("/api/planejamento-financeiro?conta="+encodeURIComponent(conta)).then(function(r){return r.json();}).then(function(d){
+    if(d && d.existe){
+      try{ renderPlanejamentoResumo(d); }catch(e){ console.error("renderPlanejamentoResumo:",e); }
+    } else {
+      card.innerHTML='<div style="font-size:14px;color:#5A6A60;line-height:1.5">🎯 <b>Planejamento Financeiro</b> ainda não enviado para este cliente. Suba o PDF acima para ver objetivos e aporte necessário.</div>';
+      card.style.display="block";
+    }
+  }).catch(function(){});
+}
+function renderPlanejamentoResumo(d){
+  var card=document.getElementById("planejamento-resumo-card"); if(!card) return;
+  var diag = d.diagnostico || {};
+  var obj = (d.objetivos||[])[0];
+  var objHtml = obj ? ('<div style="font-size:14px;color:#1E2A22"><b>'+obj.label+'</b>, aos '+obj.idade_atingimento+' anos · '+_fmtBrlPos(obj.valor)+'/'+(obj.unidade||obj.frequencia.toLowerCase())+'</div>') : "";
+  var aporteHtml = (d.capacidade_aporte_mensal!=null)
+    ? ('<span style="color:#5A6A60">Capacidade de aporte <b style="color:#1E2A22">'+_fmtBrlPos(d.capacidade_aporte_mensal)+'/mês</b></span>') : "";
+  var cenariosHtml = "";
+  if(diag.patrimonio_alvo){
+    var pa=diag.patrimonio_alvo;
+    cenariosHtml = '<div style="margin-top:12px;display:flex;gap:22px;flex-wrap:wrap;font-size:13px">'
+      +'<span style="color:#5A6A60">Projetado aos '+(diag.idade_alvo||"")+' anos <b style="color:#1E2A22">'+_fmtBrlPos(pa.atual)+'</b></span>'
+      +'<span style="color:#5A6A60">Mínimo (consumo) <b style="color:#1E2A22">'+_fmtBrlPos(pa.consumo)+'</b></span>'
+      +'<span style="color:#5A6A60">Preservar patrimônio <b style="color:#1E2A22">'+_fmtBrlPos(pa.preservacao)+'</b></span>'
+      +'</div>';
+  }
+  // Cruzamento aporte real x necessário (só existe quando o XPerformance do cliente já foi enviado)
+  var apDiagHtml = "";
+  var ad = d.aporte_diagnostico;
+  if(ad){
+    var cor = ad.status==="critico" ? "#B0502F" : (ad.status==="abaixo_do_necessario" ? "#B4833A" : "#2E7D5B");
+    var bg  = ad.status==="critico" ? "#F6E4DB" : (ad.status==="abaixo_do_necessario" ? "#FBF2E3" : "#EAF4EC");
+    var msg;
+    if(ad.status==="critico"){
+      msg = "Conta com retirada líquida média de "+_fmtBrlPos(Math.abs(ad.real_mensal_12m))+"/mês (últimos 12M), mas o plano precisa de "+_fmtBrlPos(ad.necessario_mensal_atual)+"/mês de aporte.";
+    } else if(ad.status==="abaixo_do_necessario"){
+      msg = "Aporte real médio ("+_fmtBrlPos(ad.real_mensal_12m)+"/mês, últimos 12M) abaixo do necessário ("+_fmtBrlPos(ad.necessario_mensal_atual)+"/mês).";
+    } else {
+      msg = "Aporte real médio ("+_fmtBrlPos(ad.real_mensal_12m)+"/mês, últimos 12M) dentro do necessário pelo plano.";
+    }
+    apDiagHtml = '<div style="margin-top:12px;padding:12px 14px;background:'+bg+';border-radius:8px;font-size:14px;color:'+cor+';font-weight:600;line-height:1.5">⚖️ '+msg+'</div>';
+  } else {
+    apDiagHtml = '<div style="margin-top:12px;font-size:13px;color:#8C9A92">Suba o XPerformance deste cliente para comparar o aporte real com o necessário.</div>';
+  }
+  card.innerHTML = '<p style="font-size:13px;color:#8A6A28;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:0 0 8px">🎯 Planejamento Financeiro'+(d.data_ref?(' <span style="color:#5A6A60;font-weight:400;text-transform:none;letter-spacing:0">· ref. '+d.data_ref+'</span>'):'')+'</p>'
+    + objHtml + '<div style="margin-top:8px;font-size:14px">'+aporteHtml+'</div>' + cenariosHtml + apDiagHtml;
+  card.style.display="block";
+}
 // Ao carregar um cliente, busca a Posição salva e mostra a validade (3 dias) ou o aviso de pendência
 function carregarPosicaoSalva(conta){
   var card=document.getElementById("foto-patrimonial-card"); if(!card||!conta) return;
@@ -6033,6 +6112,7 @@ async function identificarCliente(file){
     // ── Mostra o botão para avançar à Parte 2 (Cross Sell + Modelo de Servir)
     try{ mostrarBotaoProximaEtapa(d); }catch(re){ console.error("mostrarBotaoProximaEtapa:", re); }
     try{ carregarPosicaoSalva(d.conta); }catch(re){ console.error("carregarPosicaoSalva:", re); }
+    try{ carregarPlanejamentoSalvo(d.conta); }catch(re){ console.error("carregarPlanejamentoSalvo:", re); }
 
     // ── Pré-carrega o painel de histórico da Parte 2 (ainda oculta)
     try{ renderPainelCliente(d); }catch(re){ console.error("renderPainelCliente:", re); }
@@ -6604,6 +6684,7 @@ async function buscarUltimoXpPorCodigo(conta){
       if(wBtn) wBtn.style.display="block";
       if(btn){ btn.innerHTML="Continuar para a Parte 2, Cross Sell &amp; Modelo de Servir →"; btn.disabled=false; btn.style.opacity="1"; }
       try{ carregarPosicaoSalva(conta); }catch(e){}
+      try{ carregarPlanejamentoSalvo(conta); }catch(e){}
     }
 
     if(lbl){
@@ -9827,9 +9908,12 @@ def xp_identificar():
                     "delta": delta,
                 })
 
-    # Diagnósticos automáticos via função centralizada
+    # Diagnósticos automáticos via função centralizada. Se o cliente já tiver
+    # Planejamento Financeiro salvo, cruza aporte real x necessário (aparece
+    # como alerta "aporte_divergente" nos Diagnósticos automáticos da tela).
     ficha_perfil = ficha.get("perfil", "")
-    diag = gerar_diagnosticos(xp, perfil=ficha_perfil)
+    planejamento_salvo = carregar_planejamento(conta) if conta else None
+    diag = gerar_diagnosticos(xp, perfil=ficha_perfil, planejamento=planejamento_salvo)
     sugestoes = sugestoes_realocacao(xp.get("comp", {}), ficha_perfil)
 
     return jsonify({
